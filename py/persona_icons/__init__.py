@@ -52,6 +52,16 @@ REGULAR: dict[str, dict[str, str | None]] = {
     "diamond": {"body": "<path d=\"M12 3l9 9-9 9-9-9z\"/>", "cls": None},
     "diamondFilled": {"body": "<path d=\"M12 3l9 9-9 9-9-9z\" fill=\"currentColor\"/>", "cls": None},
     "caretRight": {"body": "<path d=\"M9 5l7 7-7 7z\" fill=\"currentColor\" stroke=\"none\"/>", "cls": None},
+    "arrowRight": {"body": "<path d=\"M4 12h14M13 6l6 6-6 6\"/>", "cls": None},
+    "square": {"body": "<rect x=\"4\" y=\"4\" width=\"16\" height=\"16\" rx=\"2.5\"/>", "cls": None},
+    "squareSplit": {"body": "<rect x=\"4\" y=\"4\" width=\"16\" height=\"16\" rx=\"2.5\"/><rect x=\"8.5\" y=\"8.5\" width=\"7\" height=\"7\" rx=\"1\" fill=\"currentColor\"/>", "cls": None},
+    "squareRows": {"body": "<rect x=\"4\" y=\"4\" width=\"16\" height=\"16\" rx=\"2.5\"/><path d=\"M4 9.3h16M4 14.6h16\"/>", "cls": None},
+    "squareCols": {"body": "<rect x=\"4\" y=\"4\" width=\"16\" height=\"16\" rx=\"2.5\"/><path d=\"M9.3 4v16M14.6 4v16\"/>", "cls": None},
+    "squareGrid": {"body": "<rect x=\"4\" y=\"4\" width=\"16\" height=\"16\" rx=\"2.5\"/><path d=\"M12 4v16M4 12h16\"/>", "cls": None},
+    "rectangle": {"body": "<rect x=\"3\" y=\"8\" width=\"18\" height=\"8\" rx=\"2\"/>", "cls": None},
+    "exchange": {"body": "<path d=\"M4 9h14l-3.5-3.5M20 15H6l3.5 3.5\"/>", "cls": None},
+    "wave": {"body": "<path d=\"M3 12c1.5-4 4.5-4 6 0s4.5 4 6 0 4.5-4 6 0\"/>", "cls": None},
+    "pencil": {"body": "<path d=\"M4 20l1-4L16 5l3 3L8 19z\"/><path d=\"M14 7l3 3\"/>", "cls": None},
 }
 
 # name -> inner SVG markup (48x48, self-styled)

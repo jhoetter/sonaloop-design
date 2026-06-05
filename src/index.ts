@@ -40,6 +40,16 @@ export const DotIcon = personaIcon("DotIcon", "<circle cx=\"12\" cy=\"12\" r=\"5
 export const DiamondIcon = personaIcon("DiamondIcon", "<path d=\"M12 3l9 9-9 9-9-9z\"/>");
 export const DiamondFilledIcon = personaIcon("DiamondFilledIcon", "<path d=\"M12 3l9 9-9 9-9-9z\" fill=\"currentColor\"/>");
 export const CaretRightIcon = personaIcon("CaretRightIcon", "<path d=\"M9 5l7 7-7 7z\" fill=\"currentColor\" stroke=\"none\"/>");
+export const ArrowRightIcon = personaIcon("ArrowRightIcon", "<path d=\"M4 12h14M13 6l6 6-6 6\"/>");
+export const SquareIcon = personaIcon("SquareIcon", "<rect x=\"4\" y=\"4\" width=\"16\" height=\"16\" rx=\"2.5\"/>");
+export const SquareSplitIcon = personaIcon("SquareSplitIcon", "<rect x=\"4\" y=\"4\" width=\"16\" height=\"16\" rx=\"2.5\"/><rect x=\"8.5\" y=\"8.5\" width=\"7\" height=\"7\" rx=\"1\" fill=\"currentColor\"/>");
+export const SquareRowsIcon = personaIcon("SquareRowsIcon", "<rect x=\"4\" y=\"4\" width=\"16\" height=\"16\" rx=\"2.5\"/><path d=\"M4 9.3h16M4 14.6h16\"/>");
+export const SquareColsIcon = personaIcon("SquareColsIcon", "<rect x=\"4\" y=\"4\" width=\"16\" height=\"16\" rx=\"2.5\"/><path d=\"M9.3 4v16M14.6 4v16\"/>");
+export const SquareGridIcon = personaIcon("SquareGridIcon", "<rect x=\"4\" y=\"4\" width=\"16\" height=\"16\" rx=\"2.5\"/><path d=\"M12 4v16M4 12h16\"/>");
+export const RectangleIcon = personaIcon("RectangleIcon", "<rect x=\"3\" y=\"8\" width=\"18\" height=\"8\" rx=\"2\"/>");
+export const ExchangeIcon = personaIcon("ExchangeIcon", "<path d=\"M4 9h14l-3.5-3.5M20 15H6l3.5 3.5\"/>");
+export const WaveIcon = personaIcon("WaveIcon", "<path d=\"M3 12c1.5-4 4.5-4 6 0s4.5 4 6 0 4.5-4 6 0\"/>");
+export const PencilIcon = personaIcon("PencilIcon", "<path d=\"M4 20l1-4L16 5l3 3L8 19z\"/><path d=\"M14 7l3 3\"/>");
 
 // ── High-fidelity 48×48 icons ────────────────────────────────────────────────
 export const PersonaHifi = personaIconHifi("PersonaHifi", "<circle cx=\"24\" cy=\"24\" r=\"20\" fill=\"currentColor\" fillOpacity=\"0.05\" stroke=\"none\"/><circle cx=\"24\" cy=\"19\" r=\"7\" fill=\"currentColor\" fillOpacity=\"0.09\" strokeWidth=\"1.75\"/><path d=\"M11 39a13 13 0 0 1 26 0\" fill=\"currentColor\" fillOpacity=\"0.09\" strokeWidth=\"1.75\"/><path d=\"M11 39a13 13 0 0 1 26 0\" strokeWidth=\"1.75\"/><circle cx=\"24\" cy=\"19\" r=\"7\" strokeWidth=\"1.75\"/>");
