@@ -18,6 +18,27 @@ Two flavours, mirroring `bim-icons`:
 - **hifi** — 48×48 display icons with fills and a stroke hierarchy
   (2 / 1.5 / 0.75) for hero tiles, feature cards, and empty states.
 
+## All icons
+
+![persona-icons gallery](preview/gallery.png)
+
+Regenerate this sheet after adding icons: `node scripts/gen-preview.mjs`
+(writes `preview/gallery.svg`; rasterize to `preview/gallery.png` for GitHub).
+
+**Regular · 24×24 (42)**
+
+| group | names |
+| --- | --- |
+| chrome / UI | `overview` `personas` `councils` `syntheses` `projects` `memory` `panel` `settings` `sun` `moon` `monitor` `chevron` `back` `analytics` `star` `bulb` `target` `compass` `search` |
+| status & actions | `check` `circle` `half` `alert` `close` `plus` `external` |
+| reaction markers | `thumbsup` `warning` `dot` `diamond` `diamondFilled` `caretRight` `arrowRight` |
+| research-graph notation | `square` `squareSplit` `squareRows` `squareCols` `squareGrid` `rectangle` `exchange` `wave` `pencil` |
+
+**Hi-fi · 48×48 (7)** — `persona` `council` `synthesis` `memory` `project` `insight` `search`
+
+> Component names are the PascalCase form, e.g. `search` → `SearchIcon`,
+> `diamondFilled` → `DiamondFilledIcon`, `persona` (hi-fi) → `PersonaHifi`.
+
 ## Adding or editing an icon
 
 1. Edit **`icons.data.mjs`** — add an entry under `regular` or `hifi`:

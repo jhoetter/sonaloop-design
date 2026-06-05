@@ -16,7 +16,13 @@
  *           from the wrapper (React) or CSS `svg.ic` (council), so paths stay
  *           geometry-only unless an element needs an explicit fill override.
  * hifi    : 48×48 viewBox display icons. Children may carry their own fills
- *           (fillOpacity 0.06–0.12) and a stroke hierarchy of 2 / 1.5 / 0.75.
+ *           (fill-opacity 0.06–0.12) and a stroke hierarchy of 2 / 1.5 / 0.75.
+ *
+ * IMPORTANT: `body` is injected via innerHTML in BOTH consumers (the React
+ * component uses dangerouslySetInnerHTML), so it is raw SVG — write attributes
+ * in kebab-case (`fill-opacity`, `stroke-width`, `stroke-opacity`,
+ * `stroke-linecap`…), NOT JSX camelCase. camelCase silently no-ops, e.g. a
+ * `fill-opacity` glow would render as a solid blob.
  *
  * `cls`   : optional extra CSS class applied by the Python helper (the council
  *           styles e.g. `.star` separately). Ignored by the React side.
@@ -214,17 +220,17 @@ export const hifi = {
   persona: {
     label: 'PersonaHifi',
     body:
-      '<circle cx="24" cy="24" r="20" fill="currentColor" fillOpacity="0.05" stroke="none"/>' +
-      '<circle cx="24" cy="19" r="7" fill="currentColor" fillOpacity="0.09" strokeWidth="1.75"/>' +
-      '<path d="M11 39a13 13 0 0 1 26 0" fill="currentColor" fillOpacity="0.09" strokeWidth="1.75"/>' +
-      '<path d="M11 39a13 13 0 0 1 26 0" strokeWidth="1.75"/>' +
-      '<circle cx="24" cy="19" r="7" strokeWidth="1.75"/>',
+      '<circle cx="24" cy="24" r="20" fill="currentColor" fill-opacity="0.05" stroke="none"/>' +
+      '<circle cx="24" cy="19" r="7" fill="currentColor" fill-opacity="0.09" stroke-width="1.75"/>' +
+      '<path d="M11 39a13 13 0 0 1 26 0" fill="currentColor" fill-opacity="0.09" stroke-width="1.75"/>' +
+      '<path d="M11 39a13 13 0 0 1 26 0" stroke-width="1.75"/>' +
+      '<circle cx="24" cy="19" r="7" stroke-width="1.75"/>',
   },
   council: {
     label: 'CouncilHifi',
     body:
-      '<circle cx="24" cy="24" r="20" fill="currentColor" fillOpacity="0.05" stroke="none"/>' +
-      '<path d="M9 19a8 8 0 0 1 8-8h14a8 8 0 0 1 8 8v6a8 8 0 0 1-8 8H20l-7 6v-6.6A8 8 0 0 1 9 25z" fill="currentColor" fillOpacity="0.08" strokeWidth="1.75"/>' +
+      '<circle cx="24" cy="24" r="20" fill="currentColor" fill-opacity="0.05" stroke="none"/>' +
+      '<path d="M9 19a8 8 0 0 1 8-8h14a8 8 0 0 1 8 8v6a8 8 0 0 1-8 8H20l-7 6v-6.6A8 8 0 0 1 9 25z" fill="currentColor" fill-opacity="0.08" stroke-width="1.75"/>' +
       '<circle cx="18" cy="22" r="1.8" fill="currentColor" stroke="none"/>' +
       '<circle cx="24" cy="22" r="1.8" fill="currentColor" stroke="none"/>' +
       '<circle cx="30" cy="22" r="1.8" fill="currentColor" stroke="none"/>',
@@ -232,40 +238,40 @@ export const hifi = {
   synthesis: {
     label: 'SynthesisHifi',
     body:
-      '<path d="M24 6l18 10-18 10L6 16z" fill="currentColor" fillOpacity="0.08" strokeWidth="1.75"/>' +
-      '<path d="M6 24l18 10 18-10" strokeWidth="1.5"/>' +
-      '<path d="M6 32l18 10 18-10" strokeWidth="1.5" strokeOpacity="0.55"/>',
+      '<path d="M24 6l18 10-18 10L6 16z" fill="currentColor" fill-opacity="0.08" stroke-width="1.75"/>' +
+      '<path d="M6 24l18 10 18-10" stroke-width="1.5"/>' +
+      '<path d="M6 32l18 10 18-10" stroke-width="1.5" stroke-opacity="0.55"/>',
   },
   memory: {
     label: 'MemoryHifi',
     body:
-      '<circle cx="24" cy="24" r="20" fill="currentColor" fillOpacity="0.05" stroke="none"/>' +
-      '<path d="M24 8a7 7 0 0 0-7 7 6 6 0 0 0-1.6 11.8V31a5 5 0 0 0 8.6 3.5A5 5 0 0 0 32.6 31v-4.2A6 6 0 0 0 31 15a7 7 0 0 0-7-7z" fill="currentColor" fillOpacity="0.08" strokeWidth="1.75"/>' +
-      '<path d="M24 8v30" strokeWidth="1.25" strokeOpacity="0.5"/>' +
-      '<path d="M24 17h5M24 24h-6M24 31h5" strokeWidth="1.25" strokeOpacity="0.5"/>',
+      '<circle cx="24" cy="24" r="20" fill="currentColor" fill-opacity="0.05" stroke="none"/>' +
+      '<path d="M24 8a7 7 0 0 0-7 7 6 6 0 0 0-1.6 11.8V31a5 5 0 0 0 8.6 3.5A5 5 0 0 0 32.6 31v-4.2A6 6 0 0 0 31 15a7 7 0 0 0-7-7z" fill="currentColor" fill-opacity="0.08" stroke-width="1.75"/>' +
+      '<path d="M24 8v30" stroke-width="1.25" stroke-opacity="0.5"/>' +
+      '<path d="M24 17h5M24 24h-6M24 31h5" stroke-width="1.25" stroke-opacity="0.5"/>',
   },
   project: {
     label: 'ProjectHifi',
     body:
-      '<circle cx="12" cy="13" r="4" fill="currentColor" fillOpacity="0.1" strokeWidth="1.75"/>' +
-      '<circle cx="36" cy="13" r="4" fill="currentColor" fillOpacity="0.1" strokeWidth="1.75"/>' +
-      '<circle cx="24" cy="36" r="5" fill="currentColor" fillOpacity="0.12" strokeWidth="1.75"/>' +
-      '<path d="M16 13h16M14.5 16.5l7 15M33.5 16.5l-7 15" strokeWidth="1.5"/>',
+      '<circle cx="12" cy="13" r="4" fill="currentColor" fill-opacity="0.1" stroke-width="1.75"/>' +
+      '<circle cx="36" cy="13" r="4" fill="currentColor" fill-opacity="0.1" stroke-width="1.75"/>' +
+      '<circle cx="24" cy="36" r="5" fill="currentColor" fill-opacity="0.12" stroke-width="1.75"/>' +
+      '<path d="M16 13h16M14.5 16.5l7 15M33.5 16.5l-7 15" stroke-width="1.5"/>',
   },
   insight: {
     label: 'InsightHifi',
     body:
-      '<circle cx="24" cy="20" r="18" fill="currentColor" fillOpacity="0.05" stroke="none"/>' +
-      '<path d="M24 8a11 11 0 0 0-7 19.5c1 .9 1.6 1.9 1.6 3V32h10.8v-1.5c0-1.1.6-2.1 1.6-3A11 11 0 0 0 24 8z" fill="currentColor" fillOpacity="0.09" strokeWidth="1.75"/>' +
-      '<path d="M18.6 36h10.8M20.5 40h7" strokeWidth="1.75"/>' +
-      '<path d="M24 18l2.2 4.4 4.8.7-3.5 3.4.8 4.8L24 29l-4.3 2.3.8-4.8-3.5-3.4 4.8-.7z" strokeWidth="1.1" strokeOpacity="0.7"/>',
+      '<circle cx="24" cy="20" r="18" fill="currentColor" fill-opacity="0.05" stroke="none"/>' +
+      '<path d="M24 8a11 11 0 0 0-7 19.5c1 .9 1.6 1.9 1.6 3V32h10.8v-1.5c0-1.1.6-2.1 1.6-3A11 11 0 0 0 24 8z" fill="currentColor" fill-opacity="0.09" stroke-width="1.75"/>' +
+      '<path d="M18.6 36h10.8M20.5 40h7" stroke-width="1.75"/>' +
+      '<path d="M24 18l2.2 4.4 4.8.7-3.5 3.4.8 4.8L24 29l-4.3 2.3.8-4.8-3.5-3.4 4.8-.7z" stroke-width="1.1" stroke-opacity="0.7"/>',
   },
   search: {
     label: 'SearchHifi',
     body:
-      '<circle cx="21" cy="21" r="14" fill="currentColor" fillOpacity="0.06" strokeWidth="2"/>' +
-      '<circle cx="21" cy="21" r="14" strokeWidth="2"/>' +
-      '<path d="M31.5 31.5L42 42" strokeWidth="2.5"/>' +
-      '<path d="M21 14a7 7 0 0 0-7 7" strokeWidth="1.5" strokeOpacity="0.6"/>',
+      '<circle cx="21" cy="21" r="14" fill="currentColor" fill-opacity="0.06" stroke-width="2"/>' +
+      '<circle cx="21" cy="21" r="14" stroke-width="2"/>' +
+      '<path d="M31.5 31.5L42 42" stroke-width="2.5"/>' +
+      '<path d="M21 14a7 7 0 0 0-7 7" stroke-width="1.5" stroke-opacity="0.6"/>',
   },
 };
