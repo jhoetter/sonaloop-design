@@ -1,0 +1,197 @@
+/**
+ * persona-icons — single source of truth.
+ *
+ * Every icon is authored ONCE here as neutral SVG inner-markup, then
+ * `scripts/gen.mjs` emits two consumers from it:
+ *
+ *   src/index.ts                      → React/TSX components  (persona-website)
+ *   py/persona_icons/__init__.py      → Python SVG helpers    (persona-council)
+ *
+ * Keep this file the only place icon geometry lives. After editing, run:
+ *   npm run gen      (or: node scripts/gen.mjs)
+ *
+ * ── Conventions ────────────────────────────────────────────────────────────
+ * regular : 24×24 viewBox, stroke-based, currentColor, strokeWidth ~1.75.
+ *           `body` is the inner SVG markup (no <svg> wrapper). Stroke/fill come
+ *           from the wrapper (React) or CSS `svg.ic` (council), so paths stay
+ *           geometry-only unless an element needs an explicit fill override.
+ * hifi    : 48×48 viewBox display icons. Children may carry their own fills
+ *           (fillOpacity 0.06–0.12) and a stroke hierarchy of 2 / 1.5 / 0.75.
+ *
+ * `cls`   : optional extra CSS class applied by the Python helper (the council
+ *           styles e.g. `.star` separately). Ignored by the React side.
+ */
+
+// ── Regular 24×24 chrome icons ───────────────────────────────────────────────
+// The first 15 are ported verbatim from the persona-council chrome icon set so
+// the app renders pixel-identical after the cutover.
+export const regular = {
+  overview: {
+    label: 'OverviewIcon',
+    body: '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/>',
+  },
+  personas: {
+    label: 'PersonasIcon',
+    body: '<circle cx="9" cy="8" r="3.2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><path d="M16 5.2a3 3 0 0 1 0 5.6"/><path d="M17.5 19a5.5 5.5 0 0 0-3-4.9"/>',
+  },
+  councils: {
+    label: 'CouncilsIcon',
+    body: '<path d="M21 11.5a8.5 8.5 0 0 1-12.5 7.5L4 20l1-4.5A8.5 8.5 0 1 1 21 11.5z"/>',
+  },
+  syntheses: {
+    label: 'SynthesesIcon',
+    body: '<path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/>',
+  },
+  projects: {
+    label: 'ProjectsIcon',
+    body: '<circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M8 7l8 0M7 8l4 8M17 8l-4 8"/>',
+  },
+  memory: {
+    label: 'MemoryIcon',
+    body: '<path d="M12 3a4 4 0 0 0-4 4 3.5 3.5 0 0 0-1 6.8V17a3 3 0 0 0 5 2 3 3 0 0 0 5-2v-3.2A3.5 3.5 0 0 0 16 7a4 4 0 0 0-4-4z"/>',
+  },
+  panel: {
+    label: 'PanelIcon',
+    body: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/>',
+  },
+  sun: {
+    label: 'SunIcon',
+    body: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.4 1.4M17.6 17.6L19 19M19 5l-1.4 1.4M6.4 17.6L5 19"/>',
+  },
+  moon: {
+    label: 'MoonIcon',
+    body: '<path d="M20 14.5A8 8 0 1 1 9.5 4a6.3 6.3 0 0 0 10.5 10.5z"/>',
+  },
+  monitor: {
+    label: 'MonitorIcon',
+    body: '<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M9 20h6M12 16v4"/>',
+  },
+  chevron: {
+    label: 'ChevronIcon',
+    body: '<path d="M6 9l6 6 6-6"/>',
+  },
+  back: {
+    label: 'BackIcon',
+    body: '<path d="M15 18l-6-6 6-6"/>',
+  },
+  analytics: {
+    label: 'AnalyticsIcon',
+    body: '<path d="M3 21h18"/><rect x="5" y="11" width="3.4" height="7" rx="1"/><rect x="10.3" y="6" width="3.4" height="12" rx="1"/><rect x="15.6" y="13" width="3.4" height="5" rx="1"/>',
+  },
+  star: {
+    label: 'StarIcon',
+    cls: 'star',
+    body: '<path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 17.9 6.8 20.6l1-5.8L3.5 9.7l5.9-.9z"/>',
+  },
+  bulb: {
+    label: 'BulbIcon',
+    body: '<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.8 10.6c.5.5.8 1 .8 1.6V16h6v-.8c0-.6.3-1.1.8-1.6A6 6 0 0 0 12 3z"/>',
+  },
+  target: {
+    label: 'TargetIcon',
+    body: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/>',
+  },
+  compass: {
+    label: 'CompassIcon',
+    body: '<circle cx="12" cy="12" r="9"/><path d="M15.6 8.4l-2 5.2-5.2 2 2-5.2z"/>',
+  },
+  search: {
+    label: 'SearchIcon',
+    body: '<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',
+  },
+
+  // ── Status family ──────────────────────────────────────────────────────────
+  // Available for migrating the council's inline ✓ ◐ ○ ! status glyphs to real
+  // icons when desired (see README → "Status glyphs").
+  check: {
+    label: 'CheckIcon',
+    body: '<path d="M5 12.5l4.5 4.5L19 7"/>',
+  },
+  circle: {
+    label: 'CircleIcon',
+    body: '<circle cx="12" cy="12" r="7.5"/>',
+  },
+  half: {
+    label: 'HalfIcon',
+    body: '<circle cx="12" cy="12" r="7.5"/><path d="M12 4.5a7.5 7.5 0 0 1 0 15z" fill="currentColor" stroke="none"/>',
+  },
+  alert: {
+    label: 'AlertIcon',
+    body: '<path d="M12 4.5v8.5"/><circle cx="12" cy="17.6" r="0.7" fill="currentColor" stroke="none"/>',
+  },
+  close: {
+    label: 'CloseIcon',
+    body: '<path d="M6 6l12 12M18 6L6 18"/>',
+  },
+  plus: {
+    label: 'PlusIcon',
+    body: '<path d="M12 5v14M5 12h14"/>',
+  },
+  external: {
+    label: 'ExternalIcon',
+    body: '<path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 13v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5"/>',
+  },
+};
+
+// ── High-fidelity 48×48 display icons ────────────────────────────────────────
+// For the website (hero tiles, feature cards, empty states) where a larger
+// render lets fills and detail read. currentColor-driven; no hard-coded colors.
+export const hifi = {
+  persona: {
+    label: 'PersonaHifi',
+    body:
+      '<circle cx="24" cy="24" r="20" fill="currentColor" fillOpacity="0.05" stroke="none"/>' +
+      '<circle cx="24" cy="19" r="7" fill="currentColor" fillOpacity="0.09" strokeWidth="1.75"/>' +
+      '<path d="M11 39a13 13 0 0 1 26 0" fill="currentColor" fillOpacity="0.09" strokeWidth="1.75"/>' +
+      '<path d="M11 39a13 13 0 0 1 26 0" strokeWidth="1.75"/>' +
+      '<circle cx="24" cy="19" r="7" strokeWidth="1.75"/>',
+  },
+  council: {
+    label: 'CouncilHifi',
+    body:
+      '<circle cx="24" cy="24" r="20" fill="currentColor" fillOpacity="0.05" stroke="none"/>' +
+      '<path d="M9 19a8 8 0 0 1 8-8h14a8 8 0 0 1 8 8v6a8 8 0 0 1-8 8H20l-7 6v-6.6A8 8 0 0 1 9 25z" fill="currentColor" fillOpacity="0.08" strokeWidth="1.75"/>' +
+      '<circle cx="18" cy="22" r="1.8" fill="currentColor" stroke="none"/>' +
+      '<circle cx="24" cy="22" r="1.8" fill="currentColor" stroke="none"/>' +
+      '<circle cx="30" cy="22" r="1.8" fill="currentColor" stroke="none"/>',
+  },
+  synthesis: {
+    label: 'SynthesisHifi',
+    body:
+      '<path d="M24 6l18 10-18 10L6 16z" fill="currentColor" fillOpacity="0.08" strokeWidth="1.75"/>' +
+      '<path d="M6 24l18 10 18-10" strokeWidth="1.5"/>' +
+      '<path d="M6 32l18 10 18-10" strokeWidth="1.5" strokeOpacity="0.55"/>',
+  },
+  memory: {
+    label: 'MemoryHifi',
+    body:
+      '<circle cx="24" cy="24" r="20" fill="currentColor" fillOpacity="0.05" stroke="none"/>' +
+      '<path d="M24 8a7 7 0 0 0-7 7 6 6 0 0 0-1.6 11.8V31a5 5 0 0 0 8.6 3.5A5 5 0 0 0 32.6 31v-4.2A6 6 0 0 0 31 15a7 7 0 0 0-7-7z" fill="currentColor" fillOpacity="0.08" strokeWidth="1.75"/>' +
+      '<path d="M24 8v30" strokeWidth="1.25" strokeOpacity="0.5"/>' +
+      '<path d="M24 17h5M24 24h-6M24 31h5" strokeWidth="1.25" strokeOpacity="0.5"/>',
+  },
+  project: {
+    label: 'ProjectHifi',
+    body:
+      '<circle cx="12" cy="13" r="4" fill="currentColor" fillOpacity="0.1" strokeWidth="1.75"/>' +
+      '<circle cx="36" cy="13" r="4" fill="currentColor" fillOpacity="0.1" strokeWidth="1.75"/>' +
+      '<circle cx="24" cy="36" r="5" fill="currentColor" fillOpacity="0.12" strokeWidth="1.75"/>' +
+      '<path d="M16 13h16M14.5 16.5l7 15M33.5 16.5l-7 15" strokeWidth="1.5"/>',
+  },
+  insight: {
+    label: 'InsightHifi',
+    body:
+      '<circle cx="24" cy="20" r="18" fill="currentColor" fillOpacity="0.05" stroke="none"/>' +
+      '<path d="M24 8a11 11 0 0 0-7 19.5c1 .9 1.6 1.9 1.6 3V32h10.8v-1.5c0-1.1.6-2.1 1.6-3A11 11 0 0 0 24 8z" fill="currentColor" fillOpacity="0.09" strokeWidth="1.75"/>' +
+      '<path d="M18.6 36h10.8M20.5 40h7" strokeWidth="1.75"/>' +
+      '<path d="M24 18l2.2 4.4 4.8.7-3.5 3.4.8 4.8L24 29l-4.3 2.3.8-4.8-3.5-3.4 4.8-.7z" strokeWidth="1.1" strokeOpacity="0.7"/>',
+  },
+  search: {
+    label: 'SearchHifi',
+    body:
+      '<circle cx="21" cy="21" r="14" fill="currentColor" fillOpacity="0.06" strokeWidth="2"/>' +
+      '<circle cx="21" cy="21" r="14" strokeWidth="2"/>' +
+      '<path d="M31.5 31.5L42 42" strokeWidth="2.5"/>' +
+      '<path d="M21 14a7 7 0 0 0-7 7" strokeWidth="1.5" strokeOpacity="0.6"/>',
+  },
+};
