@@ -34,10 +34,12 @@ Regenerate this sheet after adding icons: `node scripts/gen-preview.mjs`
 | reaction markers | `thumbsup` `warning` `dot` `diamond` `diamondFilled` `caretRight` `arrowRight` |
 | research-graph notation | `square` `squareSplit` `squareRows` `squareCols` `squareGrid` `rectangle` `exchange` `wave` `pencil` |
 
-**Hi-fi · 48×48 (7)** — `persona` `council` `synthesis` `memory` `project` `insight` `search`
+**Hi-fi · 48×48 (42)** — a hi-fi twin for **every** regular icon, same keys, at
+48×48 with fills + a 2 / 1.75 / 1.25 stroke hierarchy.
 
-> Component names are the PascalCase form, e.g. `search` → `SearchIcon`,
-> `diamondFilled` → `DiamondFilledIcon`, `persona` (hi-fi) → `PersonaHifi`.
+> Component names are PascalCase: regular `search` → `SearchIcon`,
+> `diamondFilled` → `DiamondFilledIcon`; hi-fi appends `Hifi`, e.g.
+> `search` → `SearchHifi`, `personas` → `PersonasHifi`.
 
 ## Adding or editing an icon
 
