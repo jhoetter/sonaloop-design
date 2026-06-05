@@ -34,6 +34,12 @@ export const AlertIcon = personaIcon("AlertIcon", "<path d=\"M12 4.5v8.5\"/><cir
 export const CloseIcon = personaIcon("CloseIcon", "<path d=\"M6 6l12 12M18 6L6 18\"/>");
 export const PlusIcon = personaIcon("PlusIcon", "<path d=\"M12 5v14M5 12h14\"/>");
 export const ExternalIcon = personaIcon("ExternalIcon", "<path d=\"M14 4h6v6\"/><path d=\"M20 4l-9 9\"/><path d=\"M18 13v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5\"/>");
+export const ThumbsUpIcon = personaIcon("ThumbsUpIcon", "<path d=\"M7 11v8a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1h3z\"/><path d=\"M7 11l4.2-7.4a1.8 1.8 0 0 1 3.2 1.4L13.5 9H19a2 2 0 0 1 2 2.3l-1.1 6.5A2 2 0 0 1 17.9 20H7z\"/>");
+export const WarningIcon = personaIcon("WarningIcon", "<path d=\"M10.3 4.3 1.8 19a2 2 0 0 0 1.7 3h16.8a2 2 0 0 0 1.7-3L13.7 4.3a2 2 0 0 0-3.4 0z\"/><path d=\"M12 9.5v4\"/><circle cx=\"12\" cy=\"17.3\" r=\"0.6\" fill=\"currentColor\" stroke=\"none\"/>");
+export const DotIcon = personaIcon("DotIcon", "<circle cx=\"12\" cy=\"12\" r=\"5\" fill=\"currentColor\" stroke=\"none\"/>");
+export const DiamondIcon = personaIcon("DiamondIcon", "<path d=\"M12 3l9 9-9 9-9-9z\"/>");
+export const DiamondFilledIcon = personaIcon("DiamondFilledIcon", "<path d=\"M12 3l9 9-9 9-9-9z\" fill=\"currentColor\"/>");
+export const CaretRightIcon = personaIcon("CaretRightIcon", "<path d=\"M9 5l7 7-7 7z\" fill=\"currentColor\" stroke=\"none\"/>");
 
 // ── High-fidelity 48×48 icons ────────────────────────────────────────────────
 export const PersonaHifi = personaIconHifi("PersonaHifi", "<circle cx=\"24\" cy=\"24\" r=\"20\" fill=\"currentColor\" fillOpacity=\"0.05\" stroke=\"none\"/><circle cx=\"24\" cy=\"19\" r=\"7\" fill=\"currentColor\" fillOpacity=\"0.09\" strokeWidth=\"1.75\"/><path d=\"M11 39a13 13 0 0 1 26 0\" fill=\"currentColor\" fillOpacity=\"0.09\" strokeWidth=\"1.75\"/><path d=\"M11 39a13 13 0 0 1 26 0\" strokeWidth=\"1.75\"/><circle cx=\"24\" cy=\"19\" r=\"7\" strokeWidth=\"1.75\"/>");

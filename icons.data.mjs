@@ -131,6 +131,33 @@ export const regular = {
     label: 'ExternalIcon',
     body: '<path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 13v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5"/>',
   },
+
+  // ── Reaction / notation markers ──────────────────────────────────────────────
+  // Replace inline Unicode UI markers (👍 ⚠ ● ◇ ◆ ▸) with real icons.
+  thumbsup: {
+    label: 'ThumbsUpIcon',
+    body: '<path d="M7 11v8a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1h3z"/><path d="M7 11l4.2-7.4a1.8 1.8 0 0 1 3.2 1.4L13.5 9H19a2 2 0 0 1 2 2.3l-1.1 6.5A2 2 0 0 1 17.9 20H7z"/>',
+  },
+  warning: {
+    label: 'WarningIcon',
+    body: '<path d="M10.3 4.3 1.8 19a2 2 0 0 0 1.7 3h16.8a2 2 0 0 0 1.7-3L13.7 4.3a2 2 0 0 0-3.4 0z"/><path d="M12 9.5v4"/><circle cx="12" cy="17.3" r="0.6" fill="currentColor" stroke="none"/>',
+  },
+  dot: {
+    label: 'DotIcon',
+    body: '<circle cx="12" cy="12" r="5" fill="currentColor" stroke="none"/>',
+  },
+  diamond: {
+    label: 'DiamondIcon',
+    body: '<path d="M12 3l9 9-9 9-9-9z"/>',
+  },
+  diamondFilled: {
+    label: 'DiamondFilledIcon',
+    body: '<path d="M12 3l9 9-9 9-9-9z" fill="currentColor"/>',
+  },
+  caretRight: {
+    label: 'CaretRightIcon',
+    body: '<path d="M9 5l7 7-7 7z" fill="currentColor" stroke="none"/>',
+  },
 };
 
 // ── High-fidelity 48×48 display icons ────────────────────────────────────────
