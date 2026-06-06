@@ -41,8 +41,8 @@ function genTs() {
   );
   lines.push('');
   lines.push('// ── Regular 24×24 icons ──────────────────────────────────────────────────────');
-  for (const [, spec] of Object.entries(regular)) {
-    lines.push(`export const ${spec.label} = personaIcon(${lit(spec.label)}, ${lit(spec.body)});`);
+  for (const [name, spec] of Object.entries(regular)) {
+    lines.push(`export const ${spec.label} = personaIcon(${lit(spec.label)}, ${lit(spec.body)}, ${lit(name)});`);
   }
   lines.push('');
   lines.push('// ── High-fidelity 48×48 icons ────────────────────────────────────────────────');
@@ -104,30 +104,39 @@ ${hi}
 HIFI_ANIM_CSS: str = ${lit(animCss)}
 
 
-def icon(name: str, cls: str | None = None) -> str:
+def icon(name: str, cls: str | None = None, animate: bool = False) -> str:
     """Return a regular 24x24 icon as an inline \`<svg class="ic ...">\` string.
 
     Returns "" for unknown names (matches the council's previous \`_icon\`).
     \`cls\` appends an extra CSS class alongside any class baked into the icon.
+    \`animate=True\` adds \`pi-animate\` so the optional hover animation applies.
     """
     spec = REGULAR.get(name)
     if spec is None:
         return ""
-    classes = "ic"
+    classes = f"ic pi pi-{name}"
     if spec.get("cls"):
         classes += " " + str(spec["cls"])
+    if animate:
+        classes += " pi-animate"
     if cls:
         classes += " " + cls
     return f'<svg class="{classes}" viewBox="0 0 24 24">{spec["body"]}</svg>'
 
 
-def hifi(name: str, size: int = 48, cls: str = "ic-hifi") -> str:
-    """Return a high-fidelity 48x48 display icon as a self-styled inline SVG."""
+def hifi(name: str, size: int = 48, cls: str = "ic-hifi", animate: bool = False) -> str:
+    """Return a high-fidelity 48x48 display icon as a self-styled inline SVG.
+
+    \`animate=True\` adds \`pi-animate\` so the optional hover animation applies.
+    """
     body = HIFI.get(name)
     if body is None:
         return ""
+    klass = f"{cls} pi-hifi pi-hifi-{name}"
+    if animate:
+        klass += " pi-animate"
     return (
-        f'<svg class="{cls} pi-hifi pi-hifi-{name}" width="{size}" height="{size}" '
+        f'<svg class="{klass}" width="{size}" height="{size}" '
         f'viewBox="0 0 48 48" fill="none" stroke="currentColor" '
         f'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{body}</svg>'
     )
