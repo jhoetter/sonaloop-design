@@ -62,12 +62,19 @@ export function personaIcon(displayName: string, body: string): PersonaIcon {
  *
  * Children carry their own fills and stroke hierarchy (2 / 1.5 / 0.75); the
  * root only provides `stroke="currentColor"` and `fill="none"` as defaults.
+ *
+ * The root carries `pi-hifi pi-hifi-<key>` classes so the optional animation
+ * stylesheet (`persona-icons/style.css`) can target a specific icon and its
+ * `data-part` elements on hover/focus. Without that stylesheet the classes are
+ * inert. A consumer `className` is appended, not overwritten.
  */
 export function personaIconHifi(
   displayName: string,
   body: string,
+  key: string,
 ): ComponentType<PersonaIconHifiProps> {
-  function Icon({ size = 48, ...rest }: PersonaIconHifiProps) {
+  const base = `pi-hifi pi-hifi-${key}`;
+  function Icon({ size = 48, className, ...rest }: PersonaIconHifiProps) {
     return (
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -80,6 +87,7 @@ export function personaIconHifi(
         strokeLinejoin="round"
         aria-hidden="true"
         focusable="false"
+        className={className ? `${base} ${className}` : base}
         dangerouslySetInnerHTML={{ __html: body }}
         {...rest}
       />

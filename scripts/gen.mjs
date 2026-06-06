@@ -18,6 +18,10 @@ const root = resolve(here, '..');
 
 const { regular, hifi } = await import(resolve(root, 'icons.data.mjs'));
 
+// Hand-authored hover-animation CSS, embedded verbatim into the Python package
+// so persona-council and persona-website share one animation source.
+const animCss = await readFile(resolve(root, 'styles/hifi-anim.css'), 'utf8');
+
 // JSON string literals are valid in both TS and Python (double-quoted, escaped).
 const lit = (s) => JSON.stringify(s);
 
@@ -42,9 +46,9 @@ function genTs() {
   }
   lines.push('');
   lines.push('// ── High-fidelity 48×48 icons ────────────────────────────────────────────────');
-  for (const [, spec] of Object.entries(hifi)) {
+  for (const [name, spec] of Object.entries(hifi)) {
     lines.push(
-      `export const ${spec.label} = personaIconHifi(${lit(spec.label)}, ${lit(spec.body)});`,
+      `export const ${spec.label} = personaIconHifi(${lit(spec.label)}, ${lit(spec.body)}, ${lit(name)});`,
     );
   }
   lines.push('');
@@ -79,7 +83,10 @@ attributes so they render without any CSS.
 
 from __future__ import annotations
 
-__all__ = ["REGULAR", "HIFI", "icon", "hifi", "names", "hifi_names"]
+__all__ = [
+    "REGULAR", "HIFI", "HIFI_ANIM_CSS",
+    "icon", "hifi", "hifi_anim_css", "names", "hifi_names",
+]
 
 # name -> {"body": inner SVG markup, "cls": optional extra CSS class}
 REGULAR: dict[str, dict[str, str | None]] = {
@@ -90,6 +97,11 @@ ${reg}
 HIFI: dict[str, str] = {
 ${hi}
 }
+
+# Optional hover-animation CSS (source: ../../styles/hifi-anim.css). Inline this
+# into a <style> block to animate hi-fi icons on hover/focus; it is inert unless
+# included, and self-disables under prefers-reduced-motion.
+HIFI_ANIM_CSS: str = ${lit(animCss)}
 
 
 def icon(name: str, cls: str | None = None) -> str:
@@ -115,10 +127,15 @@ def hifi(name: str, size: int = 48, cls: str = "ic-hifi") -> str:
     if body is None:
         return ""
     return (
-        f'<svg class="{cls}" width="{size}" height="{size}" viewBox="0 0 48 48" '
-        f'fill="none" stroke="currentColor" stroke-linecap="round" '
-        f'stroke-linejoin="round" aria-hidden="true">{body}</svg>'
+        f'<svg class="{cls} pi-hifi pi-hifi-{name}" width="{size}" height="{size}" '
+        f'viewBox="0 0 48 48" fill="none" stroke="currentColor" '
+        f'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{body}</svg>'
     )
+
+
+def hifi_anim_css() -> str:
+    """Return the hi-fi hover-animation CSS to inline in a <style> block."""
+    return HIFI_ANIM_CSS
 
 
 def names() -> list[str]:

@@ -105,6 +105,37 @@ Regular icons emit geometry under `class="ic"`; the council already styles
 `svg.ic` (16px, currentColor, strokeWidth 1.75). Hifi icons inline their own
 stroke attributes so they render with no extra CSS.
 
+## Hover animations (hi-fi)
+
+Every hi-fi icon has an opt-in hover/focus micro-interaction (settings cog
+spins, search lens scans, councils dots type, check draws itself, …). It is
+**pure CSS** — one source of truth, no JS, no new dependencies — so it works in
+**both** consumers and self-disables under `prefers-reduced-motion`.
+
+- Source: `styles/hifi-anim.css`. Sub-parts are tagged `data-part="…"` in
+  `icons.data.mjs`; the codegen puts `pi-hifi pi-hifi-<name>` on each `<svg>`.
+- Animations fire when the icon is hovered/focused, **or** when an ancestor with
+  class `.pi-hover` is hovered (put it on a button/feature card to drive the
+  icon inside). Without the stylesheet the classes are inert.
+
+**React (persona-website)** — import the stylesheet once:
+
+```ts
+import 'persona-icons/style.css';
+<PersonasHifi size={48} />                          // animates on hover/focus
+<button className="pi-hover">…<BulbHifi/></button>  // hovering the button animates the icon
+```
+
+**Python (persona-council)** — inline the generated CSS into a `<style>` block:
+
+```python
+from persona_icons import hifi_anim_css
+head = f"<style>{hifi_anim_css()}</style>"   # add once to the page <head>
+```
+
+Preview: `node scripts/gen-anim-preview.mjs` → open `preview/animated.html` and
+hover each tile.
+
 ## Status glyphs (council, optional follow-up)
 
 The council still renders a few **typographic** status marks as Unicode

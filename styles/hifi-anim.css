@@ -1,0 +1,212 @@
+/*
+ * persona-icons — hi-fi hover micro-interactions.
+ *
+ * SOURCE OF TRUTH for icon animation. `scripts/gen.mjs` copies this verbatim
+ * into the Python package (as HIFI_ANIM_CSS) so persona-council and
+ * persona-website share one animation layer. Authored by hand — safe to edit.
+ *
+ * How it hooks in
+ *   • Every hi-fi <svg> carries `pi-hifi pi-hifi-<name>` (added by the codegen).
+ *   • Animatable sub-parts carry `data-part="…"` in icons.data.mjs.
+ *   • Animations fire when the icon itself is hovered/focused, OR when an
+ *     ancestor with class `.pi-hover` is hovered (use it on a card/button to
+ *     drive the icon inside). Including this file is the opt-in; without it the
+ *     classes are inert and icons stay perfectly still.
+ *
+ * Everything lives inside prefers-reduced-motion: no-preference, so users who
+ * ask for reduced motion get the static icons.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  /* Transform about each element's own box by default; smooth, GPU-friendly. */
+  .pi-hifi * { transform-box: fill-box; }
+  .pi-hifi [data-part],
+  .pi-hifi rect,
+  .pi-hifi circle,
+  .pi-hifi path { transition: transform .38s cubic-bezier(.34, 1.4, .64, 1),
+                              fill-opacity .38s ease, stroke-opacity .38s ease; }
+
+  /* ── chrome / UI ──────────────────────────────────────────────────────── */
+
+  /* overview — four tiles pop in, staggered */
+  .pi-hifi-overview rect { transition: transform .3s cubic-bezier(.34, 1.56, .64, 1); }
+  :is(.pi-hifi-overview:hover, .pi-hifi-overview:focus-visible, .pi-hover:hover .pi-hifi-overview) rect { animation: pi-pop .42s both; }
+  :is(.pi-hifi-overview:hover, .pi-hifi-overview:focus-visible, .pi-hover:hover .pi-hifi-overview) rect:nth-of-type(2) { animation-delay: .05s; }
+  :is(.pi-hifi-overview:hover, .pi-hifi-overview:focus-visible, .pi-hover:hover .pi-hifi-overview) rect:nth-of-type(3) { animation-delay: .1s; }
+  :is(.pi-hifi-overview:hover, .pi-hifi-overview:focus-visible, .pi-hover:hover .pi-hifi-overview) rect:nth-of-type(4) { animation-delay: .15s; }
+
+  /* personas — the back person eases in */
+  .pi-hifi-personas [data-part="peer"] { opacity: 1; }
+  :is(.pi-hifi-personas:hover, .pi-hifi-personas:focus-visible, .pi-hover:hover .pi-hifi-personas) [data-part="peer"] { animation: pi-peer-in .45s both; }
+
+  /* councils — the three dots type */
+  :is(.pi-hifi-councils:hover, .pi-hifi-councils:focus-visible, .pi-hover:hover .pi-hifi-councils) circle:nth-of-type(2) { animation: pi-typing .9s ease-in-out infinite; }
+  :is(.pi-hifi-councils:hover, .pi-hifi-councils:focus-visible, .pi-hover:hover .pi-hifi-councils) circle:nth-of-type(3) { animation: pi-typing .9s ease-in-out .15s infinite; }
+  :is(.pi-hifi-councils:hover, .pi-hifi-councils:focus-visible, .pi-hover:hover .pi-hifi-councils) circle:nth-of-type(4) { animation: pi-typing .9s ease-in-out .3s infinite; }
+
+  /* syntheses — the top layer lifts */
+  :is(.pi-hifi-syntheses:hover, .pi-hifi-syntheses:focus-visible, .pi-hover:hover .pi-hifi-syntheses) [data-part="top"] { transform: translateY(-2.5px); }
+
+  /* projects — connectors draw, nodes pulse */
+  .pi-hifi-projects path { stroke-dasharray: 64; }
+  :is(.pi-hifi-projects:hover, .pi-hifi-projects:focus-visible, .pi-hover:hover .pi-hifi-projects) path { animation: pi-draw .6s ease forwards; }
+  :is(.pi-hifi-projects:hover, .pi-hifi-projects:focus-visible, .pi-hover:hover .pi-hifi-projects) circle { animation: pi-pop .4s both; }
+  :is(.pi-hifi-projects:hover, .pi-hifi-projects:focus-visible, .pi-hover:hover .pi-hifi-projects) circle:nth-of-type(2) { animation-delay: .08s; }
+  :is(.pi-hifi-projects:hover, .pi-hifi-projects:focus-visible, .pi-hover:hover .pi-hifi-projects) circle:nth-of-type(3) { animation-delay: .16s; }
+
+  /* memory — the brain "lights up" and the sulci shimmer */
+  :is(.pi-hifi-memory:hover, .pi-hifi-memory:focus-visible, .pi-hover:hover .pi-hifi-memory) [data-part="brain"] { animation: pi-brain 1.1s ease-in-out infinite; }
+  :is(.pi-hifi-memory:hover, .pi-hifi-memory:focus-visible, .pi-hover:hover .pi-hifi-memory) [data-part="sulci"] { animation: pi-shimmer 1.1s ease-in-out infinite; }
+
+  /* panel — the menu lines slide in */
+  :is(.pi-hifi-panel:hover, .pi-hifi-panel:focus-visible, .pi-hover:hover .pi-hifi-panel) [data-part="lines"] { animation: pi-slide-x .45s ease both; }
+
+  /* settings — the cog turns (continuous: an 8-tooth gear has 45° symmetry, so
+     any fixed multiple-of-45° rotation would look identical and read as static) */
+  :is(.pi-hifi-settings:hover, .pi-hifi-settings:focus-visible, .pi-hover:hover .pi-hifi-settings) [data-part="gear"] { animation: pi-spin 3.5s linear infinite; }
+
+  /* sun — rays splay and rotate, core swells */
+  .pi-hifi-sun [data-part="rays"] { transition: transform .5s cubic-bezier(.34, 1.4, .64, 1); }
+  :is(.pi-hifi-sun:hover, .pi-hifi-sun:focus-visible, .pi-hover:hover .pi-hifi-sun) [data-part="rays"] { transform: rotate(45deg) scale(1.06); }
+  :is(.pi-hifi-sun:hover, .pi-hifi-sun:focus-visible, .pi-hover:hover .pi-hifi-sun) [data-part="core"] { transform: scale(1.12); }
+
+  /* moon — a gentle tilt */
+  .pi-hifi-moon [data-part="moon"] { transform-box: view-box; transform-origin: 24px 24px; }
+  :is(.pi-hifi-moon:hover, .pi-hifi-moon:focus-visible, .pi-hover:hover .pi-hifi-moon) [data-part="moon"] { transform: rotate(-12deg); }
+
+  /* monitor — the screen switches on */
+  :is(.pi-hifi-monitor:hover, .pi-hifi-monitor:focus-visible, .pi-hover:hover .pi-hifi-monitor) [data-part="screen"] { animation: pi-screen 1.4s ease-in-out infinite; }
+
+  /* chevron — bounces down */
+  :is(.pi-hifi-chevron:hover, .pi-hifi-chevron:focus-visible, .pi-hover:hover .pi-hifi-chevron) path { animation: pi-bounce-y .5s ease; }
+
+  /* back — nudges left */
+  :is(.pi-hifi-back:hover, .pi-hifi-back:focus-visible, .pi-hover:hover .pi-hifi-back) path { transform: translateX(-3px); }
+
+  /* analytics — bars grow from the baseline, staggered */
+  .pi-hifi-analytics rect { transform-origin: bottom; }
+  :is(.pi-hifi-analytics:hover, .pi-hifi-analytics:focus-visible, .pi-hover:hover .pi-hifi-analytics) rect { animation: pi-grow-y .5s cubic-bezier(.34, 1.4, .64, 1) both; }
+  :is(.pi-hifi-analytics:hover, .pi-hifi-analytics:focus-visible, .pi-hover:hover .pi-hifi-analytics) rect:nth-of-type(2) { animation-delay: .08s; }
+  :is(.pi-hifi-analytics:hover, .pi-hifi-analytics:focus-visible, .pi-hover:hover .pi-hifi-analytics) rect:nth-of-type(3) { animation-delay: .16s; }
+
+  /* star — twinkles */
+  :is(.pi-hifi-star:hover, .pi-hifi-star:focus-visible, .pi-hover:hover .pi-hifi-star) path { transform: scale(1.1) rotate(14deg); }
+
+  /* bulb — the idea switches on */
+  :is(.pi-hifi-bulb:hover, .pi-hifi-bulb:focus-visible, .pi-hover:hover .pi-hifi-bulb) [data-part="bulb"] { animation: pi-glow 1.3s ease-in-out infinite; }
+  :is(.pi-hifi-bulb:hover, .pi-hifi-bulb:focus-visible, .pi-hover:hover .pi-hifi-bulb) [data-part="filament"] { animation: pi-shimmer 1.3s ease-in-out infinite; }
+
+  /* target — rings lock outward */
+  :is(.pi-hifi-target:hover, .pi-hifi-target:focus-visible, .pi-hover:hover .pi-hifi-target) circle { animation: pi-ring 1.1s ease-out infinite; }
+  :is(.pi-hifi-target:hover, .pi-hifi-target:focus-visible, .pi-hover:hover .pi-hifi-target) circle:nth-of-type(2) { animation-delay: .12s; }
+  :is(.pi-hifi-target:hover, .pi-hifi-target:focus-visible, .pi-hover:hover .pi-hifi-target) circle:nth-of-type(3) { animation-delay: .24s; }
+
+  /* compass — the needle settles like a real one */
+  .pi-hifi-compass [data-part="needle"] { transform-box: view-box; transform-origin: 24px 24px; }
+  :is(.pi-hifi-compass:hover, .pi-hifi-compass:focus-visible, .pi-hover:hover .pi-hifi-compass) [data-part="needle"] { animation: pi-wobble .8s cubic-bezier(.36, .07, .19, .97); }
+
+  /* search — the lens scans */
+  .pi-hifi-search [data-part="lens"] { transform-box: view-box; transform-origin: 21px 21px; }
+  :is(.pi-hifi-search:hover, .pi-hifi-search:focus-visible, .pi-hover:hover .pi-hifi-search) [data-part="lens"] { animation: pi-scan .9s ease-in-out; }
+
+  /* ── status & actions ─────────────────────────────────────────────────── */
+
+  /* check — draws itself */
+  .pi-hifi-check path { stroke-dasharray: 40; }
+  :is(.pi-hifi-check:hover, .pi-hifi-check:focus-visible, .pi-hover:hover .pi-hifi-check) path { animation: pi-draw .5s ease forwards; }
+
+  /* circle — soft pulse */
+  :is(.pi-hifi-circle:hover, .pi-hifi-circle:focus-visible, .pi-hover:hover .pi-hifi-circle) circle { transform: scale(1.07); }
+
+  /* half — the fill flips to the other side */
+  .pi-hifi-half path { transform-box: view-box; transform-origin: 24px 24px; transition: transform .5s cubic-bezier(.4, 0, .2, 1); }
+  :is(.pi-hifi-half:hover, .pi-hifi-half:focus-visible, .pi-hover:hover .pi-hifi-half) path { transform: rotate(180deg); }
+
+  /* alert — the mark gives a quick shake */
+  .pi-hifi-alert [data-part="mark"] { transform-box: view-box; transform-origin: 24px 24px; }
+  :is(.pi-hifi-alert:hover, .pi-hifi-alert:focus-visible, .pi-hover:hover .pi-hifi-alert) [data-part="mark"] { animation: pi-shake .5s ease; }
+
+  /* close — pops (a symmetric X is unchanged by 90°/180° rotation, so scale) */
+  :is(.pi-hifi-close:hover, .pi-hifi-close:focus-visible, .pi-hover:hover .pi-hifi-close) path { transform: scale(1.16); }
+
+  /* plus — grows (a + is unchanged by 90° rotation, so scale to read as "add") */
+  :is(.pi-hifi-plus:hover, .pi-hifi-plus:focus-visible, .pi-hover:hover .pi-hifi-plus) path { transform: scale(1.18); }
+
+  /* external — the arrow shoots out */
+  :is(.pi-hifi-external:hover, .pi-hifi-external:focus-visible, .pi-hover:hover .pi-hifi-external) path:nth-of-type(2),
+  :is(.pi-hifi-external:hover, .pi-hifi-external:focus-visible, .pi-hover:hover .pi-hifi-external) path:nth-of-type(3) { transform: translate(2.5px, -2.5px); }
+
+  /* ── reaction markers ─────────────────────────────────────────────────── */
+
+  /* thumbsup — approves */
+  .pi-hifi-thumbsup [data-part="hand"] { transform-box: view-box; transform-origin: 22px 32px; }
+  :is(.pi-hifi-thumbsup:hover, .pi-hifi-thumbsup:focus-visible, .pi-hover:hover .pi-hifi-thumbsup) [data-part="hand"] { transform: translateY(-2px) rotate(-8deg); }
+
+  /* warning — the mark pulses */
+  :is(.pi-hifi-warning:hover, .pi-hifi-warning:focus-visible, .pi-hover:hover .pi-hifi-warning) [data-part="mark"] { animation: pi-pulse .7s ease-in-out infinite; }
+
+  /* dot — heartbeat */
+  :is(.pi-hifi-dot:hover, .pi-hifi-dot:focus-visible, .pi-hover:hover .pi-hifi-dot) circle:nth-of-type(2) { animation: pi-pulse 1s ease-in-out infinite; }
+  :is(.pi-hifi-dot:hover, .pi-hifi-dot:focus-visible, .pi-hover:hover .pi-hifi-dot) circle:nth-of-type(1) { animation: pi-ring 1.4s ease-out infinite; }
+
+  /* diamond / diamondFilled — pop (a diamond has 4-fold symmetry; 90° is a no-op) */
+  :is(.pi-hifi-diamond:hover, .pi-hifi-diamond:focus-visible, .pi-hover:hover .pi-hifi-diamond) path { transform: scale(1.1); }
+  :is(.pi-hifi-diamondFilled:hover, .pi-hifi-diamondFilled:focus-visible, .pi-hover:hover .pi-hifi-diamondFilled) path { transform: scale(1.08); }
+
+  /* caretRight / arrowRight — advance */
+  :is(.pi-hifi-caretRight:hover, .pi-hifi-caretRight:focus-visible, .pi-hover:hover .pi-hifi-caretRight) path { transform: translateX(3px); }
+  :is(.pi-hifi-arrowRight:hover, .pi-hifi-arrowRight:focus-visible, .pi-hover:hover .pi-hifi-arrowRight) path { animation: pi-nudge-x .7s ease-in-out infinite; }
+
+  /* ── research-graph notation ──────────────────────────────────────────── */
+
+  /* square — pop */
+  :is(.pi-hifi-square:hover, .pi-hifi-square:focus-visible, .pi-hover:hover .pi-hifi-square) rect { transform: scale(1.06); }
+
+  /* squareSplit — inner block fills in */
+  :is(.pi-hifi-squareSplit:hover, .pi-hifi-squareSplit:focus-visible, .pi-hover:hover .pi-hifi-squareSplit) rect:nth-of-type(2) { animation: pi-fill-in .45s cubic-bezier(.34, 1.56, .64, 1) both; }
+
+  /* squareRows / Cols / Grid — divisions draw in */
+  .pi-hifi-squareRows path,
+  .pi-hifi-squareCols path,
+  .pi-hifi-squareGrid path { stroke-dasharray: 80; }
+  :is(.pi-hifi-squareRows:hover, .pi-hifi-squareRows:focus-visible, .pi-hover:hover .pi-hifi-squareRows) path,
+  :is(.pi-hifi-squareCols:hover, .pi-hifi-squareCols:focus-visible, .pi-hover:hover .pi-hifi-squareCols) path,
+  :is(.pi-hifi-squareGrid:hover, .pi-hifi-squareGrid:focus-visible, .pi-hover:hover .pi-hifi-squareGrid) path { animation: pi-draw .55s ease forwards; }
+
+  /* rectangle — gentle width breathe */
+  :is(.pi-hifi-rectangle:hover, .pi-hifi-rectangle:focus-visible, .pi-hover:hover .pi-hifi-rectangle) rect { transform: scaleX(1.06); }
+
+  /* exchange — the two arrows swap past each other */
+  :is(.pi-hifi-exchange:hover, .pi-hifi-exchange:focus-visible, .pi-hover:hover .pi-hifi-exchange) path:nth-of-type(1) { transform: translateX(2.5px); }
+  :is(.pi-hifi-exchange:hover, .pi-hifi-exchange:focus-visible, .pi-hover:hover .pi-hifi-exchange) path:nth-of-type(2) { transform: translateX(-2.5px); }
+
+  /* wave — flows */
+  .pi-hifi-wave path { stroke-dasharray: 12 6; }
+  :is(.pi-hifi-wave:hover, .pi-hifi-wave:focus-visible, .pi-hover:hover .pi-hifi-wave) path { animation: pi-flow 1s linear infinite; }
+
+  /* pencil — writes */
+  .pi-hifi-pencil [data-part="pencil"] { transform-box: view-box; transform-origin: 24px 24px; }
+  :is(.pi-hifi-pencil:hover, .pi-hifi-pencil:focus-visible, .pi-hover:hover .pi-hifi-pencil) [data-part="pencil"] { animation: pi-write .6s ease-in-out infinite; }
+
+  /* ── keyframes ────────────────────────────────────────────────────────── */
+  @keyframes pi-spin     { to { transform: rotate(360deg); } }
+  @keyframes pi-pop      { 0% { transform: scale(.4); opacity: 0; } 60% { transform: scale(1.12); opacity: 1; } 100% { transform: scale(1); } }
+  @keyframes pi-peer-in  { 0% { transform: translateX(-6px) scale(.6); opacity: 0; } 100% { transform: translateX(0) scale(1); opacity: 1; } }
+  @keyframes pi-typing   { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-3px); } }
+  @keyframes pi-draw     { from { stroke-dashoffset: 80; } to { stroke-dashoffset: 0; } }
+  @keyframes pi-brain    { 0%, 100% { fill-opacity: .08; } 50% { fill-opacity: .2; } }
+  @keyframes pi-shimmer  { 0%, 100% { stroke-opacity: .5; } 50% { stroke-opacity: 1; } }
+  @keyframes pi-glow     { 0%, 100% { fill-opacity: .1; } 50% { fill-opacity: .26; } }
+  @keyframes pi-screen   { 0%, 100% { fill-opacity: .08; } 50% { fill-opacity: .22; } }
+  @keyframes pi-slide-x  { 0% { transform: translateX(-5px); opacity: .2; } 100% { transform: translateX(0); opacity: 1; } }
+  @keyframes pi-bounce-y { 0%, 100% { transform: translateY(0); } 45% { transform: translateY(4px); } }
+  @keyframes pi-grow-y   { 0% { transform: scaleY(0); } 100% { transform: scaleY(1); } }
+  @keyframes pi-ring     { 0% { transform: scale(.85); opacity: 1; } 70% { transform: scale(1.12); opacity: .35; } 100% { transform: scale(1.12); opacity: 0; } }
+  @keyframes pi-wobble   { 0% { transform: rotate(0); } 25% { transform: rotate(-22deg); } 55% { transform: rotate(14deg); } 80% { transform: rotate(-6deg); } 100% { transform: rotate(0); } }
+  @keyframes pi-scan     { 0%, 100% { transform: translate(0, 0); } 30% { transform: translate(3px, -2px); } 65% { transform: translate(-2px, 2px); } }
+  @keyframes pi-shake    { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-2.5px); } 40% { transform: translateX(2.5px); } 60% { transform: translateX(-1.5px); } 80% { transform: translateX(1.5px); } }
+  @keyframes pi-pulse    { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.14); } }
+  @keyframes pi-nudge-x  { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(3px); } }
+  @keyframes pi-fill-in  { 0% { transform: scale(.2); opacity: .2; } 100% { transform: scale(1); opacity: 1; } }
+  @keyframes pi-flow     { to { stroke-dashoffset: -18; } }
+  @keyframes pi-write    { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(1.5px, 1.5px); } }
+}
