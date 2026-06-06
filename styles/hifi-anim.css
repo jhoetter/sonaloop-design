@@ -74,14 +74,15 @@
   :is(.pi-hifi-settings.pi-animate:hover, .pi-hifi-settings.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-settings.pi-animate) [data-part="gear"] { animation: pi-spin 3.5s linear infinite; }
 
   /* sun — rays splay and rotate, core swells */
-  .pi-hifi-sun [data-part="rays"] { transform-box: view-box; transform-origin: 24px 24px; transition: transform .5s cubic-bezier(.34, 1.4, .64, 1); }
+  /* sun — it SHINES: rays radiate outward and back, core gently glows
+     (a rotation said nothing about "sun") */
+  .pi-hifi-sun [data-part="rays"] { transform-box: view-box; transform-origin: 24px 24px; }
   .pi-hifi-sun [data-part="core"] { transform-box: view-box; transform-origin: 24px 24px; }
-  :is(.pi-hifi-sun.pi-animate:hover, .pi-hifi-sun.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-sun.pi-animate) [data-part="rays"] { transform: rotate(45deg) scale(1.06); }
-  :is(.pi-hifi-sun.pi-animate:hover, .pi-hifi-sun.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-sun.pi-animate) [data-part="core"] { transform: scale(1.12); }
+  :is(.pi-hifi-sun.pi-animate:hover, .pi-hifi-sun.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-sun.pi-animate) [data-part="rays"] { animation: pi-radiate 1.3s ease-in-out infinite; }
+  :is(.pi-hifi-sun.pi-animate:hover, .pi-hifi-sun.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-sun.pi-animate) [data-part="core"] { animation: pi-sun-core 1.3s ease-in-out infinite; }
 
-  /* moon — a gentle tilt */
-  .pi-hifi-moon [data-part="moon"] { transform-box: view-box; transform-origin: 24px 24px; transition: transform .5s ease; }
-  :is(.pi-hifi-moon.pi-animate:hover, .pi-hifi-moon.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-moon.pi-animate) [data-part="moon"] { transform: rotate(-10deg); }
+  /* moon — soft moonlight: the crescent gently glows (a tilt said nothing) */
+  :is(.pi-hifi-moon.pi-animate:hover, .pi-hifi-moon.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-moon.pi-animate) [data-part="moon"] { animation: pi-glow 1.6s ease-in-out infinite; }
 
   /* monitor — the screen switches on */
   :is(.pi-hifi-monitor.pi-animate:hover, .pi-hifi-monitor.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-monitor.pi-animate) [data-part="screen"] { animation: pi-screen 1.4s ease-in-out infinite; }
@@ -129,9 +130,9 @@
   .pi-hifi-circle.pi-animate circle { stroke-dasharray: var(--pi-len); }
   :is(.pi-hifi-circle.pi-animate:hover, .pi-hifi-circle.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-circle.pi-animate) circle { animation: pi-draw .6s ease forwards; }
 
-  /* half — the fill flips to the other side */
-  .pi-hifi-half path { transform-box: view-box; transform-origin: 24px 24px; transition: transform .5s cubic-bezier(.4, 0, .2, 1); }
-  :is(.pi-hifi-half.pi-animate:hover, .pi-hifi-half.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-half.pi-animate) path { transform: rotate(180deg); }
+  /* half — it's a PROGRESS glyph (◐): the fill rises up to the halfway mark */
+  .pi-hifi-half path { transform-box: fill-box; transform-origin: bottom; }
+  :is(.pi-hifi-half.pi-animate:hover, .pi-hifi-half.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-half.pi-animate) path { animation: pi-fill-up .6s cubic-bezier(.4, 0, .2, 1) forwards; }
 
   /* alert — the mark gives a quick shake */
   .pi-hifi-alert [data-part="mark"] { transform-box: view-box; transform-origin: 24px 24px; }
@@ -246,9 +247,12 @@
 
   /* "verb" / marker icons */
   .pi-settings.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-settings.pi-animate { animation: pi-spin 3.5s linear infinite; }
-  .pi-sun.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-sun.pi-animate { transform: rotate(40deg) scale(1.04); }
+  .pi-sun [data-part], .pi-sun path, .pi-sun circle { transform-box: view-box; transform-origin: 12px 12px; }
+  .pi-sun.pi-animate:is(:hover, :focus-visible) path, .pi-hover:hover .pi-sun.pi-animate path { animation: pi-radiate 1.3s ease-in-out infinite; }
+  .pi-sun.pi-animate:is(:hover, :focus-visible) circle, .pi-hover:hover .pi-sun.pi-animate circle { animation: pi-sun-core 1.3s ease-in-out infinite; }
   .pi-star.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-star.pi-animate { animation: pi-twinkle .6s ease; }
-  .pi-half.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-half.pi-animate { transform: rotate(180deg); transition: transform .5s cubic-bezier(.4, 0, .2, 1); }
+  .pi-half path { transform-box: fill-box; transform-origin: bottom; }
+  .pi-half.pi-animate:is(:hover, :focus-visible) path, .pi-hover:hover .pi-half.pi-animate path { animation: pi-fill-up .6s cubic-bezier(.4, 0, .2, 1) forwards; }
   .pi-thumbsup.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-thumbsup.pi-animate { transform: translateY(-1.5px) rotate(-8deg); }
   .pi-diamondFilled.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-diamondFilled.pi-animate { animation: pi-tap .4s ease; }
 
@@ -320,6 +324,9 @@
   @keyframes pi-shuttle  { 0%, 100% { transform: translateX(0); } 30% { transform: translateX(-2.5px); } 70% { transform: translateX(2.5px); } }
   @keyframes pi-pulse    { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.14); } }
   @keyframes pi-twinkle  { 0% { transform: scale(1) rotate(0); } 45% { transform: scale(1.16) rotate(18deg); } 100% { transform: scale(1) rotate(0); } }
+  @keyframes pi-radiate  { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.13); } }
+  @keyframes pi-sun-core { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+  @keyframes pi-fill-up  { from { transform: scaleY(0); } to { transform: scaleY(1); } }
   @keyframes pi-tap      { 0%, 100% { transform: scale(1); } 40% { transform: scale(.88); } }
   @keyframes pi-nudge-x  { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(3px); } }
   @keyframes pi-fill-in  { 0% { transform: scale(.2); opacity: .2; } 100% { transform: scale(1); opacity: 1; } }
