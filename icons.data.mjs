@@ -272,9 +272,10 @@ export const hifi = {
     label: 'MemoryHifi',
     body:
       '<circle cx="24" cy="24" r="20" fill="currentColor" fill-opacity="0.05" stroke="none"/>' +
-      '<path d="M24 8a7 7 0 0 0-7 7 6 6 0 0 0-1.6 11.8V31a5 5 0 0 0 8.6 3.5A5 5 0 0 0 32.6 31v-4.2A6 6 0 0 0 31 15a7 7 0 0 0-7-7z" fill="currentColor" fill-opacity="0.08" stroke-width="2"/>' +
-      '<path d="M24 8v30" stroke-width="1.25" stroke-opacity="0.5"/>' +
-      '<path d="M24 17h5M24 24h-6M24 31h5" stroke-width="1.25" stroke-opacity="0.5"/>',
+      // Symmetric, lobed brain; fissure + sulci stay inside the silhouette.
+      '<path d="M24 9a6.5 6.5 0 0 0-6.4 5.4 5.5 5.5 0 0 0-2.1 9.9 5 5 0 0 0 2.3 7.6 5 5 0 0 0 6.2 4.1 5 5 0 0 0 6.2-4.1 5 5 0 0 0 2.3-7.6 5.5 5.5 0 0 0-2.1-9.9A6.5 6.5 0 0 0 24 9z" fill="currentColor" fill-opacity="0.08" stroke-width="2" stroke-linejoin="round"/>' +
+      '<path d="M24 9v27" stroke-width="1.25" stroke-opacity="0.5"/>' +
+      '<path d="M24 17h4M24 23h-4M24 29h4" stroke-width="1.25" stroke-opacity="0.5"/>',
   },
   panel: {
     label: 'PanelHifi',
@@ -285,10 +286,11 @@ export const hifi = {
   },
   settings: {
     label: 'SettingsHifi',
+    // A true cog (8 teeth) so it reads as settings, not a sunburst like `sun`.
     body:
-      '<circle cx="24" cy="24" r="20" fill="currentColor" fill-opacity="0.05" stroke="none"/>' +
+      '<path d="M20.62 9.9L20.87 4.25L27.13 4.25L27.38 9.9L31.58 11.64L35.76 7.82L40.18 12.24L36.36 16.42L38.1 20.62L43.75 20.87L43.75 27.13L38.1 27.38L36.36 31.58L40.18 35.76L35.76 40.18L31.58 36.36L27.38 38.1L27.13 43.75L20.87 43.75L20.62 38.1L16.42 36.36L12.24 40.18L7.82 35.76L11.64 31.58L9.9 27.38L4.25 27.13L4.25 20.87L9.9 20.62L11.64 16.42L7.82 12.24L12.24 7.82L16.42 11.64Z" fill="currentColor" fill-opacity="0.1" stroke-width="2" stroke-linejoin="round"/>' +
       '<circle cx="24" cy="24" r="6.5" fill="currentColor" fill-opacity="0.12" stroke-width="2"/>' +
-      '<path d="M24 6v6.5M24 35.5V42M6 24h6.5M35.5 24H42M11.3 11.3l4.6 4.6M32.1 32.1l4.6 4.6M36.7 11.3l-4.6 4.6M15.9 32.1l-4.6 4.6" stroke-width="1.75"/>',
+      '<circle cx="24" cy="24" r="2" fill="currentColor" stroke="none"/>',
   },
   sun: {
     label: 'SunHifi',
@@ -341,7 +343,8 @@ export const hifi = {
       '<circle cx="24" cy="20" r="18" fill="currentColor" fill-opacity="0.05" stroke="none"/>' +
       '<path d="M24 8a11 11 0 0 0-7 19.5c1 .9 1.6 1.9 1.6 3V32h10.8v-1.5c0-1.1.6-2.1 1.6-3A11 11 0 0 0 24 8z" fill="currentColor" fill-opacity="0.1" stroke-width="2"/>' +
       '<path d="M18.6 36h10.8M20.5 40h7" stroke-width="1.75"/>' +
-      '<path d="M24 18l2.2 4.4 4.8.7-3.5 3.4.8 4.8L24 29l-4.3 2.3.8-4.8-3.5-3.4 4.8-.7z" stroke-width="1.1" stroke-opacity="0.65"/>',
+      // A filament loop reads as a bulb; the old star looked like a stray glyph.
+      '<path d="M20.5 31v-3.5a3.5 3.5 0 0 1 7 0V31" stroke-width="1.5" stroke-opacity="0.65"/>',
   },
   target: {
     label: 'TargetHifi',
