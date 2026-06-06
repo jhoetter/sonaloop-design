@@ -16,6 +16,7 @@
   ],
   "scripts": {
     "gen": "node scripts/gen.mjs",
+    "capture": "node scripts/capture-anim.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "peerDependencies": {
@@ -25,8 +26,10 @@
   "devDependencies": {
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "playwright-core": "^1.60.0",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
+    "sharp": "^0.34.5",
     "typescript": "^5.9.3"
   }
 }

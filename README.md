@@ -134,7 +134,10 @@ head = f"<style>{hifi_anim_css()}</style>"   # add once to the page <head>
 ```
 
 Preview: `node scripts/gen-anim-preview.mjs` → open `preview/animated.html` and
-hover each tile.
+hover each tile. To review motion without a browser, `npm run capture -- hifi`
+(or `all` / `reg` / `hifi:settings,reg:circle`) renders each icon's animation as
+a frame filmstrip via headless Chromium — handy for catching off-centre
+transforms. Needs the `playwright-core` + `sharp` devDependencies.
 
 ## Status glyphs (council, optional follow-up)
 

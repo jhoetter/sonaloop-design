@@ -149,3 +149,7 @@ __pycache__/
 *.egg-info/
 build/
 dist/
+
+# generated animation filmstrips (dev tool)
+preview/anim-film.png
+preview/*film*.png
