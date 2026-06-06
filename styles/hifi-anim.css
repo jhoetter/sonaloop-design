@@ -49,13 +49,8 @@
   /* syntheses — the top layer lifts a touch */
   :is(.pi-hifi-syntheses.pi-animate:hover, .pi-hifi-syntheses.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-syntheses.pi-animate) [data-part="top"] { transform: translateY(-2px); }
 
-  /* projects — connectors ink in, nodes settle */
-  .pi-hifi-projects.pi-animate { --pi-len: 64; }
-  .pi-hifi-projects.pi-animate path { stroke-dasharray: var(--pi-len); }
-  :is(.pi-hifi-projects.pi-animate:hover, .pi-hifi-projects.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-projects.pi-animate) path { animation: pi-draw .6s ease forwards; }
-  :is(.pi-hifi-projects.pi-animate:hover, .pi-hifi-projects.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-projects.pi-animate) circle { animation: pi-appear .4s ease both; }
-  :is(.pi-hifi-projects.pi-animate:hover, .pi-hifi-projects.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-projects.pi-animate) circle:nth-of-type(2) { animation-delay: .07s; }
-  :is(.pi-hifi-projects.pi-animate:hover, .pi-hifi-projects.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-projects.pi-animate) circle:nth-of-type(3) { animation-delay: .14s; }
+  /* projects — the folder's content rows slide in */
+  :is(.pi-hifi-projects.pi-animate:hover, .pi-hifi-projects.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-projects.pi-animate) [data-part="rows"] { animation: pi-slide-x .4s ease both; }
 
   /* memory — the brain quietly lights up once */
   :is(.pi-hifi-memory.pi-animate:hover, .pi-hifi-memory.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-memory.pi-animate) [data-part="brain"] { animation: pi-brain 1s ease; }
@@ -197,6 +192,13 @@
   .pi-hifi-pencil [data-part="pencil"] { transform-box: view-box; transform-origin: 24px 24px; }
   :is(.pi-hifi-pencil.pi-animate:hover, .pi-hifi-pencil.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-pencil.pi-animate) [data-part="pencil"] { animation: pi-write .6s ease; }
 
+  /* sonaloop (brand) — the loop gives one gentle settle, the nodes nod in turn */
+  .pi-hifi-sonaloop [data-part="loop"] { transform-box: view-box; transform-origin: 24px 24px; }
+  :is(.pi-hifi-sonaloop.pi-animate:hover, .pi-hifi-sonaloop.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-sonaloop.pi-animate) [data-part="loop"] { animation: pi-settle .8s ease; }
+  :is(.pi-hifi-sonaloop.pi-animate:hover, .pi-hifi-sonaloop.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-sonaloop.pi-animate) circle { animation: pi-bob .9s ease; }
+  :is(.pi-hifi-sonaloop.pi-animate:hover, .pi-hifi-sonaloop.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-sonaloop.pi-animate) circle:nth-of-type(2) { animation-delay: .08s; }
+  :is(.pi-hifi-sonaloop.pi-animate:hover, .pi-hifi-sonaloop.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-sonaloop.pi-animate) circle:nth-of-type(3) { animation-delay: .16s; }
+
   /* ════════════════════════════════════════════════════════════════════════
      Regular 24×24. Outline glyphs ink themselves; "verb" icons act softly.
      Trigger: `.pi-NAME.pi-animate:is(:hover,:focus-visible)` or `.pi-hover`.
@@ -268,10 +270,17 @@
   .pi-wave.pi-animate path { stroke-dasharray: 6 3; }
   .pi-wave.pi-animate:is(:hover, :focus-visible) path, .pi-hover:hover .pi-wave.pi-animate path { animation: pi-flow 1s ease; }
 
-  .pi-projects.pi-animate { --pi-len: 44; }
+  .pi-projects.pi-animate { --pi-len: 66; }
   .pi-projects.pi-animate path { stroke-dasharray: var(--pi-len); }
   .pi-projects.pi-animate:is(:hover, :focus-visible) path, .pi-hover:hover .pi-projects.pi-animate path { animation: pi-draw .6s ease forwards; }
-  .pi-projects.pi-animate:is(:hover, :focus-visible) circle, .pi-hover:hover .pi-projects.pi-animate circle { animation: pi-appear .4s ease both; }
+
+  /* sonaloop (brand) — the loop inks itself, the nodes settle in */
+  .pi-sonaloop.pi-animate { --pi-len: 48; }
+  .pi-sonaloop.pi-animate path { stroke-dasharray: var(--pi-len); }
+  .pi-sonaloop.pi-animate:is(:hover, :focus-visible) path, .pi-hover:hover .pi-sonaloop.pi-animate path { animation: pi-draw .6s ease forwards; }
+  .pi-sonaloop.pi-animate:is(:hover, :focus-visible) circle, .pi-hover:hover .pi-sonaloop.pi-animate circle { animation: pi-appear .4s ease both; }
+  .pi-sonaloop.pi-animate:is(:hover, :focus-visible) circle:nth-of-type(2), .pi-hover:hover .pi-sonaloop.pi-animate circle:nth-of-type(2) { animation-delay: .07s; }
+  .pi-sonaloop.pi-animate:is(:hover, :focus-visible) circle:nth-of-type(3), .pi-hover:hover .pi-sonaloop.pi-animate circle:nth-of-type(3) { animation-delay: .14s; }
 
   .pi-squareRows.pi-animate path, .pi-squareCols.pi-animate path, .pi-squareGrid.pi-animate path { stroke-dasharray: 60; }
   .pi-squareRows.pi-animate:is(:hover, :focus-visible) path, .pi-hover:hover .pi-squareRows.pi-animate path,
