@@ -1,5 +1,5 @@
 /*
- * persona-icons — hi-fi hover micro-interactions.
+ * persona-icons — hover micro-interactions (regular + hi-fi).
  *
  * SOURCE OF TRUTH for icon animation. `scripts/gen.mjs` copies this verbatim
  * into the Python package (as HIFI_ANIM_CSS) so persona-council and
@@ -10,13 +10,16 @@
  *     `pi-hifi pi-hifi-<name>`. Animatable hi-fi sub-parts carry `data-part="…"`.
  *   • Animation is OPT-IN per icon: it only plays if the <svg> ALSO has
  *     `.pi-animate` — React `animate` prop, or council `icon(name, animate=True)`
- *     / `hifi(name, animate=True)`. The default (no `.pi-animate`) is fully
- *     static, so `<BulbHifi/>` never moves unless you ask it to.
+ *     / `hifi(name, animate=True)`. The default (no `.pi-animate`) is static.
  *   • Trigger is the icon's own :hover/:focus-visible, or a hovered `.pi-hover`
  *     ancestor (put it on a card/button to drive the icon inside).
  *
- * Everything lives inside prefers-reduced-motion: no-preference, so users who
- * ask for reduced motion get the static icons.
+ * Design intent: motion should *mean* something. Outline shapes draw themselves
+ * (`pi-draw`, sized per icon via `--pi-len`); "verb" icons act out their verb
+ * (settings turns, search scans, exchange swaps, check ticks); markers pulse.
+ * Generic "scale the whole glyph" pops are avoided on purpose.
+ *
+ * Everything lives inside prefers-reduced-motion: no-preference.
  */
 @media (prefers-reduced-motion: no-preference) {
   /* Transform about each element's own box by default; smooth, GPU-friendly. */
@@ -27,9 +30,11 @@
   .pi-hifi path { transition: transform .38s cubic-bezier(.34, 1.4, .64, 1),
                               fill-opacity .38s ease, stroke-opacity .38s ease; }
 
-  /* ── chrome / UI ──────────────────────────────────────────────────────── */
+  /* ════════════════════════════════════════════════════════════════════════
+     HI-FI 48×48
+     ════════════════════════════════════════════════════════════════════════ */
 
-  /* overview — four tiles pop in, staggered */
+  /* overview — four tiles settle in, staggered */
   .pi-hifi-overview rect { transition: transform .3s cubic-bezier(.34, 1.56, .64, 1); }
   :is(.pi-hifi-overview.pi-animate:hover, .pi-hifi-overview.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-overview.pi-animate) rect { animation: pi-pop .42s both; }
   :is(.pi-hifi-overview.pi-animate:hover, .pi-hifi-overview.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-overview.pi-animate) rect:nth-of-type(2) { animation-delay: .05s; }
@@ -37,7 +42,6 @@
   :is(.pi-hifi-overview.pi-animate:hover, .pi-hifi-overview.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-overview.pi-animate) rect:nth-of-type(4) { animation-delay: .15s; }
 
   /* personas — the back person eases in */
-  .pi-hifi-personas [data-part="peer"] { opacity: 1; }
   :is(.pi-hifi-personas.pi-animate:hover, .pi-hifi-personas.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-personas.pi-animate) [data-part="peer"] { animation: pi-peer-in .45s both; }
 
   /* councils — the three dots type */
@@ -49,7 +53,8 @@
   :is(.pi-hifi-syntheses.pi-animate:hover, .pi-hifi-syntheses.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-syntheses.pi-animate) [data-part="top"] { transform: translateY(-2.5px); }
 
   /* projects — connectors draw, nodes pulse */
-  .pi-hifi-projects.pi-animate path { stroke-dasharray: 64; }
+  .pi-hifi-projects.pi-animate { --pi-len: 64; }
+  .pi-hifi-projects.pi-animate path { stroke-dasharray: var(--pi-len); }
   :is(.pi-hifi-projects.pi-animate:hover, .pi-hifi-projects.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-projects.pi-animate) path { animation: pi-draw .6s ease forwards; }
   :is(.pi-hifi-projects.pi-animate:hover, .pi-hifi-projects.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-projects.pi-animate) circle { animation: pi-pop .4s both; }
   :is(.pi-hifi-projects.pi-animate:hover, .pi-hifi-projects.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-projects.pi-animate) circle:nth-of-type(2) { animation-delay: .08s; }
@@ -63,7 +68,7 @@
   :is(.pi-hifi-panel.pi-animate:hover, .pi-hifi-panel.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-panel.pi-animate) [data-part="lines"] { animation: pi-slide-x .45s ease both; }
 
   /* settings — the cog turns (continuous: an 8-tooth gear has 45° symmetry, so
-     any fixed multiple-of-45° rotation would look identical and read as static) */
+     any fixed multiple-of-45° rotation would look static) */
   :is(.pi-hifi-settings.pi-animate:hover, .pi-hifi-settings.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-settings.pi-animate) [data-part="gear"] { animation: pi-spin 3.5s linear infinite; }
 
   /* sun — rays splay and rotate, core swells */
@@ -72,8 +77,8 @@
   :is(.pi-hifi-sun.pi-animate:hover, .pi-hifi-sun.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-sun.pi-animate) [data-part="core"] { transform: scale(1.12); }
 
   /* moon — a gentle tilt */
-  .pi-hifi-moon [data-part="moon"] { transform-box: view-box; transform-origin: 24px 24px; }
-  :is(.pi-hifi-moon.pi-animate:hover, .pi-hifi-moon.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-moon.pi-animate) [data-part="moon"] { transform: rotate(-12deg); }
+  .pi-hifi-moon [data-part="moon"] { transform-box: view-box; transform-origin: 24px 24px; transition: transform .5s ease; }
+  :is(.pi-hifi-moon.pi-animate:hover, .pi-hifi-moon.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-moon.pi-animate) [data-part="moon"] { transform: rotate(-10deg); }
 
   /* monitor — the screen switches on */
   :is(.pi-hifi-monitor.pi-animate:hover, .pi-hifi-monitor.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-monitor.pi-animate) [data-part="screen"] { animation: pi-screen 1.4s ease-in-out infinite; }
@@ -91,13 +96,13 @@
   :is(.pi-hifi-analytics.pi-animate:hover, .pi-hifi-analytics.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-analytics.pi-animate) rect:nth-of-type(3) { animation-delay: .16s; }
 
   /* star — twinkles */
-  :is(.pi-hifi-star.pi-animate:hover, .pi-hifi-star.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-star.pi-animate) path { transform: scale(1.1) rotate(14deg); }
+  :is(.pi-hifi-star.pi-animate:hover, .pi-hifi-star.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-star.pi-animate) path { animation: pi-twinkle .6s ease; }
 
   /* bulb — the idea switches on */
   :is(.pi-hifi-bulb.pi-animate:hover, .pi-hifi-bulb.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-bulb.pi-animate) [data-part="bulb"] { animation: pi-glow 1.3s ease-in-out infinite; }
   :is(.pi-hifi-bulb.pi-animate:hover, .pi-hifi-bulb.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-bulb.pi-animate) [data-part="filament"] { animation: pi-shimmer 1.3s ease-in-out infinite; }
 
-  /* target — rings lock outward */
+  /* target — rings ping outward */
   :is(.pi-hifi-target.pi-animate:hover, .pi-hifi-target.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-target.pi-animate) circle { animation: pi-ring 1.1s ease-out infinite; }
   :is(.pi-hifi-target.pi-animate:hover, .pi-hifi-target.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-target.pi-animate) circle:nth-of-type(2) { animation-delay: .12s; }
   :is(.pi-hifi-target.pi-animate:hover, .pi-hifi-target.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-target.pi-animate) circle:nth-of-type(3) { animation-delay: .24s; }
@@ -110,14 +115,15 @@
   .pi-hifi-search [data-part="lens"] { transform-box: view-box; transform-origin: 21px 21px; }
   :is(.pi-hifi-search.pi-animate:hover, .pi-hifi-search.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-search.pi-animate) [data-part="lens"] { animation: pi-scan .9s ease-in-out; }
 
-  /* ── status & actions ─────────────────────────────────────────────────── */
-
   /* check — draws itself */
-  .pi-hifi-check.pi-animate path { stroke-dasharray: 40; }
+  .pi-hifi-check.pi-animate { --pi-len: 42; }
+  .pi-hifi-check.pi-animate path { stroke-dasharray: var(--pi-len); }
   :is(.pi-hifi-check.pi-animate:hover, .pi-hifi-check.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-check.pi-animate) path { animation: pi-draw .5s ease forwards; }
 
-  /* circle — soft pulse */
-  :is(.pi-hifi-circle.pi-animate:hover, .pi-hifi-circle.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-circle.pi-animate) circle { transform: scale(1.07); }
+  /* circle — draws its ring */
+  .pi-hifi-circle.pi-animate { --pi-len: 110; }
+  .pi-hifi-circle.pi-animate circle { stroke-dasharray: var(--pi-len); }
+  :is(.pi-hifi-circle.pi-animate:hover, .pi-hifi-circle.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-circle.pi-animate) circle { animation: pi-draw .6s ease forwards; }
 
   /* half — the fill flips to the other side */
   .pi-hifi-half path { transform-box: view-box; transform-origin: 24px 24px; transition: transform .5s cubic-bezier(.4, 0, .2, 1); }
@@ -127,17 +133,19 @@
   .pi-hifi-alert [data-part="mark"] { transform-box: view-box; transform-origin: 24px 24px; }
   :is(.pi-hifi-alert.pi-animate:hover, .pi-hifi-alert.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-alert.pi-animate) [data-part="mark"] { animation: pi-shake .5s ease; }
 
-  /* close — pops (a symmetric X is unchanged by 90°/180° rotation, so scale) */
-  :is(.pi-hifi-close.pi-animate:hover, .pi-hifi-close.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-close.pi-animate) path { transform: scale(1.16); }
+  /* close — the two strokes draw in */
+  .pi-hifi-close.pi-animate { --pi-len: 24; }
+  .pi-hifi-close.pi-animate path { stroke-dasharray: var(--pi-len); }
+  :is(.pi-hifi-close.pi-animate:hover, .pi-hifi-close.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-close.pi-animate) path { animation: pi-draw .4s ease forwards; }
 
-  /* plus — grows (a + is unchanged by 90° rotation, so scale to read as "add") */
-  :is(.pi-hifi-plus.pi-animate:hover, .pi-hifi-plus.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-plus.pi-animate) path { transform: scale(1.18); }
+  /* plus — the two strokes draw in */
+  .pi-hifi-plus.pi-animate { --pi-len: 22; }
+  .pi-hifi-plus.pi-animate path { stroke-dasharray: var(--pi-len); }
+  :is(.pi-hifi-plus.pi-animate:hover, .pi-hifi-plus.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-plus.pi-animate) path { animation: pi-draw .4s ease forwards; }
 
   /* external — the arrow shoots out */
   :is(.pi-hifi-external.pi-animate:hover, .pi-hifi-external.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-external.pi-animate) path:nth-of-type(2),
   :is(.pi-hifi-external.pi-animate:hover, .pi-hifi-external.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-external.pi-animate) path:nth-of-type(3) { transform: translate(2.5px, -2.5px); }
-
-  /* ── reaction markers ─────────────────────────────────────────────────── */
 
   /* thumbsup — approves */
   .pi-hifi-thumbsup [data-part="hand"] { transform-box: view-box; transform-origin: 22px 32px; }
@@ -146,22 +154,24 @@
   /* warning — the mark pulses */
   :is(.pi-hifi-warning.pi-animate:hover, .pi-hifi-warning.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-warning.pi-animate) [data-part="mark"] { animation: pi-pulse .7s ease-in-out infinite; }
 
-  /* dot — heartbeat */
+  /* dot — heartbeat + halo */
   :is(.pi-hifi-dot.pi-animate:hover, .pi-hifi-dot.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-dot.pi-animate) circle:nth-of-type(2) { animation: pi-pulse 1s ease-in-out infinite; }
   :is(.pi-hifi-dot.pi-animate:hover, .pi-hifi-dot.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-dot.pi-animate) circle:nth-of-type(1) { animation: pi-ring 1.4s ease-out infinite; }
 
-  /* diamond / diamondFilled — pop (a diamond has 4-fold symmetry; 90° is a no-op) */
-  :is(.pi-hifi-diamond.pi-animate:hover, .pi-hifi-diamond.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-diamond.pi-animate) path { transform: scale(1.1); }
-  :is(.pi-hifi-diamondFilled.pi-animate:hover, .pi-hifi-diamondFilled.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-diamondFilled.pi-animate) path { transform: scale(1.08); }
+  /* diamond — draws its outline; diamondFilled (no stroke to draw) gives a tap */
+  .pi-hifi-diamond.pi-animate { --pi-len: 106; }
+  .pi-hifi-diamond.pi-animate path { stroke-dasharray: var(--pi-len); }
+  :is(.pi-hifi-diamond.pi-animate:hover, .pi-hifi-diamond.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-diamond.pi-animate) path { animation: pi-draw .6s ease forwards; }
+  :is(.pi-hifi-diamondFilled.pi-animate:hover, .pi-hifi-diamondFilled.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-diamondFilled.pi-animate) path { animation: pi-tap .4s ease; }
 
   /* caretRight / arrowRight — advance */
   :is(.pi-hifi-caretRight.pi-animate:hover, .pi-hifi-caretRight.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-caretRight.pi-animate) path { transform: translateX(3px); }
   :is(.pi-hifi-arrowRight.pi-animate:hover, .pi-hifi-arrowRight.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-arrowRight.pi-animate) path { animation: pi-nudge-x .7s ease-in-out infinite; }
 
-  /* ── research-graph notation ──────────────────────────────────────────── */
-
-  /* square — pop */
-  :is(.pi-hifi-square.pi-animate:hover, .pi-hifi-square.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-square.pi-animate) rect { transform: scale(1.06); }
+  /* square — draws its outline */
+  .pi-hifi-square.pi-animate { --pi-len: 130; }
+  .pi-hifi-square.pi-animate rect { stroke-dasharray: var(--pi-len); }
+  :is(.pi-hifi-square.pi-animate:hover, .pi-hifi-square.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-square.pi-animate) rect { animation: pi-draw .65s ease forwards; }
 
   /* squareSplit — inner block fills in */
   :is(.pi-hifi-squareSplit.pi-animate:hover, .pi-hifi-squareSplit.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-squareSplit.pi-animate) rect:nth-of-type(2) { animation: pi-fill-in .45s cubic-bezier(.34, 1.56, .64, 1) both; }
@@ -174,8 +184,10 @@
   :is(.pi-hifi-squareCols.pi-animate:hover, .pi-hifi-squareCols.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-squareCols.pi-animate) path,
   :is(.pi-hifi-squareGrid.pi-animate:hover, .pi-hifi-squareGrid.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-squareGrid.pi-animate) path { animation: pi-draw .55s ease forwards; }
 
-  /* rectangle — gentle width breathe */
-  :is(.pi-hifi-rectangle.pi-animate:hover, .pi-hifi-rectangle.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-rectangle.pi-animate) rect { transform: scaleX(1.06); }
+  /* rectangle — draws its outline */
+  .pi-hifi-rectangle.pi-animate { --pi-len: 112; }
+  .pi-hifi-rectangle.pi-animate rect { stroke-dasharray: var(--pi-len); }
+  :is(.pi-hifi-rectangle.pi-animate:hover, .pi-hifi-rectangle.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-rectangle.pi-animate) rect { animation: pi-draw .6s ease forwards; }
 
   /* exchange — the two arrows swap past each other */
   :is(.pi-hifi-exchange.pi-animate:hover, .pi-hifi-exchange.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-exchange.pi-animate) path:nth-of-type(1) { transform: translateX(2.5px); }
@@ -190,68 +202,78 @@
   :is(.pi-hifi-pencil.pi-animate:hover, .pi-hifi-pencil.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-pencil.pi-animate) [data-part="pencil"] { animation: pi-write .6s ease-in-out infinite; }
 
   /* ════════════════════════════════════════════════════════════════════════
-     Regular 24×24 chrome icons. Same opt-in (`.pi-animate`) + trigger model.
-     Most animate the whole <svg> (a single glyph); a few target child parts.
-     Trigger per icon: `.pi-NAME.pi-animate:is(:hover,:focus-visible)` or a
-     hovered `.pi-hover` ancestor.
+     Regular 24×24. Outline glyphs draw themselves; "verb" icons act their verb.
+     Trigger: `.pi-NAME.pi-animate:is(:hover,:focus-visible)` or `.pi-hover`.
      ════════════════════════════════════════════════════════════════════════ */
   .pi { transition: transform .35s cubic-bezier(.34, 1.4, .64, 1); }
   .pi * { transform-box: fill-box; }
+  /* draw setup: only the stroked shapes carry the dash; filled parts ignore it */
+  .pi-plus.pi-animate { --pi-len: 30; } .pi-close.pi-animate { --pi-len: 36; }
+  .pi-circle.pi-animate { --pi-len: 50; } .pi-square.pi-animate { --pi-len: 64; }
+  .pi-diamond.pi-animate { --pi-len: 54; } .pi-rectangle.pi-animate { --pi-len: 56; }
+  .pi-bulb.pi-animate { --pi-len: 52; } .pi-link.pi-animate { --pi-len: 24; }
+  .pi-councils.pi-animate { --pi-len: 54; } .pi-syntheses.pi-animate { --pi-len: 44; }
+  .pi-panel.pi-animate { --pi-len: 70; } .pi-prototype.pi-animate { --pi-len: 72; }
+  .pi-monitor.pi-animate { --pi-len: 66; } .pi-memory.pi-animate { --pi-len: 50; }
+  .pi-personas.pi-animate { --pi-len: 24; } .pi-moon.pi-animate { --pi-len: 46; }
+  .pi-target.pi-animate { --pi-len: 56; }
+  :is(.pi-plus, .pi-close, .pi-circle, .pi-square, .pi-diamond, .pi-rectangle,
+      .pi-bulb, .pi-link, .pi-councils, .pi-syntheses, .pi-panel, .pi-prototype,
+      .pi-monitor, .pi-memory, .pi-personas, .pi-moon, .pi-target).pi-animate
+      :is(path, rect, circle, line) { stroke-dasharray: var(--pi-len); }
 
-  /* whole-glyph pop — stronger */
-  .pi-close.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-close.pi-animate,
-  .pi-plus.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-plus.pi-animate,
-  .pi-diamond.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-diamond.pi-animate,
-  .pi-search.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-search.pi-animate,
-  .pi-circle.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-circle.pi-animate,
-  .pi-bulb.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-bulb.pi-animate,
-  .pi-square.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-square.pi-animate { transform: scale(1.13); }
+  .pi-plus.pi-animate:is(:hover, :focus-visible) path, .pi-hover:hover .pi-plus.pi-animate path,
+  .pi-close.pi-animate:is(:hover, :focus-visible) path, .pi-hover:hover .pi-close.pi-animate path,
+  .pi-circle.pi-animate:is(:hover, :focus-visible) circle, .pi-hover:hover .pi-circle.pi-animate circle,
+  .pi-square.pi-animate:is(:hover, :focus-visible) rect, .pi-hover:hover .pi-square.pi-animate rect,
+  .pi-diamond.pi-animate:is(:hover, :focus-visible) path, .pi-hover:hover .pi-diamond.pi-animate path,
+  .pi-rectangle.pi-animate:is(:hover, :focus-visible) rect, .pi-hover:hover .pi-rectangle.pi-animate rect,
+  .pi-bulb.pi-animate:is(:hover, :focus-visible) path, .pi-hover:hover .pi-bulb.pi-animate path,
+  .pi-link.pi-animate:is(:hover, :focus-visible) path, .pi-hover:hover .pi-link.pi-animate path,
+  .pi-councils.pi-animate:is(:hover, :focus-visible) path, .pi-hover:hover .pi-councils.pi-animate path,
+  .pi-syntheses.pi-animate:is(:hover, :focus-visible) path, .pi-hover:hover .pi-syntheses.pi-animate path,
+  .pi-panel.pi-animate:is(:hover, :focus-visible) :is(rect, path), .pi-hover:hover .pi-panel.pi-animate :is(rect, path),
+  .pi-prototype.pi-animate:is(:hover, :focus-visible) :is(rect, path), .pi-hover:hover .pi-prototype.pi-animate :is(rect, path),
+  .pi-monitor.pi-animate:is(:hover, :focus-visible) :is(rect, path), .pi-hover:hover .pi-monitor.pi-animate :is(rect, path),
+  .pi-memory.pi-animate:is(:hover, :focus-visible) path, .pi-hover:hover .pi-memory.pi-animate path,
+  .pi-personas.pi-animate:is(:hover, :focus-visible) :is(path, circle), .pi-hover:hover .pi-personas.pi-animate :is(path, circle),
+  .pi-moon.pi-animate:is(:hover, :focus-visible) path, .pi-hover:hover .pi-moon.pi-animate path,
+  .pi-target.pi-animate:is(:hover, :focus-visible) circle, .pi-hover:hover .pi-target.pi-animate circle { animation: pi-draw .6s ease forwards; }
 
-  /* whole-glyph pop — subtle */
-  .pi-diamondFilled.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-diamondFilled.pi-animate,
-  .pi-link.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-link.pi-animate,
-  .pi-personas.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-personas.pi-animate,
-  .pi-councils.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-councils.pi-animate,
-  .pi-syntheses.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-syntheses.pi-animate,
-  .pi-panel.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-panel.pi-animate,
-  .pi-prototype.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-prototype.pi-animate,
-  .pi-monitor.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-monitor.pi-animate,
-  .pi-memory.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-memory.pi-animate { transform: scale(1.07); }
-
-  .pi-rectangle.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-rectangle.pi-animate { transform: scaleX(1.08); }
-  .pi-star.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-star.pi-animate { transform: scale(1.1) rotate(14deg); }
-
-  /* whole-glyph rotate / tilt */
+  /* "verb" / marker icons */
+  .pi-settings.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-settings.pi-animate { animation: pi-spin 3.5s linear infinite; }
   .pi-sun.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-sun.pi-animate { transform: rotate(40deg) scale(1.04); }
-  .pi-moon.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-moon.pi-animate { transform: rotate(-14deg); }
+  .pi-star.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-star.pi-animate { animation: pi-twinkle .6s ease; }
   .pi-half.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-half.pi-animate { transform: rotate(180deg); transition: transform .5s cubic-bezier(.4, 0, .2, 1); }
-  .pi-pencil.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-pencil.pi-animate { transform: rotate(-9deg); }
   .pi-thumbsup.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-thumbsup.pi-animate { transform: translateY(-1.5px) rotate(-8deg); }
+  .pi-diamondFilled.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-diamondFilled.pi-animate { animation: pi-tap .4s ease; }
 
-  /* whole-glyph translate (direction affordance) */
+  /* directional */
   .pi-back.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-back.pi-animate { transform: translateX(-2.5px); }
   .pi-caretRight.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-caretRight.pi-animate { transform: translateX(2.5px); }
   .pi-external.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-external.pi-animate { transform: translate(2px, -2px); }
-  .pi-exchange.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-exchange.pi-animate { transform: scale(1.06); }
-
-  /* whole-glyph keyframes */
-  .pi-settings.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-settings.pi-animate { animation: pi-spin 3.5s linear infinite; }
   .pi-arrowRight.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-arrowRight.pi-animate { animation: pi-nudge-x .7s ease-in-out infinite; }
   .pi-chevron.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-chevron.pi-animate { animation: pi-bounce-y .5s ease; }
+  .pi-exchange.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-exchange.pi-animate { animation: pi-shuttle .7s ease-in-out; }
+  .pi-search.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-search.pi-animate { animation: pi-scan .9s ease-in-out; }
   .pi-compass.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-compass.pi-animate { animation: pi-wobble .8s cubic-bezier(.36, .07, .19, .97); }
+  .pi-pencil.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-pencil.pi-animate { animation: pi-write .6s ease-in-out infinite; }
+
+  /* markers — pulse / shake */
+  .pi-dot.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-dot.pi-animate { animation: pi-pulse 1s ease-in-out infinite; }
   .pi-alert.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-alert.pi-animate,
   .pi-warning.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-warning.pi-animate { animation: pi-shake .5s ease; }
-  .pi-dot.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-dot.pi-animate,
-  .pi-target.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-target.pi-animate { animation: pi-pulse 1s ease-in-out infinite; }
 
   /* child-targeted */
-  .pi-check.pi-animate path { stroke-dasharray: 30; }
+  .pi-check.pi-animate { --pi-len: 30; }
+  .pi-check.pi-animate path { stroke-dasharray: var(--pi-len); }
   .pi-check.pi-animate:is(:hover, :focus-visible) path, .pi-hover:hover .pi-check.pi-animate path { animation: pi-draw .5s ease forwards; }
 
   .pi-wave.pi-animate path { stroke-dasharray: 6 3; }
   .pi-wave.pi-animate:is(:hover, :focus-visible) path, .pi-hover:hover .pi-wave.pi-animate path { animation: pi-flow 1s linear infinite; }
 
-  .pi-projects.pi-animate path { stroke-dasharray: 44; }
+  .pi-projects.pi-animate { --pi-len: 44; }
+  .pi-projects.pi-animate path { stroke-dasharray: var(--pi-len); }
   .pi-projects.pi-animate:is(:hover, :focus-visible) path, .pi-hover:hover .pi-projects.pi-animate path { animation: pi-draw .6s ease forwards; }
   .pi-projects.pi-animate:is(:hover, :focus-visible) circle, .pi-hover:hover .pi-projects.pi-animate circle { animation: pi-pop .4s both; }
 
@@ -276,10 +298,10 @@
 
   /* ── keyframes ────────────────────────────────────────────────────────── */
   @keyframes pi-spin     { to { transform: rotate(360deg); } }
+  @keyframes pi-draw     { from { stroke-dashoffset: var(--pi-len, 60); } to { stroke-dashoffset: 0; } }
   @keyframes pi-pop      { 0% { transform: scale(.4); opacity: 0; } 60% { transform: scale(1.12); opacity: 1; } 100% { transform: scale(1); } }
   @keyframes pi-peer-in  { 0% { transform: translateX(-6px) scale(.6); opacity: 0; } 100% { transform: translateX(0) scale(1); opacity: 1; } }
   @keyframes pi-typing   { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-3px); } }
-  @keyframes pi-draw     { from { stroke-dashoffset: 80; } to { stroke-dashoffset: 0; } }
   @keyframes pi-brain    { 0%, 100% { fill-opacity: .08; } 50% { fill-opacity: .2; } }
   @keyframes pi-shimmer  { 0%, 100% { stroke-opacity: .5; } 50% { stroke-opacity: 1; } }
   @keyframes pi-glow     { 0%, 100% { fill-opacity: .1; } 50% { fill-opacity: .26; } }
@@ -291,7 +313,10 @@
   @keyframes pi-wobble   { 0% { transform: rotate(0); } 25% { transform: rotate(-22deg); } 55% { transform: rotate(14deg); } 80% { transform: rotate(-6deg); } 100% { transform: rotate(0); } }
   @keyframes pi-scan     { 0%, 100% { transform: translate(0, 0); } 30% { transform: translate(3px, -2px); } 65% { transform: translate(-2px, 2px); } }
   @keyframes pi-shake    { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-2.5px); } 40% { transform: translateX(2.5px); } 60% { transform: translateX(-1.5px); } 80% { transform: translateX(1.5px); } }
+  @keyframes pi-shuttle  { 0%, 100% { transform: translateX(0); } 30% { transform: translateX(-2.5px); } 70% { transform: translateX(2.5px); } }
   @keyframes pi-pulse    { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.14); } }
+  @keyframes pi-twinkle  { 0% { transform: scale(1) rotate(0); } 45% { transform: scale(1.16) rotate(18deg); } 100% { transform: scale(1) rotate(0); } }
+  @keyframes pi-tap      { 0%, 100% { transform: scale(1); } 40% { transform: scale(.88); } }
   @keyframes pi-nudge-x  { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(3px); } }
   @keyframes pi-fill-in  { 0% { transform: scale(.2); opacity: .2; } 100% { transform: scale(1); opacity: 1; } }
   @keyframes pi-flow     { to { stroke-dashoffset: -18; } }
