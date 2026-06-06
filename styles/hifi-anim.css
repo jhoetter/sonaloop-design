@@ -130,8 +130,8 @@
   .pi-hifi-circle.pi-animate circle { stroke-dasharray: var(--pi-len); }
   :is(.pi-hifi-circle.pi-animate:hover, .pi-hifi-circle.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-circle.pi-animate) circle { animation: pi-draw .6s ease forwards; }
 
-  /* half — it's a PROGRESS glyph (◐): the fill rises up to the halfway mark */
-  .pi-hifi-half path { transform-box: fill-box; transform-origin: bottom; }
+  /* half — it's a PROGRESS glyph (◐): the fill reveals up to the halfway mark
+     (clip reveal keeps the shape undistorted, unlike a scaleY squish) */
   :is(.pi-hifi-half.pi-animate:hover, .pi-hifi-half.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-half.pi-animate) path { animation: pi-fill-up .6s cubic-bezier(.4, 0, .2, 1) forwards; }
 
   /* alert — the mark gives a quick shake */
@@ -170,7 +170,7 @@
   :is(.pi-hifi-diamondFilled.pi-animate:hover, .pi-hifi-diamondFilled.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-diamondFilled.pi-animate) path { animation: pi-tap .4s ease; }
 
   /* caretRight / arrowRight — advance */
-  :is(.pi-hifi-caretRight.pi-animate:hover, .pi-hifi-caretRight.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-caretRight.pi-animate) path { transform: translateX(3px); }
+  :is(.pi-hifi-caretRight.pi-animate:hover, .pi-hifi-caretRight.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-caretRight.pi-animate) path { animation: pi-nudge-x .7s ease-in-out infinite; }
   :is(.pi-hifi-arrowRight.pi-animate:hover, .pi-hifi-arrowRight.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-arrowRight.pi-animate) path { animation: pi-nudge-x .7s ease-in-out infinite; }
 
   /* square — draws its outline */
@@ -251,14 +251,13 @@
   .pi-sun.pi-animate:is(:hover, :focus-visible) path, .pi-hover:hover .pi-sun.pi-animate path { animation: pi-radiate 1.3s ease-in-out infinite; }
   .pi-sun.pi-animate:is(:hover, :focus-visible) circle, .pi-hover:hover .pi-sun.pi-animate circle { animation: pi-sun-core 1.3s ease-in-out infinite; }
   .pi-star.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-star.pi-animate { animation: pi-twinkle .6s ease; }
-  .pi-half path { transform-box: fill-box; transform-origin: bottom; }
   .pi-half.pi-animate:is(:hover, :focus-visible) path, .pi-hover:hover .pi-half.pi-animate path { animation: pi-fill-up .6s cubic-bezier(.4, 0, .2, 1) forwards; }
   .pi-thumbsup.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-thumbsup.pi-animate { transform: translateY(-1.5px) rotate(-8deg); }
   .pi-diamondFilled.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-diamondFilled.pi-animate { animation: pi-tap .4s ease; }
 
   /* directional */
   .pi-back.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-back.pi-animate { transform: translateX(-2.5px); }
-  .pi-caretRight.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-caretRight.pi-animate { transform: translateX(2.5px); }
+  .pi-caretRight.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-caretRight.pi-animate { animation: pi-nudge-x .7s ease-in-out infinite; }
   .pi-external.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-external.pi-animate { transform: translate(2px, -2px); }
   .pi-arrowRight.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-arrowRight.pi-animate { animation: pi-nudge-x .7s ease-in-out infinite; }
   .pi-chevron.pi-animate:is(:hover, :focus-visible), .pi-hover:hover .pi-chevron.pi-animate { animation: pi-bounce-y .5s ease; }
@@ -326,7 +325,7 @@
   @keyframes pi-twinkle  { 0% { transform: scale(1) rotate(0); } 45% { transform: scale(1.16) rotate(18deg); } 100% { transform: scale(1) rotate(0); } }
   @keyframes pi-radiate  { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.13); } }
   @keyframes pi-sun-core { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
-  @keyframes pi-fill-up  { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+  @keyframes pi-fill-up  { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0 0 0 0); } }
   @keyframes pi-tap      { 0%, 100% { transform: scale(1); } 40% { transform: scale(.88); } }
   @keyframes pi-nudge-x  { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(3px); } }
   @keyframes pi-fill-in  { 0% { transform: scale(.2); opacity: .2; } 100% { transform: scale(1); opacity: 1; } }
