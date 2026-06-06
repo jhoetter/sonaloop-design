@@ -239,10 +239,12 @@ export const hifi = {
   personas: {
     label: 'PersonasHifi',
     body:
-      '<circle cx="18" cy="17" r="6.5" fill="currentColor" fill-opacity="0.1" stroke-width="2"/>' +
-      '<path d="M6 40a12 12 0 0 1 24 0z" fill="currentColor" fill-opacity="0.1" stroke-width="2"/>' +
-      '<path d="M33 11.5a6 6 0 0 1 0 11" stroke-width="1.75"/>' +
-      '<path d="M34 40a12 12 0 0 0-6.5-10.6" stroke-width="1.75"/>',
+      // Two distinct people: a full front figure + a full back head & shoulder
+      // (the old back person was a floating arc that read as a crooked head).
+      '<circle cx="18" cy="18" r="7" fill="currentColor" fill-opacity="0.1" stroke-width="2"/>' +
+      '<path d="M6 41a12 12 0 0 1 24 0z" fill="currentColor" fill-opacity="0.1" stroke-width="2"/>' +
+      '<circle cx="34" cy="15" r="5" fill="currentColor" fill-opacity="0.1" stroke-width="1.75"/>' +
+      '<path d="M31 25.5a11 11 0 0 1 11 13.5" stroke-width="1.75"/>',
   },
   councils: {
     label: 'CouncilsHifi',
@@ -274,7 +276,7 @@ export const hifi = {
       '<circle cx="24" cy="24" r="20" fill="currentColor" fill-opacity="0.05" stroke="none"/>' +
       // Symmetric, lobed brain; fissure + sulci stay inside the silhouette.
       '<path d="M24 9a6.5 6.5 0 0 0-6.4 5.4 5.5 5.5 0 0 0-2.1 9.9 5 5 0 0 0 2.3 7.6 5 5 0 0 0 6.2 4.1 5 5 0 0 0 6.2-4.1 5 5 0 0 0 2.3-7.6 5.5 5.5 0 0 0-2.1-9.9A6.5 6.5 0 0 0 24 9z" fill="currentColor" fill-opacity="0.08" stroke-width="2" stroke-linejoin="round"/>' +
-      '<path d="M24 9v27" stroke-width="1.25" stroke-opacity="0.5"/>' +
+      '<path d="M24 13v20" stroke-width="1.25" stroke-opacity="0.5"/>' +
       '<path d="M24 17h4M24 23h-4M24 29h4" stroke-width="1.25" stroke-opacity="0.5"/>',
   },
   panel: {
