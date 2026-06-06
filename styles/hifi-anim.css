@@ -68,11 +68,14 @@
   :is(.pi-hifi-panel.pi-animate:hover, .pi-hifi-panel.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-panel.pi-animate) [data-part="lines"] { animation: pi-slide-x .45s ease both; }
 
   /* settings — the cog turns (continuous: an 8-tooth gear has 45° symmetry, so
-     any fixed multiple-of-45° rotation would look static) */
+     any fixed multiple-of-45° rotation would look static). Explicit view-box
+     origin — fill-box rotation orbits off-centre and gets clipped. */
+  .pi-hifi-settings [data-part="gear"] { transform-box: view-box; transform-origin: 24px 24px; }
   :is(.pi-hifi-settings.pi-animate:hover, .pi-hifi-settings.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-settings.pi-animate) [data-part="gear"] { animation: pi-spin 3.5s linear infinite; }
 
   /* sun — rays splay and rotate, core swells */
-  .pi-hifi-sun [data-part="rays"] { transition: transform .5s cubic-bezier(.34, 1.4, .64, 1); }
+  .pi-hifi-sun [data-part="rays"] { transform-box: view-box; transform-origin: 24px 24px; transition: transform .5s cubic-bezier(.34, 1.4, .64, 1); }
+  .pi-hifi-sun [data-part="core"] { transform-box: view-box; transform-origin: 24px 24px; }
   :is(.pi-hifi-sun.pi-animate:hover, .pi-hifi-sun.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-sun.pi-animate) [data-part="rays"] { transform: rotate(45deg) scale(1.06); }
   :is(.pi-hifi-sun.pi-animate:hover, .pi-hifi-sun.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-sun.pi-animate) [data-part="core"] { transform: scale(1.12); }
 
@@ -96,6 +99,7 @@
   :is(.pi-hifi-analytics.pi-animate:hover, .pi-hifi-analytics.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-analytics.pi-animate) rect:nth-of-type(3) { animation-delay: .16s; }
 
   /* star — twinkles */
+  .pi-hifi-star path { transform-box: view-box; transform-origin: 24px 24px; }
   :is(.pi-hifi-star.pi-animate:hover, .pi-hifi-star.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-star.pi-animate) path { animation: pi-twinkle .6s ease; }
 
   /* bulb — the idea switches on */
@@ -189,9 +193,9 @@
   .pi-hifi-rectangle.pi-animate rect { stroke-dasharray: var(--pi-len); }
   :is(.pi-hifi-rectangle.pi-animate:hover, .pi-hifi-rectangle.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-rectangle.pi-animate) rect { animation: pi-draw .6s ease forwards; }
 
-  /* exchange — the two arrows swap past each other */
-  :is(.pi-hifi-exchange.pi-animate:hover, .pi-hifi-exchange.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-exchange.pi-animate) path:nth-of-type(1) { transform: translateX(2.5px); }
-  :is(.pi-hifi-exchange.pi-animate:hover, .pi-hifi-exchange.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-exchange.pi-animate) path:nth-of-type(2) { transform: translateX(-2.5px); }
+  /* exchange — the two arrows slide past each other and back (the swap) */
+  :is(.pi-hifi-exchange.pi-animate:hover, .pi-hifi-exchange.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-exchange.pi-animate) path:nth-of-type(1) { animation: pi-swap-r .6s ease; }
+  :is(.pi-hifi-exchange.pi-animate:hover, .pi-hifi-exchange.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-exchange.pi-animate) path:nth-of-type(2) { animation: pi-swap-l .6s ease; }
 
   /* wave — flows */
   .pi-hifi-wave.pi-animate path { stroke-dasharray: 12 6; }
@@ -320,5 +324,7 @@
   @keyframes pi-nudge-x  { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(3px); } }
   @keyframes pi-fill-in  { 0% { transform: scale(.2); opacity: .2; } 100% { transform: scale(1); opacity: 1; } }
   @keyframes pi-flow     { to { stroke-dashoffset: -18; } }
+  @keyframes pi-swap-r   { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(4px); } }
+  @keyframes pi-swap-l   { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(-4px); } }
   @keyframes pi-write    { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(1.5px, 1.5px); } }
 }
