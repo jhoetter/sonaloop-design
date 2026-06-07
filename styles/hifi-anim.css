@@ -203,6 +203,8 @@
      the research orbit ring settles, the cloud softly glows. */
   .pi-hifi.pi-animate:is(:hover, :focus-visible) [data-part="orbits"], .pi-hover:hover .pi-hifi.pi-animate [data-part="orbits"] { animation: pi-settle .9s ease; }
   .pi-hifi.pi-animate:is(:hover, :focus-visible) [data-part="cloud"], .pi-hover:hover .pi-hifi.pi-animate [data-part="cloud"] { animation: pi-glow 1s ease; }
+  /* base-mark + corner badge variants: the little badge gives one gentle hop */
+  .pi-hifi.pi-animate:is(:hover, :focus-visible) [data-part="badge"], .pi-hover:hover .pi-hifi.pi-animate [data-part="badge"] { animation: pi-bob .9s ease; }
 
   /* ════════════════════════════════════════════════════════════════════════
      Regular 24×24. Outline glyphs ink themselves; "verb" icons act softly.
@@ -289,6 +291,7 @@
 
   /* sonaloop product family (cloud / research) — research orbit ring settles */
   .pi.pi-animate:is(:hover, :focus-visible) [data-part="orbits"], .pi-hover:hover .pi.pi-animate [data-part="orbits"] { animation: pi-settle .7s ease; }
+  .pi.pi-animate:is(:hover, :focus-visible) [data-part="badge"], .pi-hover:hover .pi.pi-animate [data-part="badge"] { animation: pi-bob .9s ease; }
 
   .pi-squareRows.pi-animate path, .pi-squareCols.pi-animate path, .pi-squareGrid.pi-animate path { stroke-dasharray: 60; }
   .pi-squareRows.pi-animate:is(:hover, :focus-visible) path, .pi-hover:hover .pi-squareRows.pi-animate path,
