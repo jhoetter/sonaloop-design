@@ -50,8 +50,8 @@ const header = (label, yy) =>
   `<text x="${PAD}" y="${yy}" font-family="ui-sans-serif,system-ui,sans-serif" font-size="15" font-weight="700" fill="${INK}">${label}</text>`;
 
 let body = '';
-body += `<text x="${PAD}" y="${PAD + 18}" font-family="ui-sans-serif,system-ui,sans-serif" font-size="20" font-weight="700" fill="${INK}">persona-icons</text>`;
-body += `<text x="${PAD}" y="${PAD + 36}" font-family="ui-sans-serif,system-ui,sans-serif" font-size="12" fill="${MUTED}">${reg.length} regular · ${hi.length} hi-fi — one source of truth for persona-council + persona-website</text>`;
+body += `<text x="${PAD}" y="${PAD + 18}" font-family="ui-sans-serif,system-ui,sans-serif" font-size="20" font-weight="700" fill="${INK}">sonaloop-icons</text>`;
+body += `<text x="${PAD}" y="${PAD + 36}" font-family="ui-sans-serif,system-ui,sans-serif" font-size="12" fill="${MUTED}">${reg.length} regular · ${hi.length} hi-fi — one source of truth for sonaloop + persona-website</text>`;
 
 body += header(`Regular · 24×24  (${reg.length})`, y);
 y += 14;

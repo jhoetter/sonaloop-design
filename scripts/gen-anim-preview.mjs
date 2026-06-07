@@ -34,7 +34,7 @@ const html = `<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>persona-icons · hi-fi hover animations</title>
+<title>sonaloop-icons · hi-fi hover animations</title>
 <style>
   :root { color-scheme: light dark; }
   body { margin: 0; font: 14px/1.4 ui-sans-serif, system-ui, sans-serif;
@@ -61,7 +61,7 @@ ${css}
 </head>
 <body>
 <header>
-  <h1>persona-icons — hi-fi hover animations</h1>
+  <h1>sonaloop-icons — hi-fi hover animations</h1>
   <p>Hover (or keyboard-focus) any tile. Honors <code>prefers-reduced-motion</code>.</p>
 </header>
 <main class="grid">

@@ -1,8 +1,8 @@
 /*
- * persona-icons — hover micro-interactions (regular + hi-fi).
+ * sonaloop-icons — hover micro-interactions (regular + hi-fi).
  *
  * SOURCE OF TRUTH for icon animation. `scripts/gen.mjs` copies this verbatim
- * into the Python package (as HIFI_ANIM_CSS) so persona-council and
+ * into the Python package (as HIFI_ANIM_CSS) so sonaloop and
  * persona-website share one animation layer. Authored by hand — safe to edit.
  *
  * Hooks
@@ -199,6 +199,11 @@
   :is(.pi-hifi-sonaloop.pi-animate:hover, .pi-hifi-sonaloop.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-sonaloop.pi-animate) circle:nth-of-type(2) { animation-delay: .08s; }
   :is(.pi-hifi-sonaloop.pi-animate:hover, .pi-hifi-sonaloop.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-sonaloop.pi-animate) circle:nth-of-type(3) { animation-delay: .16s; }
 
+  /* sonaloop product family (cloud-N / research-N) — the inner brand loop
+     settles on hover, rotating about its own centre (fill-box, default origin). */
+  :is(.pi-hifi-sonaloop-cloud-1, .pi-hifi-sonaloop-cloud-2, .pi-hifi-sonaloop-cloud-3, .pi-hifi-sonaloop-cloud-4, .pi-hifi-sonaloop-cloud-5, .pi-hifi-sonaloop-research-1, .pi-hifi-sonaloop-research-2, .pi-hifi-sonaloop-research-3, .pi-hifi-sonaloop-research-4, .pi-hifi-sonaloop-research-5).pi-animate:is(:hover, :focus-visible) [data-part="loop"],
+  .pi-hover:hover :is(.pi-hifi-sonaloop-cloud-1, .pi-hifi-sonaloop-cloud-2, .pi-hifi-sonaloop-cloud-3, .pi-hifi-sonaloop-cloud-4, .pi-hifi-sonaloop-cloud-5, .pi-hifi-sonaloop-research-1, .pi-hifi-sonaloop-research-2, .pi-hifi-sonaloop-research-3, .pi-hifi-sonaloop-research-4, .pi-hifi-sonaloop-research-5).pi-animate [data-part="loop"] { animation: pi-settle .8s ease; }
+
   /* ════════════════════════════════════════════════════════════════════════
      Regular 24×24. Outline glyphs ink themselves; "verb" icons act softly.
      Trigger: `.pi-NAME.pi-animate:is(:hover,:focus-visible)` or `.pi-hover`.
@@ -281,6 +286,10 @@
   .pi-sonaloop.pi-animate:is(:hover, :focus-visible) circle, .pi-hover:hover .pi-sonaloop.pi-animate circle { animation: pi-appear .4s ease both; }
   .pi-sonaloop.pi-animate:is(:hover, :focus-visible) circle:nth-of-type(2), .pi-hover:hover .pi-sonaloop.pi-animate circle:nth-of-type(2) { animation-delay: .07s; }
   .pi-sonaloop.pi-animate:is(:hover, :focus-visible) circle:nth-of-type(3), .pi-hover:hover .pi-sonaloop.pi-animate circle:nth-of-type(3) { animation-delay: .14s; }
+
+  /* sonaloop product family (cloud-N / research-N) — inner brand loop settles */
+  :is(.pi-sonaloop-cloud-1, .pi-sonaloop-cloud-2, .pi-sonaloop-cloud-3, .pi-sonaloop-cloud-4, .pi-sonaloop-cloud-5, .pi-sonaloop-research-1, .pi-sonaloop-research-2, .pi-sonaloop-research-3, .pi-sonaloop-research-4, .pi-sonaloop-research-5).pi-animate:is(:hover, :focus-visible) [data-part="loop"],
+  .pi-hover:hover :is(.pi-sonaloop-cloud-1, .pi-sonaloop-cloud-2, .pi-sonaloop-cloud-3, .pi-sonaloop-cloud-4, .pi-sonaloop-cloud-5, .pi-sonaloop-research-1, .pi-sonaloop-research-2, .pi-sonaloop-research-3, .pi-sonaloop-research-4, .pi-sonaloop-research-5).pi-animate [data-part="loop"] { animation: pi-settle .7s ease; }
 
   .pi-squareRows.pi-animate path, .pi-squareCols.pi-animate path, .pi-squareGrid.pi-animate path { stroke-dasharray: 60; }
   .pi-squareRows.pi-animate:is(:hover, :focus-visible) path, .pi-hover:hover .pi-squareRows.pi-animate path,

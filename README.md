@@ -1,14 +1,14 @@
-# persona-icons
+# sonaloop-icons
 
 One icon library, two consumers — the **persona-website** (React) and the
-**persona-council** app (Python, server-rendered HTML). Every icon is authored
+**sonaloop** app (Python, server-rendered HTML). Every icon is authored
 **once** and generated into both targets, so the two products never drift.
 
 ```
 icons.data.mjs                  ← author icons here (the only source of truth)
    │  node scripts/gen.mjs
    ├─▶ src/index.ts             ← React/TSX components  (persona-website)
-   └─▶ py/persona_icons/__init__.py  ← Python SVG helpers (persona-council)
+   └─▶ py/sonaloop_icons/__init__.py  ← Python SVG helpers (sonaloop)
 ```
 
 Two flavours, mirroring `bim-icons`:
@@ -20,7 +20,7 @@ Two flavours, mirroring `bim-icons`:
 
 ## All icons
 
-![persona-icons gallery](preview/gallery.png)
+![sonaloop-icons gallery](preview/gallery.png)
 
 Regenerate this sheet after adding icons: `node scripts/gen-preview.mjs`
 (writes `preview/gallery.svg`; rasterize to `preview/gallery.png` for GitHub).
@@ -67,7 +67,7 @@ Regenerate this sheet after adding icons: `node scripts/gen-preview.mjs`
    ```
 
 3. Commit `icons.data.mjs` **and** the generated `src/index.ts` +
-   `py/persona_icons/__init__.py` (consumers read the generated files directly).
+   `py/sonaloop_icons/__init__.py` (consumers read the generated files directly).
 
 > The generated files carry a "Do not edit" header — always change
 > `icons.data.mjs` and re-run the generator.
@@ -78,7 +78,7 @@ Regenerate this sheet after adding icons: `node scripts/gen-preview.mjs`
 `vite.config.ts`), exactly like `bim-website → ../bim-icons`:
 
 ```ts
-import { SearchIcon, PersonaHifi } from 'persona-icons';
+import { SearchIcon, PersonaHifi } from 'sonaloop-icons';
 
 <SearchIcon size={18} strokeWidth={1.75} className="text-slate-600" />
 <PersonaHifi size={48} />
@@ -86,14 +86,14 @@ import { SearchIcon, PersonaHifi } from 'persona-icons';
 
 Props: `size`, `strokeWidth`, `absoluteStrokeWidth`, plus any SVG attribute.
 
-## Using it — Python (persona-council)
+## Using it — Python (sonaloop)
 
 The council installs the `py/` package as an editable path dependency
-(`pyproject.toml` → `[tool.uv.sources] persona-icons = { path = "../persona-icons/py", editable = true }`)
+(`pyproject.toml` → `[tool.uv.sources] sonaloop-icons = { path = "../sonaloop-icons/py", editable = true }`)
 and renders icons to inline SVG strings:
 
 ```python
-from persona_icons import icon, hifi
+from sonaloop_icons import icon, hifi
 
 icon("search")        # '<svg class="ic" viewBox="0 0 24 24">…</svg>'
 icon("star")          # '<svg class="ic star" …>'  (extra class baked in via data)
@@ -121,15 +121,15 @@ spins, search lens scans, councils dots type, check draws itself, …). It is
 **React (persona-website)** — import the stylesheet once:
 
 ```ts
-import 'persona-icons/style.css';
+import 'sonaloop-icons/style.css';
 <PersonasHifi size={48} />                          // animates on hover/focus
 <button className="pi-hover">…<BulbHifi/></button>  // hovering the button animates the icon
 ```
 
-**Python (persona-council)** — inline the generated CSS into a `<style>` block:
+**Python (sonaloop)** — inline the generated CSS into a `<style>` block:
 
 ```python
-from persona_icons import hifi_anim_css
+from sonaloop_icons import hifi_anim_css
 head = f"<style>{hifi_anim_css()}</style>"   # add once to the page <head>
 ```
 
@@ -155,6 +155,6 @@ icons.data.mjs        source of truth (regular + hifi)
 scripts/gen.mjs       generator (zero deps, plain Node)
 src/icon.tsx          React factories (personaIcon / personaIconHifi) — hand-written
 src/index.ts          GENERATED React barrel
-py/persona_icons/     GENERATED Python module + its pyproject.toml
+py/sonaloop_icons/     GENERATED Python module + its pyproject.toml
 package.json          npm run gen / npm run typecheck
 ```

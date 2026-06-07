@@ -4,13 +4,13 @@ export type PersonaIconProps = SVGAttributes<SVGSVGElement> & {
   size?: number | string;
   strokeWidth?: number | string;
   absoluteStrokeWidth?: boolean;
-  /** Opt in to the hover/focus micro-animation (needs `persona-icons/style.css`). */
+  /** Opt in to the hover/focus micro-animation (needs `sonaloop-icons/style.css`). */
   animate?: boolean;
 };
 
 export type PersonaIconHifiProps = SVGAttributes<SVGSVGElement> & {
   size?: number | string;
-  /** Opt in to the hover/focus micro-animation (needs `persona-icons/style.css`). */
+  /** Opt in to the hover/focus micro-animation (needs `sonaloop-icons/style.css`). */
   animate?: boolean;
 };
 
@@ -23,7 +23,7 @@ export type PersonaIcon = ComponentType<PersonaIconProps>;
  * `absoluteStrokeWidth`, plus any SVG attribute. Stroke is `currentColor`;
  * default strokeWidth is 1.75 to match the council chrome set.
  *
- *   import { SearchIcon } from 'persona-icons'
+ *   import { SearchIcon } from 'sonaloop-icons'
  *   <SearchIcon size={18} className="text-slate-600" />
  *   <SearchIcon animate />            // hover/focus micro-animation (opt-in)
  *
@@ -31,7 +31,7 @@ export type PersonaIcon = ComponentType<PersonaIconProps>;
  * string, so it is trusted (build-time constant, never user input).
  *
  * The root carries `pi pi-<key>`; `animate` adds `pi-animate`, the gate the
- * stylesheet (`persona-icons/style.css`) requires. Default is static.
+ * stylesheet (`sonaloop-icons/style.css`) requires. Default is static.
  */
 export function personaIcon(displayName: string, body: string, key: string): PersonaIcon {
   const base = `pi pi-${key}`;
@@ -77,7 +77,7 @@ export function personaIcon(displayName: string, body: string, key: string): Per
  * root only provides `stroke="currentColor"` and `fill="none"` as defaults.
  *
  * The root carries `pi-hifi pi-hifi-<key>` classes so the optional animation
- * stylesheet (`persona-icons/style.css`) can target a specific icon and its
+ * stylesheet (`sonaloop-icons/style.css`) can target a specific icon and its
  * `data-part` elements on hover/focus. Without that stylesheet the classes are
  * inert. A consumer `className` is appended, not overwritten.
  */
