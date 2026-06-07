@@ -28,6 +28,7 @@ REGULAR: dict[str, dict[str, str | None]] = {
     "briefcase": {"body": "<rect x=\"3\" y=\"7.5\" width=\"18\" height=\"12.5\" rx=\"2\"/><path d=\"M8 7.5V5.8A1.8 1.8 0 0 1 9.8 4h4.4A1.8 1.8 0 0 1 16 5.8v1.7\"/><path d=\"M3 12.5h18\"/>", "cls": None},
     "contact": {"body": "<circle cx=\"12\" cy=\"8\" r=\"3.4\"/><path d=\"M5.5 19.5a6.5 6.5 0 0 1 13 0\"/>", "cls": None},
     "tag": {"body": "<path d=\"M11.6 3.7H5A1.3 1.3 0 0 0 3.7 5v6.6a1.6 1.6 0 0 0 .47 1.13l8.2 8.2a1.6 1.6 0 0 0 2.26 0l5.6-5.6a1.6 1.6 0 0 0 0-2.26l-8.2-8.2A1.6 1.6 0 0 0 11.6 3.7z\"/><circle cx=\"7.6\" cy=\"7.6\" r=\"1.3\"/>", "cls": None},
+    "clock": {"body": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 7.2V12l3.2 1.9\"/>", "cls": None},
     "personas": {"body": "<circle cx=\"9\" cy=\"8\" r=\"3.2\"/><path d=\"M3.5 19a5.5 5.5 0 0 1 11 0\"/><path d=\"M16 5.2a3 3 0 0 1 0 5.6\"/><path d=\"M17.5 19a5.5 5.5 0 0 0-3-4.9\"/>", "cls": None},
     "councils": {"body": "<path d=\"M21 11.5a8.5 8.5 0 0 1-12.5 7.5L4 20l1-4.5A8.5 8.5 0 1 1 21 11.5z\"/>", "cls": None},
     "syntheses": {"body": "<path d=\"M12 3l9 5-9 5-9-5 9-5z\"/><path d=\"M3 13l9 5 9-5\"/>", "cls": None},
