@@ -147,6 +147,45 @@ export const regular = {
     body: '<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',
   },
 
+  // ── Method icons (purpose-built for the website's 5 research methods + pressure-test) ──
+  // jtbd — forces of progress: a strong "pull" arrow forward, a weaker "push/hold"
+  // arrow back, meeting at the moment of switch (pivot node). Distinct from
+  // `exchange` (a circular swap) — these are opposing linear forces.
+  jtbd: {
+    label: 'JtbdIcon',
+    body: '<circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/><path d="M14 12h6.5M17.5 8.5L21 12l-3.5 3.5"/><path d="M10 12H3.5M6.5 9.5L3.5 12l3 2.5"/>',
+  },
+  // pricing-research — willingness-to-pay sensitivity: a price tag over a range
+  // slider (the acceptable band, with a knob you move).
+  pricingResearch: {
+    label: 'PricingResearchIcon',
+    body: '<path d="M12.7 3.5H6.5A1.3 1.3 0 0 0 5.2 4.8V11a1.6 1.6 0 0 0 .47 1.13l5.2 5.2a1.6 1.6 0 0 0 2.26 0l4.4-4.4a1.6 1.6 0 0 0 0-2.26l-5.2-5.2A1.6 1.6 0 0 0 12.7 3.5z"/><circle cx="8.6" cy="7.4" r="1.2"/><path d="M4 21h16"/><circle cx="14" cy="21" r="1.7" fill="currentColor" stroke="none"/>',
+  },
+  // positioning — does the message land on the intended position: a map pin
+  // dropped on a precise point (the position you claim in the market).
+  positioning: {
+    label: 'PositioningIcon',
+    body: '<path d="M12 21s6.5-6.1 6.5-11A6.5 6.5 0 0 0 5.5 10c0 4.9 6.5 11 6.5 11z"/><circle cx="12" cy="10" r="2.4"/>',
+  },
+  // design-thinking-hmw — divergence: one pain point branches into several
+  // How-Might-We opportunities.
+  designThinkingHmw: {
+    label: 'DesignThinkingHmwIcon',
+    body: '<circle cx="5" cy="12" r="2.2"/><circle cx="19" cy="5.5" r="2.2"/><circle cx="19" cy="12" r="2.2"/><circle cx="19" cy="18.5" r="2.2"/><path d="M7.2 12h2.3M16.8 12h-2.3M9.5 12c2.5 0 2-6.5 5.3-6.5M9.5 12c2.5 0 2 6.5 5.3 6.5"/>',
+  },
+  // continuous-discovery — a standing panel that recurs and remembers: a cyclical
+  // loop arrow with time ticks (it comes back around, week over week).
+  continuousDiscovery: {
+    label: 'ContinuousDiscoveryIcon',
+    body: '<path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v3.2h-3.2"/><path d="M12 8v4l2.6 1.6"/>',
+  },
+  // pressure-test — stress a decision before you ship: a gauge dial with the
+  // needle pushed into the high zone.
+  pressureTest: {
+    label: 'PressureTestIcon',
+    body: '<path d="M3.5 17a8.5 8.5 0 0 1 17 0"/><path d="M3.5 17h2M18.5 17h2M12 8.5V7M6.4 11.4l-1-1M17.6 11.4l1-1"/><path d="M12 17l4.2-4.6"/><circle cx="12" cy="17" r="1.3" fill="currentColor" stroke="none"/>',
+  },
+
   // ── Status family ──────────────────────────────────────────────────────────
   // Available for migrating the council's inline ✓ ◐ ○ ! status glyphs to real
   // icons when desired (see README → "Status glyphs").
@@ -424,6 +463,69 @@ export const hifi = {
       '<circle data-part="lens" cx="21" cy="21" r="14" fill="currentColor" fill-opacity="0.06" stroke-width="2"/>' +
       '<path data-part="lens" d="M31.5 31.5L42 42" stroke-width="2.5"/>' +
       '<path data-part="lens" d="M21 14a7 7 0 0 0-7 7" stroke-width="1.5" stroke-opacity="0.6"/>',
+  },
+  // ── Method icons (48×48 twins) ───────────────────────────────────────────────
+  jtbd: {
+    label: 'JtbdHifi',
+    body:
+      '<circle cx="24" cy="24" r="20" fill="currentColor" fill-opacity="0.05" stroke="none"/>' +
+      // strong "pull" force forward
+      '<path data-part="pull" d="M27 24h13M34 17l7 7-7 7" stroke-width="2.5"/>' +
+      // weaker "push/hold" force back
+      '<path data-part="push" d="M21 24H10M15 18l-5 6 5 6" stroke-width="1.75" stroke-opacity="0.6"/>' +
+      // the moment of switch (pivot)
+      '<circle cx="24" cy="24" r="3" fill="currentColor" fill-opacity="0.2" stroke-width="1.75"/>',
+  },
+  pricingResearch: {
+    label: 'PricingResearchHifi',
+    body:
+      // a price tag
+      '<path data-part="tag" d="M25.4 6H13A2.6 2.6 0 0 0 10.4 8.6V21a3.2 3.2 0 0 0 .94 2.26l10.4 10.4a3.2 3.2 0 0 0 4.52 0l8.8-8.8a3.2 3.2 0 0 0 0-4.52L24.66 9.94A3.2 3.2 0 0 0 25.4 6z" fill="currentColor" fill-opacity="0.08" stroke-width="2"/>' +
+      '<circle cx="17.2" cy="13.8" r="2.4" stroke-width="1.75"/>' +
+      // a willingness-to-pay range slider with a knob
+      '<path d="M7 42h34" stroke-width="2"/>' +
+      '<circle data-part="knob" cx="28" cy="42" r="3.4" fill="currentColor" fill-opacity="0.2" stroke-width="2"/>',
+  },
+  positioning: {
+    label: 'PositioningHifi',
+    body:
+      '<circle cx="24" cy="20" r="18" fill="currentColor" fill-opacity="0.05" stroke="none"/>' +
+      '<path data-part="pin" d="M24 43s12-11.3 12-20.5A12 12 0 0 0 12 22.5C12 31.7 24 43 24 43z" fill="currentColor" fill-opacity="0.1" stroke-width="2"/>' +
+      '<circle data-part="dot" cx="24" cy="21" r="4.5" fill="currentColor" fill-opacity="0.2" stroke-width="1.75"/>',
+  },
+  designThinkingHmw: {
+    label: 'DesignThinkingHmwHifi',
+    body:
+      '<circle cx="24" cy="24" r="20" fill="currentColor" fill-opacity="0.05" stroke="none"/>' +
+      // branches diverging from the pain point
+      '<path data-part="branches" d="M16 24h4M28 11h-2c-4 0-3.5 13-8 13M28 24h-4M28 37h-2c-4 0-3.5-13-8-13" stroke-width="1.75" stroke-opacity="0.6"/>' +
+      // the source node (pain) + three opportunity nodes
+      '<circle data-part="src" cx="11" cy="24" r="4" fill="currentColor" fill-opacity="0.2" stroke-width="2"/>' +
+      '<circle data-part="leaf" cx="33" cy="11" r="3.6" fill="currentColor" fill-opacity="0.1" stroke-width="2"/>' +
+      '<circle data-part="leaf" cx="33" cy="24" r="3.6" fill="currentColor" fill-opacity="0.1" stroke-width="2"/>' +
+      '<circle data-part="leaf" cx="33" cy="37" r="3.6" fill="currentColor" fill-opacity="0.1" stroke-width="2"/>',
+  },
+  continuousDiscovery: {
+    label: 'ContinuousDiscoveryHifi',
+    body:
+      '<circle cx="24" cy="24" r="20" fill="currentColor" fill-opacity="0.05" stroke="none"/>' +
+      // a recurring cycle that comes back around
+      '<path data-part="cycle" d="M40 24a16 16 0 1 1-4.7-11.3" fill="currentColor" fill-opacity="0.06" stroke-width="2"/>' +
+      '<path data-part="cycle" d="M40 8v7h-7" stroke-width="2"/>' +
+      // a clock face — it remembers across time
+      '<path d="M24 16v8l5 3" stroke-width="1.75" stroke-opacity="0.7"/>',
+  },
+  pressureTest: {
+    label: 'PressureTestHifi',
+    body:
+      '<circle cx="24" cy="26" r="20" fill="currentColor" fill-opacity="0.05" stroke="none"/>' +
+      // the gauge dial
+      '<path data-part="dial" d="M7 34a17 17 0 0 1 34 0z" fill="currentColor" fill-opacity="0.08" stroke-width="2"/>' +
+      // dial ticks
+      '<path d="M7 34h3M38 34h3M24 17v3M11.6 21.6l2.1 2.1M36.4 21.6l-2.1 2.1" stroke-width="1.5" stroke-opacity="0.6"/>' +
+      // the needle pushed into the high zone
+      '<path data-part="needle" d="M24 34l9-9" stroke-width="2.5"/>' +
+      '<circle cx="24" cy="34" r="2.6" fill="currentColor" fill-opacity="0.25" stroke-width="1.75"/>',
   },
   check: {
     label: 'CheckHifi',

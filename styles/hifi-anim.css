@@ -108,6 +108,31 @@
   .pi-hifi-search [data-part="lens"] { transform-box: view-box; transform-origin: 21px 21px; }
   :is(.pi-hifi-search.pi-animate:hover, .pi-hifi-search.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-search.pi-animate) [data-part="lens"] { animation: pi-scan .8s ease; }
 
+  /* jtbd — the opposing forces ease apart a touch (push back, pull forward) */
+  :is(.pi-hifi-jtbd.pi-animate:hover, .pi-hifi-jtbd.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-jtbd.pi-animate) [data-part="pull"] { transform: translateX(2px); }
+  :is(.pi-hifi-jtbd.pi-animate:hover, .pi-hifi-jtbd.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-jtbd.pi-animate) [data-part="push"] { transform: translateX(-2px); }
+
+  /* pricingResearch — the slider knob slides to its price */
+  :is(.pi-hifi-pricingResearch.pi-animate:hover, .pi-hifi-pricingResearch.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-pricingResearch.pi-animate) [data-part="knob"] { transform: translateX(3px); }
+
+  /* positioning — the pin drops onto its position */
+  .pi-hifi-positioning [data-part="pin"] { transform-box: view-box; transform-origin: 24px 43px; }
+  :is(.pi-hifi-positioning.pi-animate:hover, .pi-hifi-positioning.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-positioning.pi-animate) [data-part="pin"] { animation: pi-drop .55s cubic-bezier(.4, 0, .2, 1); }
+  :is(.pi-hifi-positioning.pi-animate:hover, .pi-hifi-positioning.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-positioning.pi-animate) [data-part="dot"] { animation: pi-glow .9s ease; }
+
+  /* designThinkingHmw — opportunities diverge: the leaf nodes settle in, in turn */
+  :is(.pi-hifi-designThinkingHmw.pi-animate:hover, .pi-hifi-designThinkingHmw.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-designThinkingHmw.pi-animate) [data-part="leaf"] { animation: pi-appear .4s ease both; }
+  :is(.pi-hifi-designThinkingHmw.pi-animate:hover, .pi-hifi-designThinkingHmw.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-designThinkingHmw.pi-animate) [data-part="leaf"]:nth-of-type(3) { animation-delay: .06s; }
+  :is(.pi-hifi-designThinkingHmw.pi-animate:hover, .pi-hifi-designThinkingHmw.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-designThinkingHmw.pi-animate) [data-part="leaf"]:nth-of-type(4) { animation-delay: .12s; }
+
+  /* continuousDiscovery — the cycle gives one quiet turn (it comes back around) */
+  .pi-hifi-continuousDiscovery [data-part="cycle"] { transform-box: view-box; transform-origin: 24px 24px; }
+  :is(.pi-hifi-continuousDiscovery.pi-animate:hover, .pi-hifi-continuousDiscovery.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-continuousDiscovery.pi-animate) [data-part="cycle"] { animation: pi-spin 1s cubic-bezier(.4, 0, .2, 1); }
+
+  /* pressureTest — the needle sweeps up into the high zone, then settles */
+  .pi-hifi-pressureTest [data-part="needle"] { transform-box: view-box; transform-origin: 24px 34px; }
+  :is(.pi-hifi-pressureTest.pi-animate:hover, .pi-hifi-pressureTest.pi-animate:focus-visible, .pi-hover:hover .pi-hifi-pressureTest.pi-animate) [data-part="needle"] { animation: pi-sweep .7s cubic-bezier(.4, 0, .2, 1); }
+
   /* check — inks itself */
   .pi-hifi-check.pi-animate { --pi-len: 42; }
   .pi-hifi-check.pi-animate path { stroke-dasharray: var(--pi-len); }
@@ -338,4 +363,6 @@
   @keyframes pi-fill-up   { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0 0 0 0); } }
   @keyframes pi-flow      { to { stroke-dashoffset: -18; } }
   @keyframes pi-write     { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(1px, 1px); } }
+  @keyframes pi-drop      { 0% { transform: translateY(-3px); } 55% { transform: translateY(1px); } 100% { transform: translateY(0); } }
+  @keyframes pi-sweep     { 0% { transform: rotate(-22deg); } 60% { transform: rotate(5deg); } 100% { transform: rotate(0); } }
 }
