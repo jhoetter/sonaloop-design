@@ -7,7 +7,9 @@
  *   import 'sonaloop-design/components.css';
  *
  *   <BarChart items={[{ label: 'Plan', value: 8 }, { label: 'Cook', value: 3 }]} />
+ *   <StackedBarChart items={[{ label: 'Pricing', segments: [{ label: 'For', value: 6 }, { label: 'Against', value: 2 }] }]} />
  *   <PieChart items={[{ label: 'Support', value: 12 }, { label: 'Oppose', value: 4 }]} donut />
+ *   <GaugeChart items={[{ label: 'Confidence', value: 72 }]} />
  *   <EffortImpactChart items={[{ label: 'Auto shopping list', x: 2, y: 5 }]} />
  */
 import type { CSSProperties, HTMLAttributes, ReactNode } from 'react';
@@ -81,6 +83,78 @@ export function PieChart({ items, title, donut = true, showValues = true }:
             </span>
           ))}
         </div>
+      </div>
+    </figure>
+  );
+}
+
+export interface StackSegment { label: string; value: number; color?: string }
+export interface StackedBarItem { label: string; segments: StackSegment[] }
+export function StackedBarChart({ items, title, maxValue, showValues = true }:
+  { items: StackedBarItem[]; title?: string; maxValue?: number; showValues?: boolean }) {
+  const rows = items.filter((it) => it.segments?.some((s) => Number.isFinite(s.value)));
+  if (!rows.length) return null;
+  // Series identity (and colour) is shared across rows, keyed by segment label in first-seen order —
+  // so the same series reads as the same colour in every bar and in the legend.
+  const keys: string[] = [];
+  for (const it of rows) for (const s of it.segments) if (!keys.includes(s.label)) keys.push(s.label);
+  const colorOf = (s: StackSegment) => s.color ?? SERIES[Math.max(0, keys.indexOf(s.label)) % SERIES.length];
+  const totals = rows.map((it) => it.segments.reduce((n, s) => n + Math.max(0, s.value || 0), 0));
+  const mx = maxValue || Math.max(...totals) || 1;
+  const legend = keys.map((k) => ({ label: k, color: colorOf(rows.flatMap((it) => it.segments).find((s) => s.label === k)!) }));
+  return (
+    <figure className="sl-chart">
+      <Title title={title} />
+      <div className="sl-bars">
+        {rows.map((it, i) => (
+          <div className="sl-bar" key={i}>
+            <MD t={it.label} className="sl-bar__label" title={it.label} />
+            <span className="sl-bar__track">
+              <span className="sl-bar__fill sl-bar__fill--stack" style={{ '--v': `${Math.min(100, (totals[i] / mx) * 100)}%` } as Sv}>
+                {it.segments.filter((s) => s.value > 0).map((s, j) => (
+                  <span className="sl-bar__seg" key={j} title={`${s.label}: ${fmt(s.value)}`}
+                    style={{ flexGrow: s.value, '--c': colorOf(s) } as Sv} />
+                ))}
+              </span>
+            </span>
+            {showValues && <span className="sl-bar__val">{fmt(totals[i])}</span>}
+          </div>
+        ))}
+      </div>
+      <div className="sl-legend sl-legend--row" style={{ marginTop: '.9em' }}>
+        {legend.map((l, i) => (
+          <span className="sl-legend__item" key={i}>
+            <span className="sl-legend__sw" style={{ '--c': l.color } as Sv} />
+            <MD t={l.label} className="sl-legend__label" />
+          </span>
+        ))}
+      </div>
+    </figure>
+  );
+}
+
+export interface GaugeItem { label: string; value: number; max?: number; color?: string }
+export function GaugeChart({ items, title, max = 100, showValues = true }:
+  { items: GaugeItem[]; title?: string; max?: number; showValues?: boolean }) {
+  const rows = items.filter((it) => Number.isFinite(it.value));
+  if (!rows.length) return null;
+  return (
+    <figure className="sl-chart">
+      <Title title={title} />
+      <div className="sl-gauges">
+        {rows.map((it, i) => {
+          const m = it.max || max || 1;
+          const pct = Math.max(0, Math.min(100, (it.value / m) * 100));
+          return (
+            <div className="sl-gauge-item" key={i}>
+              <div className="sl-gauge" role="img" style={{ '--p': pct, '--c': seriesColor(i, it.color) } as Sv}>
+                <span className="sl-gauge__val">{Math.round(pct)}%</span>
+              </div>
+              <MD t={it.label} className="sl-gauge__label" />
+              {showValues && m !== 100 && <span className="sl-gauge__sub">{fmt(it.value)} / {fmt(m)}</span>}
+            </div>
+          );
+        })}
       </div>
     </figure>
   );

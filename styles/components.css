@@ -347,6 +347,20 @@
 .sl-bar__track { display: block; height: .7em; border-radius: var(--sl-radius-full); background: var(--sl-surface-2); overflow: hidden; }
 .sl-bar__fill { display: block; height: 100%; width: var(--v, 0%); border-radius: var(--sl-radius-full); background: var(--c, var(--sl-accent)); }
 .sl-bar__val { color: var(--sl-muted); font-variant-numeric: tabular-nums; min-width: 2em; text-align: right; }
+/* Stacked bar — the fill is sized to the bar total (--v); inner --seg-s split it by series value. */
+.sl-bar__fill--stack { display: flex; background: none; overflow: hidden; }
+.sl-bar__seg { height: 100%; flex-basis: 0; background: var(--c, var(--sl-accent)); }
+
+/* Gauge — radial progress rings (KPI / % complete). `--p` (0..100) is set inline. */
+.sl-gauges { display: flex; flex-wrap: wrap; gap: 1.5em; align-items: flex-start; }
+.sl-gauge-item { display: flex; flex-direction: column; align-items: center; gap: .55em; text-align: center; }
+.sl-gauge { position: relative; width: 7.5em; height: 7.5em; flex: none; border-radius: 50%;
+  background: conic-gradient(var(--c, var(--sl-accent)) calc(var(--p, 0) * 1%), var(--sl-surface-2) 0); }
+.sl-gauge::after { content: ''; position: absolute; inset: 15%; border-radius: 50%; background: var(--sl-bg); }
+.sl-gauge__val { position: absolute; inset: 0; z-index: 1; display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 1.35em; color: var(--sl-ink); font-variant-numeric: tabular-nums; }
+.sl-gauge__label { font-size: .85em; color: var(--sl-ink); max-width: 9em; }
+.sl-gauge__sub { font-size: .78em; color: var(--sl-muted); font-variant-numeric: tabular-nums; }
 
 /* Pie / donut — proportions (distribution, sentiment). `--slices` is set inline (conic-gradient). */
 .sl-pie-wrap { display: flex; align-items: center; gap: 1.3em; flex-wrap: wrap; }
