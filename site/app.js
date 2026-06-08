@@ -10,6 +10,7 @@
 import { inspector, scales, fonts } from '/tokens.data.mjs';
 import { regular, hifi } from '/icons.data.mjs';
 import { blocks as websiteBlocks } from '/site/website.previews.mjs';
+import { usage as websiteUsage } from '/site/website.usage.mjs';
 
 /* ── tiny helpers ──────────────────────────────────────────────────────────────── */
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -124,6 +125,25 @@ function chartEffort(items, { title = '', xLabel = 'Effort', yLabel = 'Value', q
     + `<div class="sl-quad-xlab">${esc(xLabel)}</div></div><div class="sl-legend" style="margin-top:.9em">${legend}</div></figure>`;
 }
 
+/* "Used on the website" — the consumer pages auto-detected from the sibling marketing site by
+   scripts/gen-website-usage.mjs. Blocks rendered inside another block (no direct page import) get
+   a short note instead of a list. */
+const USAGE_FALLBACK = {
+  'mega-menu': 'Rendered inside the <b>Navbar</b> (opens on hover) — not imported directly by pages.',
+  'cta-band': 'Embedded in the <b>Footer</b> by default; also drop-in standalone mid-page.',
+};
+function websiteConsumers(block) {
+  const list = websiteUsage[block] || [];
+  if (!list.length) {
+    const note = USAGE_FALLBACK[block];
+    return note ? `${h2(`${block}-used`, 'Used on the website')}${p(note)}` : '';
+  }
+  const chips = list.map((u) => `<span class="ds-usechip">${esc(u.name)}${u.to ? `<code>${esc(u.to)}</code>` : ''}</span>`).join('');
+  return `${h2(`${block}-used`, 'Used on the website')}
+    ${p(`Auto-detected from the marketing site — <b>${list.length}</b> ${list.length === 1 ? 'page composes' : 'pages compose'} this block:`)}
+    <div class="ds-usechips">${chips}</div>`;
+}
+
 /* Website-section page — a real shared component (sonaloop-design/website), shadcn-style. The
    preview is the ACTUAL component, server-rendered from src/website.tsx by
    scripts/gen-website-previews.mjs (so it can never drift / be a mockup), and the code shows the
@@ -145,6 +165,7 @@ function websitePage({ id, block, title, desc, usage, notes }) {
     ${h2(`${id}-usage`, 'Usage')}
     ${p(`A real, prop-driven React component — own-the-source, composed across the whole site (shadcn-style). Import it from <code>sonaloop-design/website</code>; load <code>sonaloop-design/components.css</code> + <code>sonaloop-design/website.css</code> once, and provide a router adapter via <code>SonaloopLinkProvider</code> for client-side links (it falls back to <code>&lt;a&gt;</code>).`)}
     ${code('tsx', usage)}
+    ${websiteConsumers(block)}
     ${notes || ''}
   `;
 }

@@ -26,7 +26,7 @@
     "images"
   ],
   "scripts": {
-    "gen": "node scripts/gen.mjs && node scripts/gen-tokens.mjs && node scripts/gen-website-previews.mjs && node scripts/gen-website-css.mjs",
+    "gen": "node scripts/gen.mjs && node scripts/gen-tokens.mjs && node scripts/gen-website-previews.mjs && node scripts/gen-website-usage.mjs && node scripts/gen-website-css.mjs",
     "gen:tokens": "node scripts/gen-tokens.mjs",
     "gen:website": "node scripts/gen-website-previews.mjs && node scripts/gen-website-css.mjs",
     "generate-canvas": "node scripts/generate-canvas.mjs",

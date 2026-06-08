@@ -131,7 +131,8 @@ make check          # drift guard: fail if any generated artifact is stale
   Product · Canvas · Integration showcases, Related Rail) as **real, prop-driven React
   components**, shadcn-style: own-the-source, composed across the whole site many times, exported
   at `sonaloop-design/website`. Each docs page shows the **actual** component (server-rendered,
-  not a mockup) plus the React import + usage.
+  not a mockup), the React import + usage, and an **auto-detected list of the marketing pages that
+  consume it** (`scripts/gen-website-usage.mjs` scans the sibling `../sonaloop-website`).
 
 It has a ⌘K search palette and a light/dark toggle, and **every** swatch, icon and component
 is rendered live from the single sources of truth (`tokens.data.mjs`, `icons.data.mjs`,
