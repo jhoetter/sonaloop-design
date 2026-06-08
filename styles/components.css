@@ -30,7 +30,7 @@
 .sl-btn--ghost { background: transparent; border-color: transparent; }
 .sl-btn--ghost:hover { background: var(--sl-hover); }
 .sl-btn--sm { padding: .35em .7em; font-size: .92em; }
-.sl-btn--lg { padding: .7em 1.15em; font-size: 1.05em; }
+.sl-btn--lg { padding: .85em 1.7em; border-radius: var(--sl-radius); }
 .sl-btn.is-active { background: var(--sl-sel); border-color: var(--sl-line); }
 .sl-btn[disabled], .sl-btn.is-disabled { color: var(--sl-faint); cursor: default; opacity: .65; }
 .sl-btn[disabled]:hover, .sl-btn.is-disabled:hover { background: var(--sl-surface); }
