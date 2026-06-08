@@ -75,6 +75,9 @@ a { color: inherit; }
 .ds-seg-btn svg { width: 16px; height: 16px; }
 .ds-seg-btn:hover { color: var(--sl-ink); }
 .ds-seg-btn.is-active { background: var(--sl-bg); color: var(--sl-ink); box-shadow: var(--sl-shadow-sm, 0 1px 2px rgba(0,0,0,.06)); }
+/* The top-bar theme toggle is the real .sl-segmented contract; size its (svgReg) icons. */
+.ds-topbar .sl-segmented__item { padding: .34em .6em; }
+.ds-topbar .sl-segmented__item svg { width: 16px; height: 16px; }
 
 /* ── Shell: sidebar + main ────────────────────────────────────────────────────── */
 .ds-shell { display: flex; padding-top: var(--ds-topbar-h); }
@@ -90,14 +93,12 @@ a { color: inherit; }
   letter-spacing: .12em; color: var(--sl-faint); padding: 0 10px; margin: 0 0 8px;
 }
 .ds-nav-item {
-  display: flex; align-items: center; gap: 9px; padding: 6px 10px; border-radius: 7px;
+  display: flex; align-items: center; padding: 6px 10px; border-radius: 7px;
   font-size: 13.5px; color: var(--sl-muted); text-decoration: none; cursor: pointer;
   transition: background .1s, color .1s;
 }
 .ds-nav-item:hover { background: var(--sl-hover); color: var(--sl-ink); }
 .ds-nav-item.is-active { background: var(--sl-sel); color: var(--sl-ink); font-weight: 550; }
-.ds-nav-item .ds-nav-ico { width: 16px; height: 16px; flex: none; color: currentColor; opacity: .85; }
-.ds-nav-item .ds-nav-ico svg { width: 16px; height: 16px; }
 
 .ds-main {
   flex: 1; min-width: 0; margin-left: var(--ds-sidebar-w);
@@ -170,6 +171,11 @@ a { color: inherit; }
 .ds-preview-stage.is-center { justify-content: center; }
 .ds-preview-stage.flavor-app { font-size: 13px; }
 .ds-preview-stage.flavor-web { font-size: 16px; }
+/* The docs' svgReg() emits icons without an intrinsic size (real apps size their own —
+   React via the size prop, the Python app via .ic), so size segmented preview icons here,
+   else icon-only items (e.g. the Theme Toggle) collapse to nothing. */
+.ds-preview-stage .sl-segmented__item svg { width: 1.05em; height: 1.05em; flex: none; }
+.ds-preview-stage .sl-segmented--stacked .sl-segmented__item svg { width: 1.25em; height: 1.25em; }
 
 /* density toggle reused from .ds-seg, smaller text variant */
 .ds-seg.ds-seg--text .ds-seg-btn { width: auto; padding: 0 11px; font-size: 12px; font-weight: 550; }
@@ -181,6 +187,10 @@ a { color: inherit; }
 .ds-copy { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--sl-line); background: var(--sl-bg); color: var(--sl-muted); border-radius: 7px; padding: 4px 9px; font: inherit; font-size: 12px; cursor: pointer; transition: color .12s, border-color .12s; }
 .ds-copy:hover { color: var(--sl-ink); border-color: color-mix(in srgb, var(--sl-ink) 22%, var(--sl-line)); }
 .ds-copy svg { width: 13px; height: 13px; }
+.ds-copy__check { display: none; }
+.ds-copy.is-copied { color: var(--sl-green); border-color: color-mix(in srgb, var(--sl-green) 42%, var(--sl-line)); }
+.ds-copy.is-copied .ds-copy__ico { display: none; }
+.ds-copy.is-copied .ds-copy__check { display: inline; }
 .ds-code pre { margin: 0; padding: 16px; overflow-x: auto; }
 .ds-code code { font-family: var(--sl-mono); font-size: 13px; line-height: 1.65; color: var(--sl-ink); white-space: pre; }
 .ds-tok-key { color: var(--sl-accent); }
@@ -262,6 +272,31 @@ a { color: inherit; }
 .ds-radii div { text-align: center; }
 .ds-radii .box { width: 80px; height: 80px; background: var(--sl-accent-weak); border: 1px solid color-mix(in srgb, var(--sl-accent) 40%, transparent); }
 .ds-radii small { display: block; font-family: var(--sl-mono); font-size: 11px; color: var(--sl-faint); margin-top: 8px; }
+/* Images foundation — reference-image gallery (light/dark pairs) */
+.ds-image-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px; margin-top: 18px; }
+.ds-image-tile { margin: 0; border-radius: 12px; border: 1px solid var(--sl-line); overflow: hidden; background: var(--sl-surface); }
+.ds-image-frame { position: relative; }
+.ds-image-frame img { display: block; width: 100%; aspect-ratio: 3 / 2; object-fit: cover; cursor: zoom-in; }
+/* show the variant the tile is set to (defaults to the page theme, per-tile togglable) */
+[data-img-pair] .img-dark { display: none; }
+[data-img-pair][data-shown="dark"] .img-light { display: none; }
+[data-img-pair][data-shown="dark"] .img-dark { display: block; }
+.ds-image-tile figcaption { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 11px 13px; border-top: 1px solid var(--sl-line); }
+.ds-image-tile .nm { display: flex; flex-direction: column; gap: 2px; font-size: 14px; font-weight: 550; color: var(--sl-ink); }
+.ds-image-tile .lbl { font-family: var(--sl-mono); font-size: 10.5px; font-weight: 400; text-transform: none; letter-spacing: 0; color: var(--sl-faint); }
+.ds-img-toggle { display: inline-flex; flex-shrink: 0; border: 1px solid var(--sl-line); border-radius: var(--sl-radius-full); overflow: hidden; }
+.ds-img-toggle button { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 24px; padding: 0; border: 0; background: transparent; color: var(--sl-faint); cursor: pointer; }
+.ds-img-toggle button svg { width: 14px; height: 14px; }
+.ds-img-toggle button.is-active { background: var(--sl-accent-weak); color: var(--sl-accent); }
+.ds-img-toggle button:hover:not(.is-active) { color: var(--sl-ink); }
+
+/* Lightbox — click a canvas preview to view it large */
+.ds-lightbox { position: fixed; inset: 0; z-index: 200; display: none; align-items: center; justify-content: center; padding: 4vh 4vw; background: color-mix(in srgb, var(--sl-bg) 78%, #000); backdrop-filter: blur(10px); }
+.ds-lightbox.is-open { display: flex; }
+.ds-lightbox img { max-width: 100%; max-height: 92vh; border-radius: 12px; border: 1px solid var(--sl-line); box-shadow: var(--sl-shadow-lg, 0 30px 80px rgba(0,0,0,.5)); cursor: zoom-out; }
+.ds-lightbox-close { position: absolute; top: 18px; right: 22px; width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--sl-line); border-radius: var(--sl-radius-full); background: var(--sl-surface); color: var(--sl-ink); font-size: 15px; cursor: pointer; }
+.ds-lightbox-close:hover { background: var(--sl-hover); }
+
 .ds-space-row { display: flex; align-items: flex-end; gap: 16px; margin-top: 18px; flex-wrap: wrap; }
 .ds-space-row div { text-align: center; }
 .ds-space-row .bar { background: var(--sl-accent); border-radius: 3px; width: 26px; }

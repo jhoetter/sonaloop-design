@@ -29,7 +29,10 @@ const svgHifi = (name, cls = '') => {
 let uid = 0;
 const nextId = () => `dsx${++uid}`;
 
-const copyIco = () => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>';
+const clipboardSvg = (cls) => `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>`;
+const checkSvg = (cls) => `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg>`;
+// A .sl-copy button carries BOTH glyphs; `.is-copied` (toggled in the click handler) swaps them.
+const copyIco = () => clipboardSvg('sl-copy__ico') + checkSvg('sl-copy__check');
 
 /* ── shared content builders ───────────────────────────────────────────────────── */
 function preview(inner, { center = false } = {}) {
@@ -55,7 +58,7 @@ function code(lang, src) {
     <div class="ds-code-head">
       <span class="ds-code-lang">${esc(lang)}</span>
       <button class="ds-copy" data-copy="${id}">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+        ${clipboardSvg('ds-copy__ico')}${checkSvg('ds-copy__check')}
         <span>Copy</span>
       </button>
     </div>
@@ -71,6 +74,47 @@ const table = (cols, rows) => `
 
 const h2 = (id, t) => `<h2 class="ds-h2" id="${id}">${esc(t)}</h2>`;
 const p = (html) => `<p class="ds-p">${html}</p>`;
+
+/* ── charts (live previews — mirror py/sonaloop_icons/charts.py + src/charts.tsx so the docs
+   render from the same .sl-chart* contract) ──────────────────────────────────────────── */
+const CHART_SERIES = ['var(--c1)', 'var(--c2)', 'var(--c3)', 'var(--c4)', 'var(--c5)', 'var(--c6)', 'var(--c7)'];
+const chSeriesColor = (it, i) => it.color || CHART_SERIES[i % CHART_SERIES.length];
+const chTitle = (t) => (t ? `<div class="sl-chart__title">${esc(t)}</div>` : '');
+
+function chartBar(items, { title = '' } = {}) {
+  const mx = Math.max(...items.map((it) => it.value)) || 1;
+  const bars = items.map((it, i) => `<div class="sl-bar"><span class="sl-bar__label">${esc(it.label)}</span>`
+    + `<span class="sl-bar__track"><span class="sl-bar__fill" style="--v:${Math.max(0, Math.min(100, (it.value / mx) * 100))}%;--c:${chSeriesColor(it, i)}"></span></span>`
+    + `<span class="sl-bar__val">${it.value}</span></div>`).join('');
+  return `<figure class="sl-chart">${chTitle(title)}<div class="sl-bars">${bars}</div></figure>`;
+}
+
+function chartPie(items, { title = '', donut = true } = {}) {
+  const total = items.reduce((s, it) => s + it.value, 0) || 1;
+  let acc = 0; const stops = [];
+  const legend = items.map((it, i) => {
+    const c = chSeriesColor(it, i); const start = (acc / total) * 100; acc += it.value;
+    stops.push(`${c} ${start.toFixed(2)}% ${((acc / total) * 100).toFixed(2)}%`);
+    return `<span class="sl-legend__item"><span class="sl-legend__sw" style="--c:${c}"></span>`
+      + `<span class="sl-legend__label">${esc(it.label)}</span>`
+      + `<span class="sl-legend__val">${it.value} · ${Math.round((it.value / total) * 100)}%</span></span>`;
+  }).join('');
+  return `<figure class="sl-chart">${chTitle(title)}<div class="sl-pie-wrap">`
+    + `<div class="sl-pie${donut ? ' sl-pie--donut' : ''}" style="--slices:conic-gradient(${stops.join(', ')})" role="img"></div>`
+    + `<div class="sl-legend">${legend}</div></div></figure>`;
+}
+
+const chLeverage = (x, y) => { const d = y - x; return d >= 2 ? 'var(--sl-green)' : d >= 1 ? 'var(--sl-accent)' : d <= -1 ? 'var(--sl-red)' : 'var(--sl-amber)'; };
+function chartEffort(items, { title = '', xLabel = 'Effort', yLabel = 'Value', quadrants = ['Quick wins', 'Big bets', 'Fill-ins', 'Time sinks'] } = {}) {
+  const dots = items.map((it, i) => `<span class="sl-quad__dot" style="--x:${((it.x - 1) / 4) * 100}%;--y:${(1 - (it.y - 1) / 4) * 100}%;--c:${it.color || chLeverage(it.x, it.y)}">${i + 1}</span>`).join('');
+  const legend = items.map((it, i) => `<span class="sl-legend__item"><span class="sl-legend__num" style="--c:${it.color || chLeverage(it.x, it.y)}">${i + 1}</span>`
+    + `<span class="sl-legend__label">${esc(it.label)}</span>`
+    + `<span class="sl-legend__val">${xLabel[0]}${it.x}·${yLabel[0]}${it.y}</span></span>`).join('');
+  const q = (i, cls) => `<span class="sl-quad__q sl-quad__q--${cls}">${esc(quadrants[i] || '')}</span>`;
+  return `<figure class="sl-chart">${chTitle(title)}<div class="sl-quad-wrap"><div class="sl-quad-ylab">${esc(yLabel)}</div>`
+    + `<div class="sl-quad"><div class="sl-quad__gx"></div><div class="sl-quad__gy"></div>${q(0, 'tl')}${q(1, 'tr')}${q(2, 'bl')}${q(3, 'br')}${dots}</div>`
+    + `<div class="sl-quad-xlab">${esc(xLabel)}</div></div><div class="sl-legend" style="margin-top:.9em">${legend}</div></figure>`;
+}
 
 function componentPage({ id, title, desc, demo, react, markup, python, variants, notes }) {
   return `
@@ -107,6 +151,7 @@ function pageIntroduction() {
       <div style="display:flex;gap:8px"><button class="sl-btn sl-btn--primary">Run council</button><button class="sl-btn">Export</button></div>
       <div style="display:flex;gap:6px"><span class="sl-badge sl-badge--positive">For 3</span><span class="sl-badge sl-badge--warning">Conditional</span><span class="sl-badge sl-badge--negative">Against</span></div>
     </div>`;
+  const chartsCanvas = `<div class="sl-chart"><div class="sl-pie sl-pie--donut" style="width:78px;height:78px;--slices:conic-gradient(var(--c1) 0 55%,var(--c2) 55% 80%,var(--c3) 80% 100%)"></div></div>`;
 
   return `
     <h1 class="ds-h1">Sonaloop Design System</h1>
@@ -117,7 +162,8 @@ function pageIntroduction() {
       ${cell('#/button', compCanvas, 'Components', 'Building blocks shared across React and Python SSR.')}
       ${cell('#/colors', `<div class="ds-canvas-colors">${colorBars}</div>`, 'Colors', 'A near-white warm light + cool dark, accessible system.')}
       ${cell('#/layout', `<div class="ds-canvas-grid"></div>`, 'Layout', 'Spacing, radii and the grid that hold every surface together.')}
-      ${cell('#/typography', `<div class="ds-canvas-type"><span>Geist Sans</span><span class="mono">Geist Mono</span></div>`, 'Typeface', 'Geist Sans &amp; Geist Mono — built for product UIs.')}
+      ${cell('#/typography', `<div class="ds-canvas-type"><span>Sona</span><span class="mono">Sona Mono</span></div>`, 'Typeface', 'Sona, Sona Mono &amp; Sona Pixel — Sonaloop&#39;s own type.')}
+      ${cell('#/chart-bar', chartsCanvas, 'Charts', 'Bar, pie/donut &amp; effort·impact — print &amp; PDF-safe.')}
     </div>
     <div class="ds-callout" style="margin-top:32px">
       <span class="ico">${svgReg('bulb')}</span>
@@ -365,6 +411,57 @@ function pageIcons() {
     ${h2('icons-usage', 'Usage')}
     ${code('tsx', `import { CouncilsIcon } from 'sonaloop-design';\n\n<CouncilsIcon className="h-5 w-5" animate />`)}
     ${code('python', `from sonaloop_icons import icon\n\nicon("councils", animate=True)  # → inline <svg class="pi pi-councils …">`)}
+  `;
+}
+
+// Every canvas pair: light + dark file, shown live from the repo root (/images/<family>/<file>).
+// These are the exact files products import via `sonaloop-design/images` (src/images.ts).
+const IMAGE_PAIRS = [
+  { name: 'canvas',   light: 'canvas/dawn.jpg',          dark: 'canvas/dusk.jpg',          label: 'Canvas', note: 'soft hills under a wide sky' },
+  { name: 'abstract', light: 'canvas/abstract-light.jpg', dark: 'canvas/abstract-dark.jpg', label: 'Abstract', note: 'pure colour-field wash, no subject' },
+  { name: 'mist',     light: 'canvas/mist-light.jpg',     dark: 'canvas/mist-dark.jpg',     label: 'Mist', note: 'fog over a still reflective plane' },
+  { name: 'meadow',   light: 'canvas/meadow-light.jpg',   dark: 'canvas/meadow-dark.jpg',   label: 'Meadow', note: 'soft wildflower field under open sky' },
+  { name: 'sky',      light: 'canvas/sky-light.jpg',      dark: 'canvas/sky-dark.jpg',      label: 'Sky', note: 'almost-empty atmospheric sky' },
+];
+
+function pageImages() {
+  // Each tile shows ONE variant, defaulting to the current theme; the per-tile
+  // toggle (or the global theme switch in the top bar) flips between light/dark.
+  const cur = theme();
+  const tile = (pr) => `
+    <figure class="ds-image-tile" data-img-pair data-shown="${cur}">
+      <div class="ds-image-frame">
+        <img class="img-light" src="/images/${pr.light}" alt="${esc(pr.label)} — light" loading="lazy" />
+        <img class="img-dark"  src="/images/${pr.dark}"  alt="${esc(pr.label)} — dark"  loading="lazy" />
+      </div>
+      <figcaption>
+        <span class="nm">${esc(pr.label)} <span class="lbl">${esc(pr.note)}</span></span>
+        <span class="ds-img-toggle" role="group" aria-label="Preview theme for ${esc(pr.label)}">
+          <button type="button" data-img-theme="light" aria-label="Light" class="${cur === 'light' ? 'is-active' : ''}">${svgReg('sun')}</button>
+          <button type="button" data-img-theme="dark" aria-label="Dark" class="${cur === 'dark' ? 'is-active' : ''}">${svgReg('moon')}</button>
+        </span>
+      </figcaption>
+    </figure>`;
+
+  return `
+    <p class="ds-eyebrow">Foundations</p>
+    <h1 class="ds-h1">Images</h1>
+    <p class="ds-lead">A small, curated set of on-brand <strong>reference images</strong> — shared across the products so everyone reaches for the same canonical asset instead of carrying their own copy. These aren't the only images a product may use; they're the blessed variants to start from. Authored once, imported everywhere, just like the icons.</p>
+
+    ${h2('images-canvas', 'Canvas')}
+    ${p('Atmospheric, oil-painted backdrops that sit behind heroes, footers and product windows. Every canvas is a matched <strong>light / dark pair</strong> — the dark twin is generated from the light one, so they share a composition and only the palette flips. Toggle a tile (or flip the whole site in the top bar) to compare.')}
+    <div class="ds-image-grid">
+      ${IMAGE_PAIRS.map(tile).join('')}
+    </div>
+
+    ${h2('images-usage', 'Usage')}
+    ${p('Each export is the bundler-resolved URL (content-hashed in production), drop-in for <code>&lt;img src&gt;</code> or a CSS <code>background</code>. Each pair exposes <code>.light</code> / <code>.dark</code>, so you pick the right one per theme.')}
+    ${code('tsx', `import { canvas, mist } from 'sonaloop-design/images';\n\n<img src={canvas.light} alt="" className="dark:hidden" />\n<img src={canvas.dark}  alt="" className="hidden dark:block" />`)}
+
+    ${h2('images-add', 'Adding & generating')}
+    ${p('The canvases are <strong>generated</strong> here as light/dark pairs with OpenAI <code>gpt-image-1</code>: the light variant comes from a prompt, then the dark twin is generated <em>from the light image</em> (same composition, cool night palette). Copy <code>.env.example</code> → <code>.env</code>, add your <code>OPENAI_API_KEY</code>, then:')}
+    ${code('bash', `npm run generate-canvas -- mist        # one pair (light, then dark from it)\nnpm run generate-canvas -- --all       # every pair`)}
+    ${p('To add a pair, add a key to the <code>PAIRS</code> map in <code>scripts/generate-canvas.mjs</code>, run it, then register the two files in <code>src/images.ts</code> so every repo can import it.')}
   `;
 }
 
@@ -639,6 +736,22 @@ const cSegmented = () => componentPage({
   python: `h("div", {"class_": "sl-segmented sl-segmented--stacked", "role": "group"},\n  h("a", {"class_": "sl-segmented__item is-active", "href": plan_url}, plan_icon, h("span", {}, "Plan")),\n  h("a", {"class_": "sl-segmented__item", "href": graph_url}, graph_icon, h("span", {}, "Graph")))`,
 });
 
+const cThemeToggle = () => componentPage({
+  id: 'theme-toggle', title: 'Theme Toggle',
+  desc: 'The one canonical colour-scheme switch shared by every product — sun (light) · monitor (system, follow the OS) · moon (dark) — built on Segmented with the shared icon set so the glyphs never diverge across repos. Presentational only: each app owns its theme state and passes <code>value</code> + <code>onChange</code> (this docs site uses the very same control in the top bar).',
+  demo: `<div class="sl-segmented" role="group" aria-label="Color scheme">
+      <button class="sl-segmented__item" aria-label="Light theme">${svgReg('sun')}</button>
+      <button class="sl-segmented__item is-active" aria-label="System theme">${svgReg('monitor')}</button>
+      <button class="sl-segmented__item" aria-label="Dark theme">${svgReg('moon')}</button>
+    </div>`,
+  variants: { cols: ['Value', 'Glyph'], rows: [
+    ['light', 'sun'], ['system', 'monitor — follows the OS setting'], ['dark', 'moon'],
+  ] },
+  react: `import { ThemeToggle } from 'sonaloop-design/components';\n\n// the app owns the state (context / store); ThemeToggle is presentational\n<ThemeToggle value={preference} onChange={setPreference} />`,
+  markup: `<div class="sl-segmented" role="group" aria-label="Color scheme">\n  <button class="sl-segmented__item" aria-label="Light theme">…sun…</button>\n  <button class="sl-segmented__item is-active" aria-label="System theme">…monitor…</button>\n  <button class="sl-segmented__item" aria-label="Dark theme">…moon…</button>\n</div>`,
+  python: `# same classes + same icons (sun / monitor / moon)\nthemes = [("light","sun",t("theme_light")), ("system","monitor",t("theme_system")), ("dark","moon",t("theme_dark"))]\nh("div", {"class_": "sl-segmented sl-segmented--stacked"},\n  [h("button", {"class_": "sl-segmented__item", "data-theme-set": v}, raw(_icon(ic)), h("span", {}, lbl)) for v, ic, lbl in themes])`,
+});
+
 const cSnippet = () => componentPage({
   id: 'snippet', title: 'Snippet · Code', desc: 'A one-line command bar and a multi-line code block, both with a copy button. Used for the install command on the site and code samples everywhere (including these docs).',
   demo: `<div style="display:flex;flex-direction:column;gap:16px;width:100%;max-width:440px">
@@ -740,6 +853,201 @@ const cStat = () => componentPage({
   python: `h("div", {"class_": "sl-stat"}, h("span", {"class_": "sl-stat__value"}, n), h("span", {"class_": "sl-stat__label"}, label))`,
 });
 
+// The chart section is built from these CHART_TYPES (one page each) — keep this the single list of
+// every chart type the design system ships, so the section can never silently miss one.
+const chartFigureNote = (snippet) => `<div class="ds-callout" style="margin-top:24px"><span class="ico">${svgReg('bulb')}</span>
+    <p>In the Sonaloop inspector a report section embeds this via the <code>chart</code> figure-kind: ${snippet} — the same component, vendored from this design system.</p></div>`;
+
+const cChartBar = () => componentPage({
+  id: 'chart-bar', title: 'Bar Chart',
+  desc: 'Horizontal labelled bars for <b>rankings & counts</b> — “what helps most”, votes per option, evidence per theme. Each bar fills proportionally to the max (or an explicit <code>maxValue</code>); series colours come from position unless an item sets <code>--c</code>.',
+  demo: `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:34px;width:100%;align-items:start">
+      ${chartBar([{ label: 'Plan ahead', value: 8 }, { label: 'Batch cook', value: 5 }, { label: 'Order in', value: 3 }, { label: 'Skip it', value: 1 }], { title: 'What helps most' })}
+      ${chartBar([{ label: 'Pricing', value: 9, color: 'var(--sl-violet)' }, { label: 'Onboarding', value: 6, color: 'var(--sl-violet)' }, { label: 'Support', value: 4, color: 'var(--sl-violet)' }], { title: 'Mentions per theme (one colour)' })}
+    </div>`,
+  variants: { cols: ['Prop', 'Type', 'Effect'], rows: [
+    ['items', '{label, value, color?}[]', 'The bars. <code>color</code> overrides the positional series colour.'],
+    ['title', 'string', 'Optional mono section title above the bars.'],
+    ['maxValue', 'number', 'Fix the 100% reference (else the largest value).'],
+  ] },
+  react: `import { BarChart } from 'sonaloop-design/charts';\n\n<BarChart\n  title="What helps most"\n  items={[{ label: 'Plan ahead', value: 8 }, { label: 'Batch cook', value: 5 }, { label: 'Skip it', value: 1 }]}\n/>`,
+  markup: `<figure class="sl-chart">\n  <div class="sl-bars">\n    <div class="sl-bar">\n      <span class="sl-bar__label">Plan ahead</span>\n      <span class="sl-bar__track"><span class="sl-bar__fill" style="--v:100%;--c:var(--c1)"></span></span>\n      <span class="sl-bar__val">8</span>\n    </div>\n  </div>\n</figure>`,
+  python: `from sonaloop_icons.charts import bar_chart\n\nbar_chart([{"label": "Plan ahead", "value": 8}, {"label": "Batch cook", "value": 5}], title="What helps most")`,
+  notes: chartFigureNote('<code>{kind:"chart", of:"bar", series:[{label, value}]}</code>'),
+});
+
+const cChartPie = () => componentPage({
+  id: 'chart-pie', title: 'Pie · Donut Chart',
+  desc: 'A <b>proportions</b> chart — council stance split, segment distribution, sentiment — drawn with a CSS <code>conic-gradient</code> plus a value/percent legend. Defaults to a <b>donut</b>; pass <code>donut=false</code> for a full pie.',
+  demo: `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:34px;width:100%;align-items:center">
+      ${chartPie([{ label: 'Support', value: 12 }, { label: 'Conditional', value: 5 }, { label: 'Oppose', value: 3 }], { title: 'Council stance · donut' })}
+      ${chartPie([{ label: '18–24', value: 7 }, { label: '25–34', value: 11 }, { label: '35–44', value: 6 }, { label: '45+', value: 3 }], { title: 'Segments · pie', donut: false })}
+    </div>`,
+  variants: { cols: ['Prop', 'Type', 'Effect'], rows: [
+    ['items', '{label, value, color?}[]', 'The slices (values are summed for the proportions).'],
+    ['donut', 'boolean = true', 'Donut (hole) vs full pie — adds <code>.sl-pie--donut</code>.'],
+    ['title', 'string', 'Optional mono section title.'],
+  ] },
+  react: `import { PieChart } from 'sonaloop-design/charts';\n\n<PieChart title="Council stance" donut\n  items={[{ label: 'Support', value: 12 }, { label: 'Conditional', value: 5 }, { label: 'Oppose', value: 3 }]}\n/>`,
+  markup: `<figure class="sl-chart">\n  <div class="sl-pie-wrap">\n    <div class="sl-pie sl-pie--donut"\n         style="--slices:conic-gradient(var(--c1) 0% 60%, var(--c2) 60% 85%, var(--c3) 85% 100%)"></div>\n    <div class="sl-legend">\n      <span class="sl-legend__item"><span class="sl-legend__sw" style="--c:var(--c1)"></span>\n        <span class="sl-legend__label">Support</span><span class="sl-legend__val">12 · 60%</span></span>\n    </div>\n  </div>\n</figure>`,
+  python: `from sonaloop_icons.charts import pie_chart\n\npie_chart([{"label": "Support", "value": 12}, {"label": "Oppose", "value": 3}], donut=True)`,
+  notes: chartFigureNote('<code>{kind:"chart", of:"pie", series:[{label, value}]}</code>'),
+});
+
+const cChartEffort = () => componentPage({
+  id: 'chart-effort-impact', title: 'Effort · Impact Chart',
+  desc: 'A <b>2×2 scatter</b> of recommendations — effort (x) against value (y), each on a 1–5 scale. Dots are numbered and auto-tinted by leverage (value − effort), with a numbered legend that stays readable in print. The quadrants read quick-wins / big-bets / fill-ins / time-sinks.',
+  demo: `<div style="width:100%;max-width:560px;margin-inline:auto">${chartEffort([
+      { label: 'Auto shopping list', x: 2, y: 5 }, { label: '3-recipe starter', x: 2, y: 4 },
+      { label: 'In-app coach', x: 4, y: 2 }, { label: 'Full meal plan', x: 5, y: 3 },
+    ], { title: 'Effort · impact' })}</div>`,
+  variants: { cols: ['Prop', 'Type', 'Effect'], rows: [
+    ['items', '{label, x, y, color?}[]', 'Points; <code>x</code> = effort, <code>y</code> = value (1–5).'],
+    ['xLabel / yLabel', 'string', 'Axis names (default Effort / Value).'],
+    ['quadrants', 'string[4]', 'TL, TR, BL, BR labels (default quick-wins…time-sinks).'],
+  ] },
+  react: `import { EffortImpactChart } from 'sonaloop-design/charts';\n\n<EffortImpactChart\n  items={[{ label: 'Auto shopping list', x: 2, y: 5 }, { label: 'Full meal plan', x: 5, y: 3 }]}\n/>`,
+  markup: `<figure class="sl-chart">\n  <div class="sl-quad-wrap">\n    <div class="sl-quad-ylab">Value</div>\n    <div class="sl-quad">\n      <div class="sl-quad__gx"></div><div class="sl-quad__gy"></div>\n      <span class="sl-quad__dot" style="--x:25%;--y:0%;--c:var(--sl-green)">1</span>\n    </div>\n    <div class="sl-quad-xlab">Effort</div>\n  </div>\n</figure>`,
+  python: `from sonaloop_icons.charts import effort_impact\n\neffort_impact([{"label": "Auto shopping list", "x": 2, "y": 5}])  # x=effort, y=value (1..5)`,
+  notes: chartFigureNote('<code>{kind:"chart", of:"effort_impact", source_id:"&lt;synthesis&gt;"}</code> (its 2×2 of recommendations)'),
+});
+
+const cTextarea = () => componentPage({
+  id: 'textarea', title: 'Textarea', desc: 'A multi-line text field — the brief, a prompt, a persona note. Same hairline + focus ring as Input; vertically resizable.',
+  demo: `<textarea class="sl-textarea" rows="3" placeholder="Describe the decision the council should weigh in on…" style="max-width:420px">We're considering a weekly meal-prep subscription for busy parents.</textarea>`,
+  react: `import { Textarea } from 'sonaloop-design/components';\n\n<Textarea rows={3} placeholder="Describe the decision…" />`,
+  markup: `<textarea class="sl-textarea" rows="3" placeholder="Describe the decision…"></textarea>`,
+  python: `h("textarea", {"class_": "sl-textarea", "rows": "3", "placeholder": "Describe the decision…"})`,
+});
+
+const cSelect = () => componentPage({
+  id: 'select', title: 'Select', desc: 'A styled native <code>&lt;select&gt;</code> with a token-driven caret — picking a model, a council preset or a sort order. Native control, so it renders identically in React and Python-SSR and is accessible for free.',
+  demo: `<span class="sl-select" style="max-width:260px">
+      <select>
+        <option>Balanced council (4 voices)</option>
+        <option>Skeptics only</option>
+        <option>Enthusiasts only</option>
+        <option>Custom…</option>
+      </select>
+    </span>`,
+  react: `import { Select } from 'sonaloop-design/components';\n\n<Select defaultValue="balanced">\n  <option value="balanced">Balanced council (4 voices)</option>\n  <option value="skeptics">Skeptics only</option>\n</Select>`,
+  markup: `<span class="sl-select">\n  <select>\n    <option>Balanced council (4 voices)</option>\n    <option>Skeptics only</option>\n  </select>\n</span>  <!-- wrapper draws the caret -->`,
+  python: `h("span", {"class_": "sl-select"},\n  h("select", {}, *[h("option", {}, name) for name in presets]))`,
+});
+
+const cCheckbox = () => componentPage({
+  id: 'checkbox', title: 'Checkbox', desc: 'A label-wrapped native checkbox for multi-select choices — which voices to include, which memory sources to ground on. The box is appearance-reset so it tints to the accent when checked.',
+  demo: `<div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start">
+      <label class="sl-check"><input type="checkbox" checked /><span>Ground on project memory</span></label>
+      <label class="sl-check"><input type="checkbox" checked /><span>Include skeptic voices</span></label>
+      <label class="sl-check"><input type="checkbox" /><span>Surface open questions only</span></label>
+      <label class="sl-check"><input type="checkbox" disabled /><span>Enterprise sources (upgrade)</span></label>
+    </div>`,
+  react: `import { Checkbox } from 'sonaloop-design/components';\n\n<Checkbox label="Ground on project memory" defaultChecked />\n<Checkbox label="Include skeptic voices" />`,
+  markup: `<label class="sl-check"><input type="checkbox" /><span>Ground on project memory</span></label>`,
+  python: `h("label", {"class_": "sl-check"}, h("input", {"type": "checkbox"}), h("span", {}, "Ground on project memory"))`,
+});
+
+const cRadio = () => componentPage({
+  id: 'radio', title: 'Radio', desc: 'A label-wrapped native radio for mutually-exclusive choices — one council size, one synthesis depth. Same <code>.sl-check</code> class as Checkbox; the <code>[type]</code> picks the round shape.',
+  demo: `<div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start">
+      <label class="sl-check"><input type="radio" name="depth" checked /><span>Quick read — headline verdict</span></label>
+      <label class="sl-check"><input type="radio" name="depth" /><span>Standard — verdict + themes</span></label>
+      <label class="sl-check"><input type="radio" name="depth" /><span>Deep — full reasoning trace</span></label>
+    </div>`,
+  variants: { cols: ['Class', 'Shape'], rows: [
+    ['.sl-check + input[type=checkbox]', 'Square box, checkmark when on.'],
+    ['.sl-check + input[type=radio]', 'Round, filled dot when on.'],
+  ] },
+  react: `import { Radio } from 'sonaloop-design/components';\n\n<Radio name="depth" label="Quick read" defaultChecked />\n<Radio name="depth" label="Deep" />`,
+  markup: `<label class="sl-check"><input type="radio" name="depth" /><span>Quick read</span></label>`,
+  python: `h("label", {"class_": "sl-check"}, h("input", {"type": "radio", "name": "depth"}), h("span", {}, "Quick read"))`,
+});
+
+const cSwitch = () => componentPage({
+  id: 'switch', title: 'Switch', desc: 'A toggle for on/off settings that take effect immediately — auto-run on save, share publicly, reduced motion. For deferred form choices prefer a Checkbox.',
+  demo: `<div style="display:flex;flex-direction:column;gap:14px;align-items:flex-start">
+      <label class="sl-switch"><input type="checkbox" class="sl-switch__input" checked /><span class="sl-switch__track"></span><span>Auto-run council on save</span></label>
+      <label class="sl-switch"><input type="checkbox" class="sl-switch__input" /><span class="sl-switch__track"></span><span>Share synthesis with team</span></label>
+      <label class="sl-switch"><input type="checkbox" class="sl-switch__input" disabled /><span class="sl-switch__track"></span><span>Continuous discovery (Research)</span></label>
+    </div>`,
+  react: `import { Switch } from 'sonaloop-design/components';\n\n<Switch label="Auto-run council on save" defaultChecked />`,
+  markup: `<label class="sl-switch">\n  <input type="checkbox" class="sl-switch__input" />\n  <span class="sl-switch__track"></span>\n  <span>Auto-run council on save</span>\n</label>`,
+  python: `h("label", {"class_": "sl-switch"},\n  h("input", {"type": "checkbox", "class_": "sl-switch__input"}),\n  h("span", {"class_": "sl-switch__track"}),\n  h("span", {}, "Auto-run council on save"))`,
+});
+
+const cField = () => componentPage({
+  id: 'field', title: 'Field · Fieldset', desc: 'The composition layer that pairs a label + optional hint or error with any control (Input, Textarea, Select, Checkbox …). <code>.sl-fieldset</code> groups related fields under a legend.',
+  demo: `<div style="display:flex;flex-direction:column;gap:18px;max-width:420px;width:100%">
+      <div class="sl-field">
+        <label class="sl-field__label" for="f-name">Council name<span class="sl-field__req">*</span></label>
+        <input class="sl-input" id="f-name" value="Meal-prep subscription" />
+        <span class="sl-field__hint">Shown in the breadcrumb and exports.</span>
+      </div>
+      <div class="sl-field sl-field--invalid">
+        <label class="sl-field__label" for="f-voices">Voices</label>
+        <span class="sl-select"><select id="f-voices"><option>Choose a preset…</option></select></span>
+        <span class="sl-field__error">Pick at least two voices to run a council.</span>
+      </div>
+      <fieldset class="sl-fieldset">
+        <legend class="sl-fieldset__legend">Grounding</legend>
+        <label class="sl-check"><input type="checkbox" checked /><span>Project memory</span></label>
+        <label class="sl-check"><input type="checkbox" /><span>Uploaded research</span></label>
+      </fieldset>
+    </div>`,
+  variants: { cols: ['Class', 'Part'], rows: [
+    ['.sl-field', 'Vertical label + control + hint/error stack.'],
+    ['.sl-field__label / __req', 'Label; <code>__req</code> is the red required mark.'],
+    ['.sl-field__hint', 'Quiet helper text below the control.'],
+    ['.sl-field__error + .sl-field--invalid', 'Error text; the modifier reddens the control border.'],
+    ['.sl-fieldset / __legend', 'Bordered group of related fields under a legend.'],
+  ] },
+  react: `import { Field, Fieldset, Input, Select, Checkbox } from 'sonaloop-design/components';\n\n<Field label="Council name" required hint="Shown in exports." htmlFor="name">\n  <Input id="name" />\n</Field>\n<Field label="Voices" error="Pick at least two voices.">\n  <Select>…</Select>\n</Field>\n<Fieldset legend="Grounding">\n  <Checkbox label="Project memory" defaultChecked />\n</Fieldset>`,
+  markup: `<div class="sl-field">\n  <label class="sl-field__label">Council name<span class="sl-field__req">*</span></label>\n  <input class="sl-input" />\n  <span class="sl-field__hint">Shown in exports.</span>\n</div>`,
+  python: `h("div", {"class_": "sl-field"},\n  h("label", {"class_": "sl-field__label"}, "Council name"),\n  h("input", {"class_": "sl-input"}),\n  h("span", {"class_": "sl-field__hint"}, "Shown in exports."))`,
+});
+
+const cEntity = () => componentPage({
+  id: 'entity', title: 'Entity', desc: 'A list row — a leading visual, a title + description, and trailing meta or actions. The shared primitive for councils, personas, projects and syntheses. Stack rows in <code>.sl-entity-list</code> for one hairline-framed list; add <code>--button</code> to make a row interactive.',
+  demo: `<div class="sl-entity-list" style="max-width:440px">
+      <div class="sl-entity sl-entity--button">
+        <span class="sl-entity__visual">${svgReg('councils')}</span>
+        <span class="sl-entity__content">
+          <span class="sl-entity__title">Meal-prep subscription</span>
+          <span class="sl-entity__desc">4 voices · broadly supportive · 2h ago</span>
+        </span>
+        <span class="sl-entity__trailing"><span class="sl-badge sl-badge--positive">For 3</span></span>
+      </div>
+      <div class="sl-entity sl-entity--button">
+        <span class="sl-entity__visual">${svgReg('personas')}</span>
+        <span class="sl-entity__content">
+          <span class="sl-entity__title">Lena Vogt</span>
+          <span class="sl-entity__desc">Busy parent · time-poor, value-driven</span>
+        </span>
+        <span class="sl-entity__trailing">${svgReg('caretRight')}</span>
+      </div>
+      <div class="sl-entity sl-entity--button">
+        <span class="sl-entity__visual">${svgReg('syntheses')}</span>
+        <span class="sl-entity__content">
+          <span class="sl-entity__title">Pricing tiers — executive summary</span>
+          <span class="sl-entity__desc">Conditional · 2 open questions</span>
+        </span>
+        <span class="sl-entity__trailing"><span class="sl-tag">Conditional</span></span>
+      </div>
+    </div>`,
+  variants: { cols: ['Class', 'Part'], rows: [
+    ['.sl-entity', 'One row: visual · content · trailing.'],
+    ['.sl-entity--button', 'Interactive row (hover affordance).'],
+    ['.sl-entity__visual', 'Leading icon or avatar.'],
+    ['.sl-entity__title / __desc', 'Primary line; muted secondary line (both truncate).'],
+    ['.sl-entity__trailing', 'Trailing badge, tag, count or chevron.'],
+    ['.sl-entity-list', 'Stacks rows under one hairline frame.'],
+  ] },
+  react: `import { Entity, EntityList } from 'sonaloop-design/components';\nimport { CouncilsIcon, Badge } from 'sonaloop-design';\n\n<EntityList>\n  <Entity button visual={<CouncilsIcon />}\n    title="Meal-prep subscription"\n    desc="4 voices · broadly supportive · 2h ago"\n    trailing={<Badge tone="positive">For 3</Badge>} />\n</EntityList>`,
+  markup: `<div class="sl-entity sl-entity--button">\n  <span class="sl-entity__visual">…</span>\n  <span class="sl-entity__content">\n    <span class="sl-entity__title">Meal-prep subscription</span>\n    <span class="sl-entity__desc">4 voices · 2h ago</span>\n  </span>\n  <span class="sl-entity__trailing">…</span>\n</div>`,
+  python: `h("div", {"class_": "sl-entity sl-entity--button"},\n  h("span", {"class_": "sl-entity__visual"}, icon("councils")),\n  h("span", {"class_": "sl-entity__content"},\n    h("span", {"class_": "sl-entity__title"}, name),\n    h("span", {"class_": "sl-entity__desc"}, meta)),\n  h("span", {"class_": "sl-entity__trailing"}, badge))`,
+});
+
 /* ── nav model ─────────────────────────────────────────────────────────────────── */
 const NAV = [
   { label: 'Foundations', items: [
@@ -749,6 +1057,7 @@ const NAV = [
     { id: 'materials', title: 'Materials', ico: 'panel', render: pageMaterials },
     { id: 'layout', title: 'Layout', ico: 'squareGrid', render: pageLayout },
     { id: 'icons', title: 'Icons', ico: 'star', render: pageIcons },
+    { id: 'images', title: 'Images', ico: 'panel', render: pageImages },
   ] },
   { label: 'Brands', items: [
     { id: 'brand', title: 'Sonaloop', ico: 'sonaloop', render: pageBrand },
@@ -764,19 +1073,32 @@ const NAV = [
     { id: 'status-dot', title: 'Status Dot', ico: 'dot', render: cStatusDot },
     { id: 'avatar', title: 'Avatar', ico: 'contact', render: cAvatar },
     { id: 'card', title: 'Card', ico: 'rectangle', render: cCard },
+    { id: 'entity', title: 'Entity', ico: 'projects', render: cEntity },
     { id: 'note', title: 'Note', ico: 'bulb', render: cNote },
     { id: 'stat', title: 'Stat', ico: 'analytics', render: cStat },
     { id: 'progress', title: 'Progress', ico: 'wave', render: cProgress },
     { id: 'segmented', title: 'Segmented · Tabs', ico: 'squareCols', render: cSegmented },
+    { id: 'theme-toggle', title: 'Theme Toggle', ico: 'monitor', render: cThemeToggle },
     { id: 'table', title: 'Table', ico: 'squareRows', render: cTable },
     { id: 'breadcrumb', title: 'Breadcrumb', ico: 'caretRight', render: cBreadcrumb },
     { id: 'empty-state', title: 'Empty State', ico: 'square', render: cEmptyState },
     { id: 'snippet', title: 'Snippet · Code', ico: 'jtbd', render: cSnippet },
     { id: 'eyebrow', title: 'Eyebrow', ico: 'wave', render: cEyebrow },
     { id: 'input', title: 'Input', ico: 'search', render: cInput },
+    { id: 'textarea', title: 'Textarea', ico: 'pencil', render: cTextarea },
+    { id: 'select', title: 'Select', ico: 'chevron', render: cSelect },
+    { id: 'checkbox', title: 'Checkbox', ico: 'check', render: cCheckbox },
+    { id: 'radio', title: 'Radio', ico: 'circle', render: cRadio },
+    { id: 'switch', title: 'Switch', ico: 'exchange', render: cSwitch },
+    { id: 'field', title: 'Field · Fieldset', ico: 'settings', render: cField },
     { id: 'kbd', title: 'Kbd', ico: 'squareSplit', render: cKbd },
     { id: 'divider', title: 'Divider', ico: 'exchange', render: cDivider },
     { id: 'arrow-link', title: 'Arrow Link', ico: 'arrowRight', render: cArrowLink },
+  ] },
+  { label: 'Charts', items: [
+    { id: 'chart-bar', title: 'Bar', ico: 'analytics', render: cChartBar },
+    { id: 'chart-pie', title: 'Pie · Donut', ico: 'half', render: cChartPie },
+    { id: 'chart-effort-impact', title: 'Effort · Impact', ico: 'target', render: cChartEffort },
   ] },
 ];
 
@@ -789,9 +1111,7 @@ function renderSidebar() {
     <div class="ds-nav-group">
       <p class="ds-nav-label">${esc(g.label)}</p>
       ${g.items.map((it) => `
-        <a class="ds-nav-item" href="#/${it.id}" data-nav="${it.id}">
-          <span class="ds-nav-ico">${it.ico ? svgReg(it.ico) : ''}</span>${esc(it.title)}
-        </a>`).join('')}
+        <a class="ds-nav-item" href="#/${it.id}" data-nav="${it.id}">${esc(it.title)}</a>`).join('')}
     </div>`).join('');
 }
 
@@ -837,13 +1157,20 @@ function wirePage(root) {
 }
 
 /* ── global delegated interactions (copy, density, swatch copy) ────────────────── */
-async function copyText(text, feedbackEl) {
+// Copy + confirm: the clipboard glyph swaps to a green check (via `.is-copied`, styled in the
+// shared CSS) and any text label reads "Copied" for ~1.6s — matching the React CopyButton.
+async function copyText(text, btn) {
   try { await navigator.clipboard.writeText(text); } catch { /* ignore */ }
-  if (feedbackEl) {
-    const span = feedbackEl.querySelector('span');
-    const prev = span ? span.textContent : null;
-    if (span) { span.textContent = 'Copied'; setTimeout(() => { span.textContent = prev; }, 1100); }
-  }
+  if (!btn) return;
+  btn.classList.add('is-copied');
+  const label = btn.querySelector('span');
+  if (label && btn._copyPrev == null) btn._copyPrev = label.textContent;
+  if (label) label.textContent = 'Copied';
+  clearTimeout(btn._copyT);
+  btn._copyT = setTimeout(() => {
+    btn.classList.remove('is-copied');
+    if (label && btn._copyPrev != null) { label.textContent = btn._copyPrev; btn._copyPrev = null; }
+  }, 1600);
 }
 
 document.addEventListener('click', (e) => {
@@ -853,6 +1180,10 @@ document.addEventListener('click', (e) => {
     if (codeEl) copyText(codeEl.textContent, copyBtn);
     return;
   }
+  // Icon-only copy buttons (snippets, code-block heads) confirm on the button itself.
+  const slCopy = e.target.closest('.sl-copy[data-copy-text]');
+  if (slCopy) { copyText(slCopy.dataset.copyText, slCopy); return; }
+  // Other copy-on-click targets (swatches, glyphs, icon cells) get the quick outline flash.
   const swatch = e.target.closest('[data-copy-text]');
   if (swatch) { copyText(swatch.dataset.copyText); flash(swatch); return; }
 
@@ -871,6 +1202,21 @@ document.addEventListener('click', (e) => {
     stage.classList.toggle('flavor-web', dens.dataset.density === 'web');
     return;
   }
+
+  const imgTheme = e.target.closest('[data-img-theme]');
+  if (imgTheme) {
+    const tile = imgTheme.closest('[data-img-pair]');
+    tile.dataset.shown = imgTheme.dataset.imgTheme;
+    tile.querySelectorAll('[data-img-theme]').forEach((b) => b.classList.toggle('is-active', b === imgTheme));
+    return;
+  }
+
+  // Click a canvas preview to open it large (the variant currently shown).
+  const frameImg = e.target.closest('.ds-image-frame img');
+  if (frameImg) {
+    openLightbox(frameImg.currentSrc || frameImg.src, frameImg.alt);
+    return;
+  }
 });
 
 function flash(el) {
@@ -879,14 +1225,56 @@ function flash(el) {
   setTimeout(() => { el.style.outline = ''; }, 280);
 }
 
+/* ── image lightbox (click a canvas preview to view it large) ──────────────────── */
+function lightboxEsc(e) { if (e.key === 'Escape') closeLightbox(); }
+
+function openLightbox(src, alt) {
+  let lb = document.getElementById('ds-lightbox');
+  if (!lb) {
+    lb = document.createElement('div');
+    lb.id = 'ds-lightbox';
+    lb.className = 'ds-lightbox';
+    lb.innerHTML = '<button class="ds-lightbox-close" aria-label="Close (Esc)">✕</button><img alt="" />';
+    document.body.appendChild(lb);
+    lb.addEventListener('click', (e) => {
+      if (e.target === lb || e.target.closest('.ds-lightbox-close')) closeLightbox();
+    });
+  }
+  const img = lb.querySelector('img');
+  img.src = src;
+  img.alt = alt || '';
+  lb.classList.add('is-open');
+  document.addEventListener('keydown', lightboxEsc);
+}
+
+function closeLightbox() {
+  const lb = document.getElementById('ds-lightbox');
+  if (lb) lb.classList.remove('is-open');
+  document.removeEventListener('keydown', lightboxEsc);
+}
+
 /* ── theme ────────────────────────────────────────────────────────────────────── */
-function setTheme(t) {
-  document.documentElement.dataset.theme = t;
-  try { localStorage.setItem('ds-theme', t); } catch { /* ignore */ }
+// Preference is 'light' | 'dark' | 'system'; 'system' resolves live via the OS setting
+// (mirrors sonaloop-website's ThemeContext). The applied `data-theme` is always concrete.
+const themeQuery = matchMedia('(prefers-color-scheme: dark)');
+let themePref = 'system';
+
+const resolvedTheme = () =>
+  themePref === 'system' ? (themeQuery.matches ? 'dark' : 'light') : themePref;
+
+// Paint the resolved theme + active button state. `render` re-renders the page so
+// theme-dependent values (colour hex, surface tiles, images) refresh.
+function applyTheme(render = true) {
+  document.documentElement.dataset.theme = resolvedTheme();
   document.querySelectorAll('[data-theme-set]').forEach((b) =>
-    b.classList.toggle('is-active', b.dataset.themeSet === t));
-  // re-render so theme-dependent values (colour hex, surface tiles) refresh
-  renderPage();
+    b.classList.toggle('is-active', b.dataset.themeSet === themePref));
+  if (render) renderPage();
+}
+
+function setTheme(pref) {
+  themePref = pref;
+  try { localStorage.setItem('ds-theme', pref); } catch { /* ignore */ }
+  applyTheme();
 }
 
 /* ── search palette ───────────────────────────────────────────────────────────── */
@@ -926,14 +1314,15 @@ function paletteGo(li) { if (!li) return; location.hash = li.dataset.href; close
 function boot() {
   // brand mark
   $('#brand-mark').innerHTML = svgReg('sonaloop');
-  // theme: stored → system → light
-  let t = 'light';
-  try { t = localStorage.getItem('ds-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); } catch { /* ignore */ }
-  document.documentElement.dataset.theme = t;
+  // theme preference: stored → system (default). 'system' tracks the OS live.
+  try { themePref = localStorage.getItem('ds-theme') || 'system'; } catch { /* ignore */ }
+  if (!['light', 'dark', 'system'].includes(themePref)) themePref = 'system';
+  applyTheme(false); // paint data-theme + button state; boot's renderPage() handles the first render
   document.querySelectorAll('[data-theme-set]').forEach((b) => {
-    b.classList.toggle('is-active', b.dataset.themeSet === t);
+    if (b.dataset.themeIco) b.innerHTML = svgReg(b.dataset.themeIco); // canonical sun/monitor/moon
     b.addEventListener('click', () => setTheme(b.dataset.themeSet));
   });
+  themeQuery.addEventListener('change', () => { if (themePref === 'system') applyTheme(); });
 
   renderSidebar();
   renderPage();

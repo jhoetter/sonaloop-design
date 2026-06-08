@@ -52,9 +52,62 @@ import 'sonaloop-design/components.css';   // load the styles once
 ```
 
 Available: `Button` (variant `default|primary|accent|ghost`, size `sm|md|lg`), `Badge`
-(`tone`), `Pill`, `Chip`, `Eyebrow`, `Card` + `CardTitle`/`CardBody`, `Input`, `Kbd`,
+(`tone`), `Pill`, `Chip`, `Eyebrow`, `Card` + `CardTitle`/`CardBody`, `Input`, `Textarea`,
+`Select`, `Checkbox`, `Radio`, `Switch`, `Field`/`Fieldset`, `Entity`/`EntityList`, `Kbd`,
 `Divider`. **Page-level compositions** (Footer, Hero, …) stay in each app and are built
 FROM these primitives + tokens — the design system shares primitives, not whole pages.
+
+## Reference images
+
+A small, curated set of on-brand **reference images** lives here too, so every product
+pulls the *same* canonical asset instead of each carrying its own copy (and drifting).
+These are **not** the only images a product may use — they're the blessed variants to reach
+for first. Authored once, imported everywhere, just like the icons.
+
+Every canvas is a **themed pair** — a `light` and a `dark` variant sharing one composition
+(the dark twin is generated *from* the light, so they stay in lockstep). Pick the variant for
+the active theme; each value is the **bundler-resolved URL** (content-hashed in production),
+drop-in for `<img src>` or a CSS `background`:
+
+```tsx
+import { canvas, mist } from 'sonaloop-design/images';
+
+<img src={canvas.light} alt="" className="dark:hidden" />
+<img src={canvas.dark}  alt="" className="hidden dark:block" />
+```
+
+Pairs available (all under `images/canvas/`, registered in [`src/images.ts`](src/images.ts)):
+
+| pair | light / dark | what it is |
+| --- | --- | --- |
+| `canvas`   | `dawn.jpg` / `dusk.jpg`                   | soft hills under a wide sky |
+| `abstract` | `abstract-light.jpg` / `abstract-dark.jpg` | pure colour-field wash, no subject |
+| `mist`     | `mist-light.jpg` / `mist-dark.jpg`       | fog over a still reflective plane |
+| `meadow`   | `meadow-light.jpg` / `meadow-dark.jpg`   | soft wildflower field under open sky |
+| `sky`      | `sky-light.jpg` / `sky-dark.jpg`         | almost-empty atmospheric sky |
+
+`canvasDawn` / `canvasDusk` remain as direct aliases of `canvas.light` / `canvas.dark`. The
+website consumes this straight from source via its Vite alias (`sonaloop-design/images`);
+published builds expose it through the package `exports` map.
+
+### Generating canvases
+
+The canvases are authored right here with OpenAI `gpt-image-1`, as **light/dark pairs**: the
+light variant is generated from a prompt, then the dark twin is generated *from the light image*
+(same composition, cool night palette) — so the two never drift apart.
+
+```
+cp .env.example .env          # then add your OPENAI_API_KEY (the .env is gitignored)
+npm run generate-canvas -- mist          # one pair (light, then dark from it)
+npm run generate-canvas -- --all         # every pair
+npm run generate-canvas -- canvas --dark # only the dark half, from the existing light
+```
+
+[`scripts/generate-canvas.mjs`](scripts/generate-canvas.mjs) holds one light prompt per pair in
+its `PAIRS` map plus the shared `DARK_INSTRUCTION`, calls the API, and converts each result to
+the final `images/canvas/<name>.jpg` (via `sharp`, 1800×1200) — the exact files `src/images.ts`
+imports. **To add a pair:** add a key to `PAIRS`, run it, then register the two files in
+[`src/images.ts`](src/images.ts).
 
 ## Develop — the design-system docs site
 

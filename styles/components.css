@@ -87,6 +87,7 @@
   background: var(--sl-bg); border: 1px solid var(--sl-line); border-radius: var(--sl-radius-sm);
 }
 .sl-input::placeholder { color: var(--sl-faint); }
+.sl-input:hover { border-color: color-mix(in srgb, var(--sl-ink) 18%, var(--sl-line)); }
 .sl-input:focus, .sl-input:focus-visible { outline: none; border-color: var(--sl-accent);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--sl-accent) 25%, transparent); }
 
@@ -156,6 +157,14 @@
   padding: .3em .6em; font: inherit; font-size: .8em; cursor: pointer; transition: color .12s, border-color .12s; }
 .sl-copy:hover { color: var(--sl-ink); border-color: color-mix(in srgb, var(--sl-ink) 22%, var(--sl-line)); }
 .sl-copy svg { width: 1.05em; height: 1.05em; }
+/* Copy confirmation — the clipboard glyph swaps to a green check while `is-copied` is set.
+   The visual lives here so the website, inspector and docs all confirm identically; each
+   consumer's own JS just adds `.is-copied` for ~1.6s after writing to the clipboard (and a
+   single-icon legacy button still turns green as a fallback). */
+.sl-copy__check { display: none; }
+.sl-copy.is-copied { color: var(--sl-green); border-color: color-mix(in srgb, var(--sl-green) 42%, var(--sl-line)); }
+.sl-copy.is-copied .sl-copy__ico { display: none; }
+.sl-copy.is-copied .sl-copy__check { display: inline; }
 .sl-snippet { display: flex; align-items: center; gap: .75em; border: 1px solid var(--sl-line);
   border-radius: var(--sl-radius-sm); background: var(--sl-surface); padding: .5em .55em .5em .9em; }
 .sl-snippet__code { flex: 1; min-width: 0; overflow-x: auto; white-space: pre; font-family: var(--sl-mono);
@@ -219,6 +228,107 @@
 .sl-stat__value { font-size: 1.35em; font-weight: 700; color: var(--sl-ink); line-height: 1; }
 .sl-stat__label { color: var(--sl-muted); font-size: .85em; }
 
+/* ── Textarea ────────────────────────────────────────────────────────────────── */
+.sl-textarea {
+  font: inherit; width: 100%; padding: .6em .8em; color: var(--sl-ink); line-height: 1.5;
+  background: var(--sl-bg); border: 1px solid var(--sl-line); border-radius: var(--sl-radius-sm);
+  resize: vertical; min-height: 4.5em;
+}
+.sl-textarea::placeholder { color: var(--sl-faint); }
+.sl-textarea:hover { border-color: color-mix(in srgb, var(--sl-ink) 18%, var(--sl-line)); }
+.sl-textarea:focus, .sl-textarea:focus-visible { outline: none; border-color: var(--sl-accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--sl-accent) 25%, transparent); }
+
+/* ── Select (styled native <select> + caret) ─────────────────────────────────── */
+.sl-select { position: relative; display: inline-flex; width: 100%; }
+.sl-select select {
+  font: inherit; width: 100%; padding: .55em 2.2em .55em .8em; color: var(--sl-ink); cursor: pointer;
+  appearance: none; -webkit-appearance: none;
+  background: var(--sl-bg); border: 1px solid var(--sl-line); border-radius: var(--sl-radius-sm);
+}
+.sl-select::after { content: ""; position: absolute; right: .9em; top: 50%; width: .45em; height: .45em;
+  border-right: 1.5px solid var(--sl-muted); border-bottom: 1.5px solid var(--sl-muted);
+  transform: translateY(-65%) rotate(45deg); pointer-events: none; }
+.sl-select select:hover { border-color: color-mix(in srgb, var(--sl-ink) 18%, var(--sl-line)); }
+.sl-select select:focus, .sl-select select:focus-visible { outline: none; border-color: var(--sl-accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--sl-accent) 25%, transparent); }
+.sl-select select:disabled { color: var(--sl-faint); cursor: default; opacity: .7; }
+
+/* ── Checkbox / Radio (one class, [type] picks the shape) ────────────────────────
+   The label wraps the native control so the whole row is clickable; appearance is reset
+   so the box/dot is token-driven and theme-aware. */
+.sl-check { display: inline-flex; align-items: center; gap: .55em; cursor: pointer;
+  color: var(--sl-ink); line-height: 1.4; }
+.sl-check input { appearance: none; -webkit-appearance: none; flex: none; margin: 0;
+  width: 1.15em; height: 1.15em; background: var(--sl-bg); border: 1px solid var(--sl-line);
+  cursor: pointer; transition: background .12s, border-color .12s; }
+.sl-check input[type="checkbox"] { border-radius: var(--sl-radius-sm); }
+.sl-check input[type="radio"] { border-radius: 50%; }
+.sl-check:hover input:not(:checked):not(:disabled) { border-color: color-mix(in srgb, var(--sl-ink) 28%, var(--sl-line)); }
+.sl-check input:checked { background: var(--sl-accent); border-color: var(--sl-accent); }
+.sl-check input[type="checkbox"]:checked {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='white' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.5 8.5l3 3 6-7'/%3E%3C/svg%3E");
+  background-size: .9em; background-position: center; background-repeat: no-repeat; }
+.sl-check input[type="radio"]:checked { box-shadow: inset 0 0 0 .22em var(--sl-bg); }
+.sl-check input:focus-visible { outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--sl-accent) 35%, transparent); }
+.sl-check input[type="radio"]:checked:focus-visible {
+  box-shadow: inset 0 0 0 .22em var(--sl-bg), 0 0 0 2px color-mix(in srgb, var(--sl-accent) 35%, transparent); }
+.sl-check input:disabled { opacity: .55; cursor: default; }
+.sl-check:has(input:disabled) { color: var(--sl-faint); cursor: default; }
+
+/* ── Switch (toggle) ─────────────────────────────────────────────────────────── */
+.sl-switch { display: inline-flex; align-items: center; gap: .6em; cursor: pointer; color: var(--sl-ink); }
+.sl-switch__input { position: absolute; opacity: 0; width: 0; height: 0; }
+.sl-switch__track { position: relative; flex: none; width: 2.2em; height: 1.25em;
+  border-radius: var(--sl-radius-full); background: var(--sl-surface-2); border: 1px solid var(--sl-line);
+  transition: background .15s, border-color .15s; }
+.sl-switch__track::after { content: ""; position: absolute; top: 50%; left: .15em; transform: translateY(-50%);
+  width: .95em; height: .95em; border-radius: 50%; background: var(--sl-bg);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--sl-ink) 28%, transparent); transition: left .15s; }
+.sl-switch__input:checked + .sl-switch__track { background: var(--sl-accent); border-color: var(--sl-accent); }
+.sl-switch__input:checked + .sl-switch__track::after { left: calc(100% - 1.1em); }
+.sl-switch__input:focus-visible + .sl-switch__track {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--sl-accent) 35%, transparent); }
+.sl-switch:has(.sl-switch__input:disabled) { cursor: default; color: var(--sl-faint); }
+.sl-switch__input:disabled + .sl-switch__track { opacity: .55; }
+
+/* ── Field (label + hint/error wrapper) · Fieldset (grouped) ─────────────────────
+   The composition layer that pairs a label + optional hint/error with any control
+   (.sl-input / .sl-textarea / .sl-select / .sl-check …). */
+.sl-field { display: flex; flex-direction: column; gap: .4em; }
+.sl-field__label { font-size: .9em; font-weight: 550; color: var(--sl-ink); }
+.sl-field__req { color: var(--sl-red); margin-left: .15em; }
+.sl-field__hint { font-size: .82em; color: var(--sl-muted); line-height: 1.45; }
+.sl-field__error { font-size: .82em; color: var(--sl-red); line-height: 1.45; }
+.sl-field--invalid :where(.sl-input, .sl-textarea, .sl-select select) { border-color: var(--sl-red); }
+.sl-field--invalid :where(.sl-input, .sl-textarea, .sl-select select):focus {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--sl-red) 25%, transparent); }
+.sl-fieldset { display: flex; flex-direction: column; gap: .7em; margin: 0;
+  border: 1px solid var(--sl-line); border-radius: var(--sl-radius); padding: 1em 1.1em; }
+.sl-fieldset__legend { padding: 0 .4em; font-weight: 600; font-size: .9em; color: var(--sl-ink); }
+
+/* ── Entity (a list row: leading visual · title/desc · trailing) ──────────────────
+   The shared primitive for council/persona/project/synthesis rows. Use .sl-entity-list to
+   stack rows under one hairline frame; --button makes a row interactive. */
+.sl-entity { display: flex; align-items: center; gap: .85em; padding: .7em .9em;
+  border: 1px solid var(--sl-line); border-radius: var(--sl-radius); background: var(--sl-surface); }
+.sl-entity--button { cursor: pointer; transition: background .12s, border-color .12s; }
+.sl-entity--button:hover { background: var(--sl-hover); }
+.sl-entity--button:focus-visible { outline: 2px solid color-mix(in srgb, var(--sl-accent) 55%, transparent); outline-offset: -1px; }
+.sl-entity__visual { flex: none; display: inline-flex; align-items: center; justify-content: center;
+  color: var(--sl-muted); line-height: 0; }
+.sl-entity__content { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: .15em; }
+.sl-entity__title { font-weight: 550; color: var(--sl-ink);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sl-entity__desc { font-size: .85em; color: var(--sl-muted);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sl-entity__trailing { flex: none; display: inline-flex; align-items: center; gap: .5em; color: var(--sl-muted); }
+.sl-entity-list { display: flex; flex-direction: column; overflow: hidden;
+  border: 1px solid var(--sl-line); border-radius: var(--sl-radius); background: var(--sl-surface); }
+.sl-entity-list .sl-entity { border: 0; border-radius: 0; border-bottom: 1px solid var(--sl-line); }
+.sl-entity-list .sl-entity:last-child { border-bottom: 0; }
+
 /* ── Charts (bar · pie/donut · effort·impact quadrant) ────────────────────────────────
    Static, token-driven, print-safe (no hover-only data) so they render identically in the
    app, the website, and headless-Chromium PDF/PPTX export. Markup is emitted by the React
@@ -234,8 +344,8 @@
 .sl-bar { display: grid; grid-template-columns: minmax(4.5em, 10em) 1fr auto; align-items: center;
   gap: .75em; font-size: .92em; }
 .sl-bar__label { color: var(--sl-ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.sl-bar__track { height: .7em; border-radius: var(--sl-radius-full); background: var(--sl-surface-2); overflow: hidden; }
-.sl-bar__fill { height: 100%; width: var(--v, 0%); border-radius: var(--sl-radius-full); background: var(--c, var(--sl-accent)); }
+.sl-bar__track { display: block; height: .7em; border-radius: var(--sl-radius-full); background: var(--sl-surface-2); overflow: hidden; }
+.sl-bar__fill { display: block; height: 100%; width: var(--v, 0%); border-radius: var(--sl-radius-full); background: var(--c, var(--sl-accent)); }
 .sl-bar__val { color: var(--sl-muted); font-variant-numeric: tabular-nums; min-width: 2em; text-align: right; }
 
 /* Pie / donut — proportions (distribution, sentiment). `--slices` is set inline (conic-gradient). */

@@ -11,18 +11,28 @@
 import { Fragment, useState } from 'react';
 import type {
   ButtonHTMLAttributes,
+  FieldsetHTMLAttributes,
   HTMLAttributes,
   InputHTMLAttributes,
   ReactNode,
+  SelectHTMLAttributes,
   TableHTMLAttributes,
+  TextareaHTMLAttributes,
 } from 'react';
+import { MonitorIcon, MoonIcon, SunIcon } from './index';
+import type { PersonaIcon } from './icon';
 
 const cx = (...c: Array<string | false | null | undefined>) => c.filter(Boolean).join(' ');
 
 const CopyGlyph = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+  <svg className="sl-copy__ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <rect x="9" y="9" width="11" height="11" rx="2" />
     <path d="M5 15V5a2 2 0 0 1 2-2h10" />
+  </svg>
+);
+const CheckGlyph = () => (
+  <svg className="sl-copy__check" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M5 13l4 4L19 7" />
   </svg>
 );
 
@@ -172,6 +182,44 @@ export function Segmented({ options, value, onChange, fill, stacked, className, 
   );
 }
 
+/* ── Theme toggle (controlled) ───────────────────────────────────────────────── */
+// The ONE canonical color-scheme switch, shared by every product so the glyphs never
+// diverge: ☀ light · ▢ system (follow the OS) · ☾ dark. It's presentational only —
+// each app owns its own theme state (React context, vanilla JS, Python-SSR) and passes
+// the current `value` + an `onChange`. Built on Segmented, so it inherits its styling.
+export type ThemePreference = 'light' | 'system' | 'dark';
+
+const THEME_TOGGLE_OPTIONS: { value: ThemePreference; Icon: PersonaIcon; label: string }[] = [
+  { value: 'light', Icon: SunIcon, label: 'Light' },
+  { value: 'system', Icon: MonitorIcon, label: 'System' },
+  { value: 'dark', Icon: MoonIcon, label: 'Dark' },
+];
+
+export interface ThemeToggleProps extends Omit<SegmentedProps, 'options' | 'value' | 'onChange'> {
+  value: ThemePreference;
+  onChange?: (value: ThemePreference) => void;
+  /** icon size in px (default 16) */
+  iconSize?: number;
+  /** show the text label beside each icon (default false — icon-only) */
+  labels?: boolean;
+}
+export function ThemeToggle({ value, onChange, iconSize = 16, labels = false, ...rest }: ThemeToggleProps) {
+  return (
+    <Segmented
+      aria-label="Color scheme"
+      value={value}
+      onChange={(v) => onChange?.(v as ThemePreference)}
+      options={THEME_TOGGLE_OPTIONS.map(({ value, Icon, label }) => ({
+        value,
+        icon: <Icon size={iconSize} />,
+        label: labels ? label : '',
+        ariaLabel: `${label} theme`,
+      }))}
+      {...rest}
+    />
+  );
+}
+
 /* ── Copy button / Snippet / Code block ──────────────────────────────────────── */
 export interface CopyButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'> {
   text: string;
@@ -184,13 +232,20 @@ export function CopyButton({ text, label = 'Copy', className, ...rest }: CopyBut
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
-      setTimeout(() => setCopied(false), 1100);
+      setTimeout(() => setCopied(false), 1600);
     } catch { /* clipboard unavailable */ }
   };
   return (
-    <button type="button" className={cx('sl-copy', className)} onClick={onClick} aria-label={label || 'Copy'} {...rest}>
+    <button
+      type="button"
+      className={cx('sl-copy', copied && 'is-copied', className)}
+      onClick={onClick}
+      aria-label={copied ? 'Copied' : label || 'Copy'}
+      {...rest}
+    >
       <CopyGlyph />
-      {(copied ? 'Copied' : label) || null}
+      <CheckGlyph />
+      {label ? <span className="sl-copy__label">{copied ? 'Copied' : label}</span> : null}
     </button>
   );
 }
@@ -315,6 +370,119 @@ export function Stat({ value, label, className, ...rest }: StatProps) {
 }
 export function Stats({ className, ...rest }: HTMLAttributes<HTMLDivElement>) {
   return <div className={cx('sl-stats', className)} {...rest} />;
+}
+
+/* ── Textarea / Select ───────────────────────────────────────────────────────── */
+export function Textarea({ className, ...rest }: TextareaHTMLAttributes<HTMLTextAreaElement>) {
+  return <textarea className={cx('sl-textarea', className)} {...rest} />;
+}
+export interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
+  /** class on the wrapper that draws the caret (the <select> takes `className`) */
+  wrapperClassName?: string;
+}
+export function Select({ className, wrapperClassName, children, ...rest }: SelectProps) {
+  return (
+    <span className={cx('sl-select', wrapperClassName)}>
+      <select className={className} {...rest}>{children}</select>
+    </span>
+  );
+}
+
+/* ── Checkbox / Radio / Switch (label-wrapped native controls) ───────────────── */
+export interface ChoiceProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
+  /** text/label shown beside the control */
+  label?: ReactNode;
+  /** class on the outer <label> wrapper (the <input> takes `className`) */
+  wrapperClassName?: string;
+}
+export function Checkbox({ label, className, wrapperClassName, ...rest }: ChoiceProps) {
+  return (
+    <label className={cx('sl-check', wrapperClassName)}>
+      <input type="checkbox" className={className} {...rest} />
+      {label != null && <span>{label}</span>}
+    </label>
+  );
+}
+export function Radio({ label, className, wrapperClassName, ...rest }: ChoiceProps) {
+  return (
+    <label className={cx('sl-check', wrapperClassName)}>
+      <input type="radio" className={className} {...rest} />
+      {label != null && <span>{label}</span>}
+    </label>
+  );
+}
+export function Switch({ label, className, wrapperClassName, ...rest }: ChoiceProps) {
+  return (
+    <label className={cx('sl-switch', wrapperClassName)}>
+      <input type="checkbox" className={cx('sl-switch__input', className)} {...rest} />
+      <span className="sl-switch__track" />
+      {label != null && <span>{label}</span>}
+    </label>
+  );
+}
+
+/* ── Field (label + hint/error) · Fieldset (grouped) ─────────────────────────── */
+export interface FieldProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
+  label?: ReactNode;
+  hint?: ReactNode;
+  error?: ReactNode;
+  required?: boolean;
+  /** id of the control the label points at */
+  htmlFor?: string;
+}
+export function Field({ label, hint, error, required, htmlFor, className, children, ...rest }: FieldProps) {
+  return (
+    <div className={cx('sl-field', error != null && 'sl-field--invalid', className)} {...rest}>
+      {label != null && (
+        <label className="sl-field__label" htmlFor={htmlFor}>
+          {label}
+          {required && <span className="sl-field__req" aria-hidden="true">*</span>}
+        </label>
+      )}
+      {children}
+      {error != null ? (
+        <span className="sl-field__error">{error}</span>
+      ) : hint != null ? (
+        <span className="sl-field__hint">{hint}</span>
+      ) : null}
+    </div>
+  );
+}
+export interface FieldsetProps extends FieldsetHTMLAttributes<HTMLFieldSetElement> {
+  legend?: ReactNode;
+}
+export function Fieldset({ legend, className, children, ...rest }: FieldsetProps) {
+  return (
+    <fieldset className={cx('sl-fieldset', className)} {...rest}>
+      {legend != null && <legend className="sl-fieldset__legend">{legend}</legend>}
+      {children}
+    </fieldset>
+  );
+}
+
+/* ── Entity (a list row: visual · title/desc · trailing) ─────────────────────── */
+export interface EntityProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
+  visual?: ReactNode;
+  title: ReactNode;
+  desc?: ReactNode;
+  trailing?: ReactNode;
+  /** render as an interactive row (hover affordance) */
+  button?: boolean;
+}
+export function Entity({ visual, title, desc, trailing, button, className, ...rest }: EntityProps) {
+  return (
+    <div className={cx('sl-entity', button && 'sl-entity--button', className)} {...rest}>
+      {visual != null && <span className="sl-entity__visual">{visual}</span>}
+      <span className="sl-entity__content">
+        <span className="sl-entity__title">{title}</span>
+        {desc != null && <span className="sl-entity__desc">{desc}</span>}
+      </span>
+      {trailing != null && <span className="sl-entity__trailing">{trailing}</span>}
+    </div>
+  );
+}
+export function EntityList({ className, ...rest }: HTMLAttributes<HTMLDivElement>) {
+  return <div className={cx('sl-entity-list', className)} {...rest} />;
 }
 
 export type { ReactNode };
