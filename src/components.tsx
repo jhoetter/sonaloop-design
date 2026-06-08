@@ -19,7 +19,7 @@ import type {
   TableHTMLAttributes,
   TextareaHTMLAttributes,
 } from 'react';
-import { MonitorIcon, MoonIcon, SunIcon } from './index';
+import { MonitorIcon, MoonIcon, SunIcon, SonaloopIcon } from './index';
 import type { PersonaIcon } from './icon';
 
 const cx = (...c: Array<string | false | null | undefined>) => c.filter(Boolean).join(' ');
@@ -483,6 +483,35 @@ export function Entity({ visual, title, desc, trailing, button, className, ...re
 }
 export function EntityList({ className, ...rest }: HTMLAttributes<HTMLDivElement>) {
   return <div className={cx('sl-entity-list', className)} {...rest} />;
+}
+
+/* ── Logo ────────────────────────────────────────────────────────────────────── */
+export type LogoSize = 'sm' | 'md' | 'lg';
+export interface LogoProps extends HTMLAttributes<HTMLSpanElement> {
+  /** Wordmark text beside the mark. Defaults to "Sonaloop". */
+  label?: string;
+  /** Set false to render the loop mark on its own (no wordmark). */
+  wordmark?: boolean;
+  size?: LogoSize;
+}
+/**
+ * The Sonaloop brand lockup: the loop mark + the "sonaloop" wordmark — "sona" in Sona Mono and
+ * the trailing "loop" in Sona Pixel (whose cells echo the mark). Single source of truth for the
+ * logo, shared with the Python-SSR app via the `.sl-logo` class layer. Render it inside the
+ * app's own link to make it navigable — the layout lives in CSS, so the wrapper stays minimal:
+ *   <L to="/"><Logo /></L>
+ */
+export function Logo({ label = 'Sonaloop', wordmark = true, size = 'md', className, ...rest }: LogoProps) {
+  // The wordmark sets its trailing "loop" in the pixel face; the rest stays in the mono run.
+  const word = /loop$/i.test(label)
+    ? <>{label.slice(0, -4)}<span className="sl-logo__loop">{label.slice(-4)}</span></>
+    : label;
+  return (
+    <span className={cx('sl-logo', size !== 'md' && `sl-logo--${size}`, className)} {...rest}>
+      <span className="sl-logo__mark"><SonaloopIcon /></span>
+      {wordmark && <span className="sl-logo__word">{word}</span>}
+    </span>
+  );
 }
 
 export type { ReactNode };

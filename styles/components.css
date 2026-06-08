@@ -106,6 +106,36 @@
 }
 .sl-arrow-link:hover, .group:hover .sl-arrow-link { gap: .85em; }
 
+/* ── Logo — the brand lockup: the loop mark + the "sonaloop" wordmark, where "sona" is set in
+   Sona Mono and the trailing "loop" in Sona Pixel (the bitmap accent whose cells echo the loop
+   mark). The single source of truth for the logo across stacks — React (website nav/footer) and
+   the Python-SSR app (sidebar) apply these classes to their OWN link, so it never drifts. The
+   mark is monochrome (--sl-ink) and sits on the baseline like a glyph; the whole lockup is
+   static (no hover/animation). Em-based — mark + wordmark track the host font-size.
+   Markup: a 24×24 SonaloopIcon SVG in `.sl-logo__mark`, and the wordmark with its final "loop"
+   wrapped in `.sl-logo__loop`. The host must load the Sona Mono + Sona Pixel faces
+   (styles/fonts.css). Use --sm / --lg to nudge the mark. ──────────────────────────────────── */
+.sl-logo {
+  display: inline-flex; align-items: baseline; gap: .16em;
+  color: var(--sl-ink); text-decoration: none; white-space: nowrap;
+}
+.sl-logo__mark {
+  display: inline-flex; align-items: center; justify-content: center; flex: none;
+  align-self: baseline; color: var(--sl-ink);
+}
+/* Two-class specificity so the mark size wins over a host `svg.ic` rule (the Python app). The
+   translate compensates for the empty space below the loop in its 24×24 box, so the mark rests
+   on the baseline rather than floating; em-based, so it tracks the lockup size. */
+.sl-logo .sl-logo__mark svg { width: 1.08em; height: 1.08em; overflow: visible; transform: translateY(.27em); }
+.sl-logo__word {
+  display: inline-flex; align-items: baseline;
+  font-family: var(--sl-mono); font-weight: 500; line-height: 1;
+  letter-spacing: .01em; text-transform: lowercase;
+}
+.sl-logo__loop { font-family: var(--sl-pixel); font-size: 1.05em; letter-spacing: 0; text-transform: none; margin-left: .04em; }
+.sl-logo--sm .sl-logo__mark svg { width: .92em; height: .92em; transform: translateY(.23em); }
+.sl-logo--lg .sl-logo__mark svg { width: 1.4em; height: 1.4em; transform: translateY(.35em); }
+
 /* ── Status dot — a small coloured presence/verdict dot ──────────────────────────── */
 .sl-dot { display: inline-block; width: .62em; height: .62em; border-radius: 50%; flex: none;
   background: var(--sl-muted); }
@@ -347,6 +377,63 @@
 .sl-bar__track { display: block; height: .7em; border-radius: var(--sl-radius-full); background: var(--sl-surface-2); overflow: hidden; }
 .sl-bar__fill { display: block; height: 100%; width: var(--v, 0%); border-radius: var(--sl-radius-full); background: var(--c, var(--sl-accent)); }
 .sl-bar__val { color: var(--sl-muted); font-variant-numeric: tabular-nums; min-width: 2em; text-align: right; }
+/* Stacked bar — the fill is sized to the bar total (--v); inner --seg-s split it by series value. */
+.sl-bar__fill--stack { display: flex; background: none; overflow: hidden; }
+.sl-bar__seg { height: 100%; flex-basis: 0; background: var(--c, var(--sl-accent)); }
+
+/* Gauge — radial progress rings (KPI / % complete). `--p` (0..100) is set inline. */
+.sl-gauges { display: flex; flex-wrap: wrap; gap: 1.5em; align-items: flex-start; }
+.sl-gauge-item { display: flex; flex-direction: column; align-items: center; gap: .55em; text-align: center; }
+.sl-gauge { position: relative; width: 7.5em; height: 7.5em; flex: none; border-radius: 50%;
+  background: conic-gradient(var(--c, var(--sl-accent)) calc(var(--p, 0) * 1%), var(--sl-surface-2) 0); }
+.sl-gauge::after { content: ''; position: absolute; inset: 15%; border-radius: 50%; background: var(--sl-bg); }
+.sl-gauge__val { position: absolute; inset: 0; z-index: 1; display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 1.35em; color: var(--sl-ink); font-variant-numeric: tabular-nums; }
+.sl-gauge__label { font-size: .85em; color: var(--sl-ink); max-width: 9em; }
+.sl-gauge__sub { font-size: .78em; color: var(--sl-muted); font-variant-numeric: tabular-nums; }
+
+/* Diverging bar — net sentiment / for↔against around a centre axis. Two half-tracks meet at the
+   zero line; each --v-sized fill grows outward (negative left, positive right). */
+.sl-dbars { display: flex; flex-direction: column; gap: .5em; }
+.sl-dbar { display: grid; grid-template-columns: minmax(4.5em, 9em) 1fr 1fr auto; align-items: center; gap: .4em; font-size: .92em; }
+.sl-dbar__label { color: var(--sl-ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sl-dbar__neg, .sl-dbar__pos { display: flex; height: .7em; background: var(--sl-surface-2); }
+.sl-dbar__neg { justify-content: flex-end; border-radius: var(--sl-radius-full) 0 0 var(--sl-radius-full); }
+.sl-dbar__pos { justify-content: flex-start; border-radius: 0 var(--sl-radius-full) var(--sl-radius-full) 0; border-left: 1px solid var(--sl-line); }
+.sl-dbar__fill { width: var(--v, 0%); height: 100%; background: var(--c, var(--sl-accent)); border-radius: inherit; }
+.sl-dbar__val { color: var(--sl-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* Heatmap / matrix — option × criteria (or persona × theme); cells tinted by value via color-mix.
+   `grid-template-columns` and each cell's tint background are set inline. */
+.sl-heat { display: grid; gap: 3px; font-size: .85em; }
+.sl-heat__col { font-weight: 600; color: var(--sl-muted); text-align: center; padding: .2em .15em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sl-heat__row { color: var(--sl-ink); align-self: center; padding-right: .5em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sl-heat__cell { display: flex; align-items: center; justify-content: center; min-height: 2em; padding: .25em;
+  border-radius: var(--sl-radius-sm); background: var(--sl-surface-2); color: var(--sl-ink); font-variant-numeric: tabular-nums; }
+
+/* Dot / range plot — where N voices land on a scale (spread/disagreement). Dots positioned by --x (%);
+   the taller --mean marker is the average. */
+.sl-dots { display: flex; flex-direction: column; gap: .5em; }
+.sl-dot-row { display: grid; grid-template-columns: minmax(4.5em, 10em) 1fr auto; gap: .75em; align-items: center; font-size: .9em; }
+.sl-dot-label { color: var(--sl-ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sl-dot-track { position: relative; height: 1.4em; }
+.sl-dot-track::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; border-top: 1px solid var(--sl-line); }
+.sl-dot-pt { position: absolute; top: 50%; left: var(--x); transform: translate(-50%, -50%);
+  width: .72em; height: .72em; border-radius: 50%; background: var(--c, var(--sl-accent)); opacity: .55; }
+.sl-dot-mean { position: absolute; top: 50%; left: var(--x); transform: translate(-50%, -50%);
+  width: .26em; height: 1.3em; border-radius: 2px; background: var(--c, var(--sl-accent)); box-shadow: 0 0 0 2px var(--sl-bg); }
+.sl-dot-val { color: var(--sl-muted); font-variant-numeric: tabular-nums; min-width: 2em; text-align: right; }
+.sl-dot-scale { display: grid; grid-template-columns: minmax(4.5em, 10em) 1fr auto; gap: .75em; margin-top: .35em; }
+.sl-dot-scale__axis { display: flex; justify-content: space-between; font-size: .75em; color: var(--sl-faint); }
+
+/* Line / trend — a static inline-SVG polyline (the one chart that needs SVG). `--c` carries the
+   series colour; non-scaling strokes keep the line crisp at any render size. */
+.sl-line svg { width: 100%; height: auto; display: block; overflow: visible; }
+.sl-line__axis { stroke: var(--sl-line); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.sl-line__path { fill: none; stroke: var(--c, var(--sl-accent)); stroke-width: 1.75;
+  vector-effect: non-scaling-stroke; stroke-linejoin: round; stroke-linecap: round; }
+.sl-line__dot { fill: var(--c, var(--sl-accent)); }
+.sl-line__labels { display: flex; justify-content: space-between; font-size: .75em; color: var(--sl-muted); margin-top: .3em; }
 
 /* Pie / donut — proportions (distribution, sentiment). `--slices` is set inline (conic-gradient). */
 .sl-pie-wrap { display: flex; align-items: center; gap: 1.3em; flex-wrap: wrap; }
@@ -381,3 +468,44 @@
   width: 1.9em; height: 1.9em; border-radius: 50%; display: flex; align-items: center; justify-content: center;
   font-size: .8em; font-weight: 700; color: var(--c, var(--sl-accent)); background: var(--sl-bg);
   border: 1.8px solid var(--c, var(--sl-accent)); box-shadow: 0 0 0 3px var(--sl-bg); }
+
+/* ── Command palette (⌘K) ─────────────────────────────────────────────────────────
+   A Linear/Raycast-style global command palette: results grouped under muted section
+   headers, a type-coloured leading icon, an optional right-aligned subtitle, and a
+   footer hint bar. Shared markup — the React <CommandPalette> (website) and the docs
+   site (vanilla JS) render these same classes, so they can never drift. */
+.sl-cmdk { position: fixed; inset: 0; z-index: 200; display: flex; align-items: flex-start; justify-content: center; }
+.sl-cmdk[hidden] { display: none; }
+.sl-cmdk-backdrop { position: absolute; inset: 0; background: color-mix(in srgb, #000 48%, transparent); backdrop-filter: blur(2px); }
+.sl-cmdk-panel { position: relative; margin-top: 12vh; width: min(600px, 92vw); max-height: 74vh;
+  display: flex; flex-direction: column; background: var(--sl-surface); border: 1px solid var(--sl-line);
+  border-radius: var(--sl-radius-lg); box-shadow: 0 24px 70px rgba(0, 0, 0, .30); overflow: hidden; }
+/* Inline presentation (docs preview / embedding): no overlay offset, a calmer shadow. */
+.sl-cmdk-panel--inline { margin: 0 auto; box-shadow: 0 10px 40px rgba(0, 0, 0, .16); }
+.sl-cmdk-head { display: flex; align-items: center; gap: .7rem; padding: .85rem 1rem; border-bottom: 1px solid var(--sl-line); }
+.sl-cmdk-head-ico { width: 1.05rem; height: 1.05rem; flex: none; color: var(--sl-faint); }
+.sl-cmdk-input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent;
+  font: inherit; font-size: .95rem; color: var(--sl-ink); }
+.sl-cmdk-input::placeholder { color: var(--sl-faint); }
+.sl-cmdk-list { flex: 1; overflow-y: auto; padding: .35rem; margin: 0; list-style: none; }
+.sl-cmdk-empty { padding: 1.7rem; text-align: center; color: var(--sl-faint); font-size: .9rem; }
+.sl-cmdk-sec { padding: .6rem .65rem .25rem; font-size: .68rem; font-weight: 600; letter-spacing: .04em; color: var(--sl-faint); }
+.sl-cmdk-item { display: flex; align-items: center; gap: .65rem; width: 100%; box-sizing: border-box;
+  padding: .55rem .65rem; border: 0; border-radius: var(--sl-radius); background: transparent;
+  font: inherit; font-size: .9rem; color: var(--sl-ink); text-align: left; text-decoration: none; cursor: pointer; }
+.sl-cmdk-item.is-active { background: var(--sl-hover); }
+.sl-cmdk-ico { flex: none; width: 1.1rem; height: 1.1rem; display: inline-flex; align-items: center; justify-content: center; color: var(--sl-muted); }
+.sl-cmdk-ico svg { width: 1.1rem; height: 1.1rem; }
+.sl-cmdk-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sl-cmdk-sub { flex: none; max-width: 42%; color: var(--sl-muted); font-size: .8rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sl-cmdk-foot { display: flex; gap: 1.15rem; padding: .5rem 1rem; border-top: 1px solid var(--sl-line);
+  background: var(--sl-surface-2); color: var(--sl-muted); font-size: .8rem; }
+.sl-cmdk-foot .sl-kbd { margin-right: .4rem; }
+
+/* Search trigger — a reusable button that opens the palette (search glyph · label · ⌘K hint). */
+.sl-cmdk-trigger { display: inline-flex; align-items: center; gap: .55rem; padding: .4rem .7rem;
+  border: 1px solid var(--sl-line); border-radius: var(--sl-radius); background: var(--sl-surface);
+  color: var(--sl-muted); font: inherit; font-size: .85rem; cursor: pointer; transition: border-color .12s, background .12s; }
+.sl-cmdk-trigger:hover { border-color: color-mix(in srgb, var(--sl-ink) 22%, var(--sl-line)); }
+.sl-cmdk-trigger-ico { width: .95rem; height: .95rem; flex: none; }
+.sl-cmdk-trigger span { flex: 1; text-align: left; }

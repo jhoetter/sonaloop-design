@@ -1,0 +1,87 @@
+/**
+ * sonaloop-design/website.css — marketing layout utilities.
+ *
+ * The shared website blocks (sonaloop-design/website) compose with a handful of custom layout
+ * utilities that aren't part of the cross-app `.sl-*` component contract — the page measure /
+ * gutter and balanced headings. They live here as the single source so every consumer (the
+ * marketing site, the docs-site previews) loads one sheet instead of re-declaring them.
+ *
+ * Load once, alongside the other design-system stylesheets:
+ *   import 'sonaloop-design/website.css';
+ *
+ * The blocks' remaining classes are plain Tailwind utilities, which each consumer's Tailwind
+ * build emits from the shared tailwind-preset (colours/fonts/radii → the --sl-* tokens).
+ */
+
+.text-balance {
+  text-wrap: balance;
+}
+
+/* Page measure — caps content at 80rem and applies a responsive inset (the site's gutter). */
+.measure-shell,
+.measure-frame {
+  --measure-inset: 1.5rem;
+  box-sizing: border-box;
+  max-width: 80rem;
+  margin-inline: auto;
+}
+
+.measure-frame {
+  padding-inline: var(--measure-inset);
+}
+
+/* Break a child out of the measure inset (full-bleed within the shell). */
+.measure-fill {
+  margin-inline: calc(var(--measure-inset) * -1);
+}
+
+/* A vertically-padded page section on the same measure. */
+.page-section {
+  --measure-inset: 1.5rem;
+  --section-gutter: 0.875rem;
+  box-sizing: border-box;
+  max-width: 80rem;
+  margin-inline: auto;
+  padding: 4rem calc(var(--measure-inset) + var(--section-gutter));
+}
+
+.page-section-compact {
+  padding-block: 3rem;
+}
+
+.page-section-loose {
+  padding-block: 5rem;
+}
+
+@media (min-width: 640px) {
+  .measure-shell,
+  .measure-frame,
+  .page-section {
+    --measure-inset: 2rem;
+  }
+
+  .page-section {
+    --section-gutter: 1rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .measure-shell,
+  .measure-frame,
+  .page-section {
+    --measure-inset: 3rem;
+  }
+
+  .page-section {
+    --section-gutter: 1.5rem;
+    padding-block: 5rem;
+  }
+
+  .page-section-compact {
+    padding-block: 4rem;
+  }
+
+  .page-section-loose {
+    padding-block: 6rem;
+  }
+}

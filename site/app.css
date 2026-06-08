@@ -47,11 +47,10 @@ a { color: inherit; }
   -webkit-backdrop-filter: saturate(1.4) blur(12px);
   border-bottom: 1px solid var(--sl-line);
 }
-.ds-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; min-width: calc(var(--ds-sidebar-w) - 20px); }
-.ds-brand-mark { width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; color: var(--sl-ink); }
-.ds-brand-mark svg { width: 26px; height: 26px; }
-.ds-brand-name { font-size: 15px; font-weight: 600; letter-spacing: -.02em; }
-.ds-brand-name span { color: var(--sl-muted); font-weight: 500; }
+/* The docs header dogfoods the shared .sl-logo lockup; this only sets header-specific
+   scale + the muted "Design" suffix on the wordmark. */
+.ds-brand { font-size: 15px; min-width: calc(var(--ds-sidebar-w) - 20px); }
+.ds-brand .ds-brand-sub { color: var(--sl-muted); margin-left: .5em; }
 
 .ds-search {
   display: flex; align-items: center; gap: 9px; height: 34px; padding: 0 10px 0 11px;
@@ -168,6 +167,18 @@ a { color: inherit; }
 .ds-canvas-grid::before, .ds-canvas-grid::after { content: "+"; position: absolute; color: var(--sl-muted); font-size: 18px; }
 .ds-canvas-grid::before { top: -10px; left: -7px; }
 .ds-canvas-grid::after { bottom: -13px; right: -7px; }
+/* Website tile — a miniature marketing page (browser-less): nav row + headline + actions. */
+.ds-canvas-web { width: 244px; }
+.ds-canvas-web .wb { border: 1px solid var(--sl-line); border-radius: 11px; overflow: hidden; background: var(--sl-surface); }
+.ds-canvas-web .wb-bar { display: flex; align-items: center; gap: 9px; padding: 9px 11px; border-bottom: 1px solid var(--sl-line); background: var(--sl-bg); }
+.ds-canvas-web .wb-bar > svg { width: 16px; height: 16px; color: var(--sl-accent); flex: none; }
+.ds-canvas-web .wb-links { display: flex; gap: 7px; flex: 1; }
+.ds-canvas-web .wb-links i { width: 26px; height: 5px; border-radius: 3px; background: var(--sl-line); display: block; }
+.ds-canvas-web .wb-cta { font-size: 10px; padding: .18em .55em; }
+.ds-canvas-web .wb-body { padding: 16px 13px 17px; }
+.ds-canvas-web .wb-h { height: 9px; border-radius: 4px; background: var(--sl-ink); opacity: .82; margin-bottom: 8px; }
+.ds-canvas-web .wb-actions { display: flex; gap: 7px; margin-top: 12px; }
+.ds-canvas-web .wb-actions .sl-btn { font-size: 10px; padding: .28em .7em; }
 
 /* ── Preview frames ───────────────────────────────────────────────────────────── */
 .ds-preview {
@@ -192,6 +203,68 @@ a { color: inherit; }
    else icon-only items (e.g. the Theme Toggle) collapse to nothing. */
 .ds-preview-stage .sl-segmented__item svg { width: 1.05em; height: 1.05em; flex: none; }
 .ds-preview-stage .sl-segmented--stacked .sl-segmented__item svg { width: 1.25em; height: 1.25em; }
+
+/* ── Website-section previews ──────────────────────────────────────────────────────
+   Marketing/app blocks need to render edge-to-edge on the page surface (the navbar and
+   footer are full-bleed; measure-frame caps their inner width). So drop the dotted matte
+   and the centring/padding the component stage uses, and sit the block on plain paper. */
+.ds-preview--web { background: var(--sl-bg); }
+/* Bare variant preview — no bar/label/badge; the section heading already names it. */
+.ds-preview--bare { margin-top: 10px; }
+.ds-used-inline { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 12px 0 0; }
+.ds-used-inline__label { font-family: var(--sl-mono); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--sl-faint); }
+.ds-preview--web .ds-pv-note { font-family: var(--sl-mono); font-size: 11px; letter-spacing: .04em; color: var(--sl-faint); }
+
+/* Parametric controls — segmented toggles per enumerated prop; swaps a pre-rendered variant. */
+.ds-wb-controls {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 18px;
+  padding: 9px 14px; border-bottom: 1px solid var(--sl-line); background: var(--sl-bg);
+}
+.ds-wb-ctrl { display: inline-flex; align-items: center; gap: 8px; }
+.ds-wb-ctrl__label { font-family: var(--sl-mono); font-size: 11px; text-transform: lowercase; letter-spacing: .03em; color: var(--sl-faint); }
+.ds-wb-controls .ds-seg-btn { width: auto; min-width: 30px; padding: 0 10px; font-size: 12px; font-weight: 550; }
+.ds-web-stage {
+  display: block; padding: 0; min-height: 0; gap: 0;
+  background: var(--sl-bg); font-size: 16px; overflow: hidden;
+}
+/* Tailwind's preflight is OFF here (so it can't touch the .ds-* chrome), which means UA
+   defaults leak into the previews — link colour/underline, list bullets, heading margins,
+   button chrome. Replay the handful of resets the marketing blocks assume, scoped to the
+   stage. They're wrapped in :where() for ZERO specificity (exactly how preflight behaves),
+   so the blocks' own classes — e.g. .sl-btn--primary's colour — always win. The copy-paste
+   markup stays clean because a real Tailwind app ships preflight. */
+:where(.ds-web-stage a) { color: inherit; text-decoration: none; }
+:where(.ds-web-stage ul, .ds-web-stage ol) { list-style: none; margin: 0; padding: 0; }
+/* Mirror preflight on headings: without it the UA's bold/large `h1`–`h3` defaults leak in and
+   render the marketing headlines heavier than on the real site (which ships preflight). The
+   blocks' text-*/font-* utilities still win (higher specificity than this :where reset). */
+:where(.ds-web-stage h1, .ds-web-stage h2, .ds-web-stage h3, .ds-web-stage h4, .ds-web-stage p, .ds-web-stage figure) { margin: 0; }
+:where(.ds-web-stage h1, .ds-web-stage h2, .ds-web-stage h3, .ds-web-stage h4) { font-size: inherit; font-weight: inherit; }
+:where(.ds-web-stage button) { background: none; border: 0; padding: 0; font: inherit; color: inherit; cursor: pointer; }
+
+/* "Used on the website" — auto-detected consumer chips (page name + route). */
+.ds-usechips { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0 0; }
+.ds-usechip {
+  display: inline-flex; align-items: center; gap: 8px; padding: 5px 10px;
+  border: 1px solid var(--sl-line); border-radius: 8px; background: var(--sl-surface);
+  font-size: 13px; color: var(--sl-ink);
+}
+.ds-usechip code {
+  font-family: var(--sl-mono); font-size: 11.5px; color: var(--sl-muted);
+  background: var(--sl-surface-2); border: 1px solid var(--sl-line); border-radius: 5px; padding: 1px 6px;
+}
+a.ds-usechip { text-decoration: none; transition: border-color .12s, background .12s, color .12s; }
+a.ds-usechip:hover { border-color: color-mix(in srgb, var(--sl-accent) 50%, var(--sl-line)); background: var(--sl-hover); }
+a.ds-usechip:hover code { color: var(--sl-accent); border-color: color-mix(in srgb, var(--sl-accent) 35%, var(--sl-line)); }
+
+/* "Source" link — the component's location in the design-system repo (detected, not hardcoded). */
+.ds-source { display: flex; align-items: center; gap: 7px; margin: 14px 0 0; font-size: 13px; color: var(--sl-muted); }
+.ds-source__ico { line-height: 0; color: var(--sl-faint); }
+.ds-source__ico svg { width: 15px; height: 15px; }
+.ds-source a { color: var(--sl-muted); text-decoration: none; display: inline-flex; align-items: center; gap: 7px; }
+.ds-source a:hover { color: var(--sl-accent); }
+.ds-source code { font-family: var(--sl-mono); font-size: 12px; }
+.ds-source__line { font-family: var(--sl-mono); font-size: 11px; color: var(--sl-faint); }
 
 /* density toggle reused from .ds-seg, smaller text variant */
 .ds-seg.ds-seg--text .ds-seg-btn { width: auto; padding: 0 11px; font-size: 12px; font-weight: 550; }
@@ -319,15 +392,16 @@ a { color: inherit; }
 .ds-space-row small { display: block; font-family: var(--sl-mono); font-size: 11px; color: var(--sl-faint); margin-top: 8px; }
 
 /* ── Brand page ───────────────────────────────────────────────────────────────── */
+/* The Sonaloop lockup renders the live .sl-logo (sized via its own font-size). The `> svg`
+   / `.wm` rules only style the product sub-pages' hi-fi marks + wordmark (Cloud / Research),
+   which sit as direct children of the hero/panel — the nested .sl-logo is unaffected. */
 .ds-brand-hero { display: flex; align-items: center; justify-content: center; gap: 18px; padding: 60px; border: 1px solid var(--sl-line); border-radius: 14px; background: var(--sl-surface); margin-top: 20px; }
-.ds-brand-hero svg { width: 56px; height: 56px; color: var(--sl-ink); }
-.ds-brand-hero .wm { font-size: 42px; font-weight: 700; letter-spacing: -.04em; color: var(--sl-ink); }
+.ds-brand-hero > svg { width: 56px; height: 56px; color: var(--sl-ink); }
+.ds-brand-hero .wm { font-family: var(--sl-mono); font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: var(--sl-ink); }
 .ds-brand-clear { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px; }
 .ds-brand-panel { border: 1px solid var(--sl-line); border-radius: 12px; padding: 30px; display: flex; align-items: center; justify-content: center; min-height: 150px; }
 .ds-brand-panel.on-dark { background: #101113; color: #e6e7ea; }
-.ds-brand-panel.on-dark svg, .ds-brand-panel.on-dark .wm { color: #e6e7ea; }
-.ds-brand-panel .wm { font-size: 28px; font-weight: 700; letter-spacing: -.03em; }
-.ds-brand-panel svg { width: 40px; height: 40px; }
+.ds-brand-panel > svg { width: 40px; height: 40px; }
 
 /* ── Footer next-link ─────────────────────────────────────────────────────────── */
 .ds-footer { max-width: var(--ds-content-max); margin: 72px auto 0; padding-top: 26px; border-top: 1px solid var(--sl-line); display: flex; justify-content: space-between; align-items: center; }
@@ -339,22 +413,10 @@ a { color: inherit; }
 .ds-foot-meta { font-size: 13px; color: var(--sl-faint); }
 .ds-foot-meta a { color: var(--sl-accent); text-decoration: none; }
 
-/* ── Search palette ───────────────────────────────────────────────────────────── */
-.ds-palette { position: fixed; inset: 0; z-index: 300; display: flex; align-items: flex-start; justify-content: center; }
-.ds-palette[hidden] { display: none; }
-.ds-palette-backdrop { position: absolute; inset: 0; background: color-mix(in srgb, var(--sl-ink) 28%, transparent); backdrop-filter: blur(2px); }
-.ds-palette-box { position: relative; margin-top: 12vh; width: min(560px, 92vw); background: var(--sl-overlay, var(--sl-surface)); border: 1px solid var(--sl-line); border-radius: 14px; box-shadow: var(--sl-shadow-lg, 0 16px 50px rgba(0,0,0,.25)); overflow: hidden; }
-.ds-palette-head { display: flex; align-items: center; gap: 11px; padding: 14px 16px; border-bottom: 1px solid var(--sl-line); }
-.ds-palette-head .ds-search-ico { width: 17px; height: 17px; color: var(--sl-faint); }
-.ds-palette-head input { flex: 1; border: 0; outline: none; background: transparent; font: inherit; font-size: 15px; color: var(--sl-ink); }
-.ds-palette-head input::placeholder { color: var(--sl-faint); }
-.ds-palette-list { list-style: none; margin: 0; padding: 8px; max-height: 52vh; overflow-y: auto; }
-.ds-palette-list li { display: flex; align-items: center; gap: 11px; padding: 9px 12px; border-radius: 8px; cursor: pointer; font-size: 14px; color: var(--sl-ink); }
-.ds-palette-list li .pl-kind { margin-left: auto; font-family: var(--sl-mono); font-size: 10px; text-transform: uppercase; letter-spacing: .1em; color: var(--sl-faint); }
-.ds-palette-list li .pl-ico { width: 17px; height: 17px; color: var(--sl-muted); display: inline-flex; }
-.ds-palette-list li .pl-ico svg { width: 17px; height: 17px; }
-.ds-palette-list li.is-active, .ds-palette-list li:hover { background: var(--sl-hover); }
-.ds-palette-empty { padding: 22px; text-align: center; color: var(--sl-faint); font-size: 14px; }
+/* The ⌘K search palette is the shared `.sl-cmdk` component (styles/components.css) — the same
+   one the marketing website mounts. Its markup lives in index.html; behaviour in app.js. Only a
+   docs-specific :hover affordance on rows is layered here (the shared CSS drives selection state). */
+.sl-cmdk-list .sl-cmdk-item:hover { background: var(--sl-hover); }
 
 /* ── Misc ─────────────────────────────────────────────────────────────────────── */
 .ds-callout { display: flex; gap: 12px; padding: 14px 16px; border: 1px solid var(--sl-line); border-left: 3px solid var(--sl-accent); border-radius: 10px; background: var(--sl-surface); margin: 18px 0 0; }

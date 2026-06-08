@@ -7,8 +7,10 @@
   "exports": {
     ".": "./src/index.ts",
     "./components": "./src/components.tsx",
+    "./website": "./src/website.tsx",
     "./charts": "./src/charts.tsx",
     "./components.css": "./styles/components.css",
+    "./website.css": "./styles/website.css",
     "./tokens.css": "./styles/tokens.css",
     "./fonts.css": "./styles/fonts.css",
     "./data": "./icons.data.mjs",
@@ -24,11 +26,12 @@
     "images"
   ],
   "scripts": {
-    "gen": "node scripts/gen.mjs && node scripts/gen-tokens.mjs",
+    "gen": "node scripts/gen.mjs && node scripts/gen-tokens.mjs && node scripts/gen-website-previews.mjs && node scripts/gen-website-usage.mjs && node scripts/gen-website-css.mjs",
     "gen:tokens": "node scripts/gen-tokens.mjs",
+    "gen:website": "node scripts/gen-website-previews.mjs && node scripts/gen-website-css.mjs",
     "generate-canvas": "node scripts/generate-canvas.mjs",
     "prepare": "git config core.hooksPath .githooks || true",
-    "check": "npm run gen && git diff --exit-code -- src/index.ts py/sonaloop_icons styles/tokens.css tailwind-preset.js",
+    "check": "npm run gen && git diff --exit-code -- src/index.ts py/sonaloop_icons styles/tokens.css tailwind-preset.js site/website.previews.mjs site/website.css",
     "capture": "node scripts/capture-anim.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
@@ -39,10 +42,13 @@
   "devDependencies": {
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "esbuild": "^0.25.0",
     "playwright-core": "^1.60.0",
+    "postcss": "^8.4.0",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "sharp": "^0.34.5",
+    "tailwindcss": "^3.4.0",
     "typescript": "^5.9.3"
   }
 }

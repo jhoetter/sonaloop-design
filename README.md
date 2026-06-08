@@ -127,12 +127,41 @@ make check          # drift guard: fail if any generated artifact is stale
 - **Components** — a live reference for every `.sl-*` primitive (Button, Badge, Tag, Pill,
   Chip, Card, Eyebrow, Input, Kbd, Divider, Arrow Link), each with an **App-dense / Web-airy**
   preview toggle and copy-ready React / class-contract / Python-SSR snippets.
+- **Website** — the marketing-site blocks (Navbar + Mega Menu, Cards, Hero, CTA Band, Footer,
+  Product · Canvas · Integration showcases, Related Rail) as **real, prop-driven React
+  components**, shadcn-style: own-the-source, composed across the whole site many times, exported
+  at `sonaloop-design/website`. Each docs page shows the **actual** component (server-rendered,
+  not a mockup), the React import + usage, and an **auto-detected list of the marketing pages that
+  consume it** (`scripts/gen-website-usage.mjs` scans the sibling `../sonaloop-website`).
 
 It has a ⌘K search palette and a light/dark toggle, and **every** swatch, icon and component
 is rendered live from the single sources of truth (`tokens.data.mjs`, `icons.data.mjs`,
-`styles/components.css`), so the docs can never drift from what ships. The chrome lives in
-`site/` (`index.html` + `app.css` + `app.js`); it is the only hand-authored part and is not
-itself part of the published package.
+`styles/components.css`, `src/website.tsx`), so the docs can never drift from what ships.
+The chrome lives in `site/` (`index.html` + `app.css` + `app.js`); it is the only hand-authored
+part and is not itself part of the published package.
+
+The Website section's previews are **server-rendered from the real components**:
+`scripts/gen-website-previews.mjs` (esbuild + `react-dom/server`, demo props in
+`scripts/website-previews.harness.tsx`) → committed `site/website.previews.mjs`, and
+`scripts/gen-website-css.mjs` compiles the Tailwind utilities those components use (+ the shared
+`styles/website.css`) → `site/website.css`. Both are part of `make gen` and guarded by
+`make check`, so the docs site needs no runtime React or Tailwind.
+
+### Using the website blocks
+
+```tsx
+import { Navbar, Footer, Hero, CtaBand, RelatedRail, SonaloopLinkProvider } from 'sonaloop-design/website';
+import 'sonaloop-design/components.css';
+import 'sonaloop-design/website.css';
+import { Link } from 'react-router';
+
+// Once at the app root: route the blocks' links client-side (they default to <a> otherwise).
+<SonaloopLinkProvider value={({ to, ...p }) => <Link to={to} {...p} />}>
+  <Navbar menus={megaMenus} currentPath={pathname} transparent />
+  …
+  <Footer columns={footerColumns} />
+</SonaloopLinkProvider>
+```
 
 ```
 icons.data.mjs                  ← author icons here (the only source of truth)

@@ -9,7 +9,11 @@
  */
 import { inspector, scales, fonts } from '/tokens.data.mjs';
 import { regular, hifi } from '/icons.data.mjs';
-import * as wb from '/site/website.data.mjs';
+import { blocks as websiteBlocks } from '/site/website.previews.mjs';
+import { usage as websiteUsage, source as websiteSource } from '/site/website.usage.mjs';
+
+// Where the local marketing site runs (its `npm run dev`), so the "Used on" chips open the real page.
+const WEBSITE_ORIGIN = 'http://localhost:3000';
 
 /* ── tiny helpers ──────────────────────────────────────────────────────────────── */
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -112,6 +116,86 @@ function chartPie(items, { title = '', donut = true } = {}) {
     + `<div class="sl-legend">${legend}</div></div></figure>`;
 }
 
+function chartStacked(items, { title = '' } = {}) {
+  const keys = []; items.forEach((it) => it.segments.forEach((s) => { if (!keys.includes(s.label)) keys.push(s.label); }));
+  const segColor = (s) => s.color || CHART_SERIES[Math.max(0, keys.indexOf(s.label)) % CHART_SERIES.length];
+  const totals = items.map((it) => it.segments.reduce((n, s) => n + Math.max(0, s.value || 0), 0));
+  const mx = Math.max(...totals) || 1;
+  const bars = items.map((it, i) => {
+    const segs = it.segments.filter((s) => s.value > 0).map((s) => `<span class="sl-bar__seg" title="${esc(s.label)}: ${s.value}" style="flex-grow:${s.value};--c:${segColor(s)}"></span>`).join('');
+    return `<div class="sl-bar"><span class="sl-bar__label">${chMd(it.label)}</span>`
+      + `<span class="sl-bar__track"><span class="sl-bar__fill sl-bar__fill--stack" style="--v:${Math.min(100, (totals[i] / mx) * 100)}%">${segs}</span></span>`
+      + `<span class="sl-bar__val">${totals[i]}</span></div>`;
+  }).join('');
+  const first = {}; items.slice().reverse().forEach((it) => it.segments.forEach((s) => { first[s.label] = s; }));
+  const legend = keys.map((k) => `<span class="sl-legend__item"><span class="sl-legend__sw" style="--c:${segColor(first[k])}"></span><span class="sl-legend__label">${chMd(k)}</span></span>`).join('');
+  return `<figure class="sl-chart">${chTitle(title)}<div class="sl-bars">${bars}</div><div class="sl-legend sl-legend--row" style="margin-top:.9em">${legend}</div></figure>`;
+}
+
+function chartGauge(items, { title = '', max = 100 } = {}) {
+  const gauges = items.map((it, i) => {
+    const m = it.max || max || 1; const pct = Math.max(0, Math.min(100, (it.value / m) * 100));
+    const sub = m !== 100 ? `<span class="sl-gauge__sub">${it.value} / ${m}</span>` : '';
+    return `<div class="sl-gauge-item"><div class="sl-gauge" role="img" style="--p:${pct};--c:${chSeriesColor(it, i)}">`
+      + `<span class="sl-gauge__val">${Math.round(pct)}%</span></div><span class="sl-gauge__label">${chMd(it.label)}</span>${sub}</div>`;
+  }).join('');
+  return `<figure class="sl-chart">${chTitle(title)}<div class="sl-gauges">${gauges}</div></figure>`;
+}
+
+function chartDiverging(items, { title = '', positiveLabel = 'Positive', negativeLabel = 'Negative', positiveColor = 'var(--sl-green)', negativeColor = 'var(--sl-red)' } = {}) {
+  const mx = Math.max(...items.map((it) => Math.max(Math.abs(it.positive || 0), Math.abs(it.negative || 0)))) || 1;
+  const bars = items.map((it) => {
+    const pos = Math.max(0, it.positive || 0), neg = Math.max(0, it.negative || 0);
+    return `<div class="sl-dbar"><span class="sl-dbar__label">${chMd(it.label)}</span>`
+      + `<span class="sl-dbar__neg"><span class="sl-dbar__fill" style="--v:${(neg / mx) * 100}%;--c:${negativeColor}"></span></span>`
+      + `<span class="sl-dbar__pos"><span class="sl-dbar__fill" style="--v:${(pos / mx) * 100}%;--c:${positiveColor}"></span></span>`
+      + `<span class="sl-dbar__val">+${pos} · −${neg}</span></div>`;
+  }).join('');
+  const legend = `<span class="sl-legend__item"><span class="sl-legend__sw" style="--c:${positiveColor}"></span><span class="sl-legend__label">${chMd(positiveLabel)}</span></span>`
+    + `<span class="sl-legend__item"><span class="sl-legend__sw" style="--c:${negativeColor}"></span><span class="sl-legend__label">${chMd(negativeLabel)}</span></span>`;
+  return `<figure class="sl-chart">${chTitle(title)}<div class="sl-dbars">${bars}</div><div class="sl-legend sl-legend--row" style="margin-top:.9em">${legend}</div></figure>`;
+}
+
+function chartHeatmap(columns, rows, { title = '', color = 'var(--sl-accent)' } = {}) {
+  const all = rows.flatMap((r) => r.values).filter((v) => Number.isFinite(v));
+  const mn = Math.min(...all, 0), mx = Math.max(...all, 1);
+  const tint = (v) => `color-mix(in srgb, ${color} ${mx === mn ? 0 : Math.max(0, Math.min(100, ((v - mn) / (mx - mn)) * 100)).toFixed(0)}%, var(--sl-surface-2))`;
+  const head = '<span class="sl-heat__corner"></span>' + columns.map((c) => `<span class="sl-heat__col">${chMd(c)}</span>`).join('');
+  const body = rows.map((r) => `<span class="sl-heat__row">${chMd(r.label)}</span>`
+    + columns.map((_, ci) => { const v = r.values[ci]; return Number.isFinite(v) ? `<span class="sl-heat__cell" style="background:${tint(v)}">${v}</span>` : '<span class="sl-heat__cell"></span>'; }).join('')).join('');
+  return `<figure class="sl-chart">${chTitle(title)}<div class="sl-heat" style="grid-template-columns:minmax(4.5em, auto) repeat(${columns.length}, minmax(2em, 1fr))">${head}${body}</div></figure>`;
+}
+
+function chartDotPlot(items, { title = '', min = 1, max = 5 } = {}) {
+  const span = (max - min) || 1; const xOf = (v) => Math.max(0, Math.min(100, ((v - min) / span) * 100));
+  const rows = items.map((it, i) => {
+    const vals = it.values.filter((v) => Number.isFinite(v));
+    const mean = Math.round((vals.reduce((s, v) => s + v, 0) / vals.length) * 10) / 10;
+    const c = it.color || CHART_SERIES[i % CHART_SERIES.length];
+    const dots = vals.map((v) => `<span class="sl-dot-pt" style="left:${xOf(v)}%;--c:${c}"></span>`).join('');
+    return `<div class="sl-dot-row"><span class="sl-dot-label">${chMd(it.label)}</span>`
+      + `<span class="sl-dot-track">${dots}<span class="sl-dot-mean" style="left:${xOf(mean)}%;--c:${c}"></span></span>`
+      + `<span class="sl-dot-val">${mean}</span></div>`;
+  }).join('');
+  const scale = `<div class="sl-dot-scale"><span></span><span class="sl-dot-scale__axis"><span>${min}</span><span>${max}</span></span><span></span></div>`;
+  return `<figure class="sl-chart">${chTitle(title)}<div class="sl-dots">${rows}</div>${scale}</figure>`;
+}
+
+function chartLine(series, { title = '', labels = null } = {}) {
+  const all = series.flatMap((s) => s.points).filter((v) => Number.isFinite(v));
+  const mn = Math.min(...all), mx = Math.max(...all), span = (mx - mn) || 1, W = 100, H = 40;
+  const xy = (pts) => pts.map((v, i) => [(i / (pts.length - 1)) * W, H - ((v - mn) / span) * H]);
+  const paths = series.map((s, i) => {
+    const c = s.color || CHART_SERIES[i % CHART_SERIES.length]; const pts = xy(s.points.filter((v) => Number.isFinite(v)));
+    const dots = pts.map(([x, y]) => `<circle class="sl-line__dot" cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" r="1.4"></circle>`).join('');
+    return `<g style="--c:${c}"><polyline class="sl-line__path" points="${pts.map(([x, y]) => `${x.toFixed(2)},${y.toFixed(2)}`).join(' ')}"></polyline>${dots}</g>`;
+  }).join('');
+  const svg = `<svg viewBox="0 0 ${W} ${H}" role="img"><line class="sl-line__axis" x1="0" y1="${H}" x2="${W}" y2="${H}"></line>${paths}</svg>`;
+  const labs = labels ? `<div class="sl-line__labels">${labels.map((l) => `<span>${esc(l)}</span>`).join('')}</div>` : '';
+  const legend = series.length > 1 ? `<div class="sl-legend sl-legend--row" style="margin-top:.6em">${series.map((s, i) => `<span class="sl-legend__item"><span class="sl-legend__sw" style="--c:${s.color || CHART_SERIES[i % CHART_SERIES.length]}"></span><span class="sl-legend__label">${chMd(s.label)}</span></span>`).join('')}</div>` : '';
+  return `<figure class="sl-chart">${chTitle(title)}<div class="sl-line">${svg}${labs}</div>${legend}</figure>`;
+}
+
 const chLeverage = (x, y) => { const d = y - x; return d >= 2 ? 'var(--sl-green)' : d >= 1 ? 'var(--sl-accent)' : d <= -1 ? 'var(--sl-red)' : 'var(--sl-amber)'; };
 function chartEffort(items, { title = '', xLabel = 'Effort', yLabel = 'Value', quadrants = ['Quick wins', 'Big bets', 'Fill-ins', 'Time sinks'] } = {}) {
   const dots = items.map((it, i) => `<span class="sl-quad__dot" style="--x:${((it.x - 1) / 4) * 100}%;--y:${(1 - (it.y - 1) / 4) * 100}%;--c:${it.color || chLeverage(it.x, it.y)}">${i + 1}</span>`).join('');
@@ -124,26 +208,115 @@ function chartEffort(items, { title = '', xLabel = 'Effort', yLabel = 'Value', q
     + `<div class="sl-quad-xlab">${esc(xLabel)}</div></div><div class="sl-legend" style="margin-top:.9em">${legend}</div></figure>`;
 }
 
-/* Website-section page — a marketing/app block shown the way Tailwind Plus does it: a full-bleed
-   live preview on the page surface, then the same Tailwind-utility markup to copy. The single
-   `markup` string (from site/website.data.mjs) drives BOTH, so the docs can't drift. Styling for
-   these utilities is precompiled into site/website.css by scripts/gen-website-css.mjs. */
-function websitePage({ id, title, desc, markup, notes }) {
+/* "Used on the website" — the consumer pages auto-detected from the sibling marketing site by
+   scripts/gen-website-usage.mjs. Blocks rendered inside another block (no direct page import) get
+   a short note instead of a list. */
+const USAGE_FALLBACK = {
+  'mega-menu': 'Rendered inside the <b>Navbar</b> (opens on hover) — not imported directly by pages.',
+  'cta-band': 'Embedded in the <b>Footer</b> by default; also drop-in standalone mid-page.',
+};
+// Open the live page on the local dev server. For dynamic :slug routes the generator resolves a
+// real example page (`u.live`, the first slug from the content registry); else fall back to the
+// route, stripping any leftover :slug to the parent collection.
+const liveHref = (u) => WEBSITE_ORIGIN + (u.live || u.to.replace(/\/:[^/]+$/, '') || '/');
+
+const usechip = (u) => u.to
+  ? `<a class="ds-usechip" href="${esc(liveHref(u))}" target="_blank" rel="noopener">${esc(u.name)}<code>${esc(u.to)}</code></a>`
+  : `<span class="ds-usechip">${esc(u.name)}</span>`;
+
+// Usage list for a block (flat) or a specific variant (when `key` is given + the block is per-variant).
+function usageList(block, key) {
+  let u = websiteUsage[block];
+  if (u && key && !Array.isArray(u)) u = u[key];
+  return Array.isArray(u) ? u : [];
+}
+
+function websiteConsumers(block) {
+  const list = usageList(block);
+  if (!list.length) {
+    const note = USAGE_FALLBACK[block];
+    return note ? `${h2(`${block}-used`, 'Used on the website')}${p(note)}` : '';
+  }
+  return `${h2(`${block}-used`, 'Used on the website')}
+    ${p(`Auto-detected from the marketing site — <b>${list.length}</b> ${list.length === 1 ? 'page composes' : 'pages compose'} this block. Each opens the live page on your local dev server (<code>${esc(WEBSITE_ORIGIN)}</code>):`)}
+    <div class="ds-usechips">${list.map(usechip).join('')}</div>`;
+}
+
+// Compact per-variant "Used on" row (no heading) for the stacked variant sections.
+function websiteConsumersInline(block, key) {
+  const list = usageList(block, key);
+  if (!list.length) return '';
+  return `<div class="ds-used-inline"><span class="ds-used-inline__label">Used on</span><div class="ds-usechips">${list.map(usechip).join('')}</div></div>`;
+}
+
+// "Source" link — detected (scripts/gen-website-usage.mjs reads src/website.tsx), never hardcoded.
+// Pass `key` for a per-variant block to link that variant's component.
+function websiteSourceLink(block, key) {
+  let s = websiteSource[block];
+  if (s && key && !s.export) s = s[key];
+  if (!s || !s.export) return '';
+  return `<p class="ds-source"><span class="ds-source__ico">${svgReg('jtbd')}</span>`
+    + `Source: <a href="${esc(s.href)}" target="_blank" rel="noopener"><code>${esc(s.file)}</code> › ${esc(s.export)}${s.line ? ` <span class="ds-source__line">L${s.line}</span>` : ''}</a></p>`;
+}
+
+/* Website-section page — a real shared component (sonaloop-design/website), shadcn-style. The
+   preview is the ACTUAL component, server-rendered from src/website.tsx by
+   scripts/gen-website-previews.mjs (so it can never drift / be a mockup), and the code shows the
+   React import + usage. The full-bleed `markup` HTML is read from site/website.previews.mjs. */
+
+function websitePage({ id, block, title, desc, usage, notes }) {
+  const data = websiteBlocks[block] || { controls: [], variants: { '': '' }, defaultKey: '' };
+
+  // Concept with several concrete variants: stack each as its own bare preview + code + where it's
+  // used (Tailwind-Plus style). The variant name is the section heading, so the preview shows only
+  // the component (no repeated label / "live" badge).
+  if (data.examples) {
+    const sections = data.examples.map((ex) => `
+      ${h2(`${id}-${ex.key}`, ex.label)}
+      ${websiteSourceLink(block, ex.key)}
+      <div class="ds-preview ds-preview--web ds-preview--bare"><div class="ds-preview-stage ds-web-stage">${ex.html}</div></div>
+      ${code('tsx', ex.code)}
+      ${websiteConsumersInline(block, ex.key)}`).join('');
+    return `
+    <p class="ds-eyebrow">Website</p>
+    <h1 class="ds-h1">${esc(title)}</h1>
+    <p class="ds-lead">${desc}</p>
+    ${p(`One concept, several variants — each with its own preview, the code below it, and where it's used. All ship from <code>sonaloop-design/website</code>.`)}
+    ${sections}
+    ${notes || ''}
+  `;
+  }
+
+  const defaultHtml = data.variants[data.defaultKey] || '';
+  // Enumerated prop controls (pre-rendered variants); the bar swaps the stage HTML, no React.
+  const controlsBar = data.controls.length ? `
+      <div class="ds-wb-controls">
+        ${data.controls.map((c) => `
+          <span class="ds-wb-ctrl">
+            <span class="ds-wb-ctrl__label">${esc(c.label)}</span>
+            <span class="ds-seg ds-seg--text" data-wb-ctrl="${esc(c.prop)}">
+              ${c.options.map((o, i) => `<button type="button" class="ds-seg-btn${i === 0 ? ' is-active' : ''}" data-wb-opt="${esc(o.key)}">${esc(o.label)}</button>`).join('')}
+            </span>
+          </span>`).join('')}
+      </div>` : '';
   return `
     <p class="ds-eyebrow">Website</p>
     <h1 class="ds-h1">${esc(title)}</h1>
     <p class="ds-lead">${desc}</p>
-    <div class="ds-preview ds-preview--web">
+    ${websiteSourceLink(block)}
+    <div class="ds-preview ds-preview--web" data-wb="${esc(block)}">
       <div class="ds-preview-bar">
         <span class="ds-pv-label">Preview</span>
         <span class="ds-top-spacer"></span>
-        <span class="ds-pv-note">Live · theme-aware</span>
+        <span class="ds-pv-note">Live · real component · theme-aware</span>
       </div>
-      <div class="ds-preview-stage ds-web-stage">${markup}</div>
+      ${controlsBar}
+      <div class="ds-preview-stage ds-web-stage" data-wb-stage>${defaultHtml}</div>
     </div>
-    ${h2(`${id}-markup`, 'Markup')}
-    ${p(`These blocks are documented as copy-paste Tailwind-utility markup — the marketing site composes them as React, but the classes are the contract. Colours, fonts and radii flow from the shared <code>tailwind-preset.js</code> (the same <code>--sl-*</code> tokens), and <code>.sl-*</code> classes (buttons, eyebrow, arrow-link, dots) come from <code>styles/components.css</code>.`)}
-    ${code('html', markup)}
+    ${h2(`${id}-usage`, 'Usage')}
+    ${p(`A real, prop-driven React component — own-the-source, composed across the whole site (shadcn-style). Import it from <code>sonaloop-design/website</code>; load <code>sonaloop-design/components.css</code> + <code>sonaloop-design/website.css</code> once, and provide a router adapter via <code>SonaloopLinkProvider</code> for client-side links (it falls back to <code>&lt;a&gt;</code>).`)}
+    ${code('tsx', usage)}
+    ${websiteConsumers(block)}
     ${notes || ''}
   `;
 }
@@ -508,16 +681,17 @@ function pageBrand() {
   return `
     <p class="ds-eyebrow">Brands</p>
     <h1 class="ds-h1">Sonaloop</h1>
-    <p class="ds-lead">The Sonaloop mark is a single continuous loop with three nodes — the feedback loop between personas, councils and synthesis. Pair it with the wordmark set in Geist Sans.</p>
+    <p class="ds-lead">The Sonaloop mark is a single continuous loop with three nodes — the feedback loop between personas, councils and synthesis. Pair it with the wordmark set in Geist Mono, uppercase. The lockup ships as the <a href="#/components/logo">Logo</a> component (<code>.sl-logo</code>) — every surface renders that one source.</p>
 
     ${h2('brand-lockup', 'Primary lockup')}
-    <div class="ds-brand-hero">${svgReg('sonaloop')}<span class="wm">Sonaloop</span></div>
+    ${p('This is the live <a href="#/components/logo">Logo</a> component (<code>.sl-logo</code>) — the same lockup the website navbar/footer and the app sidebar render.')}
+    <div class="ds-brand-hero"><span class="sl-logo" style="font-size:32px"><span class="sl-logo__mark">${svgReg('sonaloop')}</span><span class="sl-logo__word">sona<span class="sl-logo__loop">loop</span></span></span></div>
 
     ${h2('brand-contrast', 'On light & dark')}
-    ${p('The mark is monochrome <code>currentColor</code> — it inverts cleanly. Keep it ink on light surfaces and near-white on dark; avoid placing it on busy imagery or the accent indigo.')}
+    ${p('The whole lockup is monochrome <code>--sl-ink</code> — theme-aware, so it inverts cleanly. Never recolour it by hand or set it on busy imagery.')}
     <div class="ds-brand-clear">
-      <div class="ds-brand-panel">${svgReg('sonaloop')}<span class="wm" style="margin-left:14px">Sonaloop</span></div>
-      <div class="ds-brand-panel on-dark">${svgReg('sonaloop')}<span class="wm" style="margin-left:14px">Sonaloop</span></div>
+      <div class="ds-brand-panel"><span class="sl-logo" style="font-size:20px"><span class="sl-logo__mark">${svgReg('sonaloop')}</span><span class="sl-logo__word">sona<span class="sl-logo__loop">loop</span></span></span></div>
+      <div class="ds-brand-panel on-dark" data-theme="dark"><span class="sl-logo" style="font-size:20px"><span class="sl-logo__mark">${svgReg('sonaloop')}</span><span class="sl-logo__word">sona<span class="sl-logo__loop">loop</span></span></span></div>
     </div>
 
     ${h2('brand-family', 'Product family')}
@@ -531,7 +705,7 @@ function pageBrand() {
     <ul class="ds-ul">
       <li class="ds-li">Keep clear space around the lockup equal to the height of the mark.</li>
       <li class="ds-li">Don't recolour the mark, add gradients, or set it on the indigo accent.</li>
-      <li class="ds-li">Don't stretch, rotate or outline the wordmark — Geist Sans, tracking <code>-0.04em</code>.</li>
+      <li class="ds-li">Don't stretch, rotate or outline the wordmark — Geist Mono, uppercase, tracking <code>0.14em</code>.</li>
     </ul>
   `;
 }
@@ -697,6 +871,20 @@ const cArrowLink = () => componentPage({
   react: `// CSS-only class — no wrapper needed\n<Link to="/method" className="sl-arrow-link">\n  Read the method <ArrowGlyph />\n</Link>`,
   markup: `<a href="…" class="sl-arrow-link">Read the docs <svg>…→…</svg></a>`,
   python: `h("a", {"class_": "sl-arrow-link", "href": url}, "Open", arrow_svg)`,
+});
+
+const cLogo = () => componentPage({
+  id: 'logo', title: 'Logo', desc: 'The Sonaloop brand lockup — the loop <a href="#/brand">mark</a> + the <code>sonaloop</code> wordmark, lowercase and tightly set: <code>sona</code> in Sona&nbsp;Mono running straight into a Sona&nbsp;Pixel <code>loop</code> (whose cells echo the mark). The single source of truth for the logo: the React <code>&lt;Logo&gt;</code> and the Python-SSR sidebar both apply <code>.sl-logo</code>, so it never drifts. Monochrome <code>--sl-ink</code> (inverts cleanly), em-based, static. The mark sits on the baseline like a glyph; use <code>--sm</code>/<code>--lg</code> to nudge it. Needs the Sona&nbsp;Mono + Sona&nbsp;Pixel faces loaded.',
+  demo: `<div style="display:flex;flex-direction:column;gap:24px;align-items:flex-start">
+      <a href="#/logo" class="sl-logo" style="font-size:30px"><span class="sl-logo__mark">${svgReg('sonaloop')}</span><span class="sl-logo__word">sona<span class="sl-logo__loop">loop</span></span></a>
+      <span class="sl-logo" style="font-size:18px"><span class="sl-logo__mark">${svgReg('sonaloop')}</span><span class="sl-logo__word">sona<span class="sl-logo__loop">loop</span></span></span>
+      <span class="sl-logo sl-logo--lg" style="font-size:48px"><span class="sl-logo__mark">${svgReg('sonaloop')}</span><span class="sl-logo__word">sona<span class="sl-logo__loop">loop</span></span></span>
+      <span class="sl-logo"><span class="sl-logo__mark">${svgReg('sonaloop')}</span></span>
+    </div>`,
+  react: `import { Logo } from 'sonaloop-design/components';\n\n// Wrap in your router's link to make it navigable\n<Link to="/"><Logo /></Link>\n<Logo size="lg" />\n<Logo wordmark={false} />   // mark only`,
+  markup: `<a class="sl-logo" href="/">\n  <span class="sl-logo__mark"><!-- 24×24 SonaloopIcon SVG --></span>\n  <span class="sl-logo__word">sona<span class="sl-logo__loop">loop</span></span>\n</a>`,
+  python: `h("a", {"class_": "sl-logo", "href": "/"},\n  h("span", {"class_": "sl-logo__mark"}, icon("sonaloop")),\n  h("span", {"class_": "sl-logo__word"}, "sona", h("span", {"class_": "sl-logo__loop"}, "loop")))`,
+  notes: `<div class="ds-callout"><span class="ico">${svgReg('bulb')}</span><p>Usage rules (clear space, on-light/dark, the product-family badges) live on the <a href="#/brand">Brand</a> page — this component is just the canonical lockup every app renders.</p></div>`,
 });
 
 const cStatusDot = () => componentPage({
@@ -950,6 +1138,133 @@ const cChartEffort = () => componentPage({
   notes: chartFigureNote('<code>{kind:"chart", of:"effort_impact", source_id:"&lt;synthesis&gt;"}</code> (its 2×2 of recommendations)'),
 });
 
+const cChartStacked = () => componentPage({
+  id: 'chart-stacked', title: 'Stacked Bar Chart',
+  desc: 'A <b>composition</b> chart — how each category breaks down by series (stance per theme, time per phase). Bars share one scale; series colour is keyed by segment label so a series reads the same in every bar, with a shared legend.',
+  demo: `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:34px;width:100%">
+      ${chartStacked([
+        { label: 'Pricing', segments: [{ label: 'For', value: 6 }, { label: 'Conditional', value: 3 }, { label: 'Against', value: 2 }] },
+        { label: 'Onboarding', segments: [{ label: 'For', value: 4 }, { label: 'Conditional', value: 4 }, { label: 'Against', value: 1 }] },
+        { label: 'Support', segments: [{ label: 'For', value: 2 }, { label: 'Conditional', value: 3 }, { label: 'Against', value: 5 }] },
+      ], { title: 'Council stance per theme' })}
+    </div>`,
+  variants: { cols: ['Prop', 'Type', 'Effect'], rows: [
+    ['items', '{label, segments: {label, value, color?}[]}[]', 'Each bar and its stacked series segments.'],
+    ['title', 'string', 'Optional mono section title above the bars.'],
+    ['maxValue', 'number', 'Fix the 100% reference (else the largest bar total).'],
+  ] },
+  react: `import { StackedBarChart } from 'sonaloop-design/charts';\n\n<StackedBarChart\n  title="Council stance per theme"\n  items={[\n    { label: 'Pricing', segments: [{ label: 'For', value: 6 }, { label: 'Conditional', value: 3 }, { label: 'Against', value: 2 }] },\n    { label: 'Support', segments: [{ label: 'For', value: 2 }, { label: 'Conditional', value: 3 }, { label: 'Against', value: 5 }] },\n  ]}\n/>`,
+  markup: `<figure class="sl-chart">\n  <div class="sl-bars">\n    <div class="sl-bar">\n      <span class="sl-bar__label">Pricing</span>\n      <span class="sl-bar__track">\n        <span class="sl-bar__fill sl-bar__fill--stack" style="--v:100%">\n          <span class="sl-bar__seg" style="flex-grow:6;--c:var(--c1)"></span>\n          <span class="sl-bar__seg" style="flex-grow:3;--c:var(--c2)"></span>\n          <span class="sl-bar__seg" style="flex-grow:2;--c:var(--c3)"></span>\n        </span>\n      </span>\n      <span class="sl-bar__val">11</span>\n    </div>\n  </div>\n</figure>`,
+  python: `from sonaloop_icons.charts import stacked_bar_chart\n\nstacked_bar_chart([\n    {"label": "Pricing", "segments": [{"label": "For", "value": 6}, {"label": "Against", "value": 2}]},\n], title="Council stance per theme")`,
+  notes: chartFigureNote('<code>{kind:"chart", of:"stacked_bar", series:[{label, segments}]}</code>'),
+});
+
+const cChartGauge = () => componentPage({
+  id: 'chart-gauge', title: 'Gauge · Radial Progress',
+  desc: 'A <b>radial progress ring</b> — a single KPI, % complete or confidence score. The ring fills <code>value / max</code> and the centre shows the percentage. Pass several items to compare a few KPIs side by side; print- and PDF-safe like the donut.',
+  demo: `<div style="width:100%">
+      ${chartGauge([
+        { label: 'Confidence', value: 72 },
+        { label: 'Coverage', value: 58, color: 'var(--sl-violet)' },
+        { label: 'Tasks done', value: 9, max: 12, color: 'var(--sl-green)' },
+      ], { title: 'Synthesis health' })}
+    </div>`,
+  variants: { cols: ['Prop', 'Type', 'Effect'], rows: [
+    ['items', '{label, value, max?, color?}[]', 'One ring per item; <code>max</code> defaults to the chart <code>max</code>.'],
+    ['max', 'number = 100', 'Default scale for items without their own <code>max</code>.'],
+    ['title', 'string', 'Optional mono section title.'],
+  ] },
+  react: `import { GaugeChart } from 'sonaloop-design/charts';\n\n<GaugeChart title="Synthesis health"\n  items={[{ label: 'Confidence', value: 72 }, { label: 'Tasks done', value: 9, max: 12 }]}\n/>`,
+  markup: `<figure class="sl-chart">\n  <div class="sl-gauges">\n    <div class="sl-gauge-item">\n      <div class="sl-gauge" role="img" style="--p:72;--c:var(--c1)">\n        <span class="sl-gauge__val">72%</span>\n      </div>\n      <span class="sl-gauge__label">Confidence</span>\n    </div>\n  </div>\n</figure>`,
+  python: `from sonaloop_icons.charts import gauge_chart\n\ngauge_chart([{"label": "Confidence", "value": 72}, {"label": "Tasks done", "value": 9, "max": 12}])`,
+  notes: chartFigureNote('<code>{kind:"chart", of:"gauge", series:[{label, value, max}]}</code>'),
+});
+
+const cChartDiverging = () => componentPage({
+  id: 'chart-diverging', title: 'Diverging Bar Chart',
+  desc: 'A <b>net sentiment</b> chart — for ↔ against around a centre axis. Negative grows left, positive grows right, both on one magnitude scale, so council stance and before·after shifts read as a lean, not just a count.',
+  demo: `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:34px;width:100%">
+      ${chartDiverging([
+        { label: 'Pricing', positive: 6, negative: 2 }, { label: 'Onboarding', positive: 4, negative: 4 },
+        { label: 'Support', positive: 2, negative: 5 }, { label: 'Roadmap', positive: 7, negative: 1 },
+      ], { title: 'Council stance', positiveLabel: 'For', negativeLabel: 'Against' })}
+    </div>`,
+  variants: { cols: ['Prop', 'Type', 'Effect'], rows: [
+    ['items', '{label, positive, negative}[]', 'Each row; the two sides share one magnitude scale.'],
+    ['positiveLabel / negativeLabel', 'string', 'Legend names (default Positive / Negative).'],
+    ['positiveColor / negativeColor', 'string', 'Side colours (default green / red).'],
+    ['maxValue', 'number', 'Fix the scale (else the largest magnitude).'],
+  ] },
+  react: `import { DivergingBarChart } from 'sonaloop-design/charts';\n\n<DivergingBarChart\n  title="Council stance" positiveLabel="For" negativeLabel="Against"\n  items={[{ label: 'Pricing', positive: 6, negative: 2 }, { label: 'Support', positive: 2, negative: 5 }]}\n/>`,
+  markup: `<figure class="sl-chart">\n  <div class="sl-dbars">\n    <div class="sl-dbar">\n      <span class="sl-dbar__label">Pricing</span>\n      <span class="sl-dbar__neg"><span class="sl-dbar__fill" style="--v:33%;--c:var(--sl-red)"></span></span>\n      <span class="sl-dbar__pos"><span class="sl-dbar__fill" style="--v:100%;--c:var(--sl-green)"></span></span>\n      <span class="sl-dbar__val">+6 · −2</span>\n    </div>\n  </div>\n</figure>`,
+  python: `from sonaloop_icons.charts import diverging_bar_chart\n\ndiverging_bar_chart([{"label": "Pricing", "positive": 6, "negative": 2}],\n                    positive_label="For", negative_label="Against")`,
+  notes: chartFigureNote('<code>{kind:"chart", of:"diverging_bar", series:[{label, positive, negative}]}</code>'),
+});
+
+const cChartHeatmap = () => componentPage({
+  id: 'chart-heatmap', title: 'Heatmap · Matrix Chart',
+  desc: 'A <b>2D scoring matrix</b> — option × criteria, or persona × theme. Each cell is tinted by its value via <code>color-mix</code>, so the strong and weak spots of a decision pop at a glance. Print- and PDF-safe.',
+  demo: `<div style="width:100%;max-width:520px">
+      ${chartHeatmap(['Cost', 'Reach', 'Speed', 'Risk'], [
+        { label: 'Build in-house', values: [2, 5, 1, 4] },
+        { label: 'Partner', values: [4, 3, 4, 2] },
+        { label: 'Buy', values: [5, 4, 5, 3] },
+      ], { title: 'Options × criteria (1–5)' })}
+    </div>`,
+  variants: { cols: ['Prop', 'Type', 'Effect'], rows: [
+    ['columns', 'string[]', 'Column headers (the criteria / themes).'],
+    ['rows', '{label, values: number[]}[]', 'One row per option; values align to columns.'],
+    ['minValue / maxValue', 'number', 'Tint scale (else derived from the data, floored at 0/1).'],
+    ['color', 'string', 'Base hue mixed toward surface (default accent).'],
+  ] },
+  react: `import { HeatmapChart } from 'sonaloop-design/charts';\n\n<HeatmapChart\n  title="Options × criteria"\n  columns={['Cost', 'Reach', 'Speed', 'Risk']}\n  rows={[{ label: 'Build', values: [2, 5, 1, 4] }, { label: 'Buy', values: [5, 4, 5, 3] }]}\n/>`,
+  markup: `<figure class="sl-chart">\n  <div class="sl-heat" style="grid-template-columns:minmax(4.5em, auto) repeat(4, minmax(2em, 1fr))">\n    <span class="sl-heat__corner"></span>\n    <span class="sl-heat__col">Cost</span> <!-- … -->\n    <span class="sl-heat__row">Build</span>\n    <span class="sl-heat__cell" style="background:color-mix(in srgb, var(--sl-accent) 25%, var(--sl-surface-2))">2</span>\n  </div>\n</figure>`,
+  python: `from sonaloop_icons.charts import heatmap_chart\n\nheatmap_chart(["Cost", "Reach", "Speed", "Risk"],\n              [{"label": "Build", "values": [2, 5, 1, 4]}, {"label": "Buy", "values": [5, 4, 5, 3]}])`,
+  notes: chartFigureNote('<code>{kind:"chart", of:"heatmap", columns:[…], series:[{label, values}]}</code>'),
+});
+
+const cChartDotPlot = () => componentPage({
+  id: 'chart-dot-plot', title: 'Dot · Range Plot',
+  desc: 'Where <b>N voices land</b> on a 1–5 scale, per statement — the spread of opinion, not just the mean. Each value is a translucent dot; the taller marker is the average. Surfaces disagreement a single bar would hide.',
+  demo: `<div style="width:100%;max-width:520px">
+      ${chartDotPlot([
+        { label: 'Trust the AI', values: [2, 3, 3, 4, 5] },
+        { label: 'Worth the price', values: [1, 2, 2, 3, 3] },
+        { label: 'Easy to start', values: [4, 4, 5, 5, 5] },
+      ], { title: 'Persona agreement (1–5)' })}
+    </div>`,
+  variants: { cols: ['Prop', 'Type', 'Effect'], rows: [
+    ['items', '{label, values: number[], color?}[]', 'One row per statement; each value is a dot.'],
+    ['min / max', 'number = 1 / 5', 'The scale endpoints.'],
+    ['showMean', 'boolean = true', 'Draw the mean marker.'],
+  ] },
+  react: `import { DotPlotChart } from 'sonaloop-design/charts';\n\n<DotPlotChart\n  title="Persona agreement (1–5)"\n  items={[{ label: 'Trust the AI', values: [2, 3, 3, 4, 5] }]}\n/>`,
+  markup: `<figure class="sl-chart">\n  <div class="sl-dots">\n    <div class="sl-dot-row">\n      <span class="sl-dot-label">Trust the AI</span>\n      <span class="sl-dot-track">\n        <span class="sl-dot-pt" style="left:25%;--c:var(--c1)"></span>\n        <span class="sl-dot-mean" style="left:60%;--c:var(--c1)"></span>\n      </span>\n      <span class="sl-dot-val">3.4</span>\n    </div>\n  </div>\n</figure>`,
+  python: `from sonaloop_icons.charts import dot_plot_chart\n\ndot_plot_chart([{"label": "Trust the AI", "values": [2, 3, 3, 4, 5]}])`,
+  notes: chartFigureNote('<code>{kind:"chart", of:"dot_plot", series:[{label, values}]}</code>'),
+});
+
+const cChartLine = () => componentPage({
+  id: 'chart-line', title: 'Line · Trend Chart',
+  desc: 'A <b>trend over a sequence</b> — confidence across council rounds, a metric over time. A static inline-SVG polyline per series (the one chart that needs SVG), still print- and PDF-safe. Multi-series gets a legend.',
+  demo: `<div style="width:100%;max-width:520px">
+      ${chartLine([
+        { label: 'Confidence', points: [2, 3, 3, 4, 5, 6] },
+        { label: 'Coverage', points: [1, 2, 4, 4, 5, 5], color: 'var(--sl-violet)' },
+      ], { title: 'Across council rounds', labels: ['R1', 'R2', 'R3', 'R4', 'R5', 'R6'] })}
+    </div>`,
+  variants: { cols: ['Prop', 'Type', 'Effect'], rows: [
+    ['series', '{label, points: number[], color?}[]', 'One polyline per series (needs ≥ 2 points).'],
+    ['labels', 'string[]', 'Optional x-axis tick labels.'],
+    ['minValue / maxValue', 'number', 'Fix the y-range (else derived from the data).'],
+    ['showDots', 'boolean = true', 'Draw a marker at each point.'],
+  ] },
+  react: `import { LineChart } from 'sonaloop-design/charts';\n\n<LineChart\n  title="Across council rounds" labels={['R1', 'R2', 'R3', 'R4', 'R5']}\n  series={[{ label: 'Confidence', points: [2, 3, 3, 4, 6] }]}\n/>`,
+  markup: `<figure class="sl-chart">\n  <div class="sl-line">\n    <svg viewBox="0 0 100 40" role="img">\n      <line class="sl-line__axis" x1="0" y1="40" x2="100" y2="40"></line>\n      <g style="--c:var(--c1)">\n        <polyline class="sl-line__path" points="0,32 25,24 50,24 75,16 100,0"></polyline>\n      </g>\n    </svg>\n  </div>\n</figure>`,
+  python: `from sonaloop_icons.charts import line_chart\n\nline_chart([{"label": "Confidence", "points": [2, 3, 3, 4, 6]}],\n           labels=["R1", "R2", "R3", "R4", "R5"])`,
+  notes: chartFigureNote('<code>{kind:"chart", of:"line", labels:[…], series:[{label, points}]}</code>'),
+});
+
 const cTextarea = () => componentPage({
   id: 'textarea', title: 'Textarea', desc: 'A multi-line text field — the brief, a prompt, a persona note. Same hairline + focus ring as Input; vertically resizable.',
   demo: `<textarea class="sl-textarea" rows="3" placeholder="Describe the decision the council should weigh in on…" style="max-width:420px">We're considering a weekly meal-prep subscription for busy parents.</textarea>`,
@@ -1110,6 +1425,7 @@ const NAV = [
     { id: 'chip', title: 'Chip', ico: 'diamond', render: cChip },
     { id: 'status-dot', title: 'Status Dot', ico: 'dot', render: cStatusDot },
     { id: 'avatar', title: 'Avatar', ico: 'contact', render: cAvatar },
+    { id: 'logo', title: 'Logo', ico: 'sonaloop', render: cLogo },
     { id: 'card', title: 'Card', ico: 'rectangle', render: cCard },
     { id: 'entity', title: 'Entity', ico: 'projects', render: cEntity },
     { id: 'note', title: 'Note', ico: 'bulb', render: cNote },
@@ -1137,32 +1453,62 @@ const NAV = [
     { id: 'chart-bar', title: 'Bar', ico: 'analytics', render: cChartBar },
     { id: 'chart-pie', title: 'Pie · Donut', ico: 'half', render: cChartPie },
     { id: 'chart-effort-impact', title: 'Effort · Impact', ico: 'target', render: cChartEffort },
+    { id: 'chart-stacked', title: 'Stacked Bar', ico: 'squareRows', render: cChartStacked },
+    { id: 'chart-gauge', title: 'Gauge · Radial', ico: 'continuousDiscovery', render: cChartGauge },
+    { id: 'chart-diverging', title: 'Diverging Bar', ico: 'exchange', render: cChartDiverging },
+    { id: 'chart-heatmap', title: 'Heatmap · Matrix', ico: 'squareGrid', render: cChartHeatmap },
+    { id: 'chart-dot-plot', title: 'Dot · Range', ico: 'wave', render: cChartDotPlot },
+    { id: 'chart-line', title: 'Line · Trend', ico: 'analytics', render: cChartLine },
   ] },
   { label: 'Website', items: [
     { id: 'web-navbar', title: 'Navbar', ico: 'panel', render: () => websitePage({
-      id: 'web-navbar', title: 'Navbar', markup: wb.navbar(),
-      desc: 'The marketing-site top bar: brand · mega-menu triggers · pricing · the primary Install action, with a hamburger below <code>lg</code>. Sticky and translucent over the page.' }) },
-    { id: 'web-mega-menu', title: 'Mega Menu', ico: 'squareGrid', render: () => websitePage({
-      id: 'web-mega-menu', title: 'Mega Menu', markup: wb.megaMenu(),
-      desc: 'The desktop hover panel: a two-column items grid (icon · label · description) beside a promo card. Shown here in its open state — wire the hover-intent / positioning in your app.' }) },
-    { id: 'web-app-card', title: 'App · Product Cards', ico: 'rectangle', render: () => websitePage({
-      id: 'web-app-card', title: 'App · Product Cards', markup: wb.appCards(),
-      desc: 'The card atom used across product, method and solution grids: icon · label · description · arrow-link, in a responsive 3-up that reflows to one column on small screens.' }) },
+      id: 'web-navbar', block: 'navbar', title: 'Navbar',
+      desc: 'The marketing-site top bar: brand · mega-menu triggers · pricing · the primary Install action, with a hamburger below <code>lg</code>. Shown here with the <b>Solutions mega-menu open</b> (a two-column items grid beside a promo card) — it opens on hover-intent and never appears on its own. Pass <code>initialOpenKey</code> to render a panel open.',
+      usage: `import { Navbar } from 'sonaloop-design/website';\nimport { megaMenus } from './content/nav';\nimport { useLocation } from 'react-router';\n\n<Navbar menus={megaMenus} currentPath={useLocation().pathname} transparent />` }) },
+    { id: 'web-cards', title: 'Cards', ico: 'rectangle', render: () => websitePage({
+      id: 'web-cards', block: 'cards', title: 'Cards',
+      desc: 'One card concept, several variants. <code>ContentCard</code> is the base — <code>FeatureCard</code> (icon · title · body · action arrow) and <code>LinkCard</code> (the whole-card cross-link; a <code>RelatedRail</code> is just a <code>CardGrid</code> of them) are presets of it. <code>OfferCard</code> is the tier/ladder card (<code>PricingCard</code> / <code>LadderCard</code> presets); <code>VerdictCard</code> is the council proof (always in a grid); and <code>SnippetCard</code> is a feature card with a recessed product-peek stage. All laid out by <code>CardGrid</code>.',
+      usage: `import { CardGrid, FeatureCard, LinkCard, RelatedRail, OfferCard, PricingCard, LadderCard } from 'sonaloop-design/website';\n\n// feature\n<CardGrid><FeatureCard icon={<Icon name=\"councils\" size={28} />} title=\"Councils\" action={{ to: '/x', label: 'Explore' }}>…</FeatureCard></CardGrid>\n\n// link (RelatedRail = CardGrid of LinkCards)\n<RelatedRail items={[{ to: '/solutions/x', label: 'Continuous discovery', description: '…', icon: 'continuous-discovery' }]} />\n\n// offer — PricingCard & LadderCard are presets of OfferCard\n<PricingCard name=\"Cloud\" priceLine=\"from €39/mo\" icon=\"cloud\" accent=\"scan\" highlight tag=\"Popular\"\n  inherits=\"Open Core\" features={['Hosted councils & memory']} cta={{ label: 'Start trial', to: '/install' }} />\n<LadderCard name=\"Cloud\" index={1} icon=\"cloud\" accent=\"scan\" priceLine=\"from €39/mo\"\n  summary=\"Hosted councils & memory.\" bullets={['Semantic recall']} primaryCta={{ label: 'Start trial', to: '/install' }} learnMoreTo=\"/products/cloud\" />` }) },
     { id: 'web-hero', title: 'Hero', ico: 'star', render: () => websitePage({
-      id: 'web-hero', title: 'Hero', markup: wb.hero(),
-      desc: 'The page hero: a mono eyebrow, a balanced serif headline, a lead paragraph and a pair of <code>.sl-btn</code> calls to action.' }) },
-    { id: 'web-cta-band', title: 'CTA Band', ico: 'target', render: () => websitePage({
-      id: 'web-cta-band', title: 'CTA Band', markup: wb.ctaBand(),
-      desc: 'A centred call-to-action band — rendered standalone mid-page, or as the top half of the footer above the column nav.' }) },
+      id: 'web-hero', block: 'hero', title: 'Hero',
+      desc: 'The page hero: a mono eyebrow, a balanced serif headline, a lead paragraph and a pair of <code>.sl-btn</code> CTAs, with an optional painterly canvas backdrop.',
+      usage: `import { Hero } from 'sonaloop-design/website';\nimport { canvas } from 'sonaloop-design/images';\n\n<Hero kicker=\"Synthetic research\" canvas={canvas}\n  title=\"A focus group that disagrees with you — on the record.\"\n  cta={{ label: 'Install MCP — free', to: '/install' }}\n  secondary={{ label: 'See a sample report', to: '/sample-report' }}>\n  Spin up a deliberative synthetic panel on your own AI.\n</Hero>` }) },
     { id: 'web-footer', title: 'Footer', ico: 'squareRows', render: () => websitePage({
-      id: 'web-footer', title: 'Footer', markup: wb.footer(),
-      desc: 'The site footer: a brand block with positioning copy and tags, the column nav, and a bottom bar. Pair it with the CTA Band above for the full footer.' }) },
+      id: 'web-footer', block: 'footer', title: 'Footer',
+      desc: 'The <b>full site footer</b> — the CTA band and the column nav shipped together (they always pair, so they share one page). <code>Footer</code> embeds <code>CtaBand</code> via its default <code>cta</code> prop, so this is the real composition every page renders; pass <code>cta={false}</code> only when a standalone CtaBand already sits above.',
+      usage: `import { Footer } from 'sonaloop-design/website';\nimport { footerColumns } from './content/nav';\nimport { useTheme } from './contexts/ThemeContext';\n\nconst { preference, setPreference } = useTheme();\n<Footer columns={footerColumns}\n  themeControl={{ value: preference, onChange: setPreference }} />` }) },
     { id: 'web-product-showcase', title: 'Product Showcase', ico: 'panel', render: () => websitePage({
-      id: 'web-product-showcase', title: 'Product Showcase', markup: wb.productShowcase(),
-      desc: 'A split feature showcase: readable copy on a calm panel beside a framed product window. Frame it as the <em>deliverable</em>, not “our UI”.' }) },
-    { id: 'web-related-rail', title: 'Related Rail', ico: 'exchange', render: () => websitePage({
-      id: 'web-related-rail', title: 'Related Rail', markup: wb.relatedRail(),
-      desc: 'A 3-up rail of cross-link cards that stitches the IA together — the relations between solutions, methods and products, rendered as data.' }) },
+      id: 'web-product-showcase', block: 'product-showcase', title: 'Product Showcase',
+      desc: 'A split feature showcase: readable copy on a calm panel beside your product screenshot, framed in a painterly canvas matte. Frame it as the <em>deliverable</em>, not “our UI”. (Preview uses a brand canvas as a stand-in screenshot.)',
+      usage: `import { ProductShot } from 'sonaloop-design/website';\n\n<ProductShot src=\"/shots/report.png\"  /* a -light twin is auto-derived */\n  eyebrow=\"The deliverable\" title=\"A report you can hand to the room.\"\n  body=\"Every objection grounded in a quote, every verdict on the record.\"\n  caption=\"Exports to PDF · Markdown\" />` }) },
+    { id: 'web-canvas-showcase', title: 'Canvas Showcase', ico: 'square', render: () => websitePage({
+      id: 'web-canvas-showcase', block: 'canvas-showcase', title: 'Canvas Showcase',
+      desc: 'A screenshot in a browser-framed window rising out of a painterly canvas — the Cursor-style hero shot. Theme-aware: light canvas + light capture in light mode, dark in dark.',
+      usage: `import { CanvasShowcase } from 'sonaloop-design/website';\nimport { canvas } from 'sonaloop-design/images';\n\n<CanvasShowcase canvasLight={canvas.light} canvasDark={canvas.dark}\n  shotLight=\"/shots/app-light.png\" shotDark=\"/shots/app-dark.png\" />` }) },
+    { id: 'web-integration-showcase', title: 'Integration Showcase', ico: 'jtbd', render: () => websitePage({
+      id: 'web-integration-showcase', block: 'integration-showcase', title: 'Integration Showcase',
+      desc: 'A believable agent terminal floating on a painterly canvas — the “bring your own AI” moment, with a copyable MCP command and a live-looking council session.',
+      usage: `import { IntegrationShowcase } from 'sonaloop-design/website';\n\n<IntegrationShowcase />\n// optional: <IntegrationShowcase command=\"claude mcp add …\" canvas={mist} />` }) },
+    { id: 'web-command-palette', title: 'Command Palette', ico: 'search', render: () => websitePage({
+      id: 'web-command-palette', block: 'command-palette', title: 'Command Palette ⌘K',
+      desc: 'The shared ⌘K palette — the same one this docs site runs (press ⌘K). Results grouped under muted section headers, a per-item icon, an optional subtitle, full keyboard nav (↑↓ · ↵ · esc) with hover-sync, and a footer hint bar. Prop-driven: pass static <code>groups</code> for nav commands and an optional async <code>onSearch</code> for server-backed results. The host owns open state; <code>hotkey</code> (default on) binds ⌘K.',
+      usage: `import { CommandPalette, CommandTrigger, type CommandGroup } from 'sonaloop-design/website';\nimport { useState } from 'react';\n\nconst groups: CommandGroup[] = [\n  { key: 'go', label: 'Jump to', items: [\n    { title: 'Solutions', subtitle: '/solutions', to: '/solutions', icon: 'compass' },\n    { title: 'Pricing',  subtitle: '/pricing',  to: '/pricing',  icon: 'pricing-research' },\n  ] },\n  { key: 'products', label: 'Products', accent: 'var(--sl-violet)', items: [\n    { title: 'Open Core', subtitle: 'Run councils on your own AI', to: '/products/open-core', icon: 'open-core' },\n    { title: 'Cloud',     subtitle: 'Hosted councils & memory',    to: '/products/cloud',     icon: 'cloud' },\n  ] },\n];\n\nfunction App() {\n  const [open, setOpen] = useState(false);\n  return (\n    <>\n      <CommandTrigger onClick={() => setOpen(true)} label=\"Search Sonaloop\" />\n      <CommandPalette open={open} onOpenChange={setOpen} groups={groups}\n        placeholder=\"Search Sonaloop…\"\n        // optional: onSearch={async (q) => fetch('/api/search?q=' + q).then(r => r.json())}\n      />\n    </>\n  );\n}` }) },
+    { id: 'web-layout', title: 'Layout · Section', ico: 'squareRows', render: () => websitePage({
+      id: 'web-layout', block: 'layout', title: 'Layout · Section',
+      desc: 'The page scaffolding used on every page: <code>PageSection</code> (measure + vertical rhythm), <code>SectionIntro</code> (kicker · balanced title · lead), <code>NoteBand</code> (dashed mono aside) and <code>PageRuler</code> (a hairline divider on the measure).',
+      usage: `import { PageSection, SectionIntro, NoteBand, PageRuler } from 'sonaloop-design/website';\n\n<PageSection spacing=\"compact\">\n  <SectionIntro index=\"01\" kicker=\"How it works\" title=\"One engine, three ways.\" rule>\n    A calm section header with a lead paragraph.\n  </SectionIntro>\n  <NoteBand>Prices are placeholders pending validation.</NoteBand>\n  <PageRuler className=\"mt-10\" />\n</PageSection>` }) },
+    { id: 'web-content-atoms', title: 'Content Atoms', ico: 'check', render: () => websitePage({
+      id: 'web-content-atoms', block: 'content-atoms', title: 'Content Atoms',
+      desc: 'The genuine non-card content atoms: <code>CheckRow</code> (checklist item, <code>muted</code> variant), <code>StepRows</code> (a numbered bordered stack) and <code>FieldList</code> (2-up label/value). (A numbered <em>card</em> is just <code>&lt;FeatureCard eyebrow="01"&gt;</code> — see Cards.)',
+      usage: `import { CheckRow, FieldList, StepRows } from 'sonaloop-design/website';\n\n<ul className=\"space-y-2.5\">\n  <CheckRow>React in hours, not weeks</CheckRow>\n  <CheckRow muted>Optional extra</CheckRow>\n</ul>\n<StepRows steps={[{ n: '01', label: 'Persona', desc: '…' }]} />` }) },
+    { id: 'web-install-block', title: 'Install Block', ico: 'jtbd', render: () => websitePage({
+      id: 'web-install-block', block: 'install-block', title: 'Install Block',
+      desc: 'The MCP setup block — a <code>Segmented</code> client picker (Claude Code · Cursor · Codex) over the one-liner / config, with a copy button. Self-contained; <code>dark</code> pins the dusk surface.',
+      usage: `import { InstallBlock } from 'sonaloop-design/website';\n\n<InstallBlock />\n// on a dark surface:\n<InstallBlock dark />` }) },
+    { id: 'web-faq', title: 'FAQ List', ico: 'bulb', render: () => websitePage({
+      id: 'web-faq', block: 'faq', title: 'FAQ List',
+      desc: 'A divide-y question/answer stack — the same FAQ pattern that repeats across Pricing, Install and Home, now one component.',
+      usage: `import { FaqList } from 'sonaloop-design/website';\n\n<FaqList items={[\n  { q: 'Why is local free?', a: 'Your own AI writes the text — we sell methodology, not tokens.' },\n  { q: 'Do I need an API key?', a: 'No, not for the core.' },\n]} />` }) },
   ] },
 ];
 
@@ -1269,6 +1615,21 @@ async function copyText(text, btn) {
 document.addEventListener('click', (e) => {
   const navToggle = e.target.closest('[data-nav-toggle]');
   if (navToggle) { toggleNavGroup(navToggle.dataset.navToggle); return; }
+
+  // Website-preview controls: toggle the option, recompute the combination key, swap the
+  // pre-rendered variant into the stage. Keys mirror the harness: `prop:optKey|prop2:optKey2`.
+  const wbOpt = e.target.closest('[data-wb-opt]');
+  if (wbOpt) {
+    wbOpt.parentElement.querySelectorAll('[data-wb-opt]').forEach((b) => b.classList.toggle('is-active', b === wbOpt));
+    const root = wbOpt.closest('[data-wb]');
+    const data = websiteBlocks[root.dataset.wb];
+    const key = data.controls.map((c) => {
+      const active = root.querySelector(`[data-wb-ctrl="${c.prop}"] .is-active`);
+      return `${c.prop}:${active.dataset.wbOpt}`;
+    }).join('|');
+    root.querySelector('[data-wb-stage]').innerHTML = data.variants[key] ?? data.variants[data.defaultKey];
+    return;
+  }
 
   const copyBtn = e.target.closest('[data-copy]');
   if (copyBtn) {
@@ -1389,22 +1750,32 @@ function openPalette() {
 }
 function closePalette() { $('#palette').hidden = true; }
 
+// Results grouped under muted section headers (Pages · Icons), Linear/Raycast-style.
+const PALETTE_GROUPS = [{ kind: 'Page', label: 'Pages' }, { kind: 'Icon', label: 'Icons' }];
 let paletteActive = 0;
 function renderPaletteList(q) {
   q = q.trim().toLowerCase();
   const matches = (q ? PALETTE_ITEMS.filter((i) => i.title.toLowerCase().includes(q) || i.kind.toLowerCase().includes(q)) : PALETTE_ITEMS.filter((i) => i.kind === 'Page')).slice(0, 40);
   paletteActive = 0;
   const list = $('#palette-list');
-  if (!matches.length) { list.innerHTML = `<div class="ds-palette-empty">No matches for “${esc(q)}”.</div>`; return; }
-  list.innerHTML = matches.map((m, i) => `
-    <li data-href="${m.href}" class="${i === 0 ? 'is-active' : ''}">
-      <span class="pl-ico">${m.iconName ? svgReg(m.iconName) : (m.ico ? svgReg(m.ico) : '')}</span>
-      <span>${esc(m.title)}</span>
-      <span class="pl-kind">${esc(m.kind)}</span>
-    </li>`).join('');
+  if (!matches.length) { list.innerHTML = `<div class="sl-cmdk-empty">No matches for “${esc(q)}”.</div>`; return; }
+  let i = 0, html = '';
+  for (const { kind, label } of PALETTE_GROUPS) {
+    const g = matches.filter((m) => m.kind === kind);
+    if (!g.length) continue;
+    html += `<div class="sl-cmdk-sec">${esc(label)}</div>`;
+    html += g.map((m) => {
+      const ico = m.iconName ? svgReg(m.iconName) : (m.ico ? svgReg(m.ico) : '');
+      return `<div class="sl-cmdk-item${i === 0 ? ' is-active' : ''}" data-href="${m.href}" data-i="${i++}">
+        <span class="sl-cmdk-ico">${ico}</span>
+        <span class="sl-cmdk-title">${esc(m.title)}</span>
+      </div>`;
+    }).join('');
+  }
+  list.innerHTML = html;
 }
 
-function paletteGo(li) { if (!li) return; location.hash = li.dataset.href; closePalette(); }
+function paletteGo(el) { if (!el) return; location.hash = el.dataset.href; closePalette(); }
 
 /* ── boot ─────────────────────────────────────────────────────────────────────── */
 function boot() {
@@ -1427,13 +1798,17 @@ function boot() {
   // search palette
   $('#search-open').addEventListener('click', openPalette);
   $('#palette').addEventListener('click', (e) => { if (e.target.closest('[data-palette-close]')) closePalette(); });
-  $('#palette-list').addEventListener('click', (e) => paletteGo(e.target.closest('li')));
+  $('#palette-list').addEventListener('click', (e) => paletteGo(e.target.closest('.sl-cmdk-item')));
+  $('#palette-list').addEventListener('mousemove', (e) => {
+    const el = e.target.closest('.sl-cmdk-item'); if (!el) return;
+    const i = +el.dataset.i; if (i !== paletteActive) { paletteActive = i; syncActive([...$('#palette-list').querySelectorAll('.sl-cmdk-item')]); }
+  });
   $('#palette-input').addEventListener('input', (e) => renderPaletteList(e.target.value));
 
   document.addEventListener('keydown', (e) => {
     if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); $('#palette').hidden ? openPalette() : closePalette(); return; }
     if ($('#palette').hidden) return;
-    const items = [...$('#palette-list').querySelectorAll('li')];
+    const items = [...$('#palette-list').querySelectorAll('.sl-cmdk-item')];
     if (e.key === 'Escape') { closePalette(); }
     else if (e.key === 'ArrowDown') { e.preventDefault(); paletteActive = Math.min(paletteActive + 1, items.length - 1); syncActive(items); }
     else if (e.key === 'ArrowUp') { e.preventDefault(); paletteActive = Math.max(paletteActive - 1, 0); syncActive(items); }
@@ -1442,7 +1817,7 @@ function boot() {
 }
 
 function syncActive(items) {
-  items.forEach((li, i) => li.classList.toggle('is-active', i === paletteActive));
+  items.forEach((el, i) => el.classList.toggle('is-active', i === paletteActive));
   items[paletteActive]?.scrollIntoView({ block: 'nearest' });
 }
 
