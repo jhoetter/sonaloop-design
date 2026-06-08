@@ -8,6 +8,24 @@ The icon library has two consumers — the **website** (React) and the **sonaloo
 (Python, server-rendered HTML). Every icon is authored **once** and generated into both
 targets, so the products never drift.
 
+## Design tokens
+
+Same pattern for colour. Author values **once** in [`tokens.data.mjs`](tokens.data.mjs);
+`npm run gen` (or `npm run gen:tokens`) emits per-consumer CSS:
+
+```
+tokens.data.mjs                 ← author colour here (single source of truth)
+  → styles/tokens.css            R G B triplets, website var names (Tailwind opacity mods)
+  → py/sonaloop_icons/tokens.py  hex CSS string, inspector var names (sonaloop app)
+```
+
+- **Website**: `import 'sonaloop-design/tokens.css'` (its `tailwind.config.ts` reads `var(--x)`).
+- **sonaloop app**: vendors `tokens.py` → `sonaloop/_tokens.py` (via `make icons`); `web_assets.py`
+  prepends `TOKENS_CSS`.
+
+Each consumer keeps its own var names; only the values live here. Change a colour once and
+the website + app both pick it up. The brand spec/rationale is in [`BRANDING.md`](BRANDING.md).
+
 ```
 icons.data.mjs                  ← author icons here (the only source of truth)
    │  node scripts/gen.mjs

@@ -15,7 +15,8 @@
     "styles"
   ],
   "scripts": {
-    "gen": "node scripts/gen.mjs",
+    "gen": "node scripts/gen.mjs && node scripts/gen-tokens.mjs",
+    "gen:tokens": "node scripts/gen-tokens.mjs",
     "capture": "node scripts/capture-anim.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
