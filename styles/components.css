@@ -53,7 +53,7 @@
 /* ── Badge / Pill / Chip ─────────────────────────────────────────────────────── */
 .sl-badge {
   display: inline-flex; align-items: center; gap: .35em;
-  padding: .15em .6em; border-radius: 999px; font-size: .82em; font-weight: 550;
+  padding: .15em .6em; border-radius: var(--sl-radius-full); font-size: .82em; font-weight: 550;
   background: var(--sl-surface-2); color: var(--sl-muted);
 }
 .sl-badge--accent { background: var(--sl-accent-weak); color: var(--sl-accent); }
@@ -61,7 +61,7 @@
 .sl-badge--warning { background: color-mix(in srgb, var(--sl-amber) 16%, transparent); color: var(--sl-amber); }
 .sl-badge--negative { background: color-mix(in srgb, var(--sl-red) 14%, transparent); color: var(--sl-red); }
 .sl-pill { display: inline-flex; align-items: center; gap: .45em; padding: .2em .8em;
-  border: 1px solid var(--sl-line); border-radius: 999px; font-size: .9em; color: var(--sl-ink);
+  border: 1px solid var(--sl-line); border-radius: var(--sl-radius-full); font-size: .9em; color: var(--sl-ink);
   background: var(--sl-surface); }
 .sl-chip { display: inline-flex; align-items: center; gap: .45em; padding: .2em .65em;
   border: 1px solid var(--sl-line); border-radius: var(--sl-radius-sm); font-size: .85em;
@@ -92,7 +92,7 @@
 
 /* ── kbd + divider ───────────────────────────────────────────────────────────── */
 .sl-kbd { font-family: var(--sl-mono); font-size: .8em; padding: .05em .45em;
-  border: 1px solid var(--sl-line); border-radius: 5px; background: var(--sl-surface-2); color: var(--sl-ink); }
+  border: 1px solid var(--sl-line); border-radius: var(--sl-radius-sm); background: var(--sl-surface-2); color: var(--sl-ink); }
 .sl-divider { height: 1px; border: 0; background: var(--sl-line); margin: 1.1em 0; }
 
 /* ── Arrow-link — a mono uppercase "more →" link whose gap widens on hover. Apply to the
@@ -209,8 +209,8 @@
 .sl-table--zebra tbody tr:hover td { background: var(--sl-hover); }
 
 /* ── Progress bar ────────────────────────────────────────────────────────────────── */
-.sl-progress { height: .5em; border-radius: 999px; background: var(--sl-surface-2); overflow: hidden; }
-.sl-progress__bar { height: 100%; border-radius: 999px; background: var(--sl-accent); transition: width .3s var(--sl-ease, ease); }
+.sl-progress { height: .5em; border-radius: var(--sl-radius-full); background: var(--sl-surface-2); overflow: hidden; }
+.sl-progress__bar { height: 100%; border-radius: var(--sl-radius-full); background: var(--sl-accent); transition: width .3s var(--sl-ease, ease); }
 
 /* ── Stat (metric chip + strip) ──────────────────────────────────────────────────── */
 .sl-stats { display: flex; flex-wrap: wrap; gap: .55em; }

@@ -139,6 +139,8 @@ export interface SegmentedOption {
   value: string;
   label?: ReactNode;
   icon?: ReactNode;
+  /** accessible name for icon-only options (pass label="" to hide the text label) */
+  ariaLabel?: string;
 }
 export interface SegmentedProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
   options: SegmentedOption[];
@@ -158,6 +160,8 @@ export function Segmented({ options, value, onChange, fill, stacked, className, 
           type="button"
           className={cx('sl-segmented__item', o.value === value && 'is-active')}
           aria-pressed={o.value === value}
+          aria-label={o.ariaLabel}
+          title={o.ariaLabel}
           onClick={() => onChange?.(o.value)}
         >
           {o.icon}

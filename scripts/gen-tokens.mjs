@@ -41,7 +41,8 @@ const SL_MAP = {
 };
 const slDecls = (set) =>
   Object.entries(SL_MAP).map(([sl, k]) => `--sl-${sl}:${set[k]}`).join(';') +
-  `;--sl-radius:${scales.radius};--sl-radius-sm:${scales['radius-sm']};--sl-sans:${scales.sans};--sl-mono:${scales.mono};--sl-pixel:${scales.pixel}`;
+  `;--sl-radius-sm:${scales['radius-sm']};--sl-radius:${scales.radius};--sl-radius-lg:${scales['radius-lg']};--sl-radius-full:${scales['radius-full']}` +
+  `;--sl-sans:${scales.sans};--sl-mono:${scales.mono};--sl-pixel:${scales.pixel}`;
 
 // ── website: styles/tokens.css (R G B triplets; [data-theme] driven, default light) ──
 function genWebsiteCss() {
@@ -98,6 +99,19 @@ export default {
   theme: {
     extend: {
       borderColor: { DEFAULT: 'rgb(var(--line) / 0.1)' },
+      // Radius scale → design-system tokens, so every \`rounded-*\` flows from --sl-radius*
+      // (one lever for the whole site; go sharp by changing the tokens in tokens.data.mjs).
+      borderRadius: {
+        none: '0',
+        sm: 'var(--sl-radius-sm)',
+        DEFAULT: 'var(--sl-radius-sm)',
+        md: 'var(--sl-radius-sm)',
+        lg: 'var(--sl-radius)',
+        xl: 'var(--sl-radius-lg)',
+        '2xl': 'var(--sl-radius-lg)',
+        '3xl': 'var(--sl-radius-lg)',
+        full: 'var(--sl-radius-full)',
+      },
       colors: {
         paper: { DEFAULT: '${v('paper')}', dark: '${v('paper-2')}' },
         ink: { DEFAULT: '${v('ink')}', soft: '${v('ink-2')}' },

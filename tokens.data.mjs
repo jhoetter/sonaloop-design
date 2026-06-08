@@ -34,13 +34,17 @@ export const fonts = {
   serif: ['"Sona"', '"Geist"', '"Inter"', 'system-ui', 'sans-serif'],
   mono: ['"Sona Mono"', '"Geist Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
   // Sona Pixel — display/accent ONLY (loaders, council ids, "research instrument" flourishes).
-  // Built on Geist Pixel (same OFL). Default fill = Square; alt fills are separate families.
-  pixel: ['"Sona Pixel"', '"Geist Pixel"', 'ui-monospace', 'monospace'],
+  // Sonaloop's OWN clean-room face (no third-party outlines). Default fill = Square; the Loop /
+  // Square / Grid / Line fills are separate families (see styles/fonts.css + build_sona_pixel.py).
+  pixel: ['"Sona Pixel"', 'ui-monospace', 'monospace'],
 };
 
 // ── Theme-independent scales (emitted once into the inspector :root) ──────────────
 export const scales = {
-  radius: '8px', 'radius-sm': '6px', 'row-h': '48px', ease: 'cubic-bezier(.4,0,.2,1)',
+  // Radius scale — the SINGLE lever for corner roundness across the website + inspector.
+  // Change these and every surface re-skins (go sharp by dropping them toward 0).
+  'radius-sm': '6px', radius: '8px', 'radius-lg': '12px', 'radius-full': '9999px',
+  'row-h': '48px', ease: 'cubic-bezier(.4,0,.2,1)',
   sans: fonts.sans.join(','),
   mono: fonts.mono.join(','),
   pixel: fonts.pixel.join(','),
