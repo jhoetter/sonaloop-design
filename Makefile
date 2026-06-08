@@ -17,14 +17,12 @@ gen:
 check:
 	npm run check
 
-# Component gallery — the shared tokens + components.css rendered live, split into
-# App (dense, Python-SSR) and Website (airy, React/Tailwind) columns. Regenerates first
-# so the gallery always reflects the current sources. Open the printed URL.
+# Component gallery — tokens + icons + components rendered live, split into App (dense,
+# Python-SSR) and Website (airy, React/Tailwind) columns. `/` IS the gallery (no directory
+# listing). Regenerates first so it always reflects the current sources.
 dev: gen
-	@echo "→ component gallery: http://127.0.0.1:$(GALLERY_PORT)/gallery/"
-	@python3 -m http.server $(GALLERY_PORT) --bind 127.0.0.1
+	@python3 scripts/serve.py $(GALLERY_PORT) 127.0.0.1
 
 # Same, bound to all interfaces for a forwarded port (remote / container dev).
 dev-forwarded: gen
-	@echo "→ forwarded component gallery on :$(FORWARDED_GALLERY_PORT)/gallery/"
-	@python3 -m http.server $(FORWARDED_GALLERY_PORT) --bind 0.0.0.0
+	@python3 scripts/serve.py $(FORWARDED_GALLERY_PORT) 0.0.0.0
