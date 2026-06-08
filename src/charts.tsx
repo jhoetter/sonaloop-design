@@ -10,13 +10,24 @@
  *   <PieChart items={[{ label: 'Support', value: 12 }, { label: 'Oppose', value: 4 }]} donut />
  *   <EffortImpactChart items={[{ label: 'Auto shopping list', x: 2, y: 5 }]} />
  */
-import type { CSSProperties, ReactNode } from 'react';
+import type { CSSProperties, HTMLAttributes, ReactNode } from 'react';
 
 const SERIES = ['var(--c1)', 'var(--c2)', 'var(--c3)', 'var(--c4)', 'var(--c5)', 'var(--c6)', 'var(--c7)'];
 const seriesColor = (i: number, color?: string) => color ?? SERIES[i % SERIES.length];
 const fmt = (v: number) => (Number.isInteger(v) ? String(v) : `${v}`);
+// Escape, then render inline markdown (**bold**, *italic*/_italic_, `code`) so labels authored in
+// Markdown read like the rest of a report instead of showing raw `**`.
+const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const inlineMd = (s: string) => esc(s)
+  .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+  .replace(/__(.+?)__/g, '<strong>$1</strong>')
+  .replace(/(?<!\w)\*(.+?)\*(?!\w)/g, '<em>$1</em>')
+  .replace(/(?<!\w)_(.+?)_(?!\w)/g, '<em>$1</em>')
+  .replace(/`(.+?)`/g, '<code>$1</code>');
+const MD = ({ t, ...rest }: { t: string } & HTMLAttributes<HTMLSpanElement>) =>
+  <span {...rest} dangerouslySetInnerHTML={{ __html: inlineMd(t) }} />;
 const Title = ({ title }: { title?: string }) =>
-  title ? <div className="sl-chart__title">{title}</div> : null;
+  title ? <div className="sl-chart__title" dangerouslySetInnerHTML={{ __html: inlineMd(title) }} /> : null;
 type Sv = CSSProperties & Record<string, string | number>;
 
 export interface BarItem { label: string; value: number; color?: string }
@@ -31,7 +42,7 @@ export function BarChart({ items, title, maxValue, showValues = true }:
       <div className="sl-bars">
         {rows.map((it, i) => (
           <div className="sl-bar" key={i}>
-            <span className="sl-bar__label" title={it.label}>{it.label}</span>
+            <MD t={it.label} className="sl-bar__label" title={it.label} />
             <span className="sl-bar__track">
               <span className="sl-bar__fill" style={{ '--v': `${Math.max(0, Math.min(100, (it.value / mx) * 100))}%`, '--c': seriesColor(i, it.color) } as Sv} />
             </span>
@@ -65,7 +76,7 @@ export function PieChart({ items, title, donut = true, showValues = true }:
           {rows.map((it, i) => (
             <span className="sl-legend__item" key={i}>
               <span className="sl-legend__sw" style={{ '--c': seriesColor(i, it.color) } as Sv} />
-              <span className="sl-legend__label">{it.label}</span>
+              <MD t={it.label} className="sl-legend__label" />
               {showValues && <span className="sl-legend__val">{fmt(it.value)} · {Math.round((it.value / total) * 100)}%</span>}
             </span>
           ))}
@@ -109,7 +120,7 @@ export function EffortImpactChart({ items, title, xLabel = 'Effort', yLabel = 'V
           return (
             <span className="sl-legend__item" key={i}>
               <span className="sl-legend__num" style={{ '--c': c } as Sv}>{i + 1}</span>
-              <span className="sl-legend__label">{it.label}</span>
+              <MD t={it.label} className="sl-legend__label" />
               <span className="sl-legend__val">{xLabel[0]}{fmt(it.x)}·{yLabel[0]}{fmt(it.y)}</span>
             </span>
           );

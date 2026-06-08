@@ -9,6 +9,7 @@
  */
 import { inspector, scales, fonts } from '/tokens.data.mjs';
 import { regular, hifi } from '/icons.data.mjs';
+import * as wb from '/site/website.data.mjs';
 
 /* ── tiny helpers ──────────────────────────────────────────────────────────────── */
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -79,11 +80,18 @@ const p = (html) => `<p class="ds-p">${html}</p>`;
    render from the same .sl-chart* contract) ──────────────────────────────────────────── */
 const CHART_SERIES = ['var(--c1)', 'var(--c2)', 'var(--c3)', 'var(--c4)', 'var(--c5)', 'var(--c6)', 'var(--c7)'];
 const chSeriesColor = (it, i) => it.color || CHART_SERIES[i % CHART_SERIES.length];
-const chTitle = (t) => (t ? `<div class="sl-chart__title">${esc(t)}</div>` : '');
+// escape + inline markdown (**bold**, *italic*/_italic_, `code`) for chart labels — matches charts.py _md
+const chMd = (s) => esc(s)
+  .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+  .replace(/__(.+?)__/g, '<strong>$1</strong>')
+  .replace(/(?<!\w)\*(.+?)\*(?!\w)/g, '<em>$1</em>')
+  .replace(/(?<!\w)_(.+?)_(?!\w)/g, '<em>$1</em>')
+  .replace(/`(.+?)`/g, '<code>$1</code>');
+const chTitle = (t) => (t ? `<div class="sl-chart__title">${chMd(t)}</div>` : '');
 
 function chartBar(items, { title = '' } = {}) {
   const mx = Math.max(...items.map((it) => it.value)) || 1;
-  const bars = items.map((it, i) => `<div class="sl-bar"><span class="sl-bar__label">${esc(it.label)}</span>`
+  const bars = items.map((it, i) => `<div class="sl-bar"><span class="sl-bar__label">${chMd(it.label)}</span>`
     + `<span class="sl-bar__track"><span class="sl-bar__fill" style="--v:${Math.max(0, Math.min(100, (it.value / mx) * 100))}%;--c:${chSeriesColor(it, i)}"></span></span>`
     + `<span class="sl-bar__val">${it.value}</span></div>`).join('');
   return `<figure class="sl-chart">${chTitle(title)}<div class="sl-bars">${bars}</div></figure>`;
@@ -96,7 +104,7 @@ function chartPie(items, { title = '', donut = true } = {}) {
     const c = chSeriesColor(it, i); const start = (acc / total) * 100; acc += it.value;
     stops.push(`${c} ${start.toFixed(2)}% ${((acc / total) * 100).toFixed(2)}%`);
     return `<span class="sl-legend__item"><span class="sl-legend__sw" style="--c:${c}"></span>`
-      + `<span class="sl-legend__label">${esc(it.label)}</span>`
+      + `<span class="sl-legend__label">${chMd(it.label)}</span>`
       + `<span class="sl-legend__val">${it.value} · ${Math.round((it.value / total) * 100)}%</span></span>`;
   }).join('');
   return `<figure class="sl-chart">${chTitle(title)}<div class="sl-pie-wrap">`
@@ -108,12 +116,36 @@ const chLeverage = (x, y) => { const d = y - x; return d >= 2 ? 'var(--sl-green)
 function chartEffort(items, { title = '', xLabel = 'Effort', yLabel = 'Value', quadrants = ['Quick wins', 'Big bets', 'Fill-ins', 'Time sinks'] } = {}) {
   const dots = items.map((it, i) => `<span class="sl-quad__dot" style="--x:${((it.x - 1) / 4) * 100}%;--y:${(1 - (it.y - 1) / 4) * 100}%;--c:${it.color || chLeverage(it.x, it.y)}">${i + 1}</span>`).join('');
   const legend = items.map((it, i) => `<span class="sl-legend__item"><span class="sl-legend__num" style="--c:${it.color || chLeverage(it.x, it.y)}">${i + 1}</span>`
-    + `<span class="sl-legend__label">${esc(it.label)}</span>`
+    + `<span class="sl-legend__label">${chMd(it.label)}</span>`
     + `<span class="sl-legend__val">${xLabel[0]}${it.x}·${yLabel[0]}${it.y}</span></span>`).join('');
   const q = (i, cls) => `<span class="sl-quad__q sl-quad__q--${cls}">${esc(quadrants[i] || '')}</span>`;
   return `<figure class="sl-chart">${chTitle(title)}<div class="sl-quad-wrap"><div class="sl-quad-ylab">${esc(yLabel)}</div>`
     + `<div class="sl-quad"><div class="sl-quad__gx"></div><div class="sl-quad__gy"></div>${q(0, 'tl')}${q(1, 'tr')}${q(2, 'bl')}${q(3, 'br')}${dots}</div>`
     + `<div class="sl-quad-xlab">${esc(xLabel)}</div></div><div class="sl-legend" style="margin-top:.9em">${legend}</div></figure>`;
+}
+
+/* Website-section page — a marketing/app block shown the way Tailwind Plus does it: a full-bleed
+   live preview on the page surface, then the same Tailwind-utility markup to copy. The single
+   `markup` string (from site/website.data.mjs) drives BOTH, so the docs can't drift. Styling for
+   these utilities is precompiled into site/website.css by scripts/gen-website-css.mjs. */
+function websitePage({ id, title, desc, markup, notes }) {
+  return `
+    <p class="ds-eyebrow">Website</p>
+    <h1 class="ds-h1">${esc(title)}</h1>
+    <p class="ds-lead">${desc}</p>
+    <div class="ds-preview ds-preview--web">
+      <div class="ds-preview-bar">
+        <span class="ds-pv-label">Preview</span>
+        <span class="ds-top-spacer"></span>
+        <span class="ds-pv-note">Live · theme-aware</span>
+      </div>
+      <div class="ds-preview-stage ds-web-stage">${markup}</div>
+    </div>
+    ${h2(`${id}-markup`, 'Markup')}
+    ${p(`These blocks are documented as copy-paste Tailwind-utility markup — the marketing site composes them as React, but the classes are the contract. Colours, fonts and radii flow from the shared <code>tailwind-preset.js</code> (the same <code>--sl-*</code> tokens), and <code>.sl-*</code> classes (buttons, eyebrow, arrow-link, dots) come from <code>styles/components.css</code>.`)}
+    ${code('html', markup)}
+    ${notes || ''}
+  `;
 }
 
 function componentPage({ id, title, desc, demo, react, markup, python, variants, notes }) {
@@ -152,6 +184,11 @@ function pageIntroduction() {
       <div style="display:flex;gap:6px"><span class="sl-badge sl-badge--positive">For 3</span><span class="sl-badge sl-badge--warning">Conditional</span><span class="sl-badge sl-badge--negative">Against</span></div>
     </div>`;
   const chartsCanvas = `<div class="sl-chart"><div class="sl-pie sl-pie--donut" style="width:78px;height:78px;--slices:conic-gradient(var(--c1) 0 55%,var(--c2) 55% 80%,var(--c3) 80% 100%)"></div></div>`;
+  const webCanvas = `<div class="ds-canvas-web"><div class="wb">
+      <div class="wb-bar">${svgReg('sonaloop')}<div class="wb-links"><i></i><i></i><i></i></div><span class="sl-btn sl-btn--primary wb-cta">Install</span></div>
+      <div class="wb-body"><div class="wb-h" style="width:80%"></div><div class="wb-h" style="width:54%"></div>
+        <div class="wb-actions"><span class="sl-btn sl-btn--primary">Get started</span><span class="sl-btn">Docs</span></div></div>
+    </div></div>`;
 
   return `
     <h1 class="ds-h1">Sonaloop Design System</h1>
@@ -164,6 +201,7 @@ function pageIntroduction() {
       ${cell('#/layout', `<div class="ds-canvas-grid"></div>`, 'Layout', 'Spacing, radii and the grid that hold every surface together.')}
       ${cell('#/typography', `<div class="ds-canvas-type"><span>Sona</span><span class="mono">Sona Mono</span></div>`, 'Typeface', 'Sona, Sona Mono &amp; Sona Pixel — Sonaloop&#39;s own type.')}
       ${cell('#/chart-bar', chartsCanvas, 'Charts', 'Bar, pie/donut &amp; effort·impact — print &amp; PDF-safe.')}
+      ${cell('#/web-navbar', webCanvas, 'Website', 'Marketing blocks — navbar, mega-menu, cards, hero &amp; footer.')}
     </div>
     <div class="ds-callout" style="margin-top:32px">
       <span class="ico">${svgReg('bulb')}</span>
@@ -1099,6 +1137,32 @@ const NAV = [
     { id: 'chart-bar', title: 'Bar', ico: 'analytics', render: cChartBar },
     { id: 'chart-pie', title: 'Pie · Donut', ico: 'half', render: cChartPie },
     { id: 'chart-effort-impact', title: 'Effort · Impact', ico: 'target', render: cChartEffort },
+  ] },
+  { label: 'Website', items: [
+    { id: 'web-navbar', title: 'Navbar', ico: 'panel', render: () => websitePage({
+      id: 'web-navbar', title: 'Navbar', markup: wb.navbar(),
+      desc: 'The marketing-site top bar: brand · mega-menu triggers · pricing · the primary Install action, with a hamburger below <code>lg</code>. Sticky and translucent over the page.' }) },
+    { id: 'web-mega-menu', title: 'Mega Menu', ico: 'squareGrid', render: () => websitePage({
+      id: 'web-mega-menu', title: 'Mega Menu', markup: wb.megaMenu(),
+      desc: 'The desktop hover panel: a two-column items grid (icon · label · description) beside a promo card. Shown here in its open state — wire the hover-intent / positioning in your app.' }) },
+    { id: 'web-app-card', title: 'App · Product Cards', ico: 'rectangle', render: () => websitePage({
+      id: 'web-app-card', title: 'App · Product Cards', markup: wb.appCards(),
+      desc: 'The card atom used across product, method and solution grids: icon · label · description · arrow-link, in a responsive 3-up that reflows to one column on small screens.' }) },
+    { id: 'web-hero', title: 'Hero', ico: 'star', render: () => websitePage({
+      id: 'web-hero', title: 'Hero', markup: wb.hero(),
+      desc: 'The page hero: a mono eyebrow, a balanced serif headline, a lead paragraph and a pair of <code>.sl-btn</code> calls to action.' }) },
+    { id: 'web-cta-band', title: 'CTA Band', ico: 'target', render: () => websitePage({
+      id: 'web-cta-band', title: 'CTA Band', markup: wb.ctaBand(),
+      desc: 'A centred call-to-action band — rendered standalone mid-page, or as the top half of the footer above the column nav.' }) },
+    { id: 'web-footer', title: 'Footer', ico: 'squareRows', render: () => websitePage({
+      id: 'web-footer', title: 'Footer', markup: wb.footer(),
+      desc: 'The site footer: a brand block with positioning copy and tags, the column nav, and a bottom bar. Pair it with the CTA Band above for the full footer.' }) },
+    { id: 'web-product-showcase', title: 'Product Showcase', ico: 'panel', render: () => websitePage({
+      id: 'web-product-showcase', title: 'Product Showcase', markup: wb.productShowcase(),
+      desc: 'A split feature showcase: readable copy on a calm panel beside a framed product window. Frame it as the <em>deliverable</em>, not “our UI”.' }) },
+    { id: 'web-related-rail', title: 'Related Rail', ico: 'exchange', render: () => websitePage({
+      id: 'web-related-rail', title: 'Related Rail', markup: wb.relatedRail(),
+      desc: 'A 3-up rail of cross-link cards that stitches the IA together — the relations between solutions, methods and products, rendered as data.' }) },
   ] },
 ];
 
