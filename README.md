@@ -1,8 +1,12 @@
-# sonaloop-icons
+# sonaloop-design
 
-One icon library, two consumers — the **persona-website** (React) and the
-**sonaloop** app (Python, server-rendered HTML). Every icon is authored
-**once** and generated into both targets, so the two products never drift.
+Sonaloop's **global design system** — the shared brand doc ([`BRANDING.md`](BRANDING.md),
+the single source of truth) plus the icon library. Consumed by every product repo
+(`sonaloop-website`, `sonaloop`, `sonaloop-cloud`, `sonaloop-research`).
+
+The icon library has two consumers — the **website** (React) and the **sonaloop** app
+(Python, server-rendered HTML). Every icon is authored **once** and generated into both
+targets, so the products never drift.
 
 ```
 icons.data.mjs                  ← author icons here (the only source of truth)
@@ -20,7 +24,7 @@ Two flavours, mirroring `bim-icons`:
 
 ## All icons
 
-![sonaloop-icons gallery](preview/gallery.png)
+![sonaloop-design icon gallery](preview/gallery.png)
 
 Regenerate this sheet after adding icons: `node scripts/gen-preview.mjs`
 (writes `preview/gallery.svg`; rasterize to `preview/gallery.png` for GitHub).
@@ -78,7 +82,7 @@ Regenerate this sheet after adding icons: `node scripts/gen-preview.mjs`
 `vite.config.ts`), exactly like `bim-website → ../bim-icons`:
 
 ```ts
-import { SearchIcon, PersonaHifi } from 'sonaloop-icons';
+import { SearchIcon, PersonaHifi } from 'sonaloop-design';
 
 <SearchIcon size={18} strokeWidth={1.75} className="text-slate-600" />
 <PersonaHifi size={48} />
@@ -89,7 +93,7 @@ Props: `size`, `strokeWidth`, `absoluteStrokeWidth`, plus any SVG attribute.
 ## Using it — Python (sonaloop)
 
 The council installs the `py/` package as an editable path dependency
-(`pyproject.toml` → `[tool.uv.sources] sonaloop-icons = { path = "../sonaloop-icons/py", editable = true }`)
+(`pyproject.toml` → `[tool.uv.sources] sonaloop-design = { path = "../sonaloop-design/py", editable = true }`)
 and renders icons to inline SVG strings:
 
 ```python
@@ -121,7 +125,7 @@ spins, search lens scans, councils dots type, check draws itself, …). It is
 **React (persona-website)** — import the stylesheet once:
 
 ```ts
-import 'sonaloop-icons/style.css';
+import 'sonaloop-design/style.css';
 <PersonasHifi size={48} />                          // animates on hover/focus
 <button className="pi-hover">…<BulbHifi/></button>  // hovering the button animates the icon
 ```
