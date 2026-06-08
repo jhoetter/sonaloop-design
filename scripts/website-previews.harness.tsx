@@ -114,7 +114,7 @@ const BLOCKS: Block[] = [
   },
   // The full site footer = the CTA band + the column nav together (they always ship as a pair;
   // Footer embeds CtaBand via its default `cta`). The standalone CtaBand block documents mid-page use.
-  { id: 'footer', controls: [], render: () => <Footer columns={footerColumns} /> },
+  { id: 'footer', controls: [], render: () => <Footer columns={footerColumns} onSearch={() => {}} /> },
   {
     id: 'product-showcase',
     controls: [],

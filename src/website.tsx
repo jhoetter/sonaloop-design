@@ -17,7 +17,7 @@
  */
 import { createContext, Fragment, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import type { AnchorHTMLAttributes, CSSProperties, ReactNode } from 'react';
-import { Eyebrow, CopyButton, ThemeToggle } from './components';
+import { Eyebrow, CopyButton, ThemeToggle, Segmented, Tag, Avatar, type TagTone } from './components';
 import { SonaloopIcon } from './index';
 import { Icon, type IconKey } from './website-icons';
 import { canvas as defaultCanvas, type CanvasPair } from './images';
@@ -187,6 +187,121 @@ export function CardGrid({ children, className = '' }: { children: ReactNode; cl
   return <div className={cx('grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4', className)}>{children}</div>;
 }
 
+/* ── Layout primitives (page scaffolding) ────────────────────────────────────────────────── */
+/** A hairline section divider (a clean rule; `muted`/`dark` tune the opacity & colour). */
+export function RulerDivider({ className = '', muted = false, dark = false }: { className?: string; muted?: boolean; dark?: boolean; labels?: string[] }) {
+  const color = dark ? (muted ? 'bg-paper/[0.06]' : 'bg-paper/10') : (muted ? 'bg-line/[0.05]' : 'bg-line/[0.08]');
+  return (
+    <div className={className} aria-hidden="true">
+      <div className={cx('h-px w-full', color)} />
+    </div>
+  );
+}
+
+const SECTION_SPACING = { compact: 'page-section-compact', normal: '', loose: 'page-section-loose' } as const;
+/** A vertically-padded page section on the shared measure. */
+export function PageSection({ children, id, className = '', spacing = 'normal' }: { children: ReactNode; id?: string; className?: string; spacing?: keyof typeof SECTION_SPACING }) {
+  return <section id={id} className={cx('page-section', SECTION_SPACING[spacing], className)}>{children}</section>;
+}
+
+/** A full-bleed section divider on the measure (wraps RulerDivider). */
+export function PageRuler({ className = '', muted = false, dark = false, labels }: { className?: string; muted?: boolean; dark?: boolean; labels?: string[] }) {
+  return <RulerDivider className={cx('measure-frame', className)} muted={muted} dark={dark} labels={labels} />;
+}
+
+/** A section header: a kicker (optional index), a balanced serif title, and optional lead copy. */
+export function SectionIntro({
+  kicker,
+  title,
+  children,
+  index,
+  className = '',
+  titleClassName = 'font-serif text-3xl sm:text-4xl text-ink tracking-tight text-balance',
+  rule = false,
+}: {
+  kicker: ReactNode;
+  title: ReactNode;
+  children?: ReactNode;
+  index?: string;
+  className?: string;
+  titleClassName?: string;
+  rule?: boolean;
+}) {
+  return (
+    <div className={cx('mb-10 max-w-2xl lg:mb-12', className)}>
+      {rule && <div className="mb-4 h-0.5 w-8 bg-gold opacity-70" />}
+      <Kicker>
+        {index && <SectionIndex n={index} />}
+        {kicker}
+      </Kicker>
+      <h2 className={titleClassName}>{title}</h2>
+      {children && <div className="mt-4 font-sans text-sm leading-relaxed text-ink/60 sm:text-base">{children}</div>}
+    </div>
+  );
+}
+
+/** A dashed-border mono note band — quiet asides / fine print. */
+export function NoteBand({ children, className = '' }: { children: ReactNode; className?: string }) {
+  return (
+    <div className={cx('rounded-lg border border-dashed border-line/20 px-8 py-5', className)}>
+      <div className="font-mono text-xs leading-relaxed tracking-wider text-ink/40">{children}</div>
+    </div>
+  );
+}
+
+/* ── Content atoms (lists, steps, fields) ────────────────────────────────────────────────── */
+/** A checklist row (`muted` swaps the check for a quiet chevron + dimmed text). Use inside a <ul>. */
+export function CheckRow({ children, muted = false }: { children: ReactNode; muted?: boolean }) {
+  return (
+    <li className="flex items-start gap-2.5">
+      <svg viewBox="0 0 16 16" className={cx('mt-0.5 h-3.5 w-3.5 flex-shrink-0', muted ? 'text-ink/30' : 'text-blueprint/60')} fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round">
+        {muted ? <polyline points="6,2 10,8 6,14" /> : <polyline points="2,8 6,12 14,4" />}
+      </svg>
+      <span className={cx('font-sans text-sm leading-snug', muted ? 'text-ink/55' : 'text-ink/65')}>{children}</span>
+    </li>
+  );
+}
+
+/** Numbered process step rows (a bordered stack) — funnel / how-it-works sections. */
+export function StepRows({ steps }: { steps: { n: string; label: string; desc: string }[] }) {
+  return (
+    <div className="space-y-0">
+      {steps.map(({ n, label, desc }, i, arr) => (
+        <div key={n} className={cx('flex items-start gap-5 p-5 border-x border-t border-line/10', i === arr.length - 1 && 'border-b', 'hover:bg-paper-dark/30 transition-colors duration-150')}>
+          <span className="font-mono text-xs text-ink/25 w-5 flex-shrink-0 pt-0.5">{n}</span>
+          <div>
+            <p className="font-sans text-sm font-medium text-ink mb-0.5">{label}</p>
+            <p className="font-sans text-sm text-ink/55">{desc}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** A numbered step rendered as a FeatureCard (the index sits in the eyebrow slot). */
+export function StepCard({ n, title, children, icon, highlight = false }: { n: string; title: ReactNode; children: ReactNode; icon?: ReactNode; highlight?: boolean }) {
+  return (
+    <FeatureCard title={title} icon={icon} eyebrow={<span>{n}</span>} highlight={highlight} className="p-7">
+      {children}
+    </FeatureCard>
+  );
+}
+
+/** A 2-up label/value grid — spec sheets, “what you get” lists (`accent` tints the label). */
+export function FieldList({ items, className = '' }: { items: { label: string; value: ReactNode; accent?: boolean }[]; className?: string }) {
+  return (
+    <div className={cx('grid gap-5 sm:grid-cols-2', className)}>
+      {items.map(({ label, value, accent }) => (
+        <div key={label}>
+          <Eyebrow as="p" className={cx('mb-2 text-[10px]', accent ? 'text-blueprint' : 'text-ink/35')}>{label}</Eyebrow>
+          <div className="font-sans text-sm leading-relaxed text-ink/65">{value}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 /* ── RelatedRail — 3-up cross-link cards ─────────────────────────────────────────────────── */
 export type RailItem = { to: string; label: string; description?: string; icon?: IconKey };
 
@@ -247,10 +362,6 @@ export interface NavbarProps {
   pricing?: NavLinkSpec;
   secondaryLink?: NavLinkSpec;
   primaryCta?: NavLinkSpec;
-  /** When set, renders a ⌘K search affordance (desktop chip + mobile icon) that calls this to
-      open the command palette. Omit to hide it. */
-  onSearch?: () => void;
-  searchLabel?: string;
   /** Initial open mega-menu key — mainly for SSR/previews/tests that want the panel shown. */
   initialOpenKey?: string | null;
 }
@@ -264,8 +375,6 @@ export function Navbar({
   pricing = { to: '/pricing', label: 'Pricing' },
   secondaryLink = { to: '/sample-report', label: 'Sample report' },
   primaryCta = { to: '/install', label: 'Install MCP' },
-  onSearch,
-  searchLabel = 'Search',
   initialOpenKey = null,
 }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false);
@@ -338,18 +447,6 @@ export function Navbar({
               {pricing.label}
             </L>
 
-            {onSearch && (
-              <button
-                type="button"
-                onClick={onSearch}
-                aria-label={searchLabel}
-                className="ml-1 flex items-center gap-1.5 rounded-md border border-line/15 px-2.5 py-1.5 text-ink/55 transition-colors hover:border-line/30 hover:text-ink"
-              >
-                <SearchGlyph className="h-3.5 w-3.5" />
-                <kbd className="sl-kbd text-[11px]">⌘K</kbd>
-              </button>
-            )}
-
             <div className="w-px h-4 self-center bg-ink/15 mx-2" aria-hidden="true" />
 
             <L to={secondaryLink.to} className="font-sans text-[13px] text-ink/65 px-3 py-2 transition-colors hover:text-blueprint">
@@ -361,16 +458,10 @@ export function Navbar({
             </L>
           </div>
 
-          {/* Mobile: search + hamburger */}
-          <div className="lg:hidden flex items-center">
-            {onSearch && (
-              <button type="button" onClick={onSearch} aria-label={searchLabel} className="p-2 text-ink/70 transition-colors hover:text-ink">
-                <SearchGlyph className="h-5 w-5" />
-              </button>
-            )}
+          {/* Mobile: hamburger */}
           <button
             onClick={() => setMobileOpen((v) => !v)}
-            className="p-2 text-ink"
+            className="lg:hidden p-2 text-ink"
             aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={mobileOpen}
           >
@@ -389,7 +480,6 @@ export function Navbar({
               )}
             </svg>
           </button>
-          </div>
         </div>
       </div>
 
