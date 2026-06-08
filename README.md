@@ -41,6 +41,21 @@ on each stack's own markup — no shared component code:
 The website imports `sonaloop-design/components.css`; the app vendors it (via `make icons`)
 and prepends it. cloud / research inherit it automatically (they extend the core app's web).
 
+**React primitives** (`sonaloop-design/components`) are thin typed wrappers that emit those
+same `.sl-*` classes, so React apps get an ergonomic API over one styling source:
+
+```tsx
+import { Button, Card, CardTitle, Badge, Eyebrow } from 'sonaloop-design/components';
+import 'sonaloop-design/components.css';   // load the styles once
+
+<Button variant="primary" size="sm">Open</Button>
+```
+
+Available: `Button` (variant `default|primary|accent|ghost`, size `sm|md|lg`), `Badge`
+(`tone`), `Pill`, `Chip`, `Eyebrow`, `Card` + `CardTitle`/`CardBody`, `Input`, `Kbd`,
+`Divider`. **Page-level compositions** (Footer, Hero, …) stay in each app and are built
+FROM these primitives + tokens — the design system shares primitives, not whole pages.
+
 ## Develop — component gallery
 
 ```
