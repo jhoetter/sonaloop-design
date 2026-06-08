@@ -168,6 +168,18 @@ a { color: inherit; }
 .ds-canvas-grid::before, .ds-canvas-grid::after { content: "+"; position: absolute; color: var(--sl-muted); font-size: 18px; }
 .ds-canvas-grid::before { top: -10px; left: -7px; }
 .ds-canvas-grid::after { bottom: -13px; right: -7px; }
+/* Website tile — a miniature marketing page (browser-less): nav row + headline + actions. */
+.ds-canvas-web { width: 244px; }
+.ds-canvas-web .wb { border: 1px solid var(--sl-line); border-radius: 11px; overflow: hidden; background: var(--sl-surface); }
+.ds-canvas-web .wb-bar { display: flex; align-items: center; gap: 9px; padding: 9px 11px; border-bottom: 1px solid var(--sl-line); background: var(--sl-bg); }
+.ds-canvas-web .wb-bar > svg { width: 16px; height: 16px; color: var(--sl-accent); flex: none; }
+.ds-canvas-web .wb-links { display: flex; gap: 7px; flex: 1; }
+.ds-canvas-web .wb-links i { width: 26px; height: 5px; border-radius: 3px; background: var(--sl-line); display: block; }
+.ds-canvas-web .wb-cta { font-size: 10px; padding: .18em .55em; }
+.ds-canvas-web .wb-body { padding: 16px 13px 17px; }
+.ds-canvas-web .wb-h { height: 9px; border-radius: 4px; background: var(--sl-ink); opacity: .82; margin-bottom: 8px; }
+.ds-canvas-web .wb-actions { display: flex; gap: 7px; margin-top: 12px; }
+.ds-canvas-web .wb-actions .sl-btn { font-size: 10px; padding: .28em .7em; }
 
 /* ── Preview frames ───────────────────────────────────────────────────────────── */
 .ds-preview {
@@ -192,6 +204,27 @@ a { color: inherit; }
    else icon-only items (e.g. the Theme Toggle) collapse to nothing. */
 .ds-preview-stage .sl-segmented__item svg { width: 1.05em; height: 1.05em; flex: none; }
 .ds-preview-stage .sl-segmented--stacked .sl-segmented__item svg { width: 1.25em; height: 1.25em; }
+
+/* ── Website-section previews ──────────────────────────────────────────────────────
+   Marketing/app blocks need to render edge-to-edge on the page surface (the navbar and
+   footer are full-bleed; measure-frame caps their inner width). So drop the dotted matte
+   and the centring/padding the component stage uses, and sit the block on plain paper. */
+.ds-preview--web { background: var(--sl-bg); }
+.ds-preview--web .ds-pv-note { font-family: var(--sl-mono); font-size: 11px; letter-spacing: .04em; color: var(--sl-faint); }
+.ds-web-stage {
+  display: block; padding: 0; min-height: 0; gap: 0;
+  background: var(--sl-bg); font-size: 16px; overflow: hidden;
+}
+/* Tailwind's preflight is OFF here (so it can't touch the .ds-* chrome), which means UA
+   defaults leak into the previews — link colour/underline, list bullets, heading margins,
+   button chrome. Replay the handful of resets the marketing blocks assume, scoped to the
+   stage. They're wrapped in :where() for ZERO specificity (exactly how preflight behaves),
+   so the blocks' own classes — e.g. .sl-btn--primary's colour — always win. The copy-paste
+   markup stays clean because a real Tailwind app ships preflight. */
+:where(.ds-web-stage a) { color: inherit; text-decoration: none; }
+:where(.ds-web-stage ul, .ds-web-stage ol) { list-style: none; margin: 0; padding: 0; }
+:where(.ds-web-stage h1, .ds-web-stage h2, .ds-web-stage h3, .ds-web-stage p, .ds-web-stage figure) { margin: 0; }
+:where(.ds-web-stage button) { background: none; border: 0; padding: 0; font: inherit; color: inherit; cursor: pointer; }
 
 /* density toggle reused from .ds-seg, smaller text variant */
 .ds-seg.ds-seg--text .ds-seg-btn { width: auto; padding: 0 11px; font-size: 12px; font-weight: 550; }

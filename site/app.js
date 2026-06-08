@@ -9,7 +9,7 @@
  */
 import { inspector, scales, fonts } from '/tokens.data.mjs';
 import { regular, hifi } from '/icons.data.mjs';
-import * as wb from '/site/website.data.mjs';
+import { blocks as websiteBlocks } from '/site/website.previews.mjs';
 
 /* ── tiny helpers ──────────────────────────────────────────────────────────────── */
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -124,11 +124,12 @@ function chartEffort(items, { title = '', xLabel = 'Effort', yLabel = 'Value', q
     + `<div class="sl-quad-xlab">${esc(xLabel)}</div></div><div class="sl-legend" style="margin-top:.9em">${legend}</div></figure>`;
 }
 
-/* Website-section page — a marketing/app block shown the way Tailwind Plus does it: a full-bleed
-   live preview on the page surface, then the same Tailwind-utility markup to copy. The single
-   `markup` string (from site/website.data.mjs) drives BOTH, so the docs can't drift. Styling for
-   these utilities is precompiled into site/website.css by scripts/gen-website-css.mjs. */
-function websitePage({ id, title, desc, markup, notes }) {
+/* Website-section page — a real shared component (sonaloop-design/website), shadcn-style. The
+   preview is the ACTUAL component, server-rendered from src/website.tsx by
+   scripts/gen-website-previews.mjs (so it can never drift / be a mockup), and the code shows the
+   React import + usage. The full-bleed `markup` HTML is read from site/website.previews.mjs. */
+function websitePage({ id, block, title, desc, usage, notes }) {
+  const markup = websiteBlocks[block] || '';
   return `
     <p class="ds-eyebrow">Website</p>
     <h1 class="ds-h1">${esc(title)}</h1>
@@ -137,13 +138,13 @@ function websitePage({ id, title, desc, markup, notes }) {
       <div class="ds-preview-bar">
         <span class="ds-pv-label">Preview</span>
         <span class="ds-top-spacer"></span>
-        <span class="ds-pv-note">Live · theme-aware</span>
+        <span class="ds-pv-note">Live · real component · theme-aware</span>
       </div>
       <div class="ds-preview-stage ds-web-stage">${markup}</div>
     </div>
-    ${h2(`${id}-markup`, 'Markup')}
-    ${p(`These blocks are documented as copy-paste Tailwind-utility markup — the marketing site composes them as React, but the classes are the contract. Colours, fonts and radii flow from the shared <code>tailwind-preset.js</code> (the same <code>--sl-*</code> tokens), and <code>.sl-*</code> classes (buttons, eyebrow, arrow-link, dots) come from <code>styles/components.css</code>.`)}
-    ${code('html', markup)}
+    ${h2(`${id}-usage`, 'Usage')}
+    ${p(`A real, prop-driven React component — own-the-source, composed across the whole site (shadcn-style). Import it from <code>sonaloop-design/website</code>; load <code>sonaloop-design/components.css</code> + <code>sonaloop-design/website.css</code> once, and provide a router adapter via <code>SonaloopLinkProvider</code> for client-side links (it falls back to <code>&lt;a&gt;</code>).`)}
+    ${code('tsx', usage)}
     ${notes || ''}
   `;
 }
@@ -1140,29 +1141,45 @@ const NAV = [
   ] },
   { label: 'Website', items: [
     { id: 'web-navbar', title: 'Navbar', ico: 'panel', render: () => websitePage({
-      id: 'web-navbar', title: 'Navbar', markup: wb.navbar(),
-      desc: 'The marketing-site top bar: brand · mega-menu triggers · pricing · the primary Install action, with a hamburger below <code>lg</code>. Sticky and translucent over the page.' }) },
+      id: 'web-navbar', block: 'navbar', title: 'Navbar',
+      desc: 'The marketing-site top bar: brand · mega-menu triggers · pricing · the primary Install action, with a hamburger below <code>lg</code>. Sticky and translucent, with hover-intent mega panels.',
+      usage: `import { Navbar } from 'sonaloop-design/website';\nimport { megaMenus } from './content/nav';\nimport { useLocation } from 'react-router';\n\n<Navbar menus={megaMenus} currentPath={useLocation().pathname} transparent />` }) },
     { id: 'web-mega-menu', title: 'Mega Menu', ico: 'squareGrid', render: () => websitePage({
-      id: 'web-mega-menu', title: 'Mega Menu', markup: wb.megaMenu(),
-      desc: 'The desktop hover panel: a two-column items grid (icon · label · description) beside a promo card. Shown here in its open state — wire the hover-intent / positioning in your app.' }) },
-    { id: 'web-app-card', title: 'App · Product Cards', ico: 'rectangle', render: () => websitePage({
-      id: 'web-app-card', title: 'App · Product Cards', markup: wb.appCards(),
-      desc: 'The card atom used across product, method and solution grids: icon · label · description · arrow-link, in a responsive 3-up that reflows to one column on small screens.' }) },
-    { id: 'web-hero', title: 'Hero', ico: 'star', render: () => websitePage({
-      id: 'web-hero', title: 'Hero', markup: wb.hero(),
-      desc: 'The page hero: a mono eyebrow, a balanced serif headline, a lead paragraph and a pair of <code>.sl-btn</code> calls to action.' }) },
-    { id: 'web-cta-band', title: 'CTA Band', ico: 'target', render: () => websitePage({
-      id: 'web-cta-band', title: 'CTA Band', markup: wb.ctaBand(),
-      desc: 'A centred call-to-action band — rendered standalone mid-page, or as the top half of the footer above the column nav.' }) },
-    { id: 'web-footer', title: 'Footer', ico: 'squareRows', render: () => websitePage({
-      id: 'web-footer', title: 'Footer', markup: wb.footer(),
-      desc: 'The site footer: a brand block with positioning copy and tags, the column nav, and a bottom bar. Pair it with the CTA Band above for the full footer.' }) },
-    { id: 'web-product-showcase', title: 'Product Showcase', ico: 'panel', render: () => websitePage({
-      id: 'web-product-showcase', title: 'Product Showcase', markup: wb.productShowcase(),
-      desc: 'A split feature showcase: readable copy on a calm panel beside a framed product window. Frame it as the <em>deliverable</em>, not “our UI”.' }) },
+      id: 'web-mega-menu', block: 'mega-menu', title: 'Mega Menu',
+      desc: 'The desktop hover panel rendered standalone: a two-column items grid (icon · label · description) beside a promo card. <code>Navbar</code> mounts this for you on hover; use it directly to compose custom menus.',
+      usage: `import { MegaMenuPanel, type MegaMenu } from 'sonaloop-design/website';\n\nconst menu: MegaMenu = {\n  key: 'solutions', label: 'Solutions', to: '/solutions',\n  columns: [{ heading: 'By the job to be done', items: [\n    { to: '/solutions/discovery', label: 'Continuous discovery', description: '…', icon: 'continuous-discovery' },\n  ] }],\n  promo: { eyebrow: 'See it work', title: '…', body: '…', cta: { label: 'See a sample report', to: '/sample-report' } },\n};\n\n<MegaMenuPanel menu={menu} />` }) },
+    { id: 'web-app-card', title: 'Cards · Grid', ico: 'rectangle', render: () => websitePage({
+      id: 'web-app-card', block: 'app-card', title: 'Cards · Grid',
+      desc: 'The <code>FeatureCard</code> atom (icon · title · body · arrow-link) in a responsive <code>CardGrid</code> — the product/method/solution grids that reflow 3 → 2 → 1 columns.',
+      usage: `import { CardGrid, FeatureCard, Icon } from 'sonaloop-design/website';\n\n<CardGrid>\n  <FeatureCard icon={<Icon name=\"councils\" size={28} />} title=\"Councils\"\n    action={{ to: '/products/councils', label: 'Explore' }}>\n    Synthetic personas that debate a decision and disagree on the record.\n  </FeatureCard>\n  {/* … */}\n</CardGrid>` }) },
     { id: 'web-related-rail', title: 'Related Rail', ico: 'exchange', render: () => websitePage({
-      id: 'web-related-rail', title: 'Related Rail', markup: wb.relatedRail(),
-      desc: 'A 3-up rail of cross-link cards that stitches the IA together — the relations between solutions, methods and products, rendered as data.' }) },
+      id: 'web-related-rail', block: 'related-rail', title: 'Related Rail',
+      desc: 'A 3-up rail of cross-link cards that stitches the IA together — the relations between solutions, methods and products, rendered from registry items.',
+      usage: `import { RelatedRail } from 'sonaloop-design/website';\n\n<RelatedRail items={[\n  { to: '/solutions/discovery', label: 'Continuous discovery', description: '…', icon: 'continuous-discovery' },\n  { to: '/solutions/positioning', label: 'Positioning', description: '…', icon: 'positioning' },\n]} />` }) },
+    { id: 'web-hero', title: 'Hero', ico: 'star', render: () => websitePage({
+      id: 'web-hero', block: 'hero', title: 'Hero',
+      desc: 'The page hero: a mono eyebrow, a balanced serif headline, a lead paragraph and a pair of <code>.sl-btn</code> CTAs, with an optional painterly canvas backdrop.',
+      usage: `import { Hero } from 'sonaloop-design/website';\nimport { canvas } from 'sonaloop-design/images';\n\n<Hero kicker=\"Synthetic research\" canvas={canvas}\n  title=\"A focus group that disagrees with you — on the record.\"\n  cta={{ label: 'Install MCP — free', to: '/install' }}\n  secondary={{ label: 'See a sample report', to: '/sample-report' }}>\n  Spin up a deliberative synthetic panel on your own AI.\n</Hero>` }) },
+    { id: 'web-cta-band', title: 'CTA Band', ico: 'target', render: () => websitePage({
+      id: 'web-cta-band', block: 'cta-band', title: 'CTA Band',
+      desc: 'A centred call-to-action band — rendered standalone mid-page, or as the top half of the footer. <code>DEFAULT_CTA</code> ships the install ⇄ sample-report copy.',
+      usage: `import { CtaBand, DEFAULT_CTA } from 'sonaloop-design/website';\n\n<CtaBand {...DEFAULT_CTA} />\n\n// or fully custom:\n<CtaBand eyebrow=\"Bring your own AI\" title=\"Run a council that pushes back.\"\n  primary={{ label: 'Install MCP — free', to: '/install' }}\n  secondary={{ label: 'See a sample report', to: '/sample-report' }} />` }) },
+    { id: 'web-footer', title: 'Footer', ico: 'squareRows', render: () => websitePage({
+      id: 'web-footer', block: 'footer', title: 'Footer',
+      desc: 'The site footer: a brand block with positioning copy and tags, the column nav, and a bottom bar. Embeds the CTA Band by default (pass <code>cta={false}</code> to omit, or your own theme toggle).',
+      usage: `import { Footer } from 'sonaloop-design/website';\nimport { footerColumns } from './content/nav';\nimport { useTheme } from './contexts/ThemeContext';\n\nconst { preference, setPreference } = useTheme();\n<Footer columns={footerColumns}\n  themeControl={{ value: preference, onChange: setPreference }} />` }) },
+    { id: 'web-product-showcase', title: 'Product Showcase', ico: 'panel', render: () => websitePage({
+      id: 'web-product-showcase', block: 'product-showcase', title: 'Product Showcase',
+      desc: 'A split feature showcase: readable copy on a calm panel beside your product screenshot, framed in a painterly canvas matte. Frame it as the <em>deliverable</em>, not “our UI”. (Preview uses a brand canvas as a stand-in screenshot.)',
+      usage: `import { ProductShot } from 'sonaloop-design/website';\n\n<ProductShot src=\"/shots/report.png\"  /* a -light twin is auto-derived */\n  eyebrow=\"The deliverable\" title=\"A report you can hand to the room.\"\n  body=\"Every objection grounded in a quote, every verdict on the record.\"\n  caption=\"Exports to PDF · Markdown\" />` }) },
+    { id: 'web-canvas-showcase', title: 'Canvas Showcase', ico: 'square', render: () => websitePage({
+      id: 'web-canvas-showcase', block: 'canvas-showcase', title: 'Canvas Showcase',
+      desc: 'A screenshot in a browser-framed window rising out of a painterly canvas — the Cursor-style hero shot. Theme-aware: light canvas + light capture in light mode, dark in dark.',
+      usage: `import { CanvasShowcase } from 'sonaloop-design/website';\nimport { canvas } from 'sonaloop-design/images';\n\n<CanvasShowcase canvasLight={canvas.light} canvasDark={canvas.dark}\n  shotLight=\"/shots/app-light.png\" shotDark=\"/shots/app-dark.png\" />` }) },
+    { id: 'web-integration-showcase', title: 'Integration Showcase', ico: 'jtbd', render: () => websitePage({
+      id: 'web-integration-showcase', block: 'integration-showcase', title: 'Integration Showcase',
+      desc: 'A believable agent terminal floating on a painterly canvas — the “bring your own AI” moment, with a copyable MCP command and a live-looking council session.',
+      usage: `import { IntegrationShowcase } from 'sonaloop-design/website';\n\n<IntegrationShowcase />\n// optional: <IntegrationShowcase command=\"claude mcp add …\" canvas={mist} />` }) },
   ] },
 ];
 
