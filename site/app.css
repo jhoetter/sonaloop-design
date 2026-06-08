@@ -47,11 +47,10 @@ a { color: inherit; }
   -webkit-backdrop-filter: saturate(1.4) blur(12px);
   border-bottom: 1px solid var(--sl-line);
 }
-.ds-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; min-width: calc(var(--ds-sidebar-w) - 20px); }
-.ds-brand-mark { width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; color: var(--sl-ink); }
-.ds-brand-mark svg { width: 26px; height: 26px; }
-.ds-brand-name { font-size: 15px; font-weight: 600; letter-spacing: -.02em; }
-.ds-brand-name span { color: var(--sl-muted); font-weight: 500; }
+/* The docs header dogfoods the shared .sl-logo lockup; this only sets header-specific
+   scale + the muted "Design" suffix on the wordmark. */
+.ds-brand { font-size: 15px; min-width: calc(var(--ds-sidebar-w) - 20px); }
+.ds-brand .ds-brand-sub { color: var(--sl-muted); }
 
 .ds-search {
   display: flex; align-items: center; gap: 9px; height: 34px; padding: 0 10px 0 11px;
@@ -210,6 +209,10 @@ a { color: inherit; }
    footer are full-bleed; measure-frame caps their inner width). So drop the dotted matte
    and the centring/padding the component stage uses, and sit the block on plain paper. */
 .ds-preview--web { background: var(--sl-bg); }
+/* Bare variant preview — no bar/label/badge; the section heading already names it. */
+.ds-preview--bare { margin-top: 10px; }
+.ds-used-inline { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 12px 0 0; }
+.ds-used-inline__label { font-family: var(--sl-mono); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--sl-faint); }
 .ds-preview--web .ds-pv-note { font-family: var(--sl-mono); font-size: 11px; letter-spacing: .04em; color: var(--sl-faint); }
 
 /* Parametric controls — segmented toggles per enumerated prop; swaps a pre-rendered variant. */
@@ -389,15 +392,16 @@ a.ds-usechip:hover code { color: var(--sl-accent); border-color: color-mix(in sr
 .ds-space-row small { display: block; font-family: var(--sl-mono); font-size: 11px; color: var(--sl-faint); margin-top: 8px; }
 
 /* ── Brand page ───────────────────────────────────────────────────────────────── */
+/* The Sonaloop lockup renders the live .sl-logo (sized via its own font-size). The `> svg`
+   / `.wm` rules only style the product sub-pages' hi-fi marks + wordmark (Cloud / Research),
+   which sit as direct children of the hero/panel — the nested .sl-logo is unaffected. */
 .ds-brand-hero { display: flex; align-items: center; justify-content: center; gap: 18px; padding: 60px; border: 1px solid var(--sl-line); border-radius: 14px; background: var(--sl-surface); margin-top: 20px; }
-.ds-brand-hero svg { width: 56px; height: 56px; color: var(--sl-ink); }
-.ds-brand-hero .wm { font-size: 42px; font-weight: 700; letter-spacing: -.04em; color: var(--sl-ink); }
+.ds-brand-hero > svg { width: 56px; height: 56px; color: var(--sl-ink); }
+.ds-brand-hero .wm { font-family: var(--sl-mono); font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: var(--sl-ink); }
 .ds-brand-clear { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px; }
 .ds-brand-panel { border: 1px solid var(--sl-line); border-radius: 12px; padding: 30px; display: flex; align-items: center; justify-content: center; min-height: 150px; }
 .ds-brand-panel.on-dark { background: #101113; color: #e6e7ea; }
-.ds-brand-panel.on-dark svg, .ds-brand-panel.on-dark .wm { color: #e6e7ea; }
-.ds-brand-panel .wm { font-size: 28px; font-weight: 700; letter-spacing: -.03em; }
-.ds-brand-panel svg { width: 40px; height: 40px; }
+.ds-brand-panel > svg { width: 40px; height: 40px; }
 
 /* ── Footer next-link ─────────────────────────────────────────────────────────── */
 .ds-footer { max-width: var(--ds-content-max); margin: 72px auto 0; padding-top: 26px; border-top: 1px solid var(--sl-line); display: flex; justify-content: space-between; align-items: center; }

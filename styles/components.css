@@ -106,6 +106,36 @@
 }
 .sl-arrow-link:hover, .group:hover .sl-arrow-link { gap: .85em; }
 
+/* ── Logo — the brand lockup: the loop mark + the "sonaloop" wordmark, where "sona" is set in
+   Sona Mono and the trailing "loop" in Sona Pixel (the bitmap accent whose cells echo the loop
+   mark). The single source of truth for the logo across stacks — React (website nav/footer) and
+   the Python-SSR app (sidebar) apply these classes to their OWN link, so it never drifts. The
+   mark is monochrome (--sl-ink) and sits on the baseline like a glyph; the whole lockup is
+   static (no hover/animation). Em-based — mark + wordmark track the host font-size.
+   Markup: a 24×24 SonaloopIcon SVG in `.sl-logo__mark`, and the wordmark with its final "loop"
+   wrapped in `.sl-logo__loop`. The host must load the Sona Mono + Sona Pixel faces
+   (styles/fonts.css). Use --sm / --lg to nudge the mark. ──────────────────────────────────── */
+.sl-logo {
+  display: inline-flex; align-items: baseline; gap: .16em;
+  color: var(--sl-ink); text-decoration: none; white-space: nowrap;
+}
+.sl-logo__mark {
+  display: inline-flex; align-items: center; justify-content: center; flex: none;
+  align-self: baseline; color: var(--sl-ink);
+}
+/* Two-class specificity so the mark size wins over a host `svg.ic` rule (the Python app). The
+   translate compensates for the empty space below the loop in its 24×24 box, so the mark rests
+   on the baseline rather than floating; em-based, so it tracks the lockup size. */
+.sl-logo .sl-logo__mark svg { width: 1.08em; height: 1.08em; overflow: visible; transform: translateY(.27em); }
+.sl-logo__word {
+  display: inline-flex; align-items: baseline;
+  font-family: var(--sl-mono); font-weight: 500; line-height: 1;
+  letter-spacing: .01em; text-transform: lowercase;
+}
+.sl-logo__loop { font-family: var(--sl-pixel); font-size: 1.05em; letter-spacing: 0; text-transform: none; margin-left: .04em; }
+.sl-logo--sm .sl-logo__mark svg { width: .92em; height: .92em; transform: translateY(.23em); }
+.sl-logo--lg .sl-logo__mark svg { width: 1.4em; height: 1.4em; transform: translateY(.35em); }
+
 /* ── Status dot — a small coloured presence/verdict dot ──────────────────────────── */
 .sl-dot { display: inline-block; width: .62em; height: .62em; border-radius: 50%; flex: none;
   background: var(--sl-muted); }

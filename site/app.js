@@ -220,24 +220,41 @@ const USAGE_FALLBACK = {
 // route, stripping any leftover :slug to the parent collection.
 const liveHref = (u) => WEBSITE_ORIGIN + (u.live || u.to.replace(/\/:[^/]+$/, '') || '/');
 
+const usechip = (u) => u.to
+  ? `<a class="ds-usechip" href="${esc(liveHref(u))}" target="_blank" rel="noopener">${esc(u.name)}<code>${esc(u.to)}</code></a>`
+  : `<span class="ds-usechip">${esc(u.name)}</span>`;
+
+// Usage list for a block (flat) or a specific variant (when `key` is given + the block is per-variant).
+function usageList(block, key) {
+  let u = websiteUsage[block];
+  if (u && key && !Array.isArray(u)) u = u[key];
+  return Array.isArray(u) ? u : [];
+}
+
 function websiteConsumers(block) {
-  const list = websiteUsage[block] || [];
+  const list = usageList(block);
   if (!list.length) {
     const note = USAGE_FALLBACK[block];
     return note ? `${h2(`${block}-used`, 'Used on the website')}${p(note)}` : '';
   }
-  const chips = list.map((u) => u.to
-    ? `<a class="ds-usechip" href="${esc(liveHref(u))}" target="_blank" rel="noopener">${esc(u.name)}<code>${esc(u.to)}</code></a>`
-    : `<span class="ds-usechip">${esc(u.name)}</span>`).join('');
   return `${h2(`${block}-used`, 'Used on the website')}
     ${p(`Auto-detected from the marketing site — <b>${list.length}</b> ${list.length === 1 ? 'page composes' : 'pages compose'} this block. Each opens the live page on your local dev server (<code>${esc(WEBSITE_ORIGIN)}</code>):`)}
-    <div class="ds-usechips">${chips}</div>`;
+    <div class="ds-usechips">${list.map(usechip).join('')}</div>`;
+}
+
+// Compact per-variant "Used on" row (no heading) for the stacked variant sections.
+function websiteConsumersInline(block, key) {
+  const list = usageList(block, key);
+  if (!list.length) return '';
+  return `<div class="ds-used-inline"><span class="ds-used-inline__label">Used on</span><div class="ds-usechips">${list.map(usechip).join('')}</div></div>`;
 }
 
 // "Source" link — detected (scripts/gen-website-usage.mjs reads src/website.tsx), never hardcoded.
-function websiteSourceLink(block) {
-  const s = websiteSource[block];
-  if (!s) return '';
+// Pass `key` for a per-variant block to link that variant's component.
+function websiteSourceLink(block, key) {
+  let s = websiteSource[block];
+  if (s && key && !s.export) s = s[key];
+  if (!s || !s.export) return '';
   return `<p class="ds-source"><span class="ds-source__ico">${svgReg('jtbd')}</span>`
     + `Source: <a href="${esc(s.href)}" target="_blank" rel="noopener"><code>${esc(s.file)}</code> › ${esc(s.export)}${s.line ? ` <span class="ds-source__line">L${s.line}</span>` : ''}</a></p>`;
 }
@@ -246,8 +263,30 @@ function websiteSourceLink(block) {
    preview is the ACTUAL component, server-rendered from src/website.tsx by
    scripts/gen-website-previews.mjs (so it can never drift / be a mockup), and the code shows the
    React import + usage. The full-bleed `markup` HTML is read from site/website.previews.mjs. */
+
 function websitePage({ id, block, title, desc, usage, notes }) {
   const data = websiteBlocks[block] || { controls: [], variants: { '': '' }, defaultKey: '' };
+
+  // Concept with several concrete variants: stack each as its own bare preview + code + where it's
+  // used (Tailwind-Plus style). The variant name is the section heading, so the preview shows only
+  // the component (no repeated label / "live" badge).
+  if (data.examples) {
+    const sections = data.examples.map((ex) => `
+      ${h2(`${id}-${ex.key}`, ex.label)}
+      ${websiteSourceLink(block, ex.key)}
+      <div class="ds-preview ds-preview--web ds-preview--bare"><div class="ds-preview-stage ds-web-stage">${ex.html}</div></div>
+      ${code('tsx', ex.code)}
+      ${websiteConsumersInline(block, ex.key)}`).join('');
+    return `
+    <p class="ds-eyebrow">Website</p>
+    <h1 class="ds-h1">${esc(title)}</h1>
+    <p class="ds-lead">${desc}</p>
+    ${p(`One concept, several variants — each with its own preview, the code below it, and where it's used. All ship from <code>sonaloop-design/website</code>.`)}
+    ${sections}
+    ${notes || ''}
+  `;
+  }
+
   const defaultHtml = data.variants[data.defaultKey] || '';
   // Enumerated prop controls (pre-rendered variants); the bar swaps the stage HTML, no React.
   const controlsBar = data.controls.length ? `
@@ -642,16 +681,17 @@ function pageBrand() {
   return `
     <p class="ds-eyebrow">Brands</p>
     <h1 class="ds-h1">Sonaloop</h1>
-    <p class="ds-lead">The Sonaloop mark is a single continuous loop with three nodes — the feedback loop between personas, councils and synthesis. Pair it with the wordmark set in Geist Sans.</p>
+    <p class="ds-lead">The Sonaloop mark is a single continuous loop with three nodes — the feedback loop between personas, councils and synthesis. Pair it with the wordmark set in Geist Mono, uppercase. The lockup ships as the <a href="#/components/logo">Logo</a> component (<code>.sl-logo</code>) — every surface renders that one source.</p>
 
     ${h2('brand-lockup', 'Primary lockup')}
-    <div class="ds-brand-hero">${svgReg('sonaloop')}<span class="wm">Sonaloop</span></div>
+    ${p('This is the live <a href="#/components/logo">Logo</a> component (<code>.sl-logo</code>) — the same lockup the website navbar/footer and the app sidebar render.')}
+    <div class="ds-brand-hero"><span class="sl-logo" style="font-size:32px"><span class="sl-logo__mark">${svgReg('sonaloop')}</span><span class="sl-logo__word">Sonaloop</span></span></div>
 
     ${h2('brand-contrast', 'On light & dark')}
-    ${p('The mark is monochrome <code>currentColor</code> — it inverts cleanly. Keep it ink on light surfaces and near-white on dark; avoid placing it on busy imagery or the accent indigo.')}
+    ${p('The mark carries the indigo accent; the wordmark is <code>--sl-ink</code>. Both are theme-aware, so the lockup inverts cleanly — never recolour it by hand or set it on busy imagery.')}
     <div class="ds-brand-clear">
-      <div class="ds-brand-panel">${svgReg('sonaloop')}<span class="wm" style="margin-left:14px">Sonaloop</span></div>
-      <div class="ds-brand-panel on-dark">${svgReg('sonaloop')}<span class="wm" style="margin-left:14px">Sonaloop</span></div>
+      <div class="ds-brand-panel"><span class="sl-logo" style="font-size:20px"><span class="sl-logo__mark">${svgReg('sonaloop')}</span><span class="sl-logo__word">Sonaloop</span></span></div>
+      <div class="ds-brand-panel on-dark" data-theme="dark"><span class="sl-logo" style="font-size:20px"><span class="sl-logo__mark">${svgReg('sonaloop')}</span><span class="sl-logo__word">Sonaloop</span></span></div>
     </div>
 
     ${h2('brand-family', 'Product family')}
@@ -665,7 +705,7 @@ function pageBrand() {
     <ul class="ds-ul">
       <li class="ds-li">Keep clear space around the lockup equal to the height of the mark.</li>
       <li class="ds-li">Don't recolour the mark, add gradients, or set it on the indigo accent.</li>
-      <li class="ds-li">Don't stretch, rotate or outline the wordmark — Geist Sans, tracking <code>-0.04em</code>.</li>
+      <li class="ds-li">Don't stretch, rotate or outline the wordmark — Geist Mono, uppercase, tracking <code>0.14em</code>.</li>
     </ul>
   `;
 }
@@ -831,6 +871,20 @@ const cArrowLink = () => componentPage({
   react: `// CSS-only class — no wrapper needed\n<Link to="/method" className="sl-arrow-link">\n  Read the method <ArrowGlyph />\n</Link>`,
   markup: `<a href="…" class="sl-arrow-link">Read the docs <svg>…→…</svg></a>`,
   python: `h("a", {"class_": "sl-arrow-link", "href": url}, "Open", arrow_svg)`,
+});
+
+const cLogo = () => componentPage({
+  id: 'logo', title: 'Logo', desc: 'The Sonaloop brand lockup — the loop <a href="#/brand">mark</a> paired with the mono <code>SONALOOP</code> wordmark. The single source of truth for the logo: the React <code>&lt;Logo&gt;</code> and the Python-SSR sidebar both apply <code>.sl-logo</code>, so it can never drift between surfaces. Em-based, so it scales with the host font-size; the mark lifts on hover when the lockup is a link. Use <code>--sm</code>/<code>--lg</code> to nudge the mark, <code>--plain</code> to drop the hover lift, and <code>--display</code> for the hero treatment — lowercase, tightly set, mono “sona” running into a Sona&nbsp;Pixel “loop” (whose cells echo the mark).',
+  demo: `<div style="display:flex;flex-direction:column;gap:24px;align-items:flex-start">
+      <a href="#/logo" class="sl-logo" style="font-size:18px"><span class="sl-logo__mark">${svgReg('sonaloop')}</span><span class="sl-logo__word">Sonaloop</span></a>
+      <span class="sl-logo sl-logo--lg"><span class="sl-logo__mark">${svgReg('sonaloop')}</span><span class="sl-logo__word">Sonaloop</span></span>
+      <span class="sl-logo sl-logo--sm sl-logo--plain"><span class="sl-logo__mark">${svgReg('sonaloop')}</span></span>
+      <span class="sl-logo sl-logo--display" style="font-size:34px"><span class="sl-logo__mark">${svgReg('sonaloop')}</span><span class="sl-logo__word">Sona<span class="sl-logo__loop">loop</span></span></span>
+    </div>`,
+  react: `import { Logo } from 'sonaloop-design/components';\n\n// Wrap in your router's link to make it navigable\n<Link to="/"><Logo /></Link>\n<Logo size="lg" />\n<Logo wordmark={false} />   // mark only\n<Logo display />            // hero: mono "Sona" + pixel "loop"`,
+  markup: `<a class="sl-logo" href="/">\n  <span class="sl-logo__mark"><!-- 24×24 SonaloopIcon SVG --></span>\n  <span class="sl-logo__word">Sonaloop</span>\n</a>\n\n<!-- Display lockup -->\n<span class="sl-logo sl-logo--display">\n  <span class="sl-logo__mark">…</span>\n  <span class="sl-logo__word">Sona<span class="sl-logo__loop">loop</span></span>\n</span>`,
+  python: `h("a", {"class_": "sl-logo", "href": "/"},\n  h("span", {"class_": "sl-logo__mark"}, icon("sonaloop")),\n  h("span", {"class_": "sl-logo__word"}, brand_name()))`,
+  notes: `<div class="ds-callout"><span class="ico">${svgReg('bulb')}</span><p>Usage rules (clear space, on-light/dark, the product-family badges) live on the <a href="#/brand">Brand</a> page — this component is just the canonical lockup every app renders.</p></div>`,
 });
 
 const cStatusDot = () => componentPage({
@@ -1371,6 +1425,7 @@ const NAV = [
     { id: 'chip', title: 'Chip', ico: 'diamond', render: cChip },
     { id: 'status-dot', title: 'Status Dot', ico: 'dot', render: cStatusDot },
     { id: 'avatar', title: 'Avatar', ico: 'contact', render: cAvatar },
+    { id: 'logo', title: 'Logo', ico: 'sonaloop', render: cLogo },
     { id: 'card', title: 'Card', ico: 'rectangle', render: cCard },
     { id: 'entity', title: 'Entity', ico: 'projects', render: cEntity },
     { id: 'note', title: 'Note', ico: 'bulb', render: cNote },
@@ -1410,14 +1465,10 @@ const NAV = [
       id: 'web-navbar', block: 'navbar', title: 'Navbar',
       desc: 'The marketing-site top bar: brand · mega-menu triggers · pricing · the primary Install action, with a hamburger below <code>lg</code>. Shown here with the <b>Solutions mega-menu open</b> (a two-column items grid beside a promo card) — it opens on hover-intent and never appears on its own. Pass <code>initialOpenKey</code> to render a panel open.',
       usage: `import { Navbar } from 'sonaloop-design/website';\nimport { megaMenus } from './content/nav';\nimport { useLocation } from 'react-router';\n\n<Navbar menus={megaMenus} currentPath={useLocation().pathname} transparent />` }) },
-    { id: 'web-app-card', title: 'Cards · Grid', ico: 'rectangle', render: () => websitePage({
-      id: 'web-app-card', block: 'app-card', title: 'Cards · Grid',
-      desc: 'The <code>FeatureCard</code> atom (icon · title · body · arrow-link) in a responsive <code>CardGrid</code> — the product/method/solution grids that reflow 3 → 2 → 1 columns.',
-      usage: `import { CardGrid, FeatureCard, Icon } from 'sonaloop-design/website';\n\n<CardGrid>\n  <FeatureCard icon={<Icon name=\"councils\" size={28} />} title=\"Councils\"\n    action={{ to: '/products/councils', label: 'Explore' }}>\n    Synthetic personas that debate a decision and disagree on the record.\n  </FeatureCard>\n  {/* … */}\n</CardGrid>` }) },
-    { id: 'web-related-rail', title: 'Related Rail', ico: 'exchange', render: () => websitePage({
-      id: 'web-related-rail', block: 'related-rail', title: 'Related Rail',
-      desc: 'A 3-up rail of cross-link cards that stitches the IA together — the relations between solutions, methods and products, rendered from registry items.',
-      usage: `import { RelatedRail } from 'sonaloop-design/website';\n\n<RelatedRail items={[\n  { to: '/solutions/discovery', label: 'Continuous discovery', description: '…', icon: 'continuous-discovery' },\n  { to: '/solutions/positioning', label: 'Positioning', description: '…', icon: 'positioning' },\n]} />` }) },
+    { id: 'web-cards', title: 'Cards', ico: 'rectangle', render: () => websitePage({
+      id: 'web-cards', block: 'cards', title: 'Cards',
+      desc: 'One card concept, several variants. <code>ContentCard</code> is the base — <code>FeatureCard</code> (icon · title · body · action arrow) and <code>LinkCard</code> (the whole-card cross-link; a <code>RelatedRail</code> is just a <code>CardGrid</code> of them) are presets of it. <code>OfferCard</code> is the tier/ladder card (<code>PricingCard</code> / <code>LadderCard</code> presets); <code>VerdictCard</code> is the council proof (always in a grid); and <code>SnippetCard</code> is a feature card with a recessed product-peek stage. All laid out by <code>CardGrid</code>.',
+      usage: `import { CardGrid, FeatureCard, LinkCard, RelatedRail, OfferCard, PricingCard, LadderCard } from 'sonaloop-design/website';\n\n// feature\n<CardGrid><FeatureCard icon={<Icon name=\"councils\" size={28} />} title=\"Councils\" action={{ to: '/x', label: 'Explore' }}>…</FeatureCard></CardGrid>\n\n// link (RelatedRail = CardGrid of LinkCards)\n<RelatedRail items={[{ to: '/solutions/x', label: 'Continuous discovery', description: '…', icon: 'continuous-discovery' }]} />\n\n// offer — PricingCard & LadderCard are presets of OfferCard\n<PricingCard name=\"Cloud\" priceLine=\"from €39/mo\" icon=\"cloud\" accent=\"scan\" highlight tag=\"Popular\"\n  inherits=\"Open Core\" features={['Hosted councils & memory']} cta={{ label: 'Start trial', to: '/install' }} />\n<LadderCard name=\"Cloud\" index={1} icon=\"cloud\" accent=\"scan\" priceLine=\"from €39/mo\"\n  summary=\"Hosted councils & memory.\" bullets={['Semantic recall']} primaryCta={{ label: 'Start trial', to: '/install' }} learnMoreTo=\"/products/cloud\" />` }) },
     { id: 'web-hero', title: 'Hero', ico: 'star', render: () => websitePage({
       id: 'web-hero', block: 'hero', title: 'Hero',
       desc: 'The page hero: a mono eyebrow, a balanced serif headline, a lead paragraph and a pair of <code>.sl-btn</code> CTAs, with an optional painterly canvas backdrop.',
@@ -1442,6 +1493,22 @@ const NAV = [
       id: 'web-command-palette', block: 'command-palette', title: 'Command Palette ⌘K',
       desc: 'The shared ⌘K palette — the same one this docs site runs (press ⌘K). Results grouped under muted section headers, a per-item icon, an optional subtitle, full keyboard nav (↑↓ · ↵ · esc) with hover-sync, and a footer hint bar. Prop-driven: pass static <code>groups</code> for nav commands and an optional async <code>onSearch</code> for server-backed results. The host owns open state; <code>hotkey</code> (default on) binds ⌘K.',
       usage: `import { CommandPalette, CommandTrigger, type CommandGroup } from 'sonaloop-design/website';\nimport { useState } from 'react';\n\nconst groups: CommandGroup[] = [\n  { key: 'go', label: 'Jump to', items: [\n    { title: 'Solutions', subtitle: '/solutions', to: '/solutions', icon: 'compass' },\n    { title: 'Pricing',  subtitle: '/pricing',  to: '/pricing',  icon: 'pricing-research' },\n  ] },\n  { key: 'products', label: 'Products', accent: 'var(--sl-violet)', items: [\n    { title: 'Open Core', subtitle: 'Run councils on your own AI', to: '/products/open-core', icon: 'open-core' },\n    { title: 'Cloud',     subtitle: 'Hosted councils & memory',    to: '/products/cloud',     icon: 'cloud' },\n  ] },\n];\n\nfunction App() {\n  const [open, setOpen] = useState(false);\n  return (\n    <>\n      <CommandTrigger onClick={() => setOpen(true)} label=\"Search Sonaloop\" />\n      <CommandPalette open={open} onOpenChange={setOpen} groups={groups}\n        placeholder=\"Search Sonaloop…\"\n        // optional: onSearch={async (q) => fetch('/api/search?q=' + q).then(r => r.json())}\n      />\n    </>\n  );\n}` }) },
+    { id: 'web-layout', title: 'Layout · Section', ico: 'squareRows', render: () => websitePage({
+      id: 'web-layout', block: 'layout', title: 'Layout · Section',
+      desc: 'The page scaffolding used on every page: <code>PageSection</code> (measure + vertical rhythm), <code>SectionIntro</code> (kicker · balanced title · lead), <code>NoteBand</code> (dashed mono aside) and <code>PageRuler</code> (a hairline divider on the measure).',
+      usage: `import { PageSection, SectionIntro, NoteBand, PageRuler } from 'sonaloop-design/website';\n\n<PageSection spacing=\"compact\">\n  <SectionIntro index=\"01\" kicker=\"How it works\" title=\"One engine, three ways.\" rule>\n    A calm section header with a lead paragraph.\n  </SectionIntro>\n  <NoteBand>Prices are placeholders pending validation.</NoteBand>\n  <PageRuler className=\"mt-10\" />\n</PageSection>` }) },
+    { id: 'web-content-atoms', title: 'Content Atoms', ico: 'check', render: () => websitePage({
+      id: 'web-content-atoms', block: 'content-atoms', title: 'Content Atoms',
+      desc: 'The genuine non-card content atoms: <code>CheckRow</code> (checklist item, <code>muted</code> variant), <code>StepRows</code> (a numbered bordered stack) and <code>FieldList</code> (2-up label/value). (A numbered <em>card</em> is just <code>&lt;FeatureCard eyebrow="01"&gt;</code> — see Cards.)',
+      usage: `import { CheckRow, FieldList, StepRows } from 'sonaloop-design/website';\n\n<ul className=\"space-y-2.5\">\n  <CheckRow>React in hours, not weeks</CheckRow>\n  <CheckRow muted>Optional extra</CheckRow>\n</ul>\n<StepRows steps={[{ n: '01', label: 'Persona', desc: '…' }]} />` }) },
+    { id: 'web-install-block', title: 'Install Block', ico: 'jtbd', render: () => websitePage({
+      id: 'web-install-block', block: 'install-block', title: 'Install Block',
+      desc: 'The MCP setup block — a <code>Segmented</code> client picker (Claude Code · Cursor · Codex) over the one-liner / config, with a copy button. Self-contained; <code>dark</code> pins the dusk surface.',
+      usage: `import { InstallBlock } from 'sonaloop-design/website';\n\n<InstallBlock />\n// on a dark surface:\n<InstallBlock dark />` }) },
+    { id: 'web-faq', title: 'FAQ List', ico: 'bulb', render: () => websitePage({
+      id: 'web-faq', block: 'faq', title: 'FAQ List',
+      desc: 'A divide-y question/answer stack — the same FAQ pattern that repeats across Pricing, Install and Home, now one component.',
+      usage: `import { FaqList } from 'sonaloop-design/website';\n\n<FaqList items={[\n  { q: 'Why is local free?', a: 'Your own AI writes the text — we sell methodology, not tokens.' },\n  { q: 'Do I need an API key?', a: 'No, not for the core.' },\n]} />` }) },
   ] },
 ];
 

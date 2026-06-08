@@ -17,8 +17,7 @@
  */
 import { createContext, Fragment, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import type { AnchorHTMLAttributes, CSSProperties, ReactNode } from 'react';
-import { Eyebrow, CopyButton, ThemeToggle, Segmented, Tag, Avatar, type TagTone } from './components';
-import { SonaloopIcon } from './index';
+import { Eyebrow, CopyButton, ThemeToggle, Segmented, Tag, Avatar, Logo, type TagTone } from './components';
 import { Icon, type IconKey } from './website-icons';
 import { canvas as defaultCanvas, type CanvasPair } from './images';
 
@@ -135,25 +134,38 @@ export function DrawingFrame({
 }
 
 /* ── FeatureCard + grid ──────────────────────────────────────────────────────────────────── */
-export function FeatureCard({
-  icon,
-  eyebrow,
-  title,
-  children,
-  highlight = false,
-  className = '',
-  framed = true,
-  action,
-}: {
+/* ── ContentCard — the base content card. Two modes: a feature card (serif title, optional eyebrow
+   + action arrow-link) or, when `to` is set, a whole-card LINK (sans label, "Explore" at the
+   bottom). FeatureCard and LinkCard are thin presets of it. ──────────────────────────────────── */
+export type ContentCardProps = {
   icon?: ReactNode;
   eyebrow?: ReactNode;
   title: ReactNode;
-  children: ReactNode;
+  children?: ReactNode;
   highlight?: boolean;
   className?: string;
   framed?: boolean;
+  /** Inline arrow-link (feature mode). */
   action?: { to: string; label: string };
-}) {
+  /** When set, the WHOLE card is a link (link mode); renders `linkLabel` (default "Explore"). */
+  to?: string;
+  linkLabel?: ReactNode;
+};
+export function ContentCard({ icon, eyebrow, title, children, highlight = false, className = '', framed = true, action, to, linkLabel = 'Explore' }: ContentCardProps) {
+  // Whole-card link mode (the cross-link / related-rail card).
+  if (to) {
+    return (
+      <L to={to} className={cx('group flex flex-col gap-3 rounded-lg border border-line/[0.09] p-5 transition-colors hover:border-blueprint/40 hover:bg-paper-dark/50', className)}>
+        {icon && <span className="text-blueprint/65 group-hover:text-blueprint">{icon}</span>}
+        <div>
+          <p className="font-sans text-sm font-medium text-ink">{title}</p>
+          {children && <p className="mt-1 font-sans text-sm text-ink/55 leading-snug">{children}</p>}
+        </div>
+        <span className="mt-auto sl-arrow-link">{linkLabel}<ArrowGlyph /></span>
+      </L>
+    );
+  }
+  // Feature / content mode (serif title, optional eyebrow + action arrow-link).
   const body = (
     <>
       {(icon || eyebrow) && (
@@ -163,7 +175,7 @@ export function FeatureCard({
         </div>
       )}
       <h3 className="mb-3 font-serif text-xl text-ink">{title}</h3>
-      <div className="font-sans text-sm leading-relaxed text-ink/65">{children}</div>
+      {children && <div className="font-sans text-sm leading-relaxed text-ink/65">{children}</div>}
       {action && (
         <L to={action.to} className="mt-6 sl-arrow-link">
           {action.label}
@@ -172,14 +184,17 @@ export function FeatureCard({
       )}
     </>
   );
-
   const classes = cx(
     'group pi-hover min-h-full p-7 transition-all duration-200',
     highlight ? 'border-blueprint/35 bg-blueprint/5' : 'hover:border-blueprint/30 hover:bg-paper-dark/50',
     className,
   );
-
   return framed ? <DrawingFrame className={classes}>{body}</DrawingFrame> : <div className={cx('rounded-xl border', classes)}>{body}</div>;
+}
+
+/** FeatureCard — content-card preset (serif title · optional eyebrow · action arrow-link). */
+export function FeatureCard(props: Omit<ContentCardProps, 'to' | 'linkLabel'> & { children: ReactNode }) {
+  return <ContentCard {...props} />;
 }
 
 /** A simple responsive grid for cards (1 → 2 → 3 columns). */
@@ -279,15 +294,6 @@ export function StepRows({ steps }: { steps: { n: string; label: string; desc: s
   );
 }
 
-/** A numbered step rendered as a FeatureCard (the index sits in the eyebrow slot). */
-export function StepCard({ n, title, children, icon, highlight = false }: { n: string; title: ReactNode; children: ReactNode; icon?: ReactNode; highlight?: boolean }) {
-  return (
-    <FeatureCard title={title} icon={icon} eyebrow={<span>{n}</span>} highlight={highlight} className="p-7">
-      {children}
-    </FeatureCard>
-  );
-}
-
 /** A 2-up label/value grid — spec sheets, “what you get” lists (`accent` tints the label). */
 export function FieldList({ items, className = '' }: { items: { label: string; value: ReactNode; accent?: boolean }[]; className?: string }) {
   return (
@@ -302,35 +308,260 @@ export function FieldList({ items, className = '' }: { items: { label: string; v
   );
 }
 
-/* ── RelatedRail — 3-up cross-link cards ─────────────────────────────────────────────────── */
-export type RailItem = { to: string; label: string; description?: string; icon?: IconKey };
+/* ── InstallBlock — the MCP config (Claude · Cursor · Codex tabs + copy) ──────────────────── */
+const INSTALL_ENDPOINT = 'https://api.sonaloop.com/mcp';
+const INSTALL_CLIENTS: { id: string; label: string; lang: string; code: string }[] = [
+  { id: 'claude', label: 'Claude Code', lang: 'shell', code: `claude mcp add sonaloop --scope user --transport http ${INSTALL_ENDPOINT}` },
+  { id: 'cursor', label: 'Cursor', lang: '~/.cursor/mcp.json', code: `{\n  "mcpServers": {\n    "sonaloop": { "url": "${INSTALL_ENDPOINT}" }\n  }\n}` },
+  { id: 'codex', label: 'Codex', lang: '~/.codex/config.toml', code: `[mcp_servers.sonaloop]\nurl = "${INSTALL_ENDPOINT}"` },
+];
 
-export function RelatedRail({ items }: { items: RailItem[] }) {
+export function InstallBlock({ dark = false, className = '' }: { dark?: boolean; className?: string }) {
+  const [active, setActive] = useState(INSTALL_CLIENTS[0].id);
+  const client = INSTALL_CLIENTS.find((c) => c.id === active)!;
+  const isShell = client.lang === 'shell';
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      {items.map((it) => (
-        <L
-          key={it.to + it.label}
-          to={it.to}
-          className="group flex flex-col gap-3 rounded-lg border border-line/[0.09] p-5 transition-colors hover:border-blueprint/40 hover:bg-paper-dark/50"
-        >
-          {it.icon && (
-            <span className="text-blueprint/65 group-hover:text-blueprint">
-              <Icon name={it.icon} size={28} animate />
-            </span>
-          )}
-          <div>
-            <p className="font-sans text-sm font-medium text-ink">{it.label}</p>
-            {it.description && <p className="mt-1 font-sans text-sm text-ink/55 leading-snug">{it.description}</p>}
-          </div>
-          <span className="mt-auto sl-arrow-link">
-            Explore
-            <ArrowGlyph />
-          </span>
-        </L>
+    <div data-theme={dark ? 'dark' : undefined} className={cx('rounded-lg border border-line/12 bg-paper-dark/40 overflow-hidden', className)}>
+      <div className="flex flex-wrap items-center gap-3 border-b border-line/10 px-3 py-2.5">
+        <Segmented aria-label="MCP client" value={active} onChange={setActive} options={INSTALL_CLIENTS.map((c) => ({ value: c.id, label: c.label }))} />
+        <Eyebrow className="ml-auto hidden sm:inline text-[10px] text-ink/40">Set up in under a minute · no API key</Eyebrow>
+      </div>
+      <div className="flex items-start gap-3 px-4 py-4 sm:px-5 sm:py-5">
+        {isShell && <span className="mt-0.5 select-none font-mono text-sm text-blueprint">$</span>}
+        <pre className="flex-1 overflow-x-auto whitespace-pre font-mono text-[13px] leading-relaxed text-ink/80"><code>{client.code}</code></pre>
+        <CopyButton text={client.code} className="flex-shrink-0" />
+      </div>
+    </div>
+  );
+}
+
+/* ── VerdictCard — a persona pull-quote (the "council pushes back" proof) ──────────────────── */
+export type Verdict = { tag: string; quote: string; persona: string; role: string };
+const VERDICT_WARM = new Set(['objection', 'churn-risk', 'opposed', 'risk']);
+const VERDICT_SHIFT = new Set(['stance-shift', 'switching', 'conditional']);
+const verdictTone = (tag: string): TagTone => (VERDICT_WARM.has(tag) ? 'warm' : VERDICT_SHIFT.has(tag) ? 'accent' : 'neutral');
+
+export function VerdictCard({ verdict }: { verdict: Verdict }) {
+  return (
+    <figure className="flex flex-col gap-5 rounded-lg border border-line/[0.09] bg-paper-dark/40 p-6">
+      <Tag tone={verdictTone(verdict.tag)} className="self-start">{verdict.tag}</Tag>
+      <blockquote className="font-serif text-lg leading-snug text-ink text-balance">“{verdict.quote}”</blockquote>
+      <figcaption className="mt-auto font-sans text-sm">
+        <span className="font-medium text-ink">{verdict.persona}</span>
+        <span className="text-ink/50"> · {verdict.role}</span>
+      </figcaption>
+    </figure>
+  );
+}
+
+/* ── Snippets — believable "product peek" UI cards (token-driven, light/dark) ──────────────── */
+function SnippetCheck() {
+  return (
+    <svg viewBox="0 0 16 16" className="h-3.5 w-3.5 text-blueprint" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="3,8 6.5,11.5 13,4.5" />
+    </svg>
+  );
+}
+
+const SNIPPET_METHODS: { label: string; icon: IconKey; active?: boolean }[] = [
+  { label: 'Jobs to be done', icon: 'jtbd', active: true },
+  { label: 'Positioning tests', icon: 'positioning' },
+  { label: 'Continuous discovery', icon: 'continuous-discovery' },
+  { label: 'Pressure-test', icon: 'pressure-test' },
+];
+
+/** A "pick a method" dropdown — like a model picker, using the real method icons. */
+export function SnippetMethodPicker({ items = SNIPPET_METHODS }: { items?: { label: string; icon: IconKey; active?: boolean }[] }) {
+  return (
+    <div className="rounded-xl border border-line/10 bg-paper p-2 shadow-[0_1px_2px_rgb(var(--ink)/0.05)]">
+      <Eyebrow as="p" className="px-2.5 pb-1 pt-1.5 text-[10px] text-ink/40">Method</Eyebrow>
+      <ul>
+        {items.map((m) => (
+          <li key={m.label} className={cx('flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm', m.active ? 'bg-blueprint/10 text-ink' : 'text-ink/70')}>
+            <span className="text-blueprint/70"><Icon name={m.icon} size={18} /></span>
+            <span className="flex-1 truncate">{m.label}</span>
+            {m.active && <SnippetCheck />}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+/** A verdict card — a persona, a stance, the quote (the small "peek" variant). */
+export function SnippetVerdict({
+  name = 'Marcus Hale',
+  role = 'CFO · scale-up',
+  tag = 'objection',
+  quote = 'Per-seat pricing punishes exactly the teams you want expanding. I’d cap it.',
+}: { name?: string; role?: string; tag?: string; quote?: string } = {}) {
+  return (
+    <div className="rounded-xl border border-line/10 bg-paper p-4 shadow-[0_1px_2px_rgb(var(--ink)/0.05)]">
+      <div className="flex items-center gap-2.5">
+        <Avatar name={name} tone="accent" style={{ width: 34, height: 34, fontSize: 34 * 0.34 }} />
+        <div className="min-w-0">
+          <p className="font-sans text-sm font-medium text-ink leading-tight">{name}</p>
+          <p className="font-sans text-xs text-ink/50">{role}</p>
+        </div>
+        <Tag tone="warm" className="ml-auto">{tag}</Tag>
+      </div>
+      <p className="mt-3 font-serif text-[15px] leading-snug text-ink/90">“{quote}”</p>
+    </div>
+  );
+}
+
+/** A sentiment bar across the council. */
+export function SnippetSentiment({
+  segments = [
+    { label: 'For', pct: 25, cls: 'bg-blueprint' },
+    { label: 'Conditional', pct: 42, cls: 'bg-gold' },
+    { label: 'Against', pct: 33, cls: 'bg-ink/30' },
+  ],
+}: { segments?: { label: string; pct: number; cls: string }[] } = {}) {
+  return (
+    <div className="rounded-xl border border-line/10 bg-paper p-4 shadow-[0_1px_2px_rgb(var(--ink)/0.05)]">
+      <div className="mb-3 flex items-center gap-2">
+        <span className="text-blueprint/70"><Icon name="analytics" size={16} /></span>
+        <Eyebrow as="p" className="text-[10px] text-ink/45">Sentiment across the council</Eyebrow>
+      </div>
+      <div className="flex h-2.5 w-full overflow-hidden rounded-full border border-line/5">
+        {segments.map((s) => <div key={s.label} className={s.cls} style={{ width: `${s.pct}%` }} />)}
+      </div>
+      <div className="mt-2.5 flex flex-wrap gap-x-4 gap-y-1">
+        {segments.map((s) => <span key={s.label} className="font-mono text-[11px] text-ink/50">{s.label} {s.pct}%</span>)}
+      </div>
+    </div>
+  );
+}
+
+/* ── SnippetCard — a feature card whose recessed footer "stage" holds a product peek (one of the
+   Snippet* widgets above). The "why it's different" cells on the homepage are these. ─────────── */
+export function SnippetCard({ icon, title, body, peek, to, linkLabel }: { icon?: ReactNode; title: ReactNode; body?: ReactNode; peek: ReactNode; to?: string; linkLabel?: ReactNode }) {
+  return (
+    <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-line/10 bg-paper">
+      <div className="p-6">
+        {icon && <span className="mb-4 inline-flex text-blueprint/70">{icon}</span>}
+        <h3 className="font-serif text-xl text-ink mb-1.5">{title}</h3>
+        {body && <p className="font-sans text-sm text-ink/60 leading-relaxed">{body}</p>}
+        {to && <div className="mt-4"><ArrowLink to={to}>{linkLabel}</ArrowLink></div>}
+      </div>
+      <div className="flex flex-1 flex-col justify-center border-t border-line/10 bg-paper-dark p-5 sm:p-6">
+        {peek}
+      </div>
+    </div>
+  );
+}
+
+/* ── FAQ list — a divide-y Q/A stack ─────────────────────────────────────────────────────── */
+export type FaqItem = { q: string; a: ReactNode };
+export function FaqList({ items, className = '' }: { items: FaqItem[]; className?: string }) {
+  return (
+    <div className={cx('divide-y divide-line/10 border-y border-line/10', className)}>
+      {items.map((f) => (
+        <div key={f.q} className="py-5">
+          <p className="font-sans text-sm font-medium text-ink mb-1.5">{f.q}</p>
+          <p className="font-sans text-sm text-ink/60 leading-relaxed">{f.a}</p>
+        </div>
       ))}
     </div>
   );
+}
+
+/* ── Accent system — per-product tonal identity (rules, tints, CTAs). Full static class
+   strings so Tailwind keeps them. Used by the pricing / ladder cards. ─────────────────────── */
+export type Accent = 'blueprint' | 'scan' | 'gold';
+export type AccentClasses = { rule: string; icon: string; softBg: string; softBorder: string; ctaSolid: string; text: string };
+const ACCENTS: Record<Accent, AccentClasses> = {
+  blueprint: { rule: 'bg-blueprint', icon: 'text-blueprint', softBg: 'bg-blueprint/5', softBorder: 'border-blueprint/30', ctaSolid: 'bg-blueprint text-paper hover:bg-blueprint-deep', text: 'text-blueprint' },
+  scan: { rule: 'bg-scan', icon: 'text-blueprint', softBg: 'bg-scan/10', softBorder: 'border-scan/40', ctaSolid: 'bg-blueprint text-paper hover:bg-blueprint-deep', text: 'text-blueprint' },
+  gold: { rule: 'bg-gold', icon: 'text-gold', softBg: 'bg-gold/[0.06]', softBorder: 'border-gold/30', ctaSolid: 'bg-gold/90 text-ink hover:bg-gold', text: 'text-ink' },
+};
+export const accentClasses = (accent: Accent): AccentClasses => ACCENTS[accent];
+
+const CARD_CTA = 'inline-flex w-full items-center justify-center gap-2 rounded-md px-5 py-3 font-sans text-sm font-medium transition-colors';
+const CARD_CTA_OUTLINE = 'border border-line/20 text-ink hover:border-blueprint hover:text-blueprint';
+export type CardCta = { to?: string; href?: string; label: string };
+
+/* ── OfferCard — the one parameterized "offer" card (accent bar · icon · header · price · body ·
+   CheckRow bullets · CTA). PricingCard & LadderCard are thin presets over it. The right-hand
+   header slot is a pricing `tag` or a ladder `index` eyebrow; the body is a `summary` paragraph
+   and/or an `inherits` line. `highlight` tints the card + solidifies the CTA; `solidCta`
+   solidifies the CTA alone (e.g. the gold ladder tier). ──────────────────────────────────── */
+export type OfferCardProps = {
+  name: string;
+  to?: string;
+  priceLine?: ReactNode;
+  icon?: IconKey;
+  accent?: Accent;
+  index?: number;
+  tag?: string;
+  inherits?: string;
+  summary?: ReactNode;
+  bullets: string[];
+  highlight?: boolean;
+  solidCta?: boolean;
+  cta: CardCta;
+  learnMoreTo?: string;
+  size?: 'md' | 'lg';
+};
+export function OfferCard({ name, to, priceLine, icon, accent = 'blueprint', index, tag, inherits, summary, bullets, highlight = false, solidCta, cta, learnMoreTo, size = 'md' }: OfferCardProps) {
+  const acc = accentClasses(accent);
+  const lg = size === 'lg';
+  const ctaClass = (solidCta ?? highlight) ? acc.ctaSolid : CARD_CTA_OUTLINE;
+  const nameCls = cx('font-serif text-ink', lg ? 'text-2xl' : 'text-xl');
+  return (
+    <DrawingFrame className={cx('group flex flex-col transition-all duration-200', lg ? 'p-8' : 'p-7', highlight ? 'border-blueprint/35 bg-blueprint/5' : cx('hover:border-blueprint/30', lg ? 'hover:bg-paper-dark/40' : 'hover:bg-paper-dark/50'))}>
+      <div className={cx(lg ? '-mt-8 -mx-8 mb-7' : '-mt-7 -mx-7 mb-6', 'h-1', acc.rule)} aria-hidden="true" />
+      <div className={cx('flex items-start justify-between', lg ? 'mb-6 gap-4' : 'mb-5 gap-3')}>
+        <div className={highlight ? acc.icon : cx(acc.icon, 'opacity-80')}>{icon && <Icon name={icon} size={lg ? 44 : 34} animate />}</div>
+        {index !== undefined && <Eyebrow className="text-[10px] text-ink/30">{`0${index + 1}`}</Eyebrow>}
+        {tag && <Tag>{tag}</Tag>}
+      </div>
+      {to
+        ? <L to={to} className={cx(nameCls, 'hover:text-blueprint transition-colors')}>{name}</L>
+        : <h3 className={nameCls}>{name}</h3>}
+      {priceLine && <p className="mt-1.5 font-mono text-sm tracking-wide text-ink/45">{priceLine}</p>}
+      {summary && <p className="mt-4 font-sans text-sm text-ink/65 leading-relaxed">{summary}</p>}
+      <div className={cx('h-px w-full bg-ink/10', lg ? 'my-6' : 'my-5')} />
+      {inherits && <p className="mb-3 font-sans text-xs text-ink/45">Everything in <span className="text-ink/70">{inherits}</span>, plus:</p>}
+      <ul className={cx('flex-1', lg ? 'space-y-3' : 'space-y-2.5')}>{bullets.map((b) => <CheckRow key={b}>{b}</CheckRow>)}</ul>
+      <div className={cx('flex flex-col gap-3', lg ? 'mt-6' : 'mt-7')}>
+        {cta.href
+          ? <a href={cta.href} className={cx(CARD_CTA, ctaClass)}>{cta.label}<ArrowGlyph /></a>
+          : <L to={cta.to ?? '#'} className={cx(CARD_CTA, ctaClass)}>{cta.label}<ArrowGlyph /></L>}
+        {learnMoreTo && <L to={learnMoreTo} className="sl-arrow-link justify-center">Learn more<ArrowGlyph /></L>}
+      </div>
+    </DrawingFrame>
+  );
+}
+
+/* PricingCard — pricing-tier preset of OfferCard (tag · "inherits" · highlight). */
+export type PricingCardProps = { name: string; to?: string; priceLine: ReactNode; icon?: IconKey; accent?: Accent; inherits?: string; features: string[]; highlight?: boolean; tag?: string; cta: CardCta };
+export function PricingCard({ features, ...p }: PricingCardProps) {
+  return <OfferCard size="md" bullets={features} {...p} />;
+}
+
+/* LadderCard — product "consumption ladder" preset of OfferCard (index · summary · learn-more). */
+export type LadderCardProps = { name: string; index: number; icon?: IconKey; accent?: Accent; priceLine: ReactNode; summary: ReactNode; bullets: string[]; primaryCta: CardCta; learnMoreTo?: string };
+export function LadderCard({ primaryCta, accent = 'blueprint', ...p }: LadderCardProps) {
+  return <OfferCard size="lg" accent={accent} cta={primaryCta} solidCta={accent === 'gold'} {...p} />;
+}
+
+/* ── LinkCard — the cross-link card variant (whole card is a link: icon · label · desc · arrow) ── */
+export type RailItem = { to: string; label: string; description?: string; icon?: IconKey };
+
+/** LinkCard — content-card preset where the whole card is a link (icon · label · desc · "Explore"). */
+export function LinkCard({ to, label, description, icon }: RailItem) {
+  return (
+    <ContentCard to={to} icon={icon && <Icon name={icon} size={28} animate />} title={label}>
+      {description}
+    </ContentCard>
+  );
+}
+
+/** RelatedRail — a CardGrid of LinkCards (the IA cross-link rail). */
+export function RelatedRail({ items }: { items: RailItem[] }) {
+  return <CardGrid>{items.map((it) => <LinkCard key={it.to + it.label} {...it} />)}</CardGrid>;
 }
 
 /* ── Navbar + mega-menu ──────────────────────────────────────────────────────────────────── */
@@ -425,9 +656,8 @@ export function Navbar({
       <div className="measure-frame">
         <div className="flex items-center justify-between h-16">
           {/* Brand */}
-          <L to={brand.to} className="pi-hover flex items-center gap-2.5 group text-ink">
-            <SonaloopIcon size={24} animate className="text-blueprint-deep transition-transform duration-200 group-hover:scale-110" />
-            <span className="font-mono text-sm font-medium tracking-[0.14em] uppercase">{brand.label}</span>
+          <L to={brand.to} className="pi-hover group w-fit">
+            <Logo label={brand.label} />
           </L>
 
           {/* Desktop: mega-menu triggers */}
@@ -808,9 +1038,8 @@ export function Footer({
             <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.7fr_1fr_1fr_1fr_1fr] gap-x-10 gap-y-14 pt-16 mb-16">
               {/* Brand */}
               <div className="sm:col-span-2 lg:col-span-1 flex flex-col justify-between gap-12">
-                <L to={brand.to} className="pi-hover inline-flex items-center gap-2.5 group w-fit">
-                  <SonaloopIcon size={24} animate className="text-blueprint-deep transition-transform duration-200 group-hover:scale-110" />
-                  <span className="font-mono text-sm font-medium tracking-[0.14em] uppercase text-ink">{brand.label}</span>
+                <L to={brand.to} className="pi-hover group w-fit">
+                  <Logo label={brand.label} />
                 </L>
 
                 <div>
