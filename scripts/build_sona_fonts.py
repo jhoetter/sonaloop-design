@@ -25,11 +25,17 @@ from fontTools.ttLib import TTFont
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 FONTS = ROOT / "fonts"
 
-# file → Sona family name. Only the text faces are Geist-derived (this script renames them);
-# the Sona Pixel family is now 100% clean-room — built by scripts/build_sona_pixel.py, not here.
+# file → Sona family name. The text faces AND Sona Pixel are Geist-derived (this script renames
+# them Geist → Sona, OFL-compliant). A fully clean-room pixel face is also available, unused by
+# default, via scripts/build_sona_pixel.py — see BRANDING.md.
 FAMILIES = {
     "Sona-Variable.woff2":       "Sona",
     "SonaMono-Variable.woff2":   "Sona Mono",
+    "SonaPixel-Square.woff2":    "Sona Pixel Square",
+    "SonaPixel-Circle.woff2":    "Sona Pixel Circle",
+    "SonaPixel-Grid.woff2":      "Sona Pixel Grid",
+    "SonaPixel-Line.woff2":      "Sona Pixel Line",
+    "SonaPixel-Triangle.woff2":  "Sona Pixel Triangle",
 }
 
 NOTE = ("Sona is a Sonaloop typeface derived from Geist (c) 2023 Vercel, in collaboration "

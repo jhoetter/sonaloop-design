@@ -242,19 +242,20 @@ function pageTypography() {
     ${p('A bitmap display face for special technical moments — loaders, council ids, a "research instrument" flourish. <b>Never for body text.</b>')}
 
     <div class="ds-pixel-hero">
-      <div class="ds-pixel-hero-tag"><span class="sl-eyebrow">Sona Pixel</span> <span class="ds-pixel-badge">100% Sonaloop · clean-room</span></div>
-      <div class="ds-pixel-hero-sample" style="font-family:'Sona Pixel Loop'">SONALOOP</div>
-      <div class="ds-pixel-hero-sub" style="font-family:'Sona Pixel Loop'">LOADING · COUNCIL_24105090</div>
-      <p class="ds-pixel-hero-note">Sonaloop's <b>own typeface</b> — drawn entirely in code (<code>scripts/build_sona_pixel.py</code>), <b>no Geist or third-party outlines</b>, so it's wholly ours under any license we choose. One bitmap source, four "fills" (shown below); the brand-native <b>Loop</b> uses soft round dots that echo the loop mark.</p>
+      <div class="ds-pixel-hero-tag"><span class="sl-eyebrow">Sona Pixel</span> <span class="ds-pixel-badge">default · Line</span></div>
+      <div class="ds-pixel-hero-sample" style="font-family:'Sona Pixel'">SONALOOP</div>
+      <div class="ds-pixel-hero-sub" style="font-family:'Sona Pixel'">LOADING · council_24105090</div>
+      <p class="ds-pixel-hero-note">A finely-gridded bitmap face — Sona's letterforms rendered as pixels. Built on <b>Geist Pixel</b> (SIL OFL-1.1), renamed Geist → Sona, the same OFL-derived status as the Sona / Sona Mono text faces. The default <code>--sl-pixel</code> / <code>font-pixel</code> family is the <b>Line</b> fill — delicate outlined cells.</p>
     </div>
 
-    ${p('Four fills share one design — pick per context. The default <code>--sl-pixel</code> / <code>font-pixel</code> family is <b>Square</b>; Loop / Grid / Line are also exposed by name.')}
+    ${p('Five fills share one design — pick per context. <code>--sl-pixel</code> defaults to <b>Line</b>; each fill is also exposed by name.')}
     <div class="ds-pixel-grid">
       ${[
-        ['Loop', "'Sona Pixel Loop'", 'Round dots — echoes the loop mark. ★ brand-native.'],
-        ['Square', "'Sona Pixel Square'", 'Solid blocks — crisp, neutral. The default.'],
-        ['Grid', "'Sona Pixel Grid'", 'Small blocks with gaps — schematic, blueprint-y.'],
-        ['Line', "'Sona Pixel Line'", 'Hollow outlined cells — lightest, most diagrammatic.'],
+        ['Line', "'Sona Pixel Line'", 'Hollow outlined cells — delicate. ★ the default.'],
+        ['Square', "'Sona Pixel Square'", 'Solid blocks — crisp, neutral.'],
+        ['Circle', "'Sona Pixel Circle'", 'Round dots — soft, echoes the loop mark.'],
+        ['Grid', "'Sona Pixel Grid'", 'Blocks with gaps — schematic, blueprint-y.'],
+        ['Triangle', "'Sona Pixel Triangle'", 'Triangular pixels — most decorative.'],
       ].map(([name, fam, note]) => `
         <div class="ds-pixel-card">
           <div class="lbl">Sona Pixel · ${esc(name)}</div>

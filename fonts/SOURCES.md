@@ -20,41 +20,41 @@ themselves now report a Sona family — not just our CSS alias.
 |------|--------|------------------------|
 | `Sona-Variable.woff2` | `Sona` | `geist-sans/Geist-Variable.woff2` |
 | `SonaMono-Variable.woff2` | `Sona Mono` | `geist-mono/GeistMono-Variable.woff2` |
+| `SonaPixel-Line.woff2` | `Sona Pixel` (default) / `Sona Pixel Line` | `geist-pixel/GeistPixel-Line.woff2` |
+| `SonaPixel-Square.woff2` | `Sona Pixel Square` | `geist-pixel/GeistPixel-Square.woff2` |
+| `SonaPixel-Circle.woff2` | `Sona Pixel Circle` | `geist-pixel/GeistPixel-Circle.woff2` |
+| `SonaPixel-Grid.woff2` | `Sona Pixel Grid` | `geist-pixel/GeistPixel-Grid.woff2` |
+| `SonaPixel-Triangle.woff2` | `Sona Pixel Triangle` | `geist-pixel/GeistPixel-Triangle.woff2` |
 
-## Sona Pixel — 100% Sonaloop original (clean-room)
+**Sona Pixel** is a high-res bitmap display face; the **default `--sl-pixel` family is the Line
+fill**. It is Geist-derived (renamed), exactly like the text faces above — chosen for fidelity to
+the Geist Pixel look. A fully **clean-room** own pixel face (a 5×7 bitmap drawn entirely in code,
+no third-party outlines) is also available but **not active by default** — see below.
 
-The entire **Sona Pixel** family contains **no Geist (or any third-party) outline data**. Every
-glyph is a 5×7 bitmap authored in [`../scripts/build_sona_pixel.py`](../scripts/build_sona_pixel.py)
-and rasterised to outlines with fontTools — wholly Sonaloop's, under any license we choose
-(currently OFL 1.1, © 2026 Sonaloop). One bitmap source, four "fills":
+## Optional: a 100% clean-room own pixel face
 
-| file | family | fill |
-|------|--------|------|
-| `SonaPixelLoop-Regular.woff2` | `Sona Pixel Loop` | round dots (brand-native) |
-| `SonaPixelSquare-Regular.woff2` | `Sona Pixel` / `Sona Pixel Square` | solid blocks (default) |
-| `SonaPixelGrid-Regular.woff2` | `Sona Pixel Grid` | small blocks, gaps |
-| `SonaPixelLine-Regular.woff2` | `Sona Pixel Line` | hollow outlined cells |
-
-Regenerate / restyle: `python3 scripts/build_sona_pixel.py [Loop Square Grid Line]`.
-
-> The earlier Geist-derived `SonaPixel-{Square,Circle,Grid,Line,Triangle}.woff2` have been
-> **retired** — the pixel slot is now fully license-clean.
+[`../scripts/build_sona_pixel.py`](../scripts/build_sona_pixel.py) generates `Sona Pixel` from
+scratch — every glyph authored as a 5×7 bitmap, no Geist outlines, wholly Sonaloop's. It reads
+coarser/blockier than Geist Pixel, so it is kept as a future *license-clean* option rather than
+the active face. To adopt it, generate the woff2 and repoint `styles/fonts.css` at them.
 
 ## Reproduce from scratch
 
 ```sh
-# text faces — download Geist (the upstream we currently build on) then rename Geist → Sona
+# all faces (text + pixel) — download Geist, then rename Geist → Sona
 base="https://cdn.jsdelivr.net/npm/geist@1.7.2/dist/fonts"
 curl -sSL -o fonts/Sona-Variable.woff2      "$base/geist-sans/Geist-Variable.woff2"
 curl -sSL -o fonts/SonaMono-Variable.woff2  "$base/geist-mono/GeistMono-Variable.woff2"
+for v in Square Circle Grid Line Triangle; do
+  curl -sSL -o "fonts/SonaPixel-$v.woff2" "$base/geist-pixel/GeistPixel-$v.woff2"
+done
 python3 scripts/build_sona_fonts.py          # rename, OFL-compliant (needs fonttools, brotli)
 python3 scripts/build_sona_fonts.py --check   # verify
 
-# Sona Pixel — generate our own from code (no download)
-python3 scripts/build_sona_pixel.py
+# optional: the clean-room own pixel face instead
+# python3 scripts/build_sona_pixel.py
 
-# regenerate the token layer (--sl-sans / --sl-mono / --sl-pixel, Tailwind)
-npm run gen
+npm run gen   # regenerate the token layer
 ```
 
 See **BRANDING.md → "Sona — provenance & roadmap"** for the plan to evolve Sona into a

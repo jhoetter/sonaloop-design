@@ -29,34 +29,39 @@
        url("/fonts/SonaMono-Variable.woff2") format("woff2");
 }
 
-/* Sona Pixel — Sonaloop's OWN clean-room pixel family (no Geist / third-party outlines at all).
- * Drawn entirely in code by scripts/build_sona_pixel.py — wholly ours, OFL-1.1 © 2026 Sonaloop.
- * A bitmap DISPLAY face for technical flourishes (loaders, council ids, "SONALOOP"); never body
- * text. Caps-height (lowercase renders as caps). One bitmap source, four "fills":
- *   Loop (round dots, brand-native) · Square (solid) · Grid (gapped) · Line (hollow).
- * The default family "Sona Pixel" is the Square fill; the four are also exposed by name. */
+/* Sona Pixel — a high-resolution bitmap DISPLAY face for technical flourishes (loaders, council
+ * ids, "SONALOOP"); never body text. Built on Geist Pixel (© 2023 Vercel + basement.studio,
+ * SIL OFL-1.1), renamed Geist → Sona by scripts/build_sona_fonts.py — same OFL-derived status as
+ * the Sona / Sona Mono text faces. Ships in five "fills"; the DEFAULT family "Sona Pixel" is the
+ * Line fill (delicate outlined cells). The five are also exposed by name.
+ * (A fully clean-room own pixel face is available via scripts/build_sona_pixel.py — see BRANDING.md.) */
 @font-face {
-  font-family: "Sona Pixel";           /* default = Square */
+  font-family: "Sona Pixel";           /* default = Line */
   font-style: normal; font-weight: 400; font-display: swap;
-  src: url("/fonts/SonaPixelSquare-Regular.woff2") format("woff2");
+  src: url("/fonts/SonaPixel-Line.woff2") format("woff2");
 }
 @font-face {
-  font-family: "Sona Pixel Loop";      /* round dots — echoes the loop mark (brand-native) */
+  font-family: "Sona Pixel Line";      /* hollow outlined cells — the default, finely gridded */
   font-style: normal; font-weight: 400; font-display: swap;
-  src: url("/fonts/SonaPixelLoop-Regular.woff2") format("woff2");
+  src: url("/fonts/SonaPixel-Line.woff2") format("woff2");
 }
 @font-face {
   font-family: "Sona Pixel Square";    /* solid blocks — crisp, neutral */
   font-style: normal; font-weight: 400; font-display: swap;
-  src: url("/fonts/SonaPixelSquare-Regular.woff2") format("woff2");
+  src: url("/fonts/SonaPixel-Square.woff2") format("woff2");
 }
 @font-face {
-  font-family: "Sona Pixel Grid";      /* small blocks with gaps — schematic */
+  font-family: "Sona Pixel Circle";    /* round dots — soft, echoes the loop mark */
   font-style: normal; font-weight: 400; font-display: swap;
-  src: url("/fonts/SonaPixelGrid-Regular.woff2") format("woff2");
+  src: url("/fonts/SonaPixel-Circle.woff2") format("woff2");
 }
 @font-face {
-  font-family: "Sona Pixel Line";      /* hollow outlined cells — lightest */
+  font-family: "Sona Pixel Grid";      /* blocks with gaps — schematic */
   font-style: normal; font-weight: 400; font-display: swap;
-  src: url("/fonts/SonaPixelLine-Regular.woff2") format("woff2");
+  src: url("/fonts/SonaPixel-Grid.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Sona Pixel Triangle";  /* triangular pixels — most decorative */
+  font-style: normal; font-weight: 400; font-display: swap;
+  src: url("/fonts/SonaPixel-Triangle.woff2") format("woff2");
 }
