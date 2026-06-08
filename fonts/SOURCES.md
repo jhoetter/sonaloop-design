@@ -26,6 +26,17 @@ themselves now report a Sona family — not just our CSS alias.
 | `SonaPixel-Line.woff2` | `Sona Pixel Line` | `geist-pixel/GeistPixel-Line.woff2` |
 | `SonaPixel-Triangle.woff2` | `Sona Pixel Triangle` | `geist-pixel/GeistPixel-Triangle.woff2` |
 
+### Not derived from anything — Sonaloop original
+
+| file | family | source |
+|------|--------|--------|
+| `SonaPixelLoop-Regular.woff2` | `Sona Pixel Loop` | **clean-room**, drawn in code by [`../scripts/build_sona_pixel.py`](../scripts/build_sona_pixel.py) |
+
+`Sona Pixel Loop` contains **no Geist (or any third-party) outline data** — every glyph is a
+5×7 bitmap authored in the generator and rasterised to dots/outlines with fontTools. It is
+therefore wholly Sonaloop's, under any license we choose (currently OFL 1.1, © 2026 Sonaloop).
+Regenerate / restyle: `python3 scripts/build_sona_pixel.py [--shape dot|square]`.
+
 ## Reproduce from scratch
 
 ```sh

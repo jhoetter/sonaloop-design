@@ -239,7 +239,16 @@ function pageTypography() {
     ${specimen('Sona Mono', 'var(--sl-mono)')}
 
     ${h2('type-pixel', 'Sona Pixel · display')}
-    ${p('A bitmap display face for special technical moments — loaders, council ids, a "research instrument" flourish. <b>Never for body text.</b> It ships in five pixel "fills"; compare them below and pick the one that best resembles the brand (the loop mark leans soft &amp; rounded — see BRANDING.md). The default <code>--sl-pixel</code> family is the Square fill.')}
+    ${p('A bitmap display face for special technical moments — loaders, council ids, a "research instrument" flourish. <b>Never for body text.</b>')}
+
+    <div class="ds-pixel-hero">
+      <div class="ds-pixel-hero-tag"><span class="sl-eyebrow">Sona Pixel Loop</span> <span class="ds-pixel-badge">100% Sonaloop · clean-room</span></div>
+      <div class="ds-pixel-hero-sample" style="font-family:'Sona Pixel Loop'">SONALOOP</div>
+      <div class="ds-pixel-hero-sub" style="font-family:'Sona Pixel Loop'">LOADING · COUNCIL_24105090</div>
+      <p class="ds-pixel-hero-note">Sonaloop's <b>first fully-own typeface</b> — drawn entirely in code (<code>scripts/build_sona_pixel.py</code>), <b>no Geist or third-party outlines</b>, so it's wholly ours under any license we choose. Soft round dots echo the loop mark. This is the Phase-2 end-state for the pixel slot; once approved it replaces the Geist-derived fills below.</p>
+    </div>
+
+    ${p('Until then, Sona Pixel ships in five Geist-derived "fills"; compare them and the loop-native face above. The default <code>--sl-pixel</code> family is the Square fill.')}
     <div class="ds-pixel-grid">
       ${[
         ['Square', "'Sona Pixel'", 'Canonical pixel — crisp, technical, neutral.'],

@@ -59,3 +59,13 @@
   font-style: normal; font-weight: 400; font-display: swap;
   src: url("/fonts/SonaPixel-Triangle.woff2") format("woff2");
 }
+
+/* Sona Pixel Loop — Sonaloop's FIRST 100%-own face: a clean-room pixel font drawn entirely in
+ * code (scripts/build_sona_pixel.py), no Geist/third-party outlines. Soft round "loop" dots to
+ * echo the mark. Display only; caps-height (lowercase renders as caps). The end-state for the
+ * pixel slot once approved — it can replace the Geist-derived fills above. */
+@font-face {
+  font-family: "Sona Pixel Loop";
+  font-style: normal; font-weight: 400; font-display: swap;
+  src: url("/fonts/SonaPixelLoop-Regular.woff2") format("woff2");
+}

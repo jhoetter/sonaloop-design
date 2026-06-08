@@ -235,6 +235,15 @@ a { color: inherit; }
 .ds-pixel-sub { font-size: 15px; line-height: 1.5; color: var(--sl-muted); word-break: break-all; }
 .ds-pixel-note { font-size: 12.5px; color: var(--sl-faint); margin-top: 12px; }
 
+/* Sona Pixel Loop hero — the first 100%-own face */
+.ds-pixel-hero { border: 1px solid var(--sl-accent); border-radius: 14px; padding: 24px 26px; margin: 16px 0; background: linear-gradient(180deg, var(--sl-accent-weak), var(--sl-surface)); }
+.ds-pixel-hero-tag { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.ds-pixel-badge { font-family: var(--sl-mono); font-size: 10px; text-transform: uppercase; letter-spacing: .1em; color: var(--sl-accent); border: 1px solid var(--sl-accent); border-radius: 999px; padding: 3px 9px; }
+.ds-pixel-hero-sample { font-size: 52px; line-height: 1; color: var(--sl-ink); letter-spacing: 2px; margin: 16px 0 6px; }
+.ds-pixel-hero-sub { font-size: 22px; line-height: 1.2; color: var(--sl-accent); letter-spacing: 1px; }
+.ds-pixel-hero-note { font-size: 13px; line-height: 1.6; color: var(--sl-muted); margin: 14px 0 0; max-width: 60ch; }
+.ds-pixel-hero-note b { color: var(--sl-ink); font-weight: 600; }
+
 /* ── Icon gallery ─────────────────────────────────────────────────────────────── */
 .ds-icon-search { display: flex; align-items: center; gap: 10px; margin: 18px 0 6px; max-width: 360px; }
 .ds-icon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 8px; margin-top: 12px; }
