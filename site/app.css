@@ -223,7 +223,11 @@ a { color: inherit; }
    markup stays clean because a real Tailwind app ships preflight. */
 :where(.ds-web-stage a) { color: inherit; text-decoration: none; }
 :where(.ds-web-stage ul, .ds-web-stage ol) { list-style: none; margin: 0; padding: 0; }
-:where(.ds-web-stage h1, .ds-web-stage h2, .ds-web-stage h3, .ds-web-stage p, .ds-web-stage figure) { margin: 0; }
+/* Mirror preflight on headings: without it the UA's bold/large `h1`–`h3` defaults leak in and
+   render the marketing headlines heavier than on the real site (which ships preflight). The
+   blocks' text-*/font-* utilities still win (higher specificity than this :where reset). */
+:where(.ds-web-stage h1, .ds-web-stage h2, .ds-web-stage h3, .ds-web-stage h4, .ds-web-stage p, .ds-web-stage figure) { margin: 0; }
+:where(.ds-web-stage h1, .ds-web-stage h2, .ds-web-stage h3, .ds-web-stage h4) { font-size: inherit; font-weight: inherit; }
 :where(.ds-web-stage button) { background: none; border: 0; padding: 0; font: inherit; color: inherit; cursor: pointer; }
 
 /* "Used on the website" — auto-detected consumer chips (page name + route). */
