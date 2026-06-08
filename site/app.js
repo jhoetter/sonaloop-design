@@ -116,6 +116,32 @@ function chartPie(items, { title = '', donut = true } = {}) {
     + `<div class="sl-legend">${legend}</div></div></figure>`;
 }
 
+function chartStacked(items, { title = '' } = {}) {
+  const keys = []; items.forEach((it) => it.segments.forEach((s) => { if (!keys.includes(s.label)) keys.push(s.label); }));
+  const segColor = (s) => s.color || CHART_SERIES[Math.max(0, keys.indexOf(s.label)) % CHART_SERIES.length];
+  const totals = items.map((it) => it.segments.reduce((n, s) => n + Math.max(0, s.value || 0), 0));
+  const mx = Math.max(...totals) || 1;
+  const bars = items.map((it, i) => {
+    const segs = it.segments.filter((s) => s.value > 0).map((s) => `<span class="sl-bar__seg" title="${esc(s.label)}: ${s.value}" style="flex-grow:${s.value};--c:${segColor(s)}"></span>`).join('');
+    return `<div class="sl-bar"><span class="sl-bar__label">${chMd(it.label)}</span>`
+      + `<span class="sl-bar__track"><span class="sl-bar__fill sl-bar__fill--stack" style="--v:${Math.min(100, (totals[i] / mx) * 100)}%">${segs}</span></span>`
+      + `<span class="sl-bar__val">${totals[i]}</span></div>`;
+  }).join('');
+  const first = {}; items.slice().reverse().forEach((it) => it.segments.forEach((s) => { first[s.label] = s; }));
+  const legend = keys.map((k) => `<span class="sl-legend__item"><span class="sl-legend__sw" style="--c:${segColor(first[k])}"></span><span class="sl-legend__label">${chMd(k)}</span></span>`).join('');
+  return `<figure class="sl-chart">${chTitle(title)}<div class="sl-bars">${bars}</div><div class="sl-legend sl-legend--row" style="margin-top:.9em">${legend}</div></figure>`;
+}
+
+function chartGauge(items, { title = '', max = 100 } = {}) {
+  const gauges = items.map((it, i) => {
+    const m = it.max || max || 1; const pct = Math.max(0, Math.min(100, (it.value / m) * 100));
+    const sub = m !== 100 ? `<span class="sl-gauge__sub">${it.value} / ${m}</span>` : '';
+    return `<div class="sl-gauge-item"><div class="sl-gauge" role="img" style="--p:${pct};--c:${chSeriesColor(it, i)}">`
+      + `<span class="sl-gauge__val">${Math.round(pct)}%</span></div><span class="sl-gauge__label">${chMd(it.label)}</span>${sub}</div>`;
+  }).join('');
+  return `<figure class="sl-chart">${chTitle(title)}<div class="sl-gauges">${gauges}</div></figure>`;
+}
+
 const chLeverage = (x, y) => { const d = y - x; return d >= 2 ? 'var(--sl-green)' : d >= 1 ? 'var(--sl-accent)' : d <= -1 ? 'var(--sl-red)' : 'var(--sl-amber)'; };
 function chartEffort(items, { title = '', xLabel = 'Effort', yLabel = 'Value', quadrants = ['Quick wins', 'Big bets', 'Fill-ins', 'Time sinks'] } = {}) {
   const dots = items.map((it, i) => `<span class="sl-quad__dot" style="--x:${((it.x - 1) / 4) * 100}%;--y:${(1 - (it.y - 1) / 4) * 100}%;--c:${it.color || chLeverage(it.x, it.y)}">${i + 1}</span>`).join('');
@@ -135,8 +161,10 @@ const USAGE_FALLBACK = {
   'mega-menu': 'Rendered inside the <b>Navbar</b> (opens on hover) — not imported directly by pages.',
   'cta-band': 'Embedded in the <b>Footer</b> by default; also drop-in standalone mid-page.',
 };
-// Dynamic :slug routes have no real URL — open the parent collection page instead.
-const liveHref = (to) => WEBSITE_ORIGIN + (to.replace(/\/:[^/]+$/, '') || '/');
+// Open the live page on the local dev server. For dynamic :slug routes the generator resolves a
+// real example page (`u.live`, the first slug from the content registry); else fall back to the
+// route, stripping any leftover :slug to the parent collection.
+const liveHref = (u) => WEBSITE_ORIGIN + (u.live || u.to.replace(/\/:[^/]+$/, '') || '/');
 
 function websiteConsumers(block) {
   const list = websiteUsage[block] || [];
@@ -145,7 +173,7 @@ function websiteConsumers(block) {
     return note ? `${h2(`${block}-used`, 'Used on the website')}${p(note)}` : '';
   }
   const chips = list.map((u) => u.to
-    ? `<a class="ds-usechip" href="${esc(liveHref(u.to))}" target="_blank" rel="noopener">${esc(u.name)}<code>${esc(u.to)}</code></a>`
+    ? `<a class="ds-usechip" href="${esc(liveHref(u))}" target="_blank" rel="noopener">${esc(u.name)}<code>${esc(u.to)}</code></a>`
     : `<span class="ds-usechip">${esc(u.name)}</span>`).join('');
   return `${h2(`${block}-used`, 'Used on the website')}
     ${p(`Auto-detected from the marketing site — <b>${list.length}</b> ${list.length === 1 ? 'page composes' : 'pages compose'} this block. Each opens the live page on your local dev server (<code>${esc(WEBSITE_ORIGIN)}</code>):`)}
@@ -165,19 +193,32 @@ function websiteSourceLink(block) {
    scripts/gen-website-previews.mjs (so it can never drift / be a mockup), and the code shows the
    React import + usage. The full-bleed `markup` HTML is read from site/website.previews.mjs. */
 function websitePage({ id, block, title, desc, usage, notes }) {
-  const markup = websiteBlocks[block] || '';
+  const data = websiteBlocks[block] || { controls: [], variants: { '': '' }, defaultKey: '' };
+  const defaultHtml = data.variants[data.defaultKey] || '';
+  // Enumerated prop controls (pre-rendered variants); the bar swaps the stage HTML, no React.
+  const controlsBar = data.controls.length ? `
+      <div class="ds-wb-controls">
+        ${data.controls.map((c) => `
+          <span class="ds-wb-ctrl">
+            <span class="ds-wb-ctrl__label">${esc(c.label)}</span>
+            <span class="ds-seg ds-seg--text" data-wb-ctrl="${esc(c.prop)}">
+              ${c.options.map((o, i) => `<button type="button" class="ds-seg-btn${i === 0 ? ' is-active' : ''}" data-wb-opt="${esc(o.key)}">${esc(o.label)}</button>`).join('')}
+            </span>
+          </span>`).join('')}
+      </div>` : '';
   return `
     <p class="ds-eyebrow">Website</p>
     <h1 class="ds-h1">${esc(title)}</h1>
     <p class="ds-lead">${desc}</p>
     ${websiteSourceLink(block)}
-    <div class="ds-preview ds-preview--web">
+    <div class="ds-preview ds-preview--web" data-wb="${esc(block)}">
       <div class="ds-preview-bar">
         <span class="ds-pv-label">Preview</span>
         <span class="ds-top-spacer"></span>
         <span class="ds-pv-note">Live · real component · theme-aware</span>
       </div>
-      <div class="ds-preview-stage ds-web-stage">${markup}</div>
+      ${controlsBar}
+      <div class="ds-preview-stage ds-web-stage" data-wb-stage>${defaultHtml}</div>
     </div>
     ${h2(`${id}-usage`, 'Usage')}
     ${p(`A real, prop-driven React component — own-the-source, composed across the whole site (shadcn-style). Import it from <code>sonaloop-design/website</code>; load <code>sonaloop-design/components.css</code> + <code>sonaloop-design/website.css</code> once, and provide a router adapter via <code>SonaloopLinkProvider</code> for client-side links (it falls back to <code>&lt;a&gt;</code>).`)}
@@ -989,6 +1030,48 @@ const cChartEffort = () => componentPage({
   notes: chartFigureNote('<code>{kind:"chart", of:"effort_impact", source_id:"&lt;synthesis&gt;"}</code> (its 2×2 of recommendations)'),
 });
 
+const cChartStacked = () => componentPage({
+  id: 'chart-stacked', title: 'Stacked Bar Chart',
+  desc: 'A <b>composition</b> chart — how each category breaks down by series (stance per theme, time per phase). Bars share one scale; series colour is keyed by segment label so a series reads the same in every bar, with a shared legend.',
+  demo: `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:34px;width:100%">
+      ${chartStacked([
+        { label: 'Pricing', segments: [{ label: 'For', value: 6 }, { label: 'Conditional', value: 3 }, { label: 'Against', value: 2 }] },
+        { label: 'Onboarding', segments: [{ label: 'For', value: 4 }, { label: 'Conditional', value: 4 }, { label: 'Against', value: 1 }] },
+        { label: 'Support', segments: [{ label: 'For', value: 2 }, { label: 'Conditional', value: 3 }, { label: 'Against', value: 5 }] },
+      ], { title: 'Council stance per theme' })}
+    </div>`,
+  variants: { cols: ['Prop', 'Type', 'Effect'], rows: [
+    ['items', '{label, segments: {label, value, color?}[]}[]', 'Each bar and its stacked series segments.'],
+    ['title', 'string', 'Optional mono section title above the bars.'],
+    ['maxValue', 'number', 'Fix the 100% reference (else the largest bar total).'],
+  ] },
+  react: `import { StackedBarChart } from 'sonaloop-design/charts';\n\n<StackedBarChart\n  title="Council stance per theme"\n  items={[\n    { label: 'Pricing', segments: [{ label: 'For', value: 6 }, { label: 'Conditional', value: 3 }, { label: 'Against', value: 2 }] },\n    { label: 'Support', segments: [{ label: 'For', value: 2 }, { label: 'Conditional', value: 3 }, { label: 'Against', value: 5 }] },\n  ]}\n/>`,
+  markup: `<figure class="sl-chart">\n  <div class="sl-bars">\n    <div class="sl-bar">\n      <span class="sl-bar__label">Pricing</span>\n      <span class="sl-bar__track">\n        <span class="sl-bar__fill sl-bar__fill--stack" style="--v:100%">\n          <span class="sl-bar__seg" style="flex-grow:6;--c:var(--c1)"></span>\n          <span class="sl-bar__seg" style="flex-grow:3;--c:var(--c2)"></span>\n          <span class="sl-bar__seg" style="flex-grow:2;--c:var(--c3)"></span>\n        </span>\n      </span>\n      <span class="sl-bar__val">11</span>\n    </div>\n  </div>\n</figure>`,
+  python: `from sonaloop_icons.charts import stacked_bar_chart\n\nstacked_bar_chart([\n    {"label": "Pricing", "segments": [{"label": "For", "value": 6}, {"label": "Against", "value": 2}]},\n], title="Council stance per theme")`,
+  notes: chartFigureNote('<code>{kind:"chart", of:"stacked_bar", series:[{label, segments}]}</code>'),
+});
+
+const cChartGauge = () => componentPage({
+  id: 'chart-gauge', title: 'Gauge · Radial Progress',
+  desc: 'A <b>radial progress ring</b> — a single KPI, % complete or confidence score. The ring fills <code>value / max</code> and the centre shows the percentage. Pass several items to compare a few KPIs side by side; print- and PDF-safe like the donut.',
+  demo: `<div style="width:100%">
+      ${chartGauge([
+        { label: 'Confidence', value: 72 },
+        { label: 'Coverage', value: 58, color: 'var(--sl-violet)' },
+        { label: 'Tasks done', value: 9, max: 12, color: 'var(--sl-green)' },
+      ], { title: 'Synthesis health' })}
+    </div>`,
+  variants: { cols: ['Prop', 'Type', 'Effect'], rows: [
+    ['items', '{label, value, max?, color?}[]', 'One ring per item; <code>max</code> defaults to the chart <code>max</code>.'],
+    ['max', 'number = 100', 'Default scale for items without their own <code>max</code>.'],
+    ['title', 'string', 'Optional mono section title.'],
+  ] },
+  react: `import { GaugeChart } from 'sonaloop-design/charts';\n\n<GaugeChart title="Synthesis health"\n  items={[{ label: 'Confidence', value: 72 }, { label: 'Tasks done', value: 9, max: 12 }]}\n/>`,
+  markup: `<figure class="sl-chart">\n  <div class="sl-gauges">\n    <div class="sl-gauge-item">\n      <div class="sl-gauge" role="img" style="--p:72;--c:var(--c1)">\n        <span class="sl-gauge__val">72%</span>\n      </div>\n      <span class="sl-gauge__label">Confidence</span>\n    </div>\n  </div>\n</figure>`,
+  python: `from sonaloop_icons.charts import gauge_chart\n\ngauge_chart([{"label": "Confidence", "value": 72}, {"label": "Tasks done", "value": 9, "max": 12}])`,
+  notes: chartFigureNote('<code>{kind:"chart", of:"gauge", series:[{label, value, max}]}</code>'),
+});
+
 const cTextarea = () => componentPage({
   id: 'textarea', title: 'Textarea', desc: 'A multi-line text field — the brief, a prompt, a persona note. Same hairline + focus ring as Input; vertically resizable.',
   demo: `<textarea class="sl-textarea" rows="3" placeholder="Describe the decision the council should weigh in on…" style="max-width:420px">We're considering a weekly meal-prep subscription for busy parents.</textarea>`,
@@ -1176,6 +1259,8 @@ const NAV = [
     { id: 'chart-bar', title: 'Bar', ico: 'analytics', render: cChartBar },
     { id: 'chart-pie', title: 'Pie · Donut', ico: 'half', render: cChartPie },
     { id: 'chart-effort-impact', title: 'Effort · Impact', ico: 'target', render: cChartEffort },
+    { id: 'chart-stacked', title: 'Stacked Bar', ico: 'squareRows', render: cChartStacked },
+    { id: 'chart-gauge', title: 'Gauge · Radial', ico: 'continuousDiscovery', render: cChartGauge },
   ] },
   { label: 'Website', items: [
     { id: 'web-navbar', title: 'Navbar', ico: 'panel', render: () => websitePage({
@@ -1324,6 +1409,21 @@ async function copyText(text, btn) {
 document.addEventListener('click', (e) => {
   const navToggle = e.target.closest('[data-nav-toggle]');
   if (navToggle) { toggleNavGroup(navToggle.dataset.navToggle); return; }
+
+  // Website-preview controls: toggle the option, recompute the combination key, swap the
+  // pre-rendered variant into the stage. Keys mirror the harness: `prop:optKey|prop2:optKey2`.
+  const wbOpt = e.target.closest('[data-wb-opt]');
+  if (wbOpt) {
+    wbOpt.parentElement.querySelectorAll('[data-wb-opt]').forEach((b) => b.classList.toggle('is-active', b === wbOpt));
+    const root = wbOpt.closest('[data-wb]');
+    const data = websiteBlocks[root.dataset.wb];
+    const key = data.controls.map((c) => {
+      const active = root.querySelector(`[data-wb-ctrl="${c.prop}"] .is-active`);
+      return `${c.prop}:${active.dataset.wbOpt}`;
+    }).join('|');
+    root.querySelector('[data-wb-stage]').innerHTML = data.variants[key] ?? data.variants[data.defaultKey];
+    return;
+  }
 
   const copyBtn = e.target.closest('[data-copy]');
   if (copyBtn) {

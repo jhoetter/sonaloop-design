@@ -211,6 +211,15 @@ a { color: inherit; }
    and the centring/padding the component stage uses, and sit the block on plain paper. */
 .ds-preview--web { background: var(--sl-bg); }
 .ds-preview--web .ds-pv-note { font-family: var(--sl-mono); font-size: 11px; letter-spacing: .04em; color: var(--sl-faint); }
+
+/* Parametric controls — segmented toggles per enumerated prop; swaps a pre-rendered variant. */
+.ds-wb-controls {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 18px;
+  padding: 9px 14px; border-bottom: 1px solid var(--sl-line); background: var(--sl-bg);
+}
+.ds-wb-ctrl { display: inline-flex; align-items: center; gap: 8px; }
+.ds-wb-ctrl__label { font-family: var(--sl-mono); font-size: 11px; text-transform: lowercase; letter-spacing: .03em; color: var(--sl-faint); }
+.ds-wb-controls .ds-seg-btn { width: auto; min-width: 30px; padding: 0 10px; font-size: 12px; font-weight: 550; }
 .ds-web-stage {
   display: block; padding: 0; min-height: 0; gap: 0;
   background: var(--sl-bg); font-size: 16px; overflow: hidden;

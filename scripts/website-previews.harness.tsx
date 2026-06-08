@@ -1,11 +1,10 @@
 /**
  * Render harness for the docs-site "Website" previews.
  *
- * scripts/gen-website-previews.mjs bundles this with esbuild and calls `renderAll()` — each block
- * is the REAL component from src/website.tsx, server-rendered with realistic demo props, so the
- * docs previews are faithful (no mockups) and can never drift from the shipped components. Links
- * fall back to plain <a> (no SonaloopLinkProvider needed here). Brand canvases resolve to served
- * URLs via the images shim in the build script.
+ * scripts/gen-website-previews.mjs bundles this with esbuild and calls `renderAll()`. Each block is
+ * the REAL component from src/website.tsx, server-rendered with realistic demo props — so previews
+ * are faithful (no mockups) and can't drift. Blocks may declare `controls` (enumerated props): every
+ * combination is pre-rendered so the docs control bar can swap between them without shipping React.
  */
 import { renderToStaticMarkup } from 'react-dom/server';
 import type { ReactElement } from 'react';
@@ -28,6 +27,7 @@ import {
   type RailItem,
 } from '../src/website';
 
+/* ── demo data ───────────────────────────────────────────────────────────────────────────── */
 const menus: MegaMenu[] = [
   {
     key: 'solutions',
@@ -44,41 +44,10 @@ const menus: MegaMenu[] = [
         ],
       },
     ],
-    promo: {
-      eyebrow: 'See it work',
-      title: 'A council that pushes back',
-      body: 'Watch synthetic customers disagree — with quotes, on the record.',
-      cta: { label: 'See a sample report', to: '/sample-report' },
-    },
+    promo: { eyebrow: 'See it work', title: 'A council that pushes back', body: 'Watch synthetic customers disagree — with quotes, on the record.', cta: { label: 'See a sample report', to: '/sample-report' } },
   },
-  {
-    key: 'methods',
-    label: 'Methods',
-    to: '/methods',
-    columns: [
-      {
-        heading: 'The craft library',
-        items: [
-          { to: '/methods/jtbd', label: 'Jobs to be done', description: 'Interview the demand behind the demand.', icon: 'jtbd' },
-          { to: '/methods/positioning', label: 'Positioning tests', description: 'Pit messages against each other.', icon: 'positioning' },
-        ],
-      },
-    ],
-  },
-  {
-    key: 'products',
-    label: 'Products',
-    to: '/products',
-    columns: [
-      {
-        heading: 'The consumption ladder',
-        items: [
-          { to: '/products/open-core', label: 'Open Core', description: 'Run councils on your own AI, free.', icon: 'open-core' },
-          { to: '/products/cloud', label: 'Cloud', description: 'Hosted councils, memory & syntheses.', icon: 'cloud' },
-        ],
-      },
-    ],
-  },
+  { key: 'methods', label: 'Methods', to: '/methods', columns: [{ heading: 'The craft library', items: [{ to: '/methods/jtbd', label: 'Jobs to be done', description: 'Interview the demand behind the demand.', icon: 'jtbd' }, { to: '/methods/positioning', label: 'Positioning tests', description: 'Pit messages against each other.', icon: 'positioning' }] }] },
+  { key: 'products', label: 'Products', to: '/products', columns: [{ heading: 'The consumption ladder', items: [{ to: '/products/open-core', label: 'Open Core', description: 'Run councils on your own AI, free.', icon: 'open-core' }, { to: '/products/cloud', label: 'Cloud', description: 'Hosted councils, memory & syntheses.', icon: 'cloud' }] }] },
 ];
 
 const footerColumns: FooterColumn[] = [
@@ -96,64 +65,75 @@ const railItems: RailItem[] = [
 
 const cards = (
   <CardGrid>
-    <FeatureCard icon={<Icon name="councils" size={28} />} title="Councils" action={{ to: '/products/councils', label: 'Explore' }}>
-      Synthetic personas that debate a decision and disagree on the record.
-    </FeatureCard>
-    <FeatureCard icon={<Icon name="personas" size={28} />} title="Personas" action={{ to: '/products/personas', label: 'Explore' }}>
-      Longitudinal profiles grounded in memory — not one-shot prompt characters.
-    </FeatureCard>
-    <FeatureCard icon={<Icon name="memory" size={28} />} title="Memory" action={{ to: '/products/memory', label: 'Explore' }}>
-      A panel that remembers what each persona said before, across sessions.
-    </FeatureCard>
+    <FeatureCard icon={<Icon name="councils" size={28} />} title="Councils" action={{ to: '/products/councils', label: 'Explore' }}>Synthetic personas that debate a decision and disagree on the record.</FeatureCard>
+    <FeatureCard icon={<Icon name="personas" size={28} />} title="Personas" action={{ to: '/products/personas', label: 'Explore' }}>Longitudinal profiles grounded in memory — not one-shot prompt characters.</FeatureCard>
+    <FeatureCard icon={<Icon name="memory" size={28} />} title="Memory" action={{ to: '/products/memory', label: 'Explore' }}>A panel that remembers what each persona said before, across sessions.</FeatureCard>
   </CardGrid>
 );
 
-export const demos: Record<string, ReactElement> = {
-  navbar: <Navbar menus={menus} />,
-  'mega-menu': (
-    <div className="measure-frame pt-2 pb-8">
-      <MegaMenuPanel menu={menus[0]} />
-    </div>
-  ),
-  'app-card': <div className="measure-frame py-8">{cards}</div>,
-  hero: (
-    <Hero
-      kicker="Synthetic research"
-      title="A focus group that disagrees with you — on the record."
-      cta={{ label: 'Install MCP — free', to: '/install' }}
-      secondary={{ label: 'See a sample report', to: '/sample-report' }}
-    >
-      Spin up a deliberative synthetic panel on your own AI. It debates, grounds every objection in lived experience, and runs locally.
-    </Hero>
-  ),
-  'cta-band': <div className="pt-8"><CtaBand {...DEFAULT_CTA} /></div>,
-  footer: <Footer columns={footerColumns} cta={false} />,
-  'product-showcase': (
-    <div className="py-8">
-      <ProductShot
-        src="/images/canvas/abstract-dark.jpg"
-        eyebrow="The deliverable"
-        title="A report you can hand to the room."
-        body="Every objection grounded in a quote, every verdict on the record — framed as the deliverable, not “our UI”. Pass your own screenshot via the `src` prop."
-        caption="Exports to PDF · Markdown"
-      />
-    </div>
-  ),
-  'canvas-showcase': (
-    <div className="py-8">
-      <CanvasShowcase canvasLight="/images/canvas/dawn.jpg" canvasDark="/images/canvas/dusk.jpg" shotLight="/images/canvas/abstract-light.jpg" shotDark="/images/canvas/abstract-dark.jpg" />
-    </div>
-  ),
-  'integration-showcase': (
-    <div className="measure-frame py-8">
-      <IntegrationShowcase />
-    </div>
-  ),
-  'related-rail': <div className="measure-frame py-8">{<RelatedRail items={railItems} />}</div>,
-};
+/* ── blocks (+ optional enumerated controls) ─────────────────────────────────────────────── */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Opt = { key: string; label: string; value: any };
+type Control = { prop: string; label: string; options: Opt[] };
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Block = { id: string; controls: Control[]; render: (props: any) => ReactElement };
 
-export function renderAll(): Record<string, string> {
-  const out: Record<string, string> = {};
-  for (const [key, el] of Object.entries(demos)) out[key] = renderToStaticMarkup(el);
+const onOff = (off = 'off', on = 'on'): Opt[] => [{ key: 'off', label: off, value: false }, { key: 'on', label: on, value: true }];
+const weight: Control = { prop: 'titleWeight', label: 'weight', options: [{ key: 'normal', label: '400', value: 'normal' }, { key: 'medium', label: '500', value: 'medium' }, { key: 'semibold', label: '600', value: 'semibold' }] };
+
+const BLOCKS: Block[] = [
+  { id: 'navbar', controls: [{ prop: 'forceDark', label: 'forceDark', options: onOff() }], render: (p) => <Navbar menus={menus} {...p} /> },
+  { id: 'mega-menu', controls: [], render: () => <div className="measure-frame pt-2 pb-8"><MegaMenuPanel menu={menus[0]} /></div> },
+  { id: 'app-card', controls: [], render: () => <div className="measure-frame py-8">{cards}</div> },
+  { id: 'related-rail', controls: [], render: () => <div className="measure-frame py-8"><RelatedRail items={railItems} /></div> },
+  {
+    id: 'hero',
+    controls: [{ prop: 'home', label: 'home', options: onOff() }, weight],
+    render: (p) => (
+      <Hero kicker="Synthetic research" title="A focus group that disagrees with you — on the record." cta={{ label: 'Install MCP — free', to: '/install' }} secondary={{ label: 'See a sample report', to: '/sample-report' }} {...p}>
+        Spin up a deliberative synthetic panel on your own AI. It debates, grounds every objection in lived experience, and runs locally.
+      </Hero>
+    ),
+  },
+  { id: 'cta-band', controls: [weight], render: (p) => <div className="pt-8"><CtaBand {...DEFAULT_CTA} {...p} /></div> },
+  { id: 'footer', controls: [{ prop: 'forceDark', label: 'forceDark', options: onOff() }], render: (p) => <Footer columns={footerColumns} cta={false} {...p} /> },
+  {
+    id: 'product-showcase',
+    controls: [],
+    render: () => (
+      <div className="py-8">
+        <ProductShot src="/images/canvas/abstract-dark.jpg" eyebrow="The deliverable" title="A report you can hand to the room." body="Every objection grounded in a quote, every verdict on the record — framed as the deliverable, not “our UI”. Pass your own screenshot via the `src` prop." caption="Exports to PDF · Markdown" />
+      </div>
+    ),
+  },
+  { id: 'canvas-showcase', controls: [], render: () => <div className="py-8"><CanvasShowcase canvasLight="/images/canvas/dawn.jpg" canvasDark="/images/canvas/dusk.jpg" shotLight="/images/canvas/abstract-light.jpg" shotDark="/images/canvas/abstract-dark.jpg" /></div> },
+  { id: 'integration-showcase', controls: [], render: () => <div className="measure-frame py-8"><IntegrationShowcase /></div> },
+];
+
+// Cartesian product of the controls' options → [{ key, props }] (key '' when no controls).
+function combinations(controls: Control[]) {
+  let acc = [{ key: '', props: {} as Record<string, unknown> }];
+  for (const c of controls) {
+    const next: typeof acc = [];
+    for (const a of acc) for (const o of c.options) {
+      next.push({ key: a.key ? `${a.key}|${c.prop}:${o.key}` : `${c.prop}:${o.key}`, props: { ...a.props, [c.prop]: o.value } });
+    }
+    acc = next;
+  }
+  return acc;
+}
+
+export function renderAll() {
+  const out: Record<string, { controls: { prop: string; label: string; options: { key: string; label: string }[] }[]; variants: Record<string, string>; defaultKey: string }> = {};
+  for (const b of BLOCKS) {
+    const combos = combinations(b.controls);
+    const variants: Record<string, string> = {};
+    for (const { key, props } of combos) variants[key] = renderToStaticMarkup(b.render(props));
+    out[b.id] = {
+      controls: b.controls.map((c) => ({ prop: c.prop, label: c.label, options: c.options.map((o) => ({ key: o.key, label: o.label })) })),
+      variants,
+      defaultKey: combos[0].key,
+    };
+  }
   return out;
 }

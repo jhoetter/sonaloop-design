@@ -77,6 +77,20 @@ const TEMPLATE_ROUTES = {
 };
 const humanize = (s) => s.replace(/Page$/, '').replace(/([a-z])([A-Z])/g, '$1 $2').replace(/^./, (c) => c.toUpperCase());
 
+// For a dynamic `/<collection>/:slug` route, resolve a REAL example page by reading the first
+// slug out of the matching content registry — so the chip links to an actual page, not `:slug`.
+const COLLECTION_CONTENT = { solutions: 'solutions', methods: 'methods', products: 'products', blog: 'posts' };
+function exampleLive(to) {
+  const m = to.match(/^\/([^/]+)\/:slug$/);
+  if (!m) return undefined;
+  const file = COLLECTION_CONTENT[m[1]];
+  if (!file) return undefined;
+  const p = path.join(siteSrc, 'content', `${file}.ts`);
+  if (!fs.existsSync(p)) return undefined;
+  const slug = fs.readFileSync(p, 'utf8').match(/slug:\s*['"]([^'"]+)['"]/);
+  return slug ? `/${m[1]}/${slug[1]}` : undefined;
+}
+
 function walk(dir) {
   let out = [];
   for (const e of fs.readdirSync(dir)) {
@@ -94,8 +108,10 @@ function computeUsage() {
   const usesTag = (src, n) => new RegExp(`<${n}[\\s/>]`).test(src);
   const label = (file) => {
     const base = path.basename(file, '.tsx');
-    if (TEMPLATE_ROUTES[base]) return TEMPLATE_ROUTES[base];
-    return { name: humanize(base), to: byBase[base] ?? '' };
+    const entry = TEMPLATE_ROUTES[base] ? { ...TEMPLATE_ROUTES[base] } : { name: humanize(base), to: byBase[base] ?? '' };
+    const live = entry.to ? exampleLive(entry.to) : undefined;
+    if (live) entry.live = live;
+    return entry;
   };
 
   const usage = {};

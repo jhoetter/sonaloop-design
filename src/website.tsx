@@ -26,6 +26,12 @@ export { Icon, type IconKey } from './website-icons';
 
 const cx = (...c: Array<string | false | null | undefined>) => c.filter(Boolean).join(' ');
 
+/* Optional heading weight for the big marketing headlines. Static class map (not a dynamic
+   `font-${w}` string) so Tailwind can see the literals and emit them. Default `normal` (400)
+   matches the inherited weight, so existing call sites are unchanged. */
+const TITLE_WEIGHT = { normal: 'font-normal', medium: 'font-medium', semibold: 'font-semibold' } as const;
+export type TitleWeight = keyof typeof TITLE_WEIGHT;
+
 /* ── Link adapter ──────────────────────────────────────────────────────────────────────────
    The blocks render every internal link through the injected component, so a react-router app
    gets client-side navigation while the docs site / SSR fall back to a plain anchor. */
@@ -528,10 +534,11 @@ export interface HeroProps {
   secondary?: HeroCta;
   home?: boolean;
   titleClassName?: string;
+  titleWeight?: TitleWeight;
   canvas?: CanvasPair;
 }
 
-export function Hero({ kicker, title, children, cta, secondary, home = false, titleClassName = 'font-serif', canvas }: HeroProps) {
+export function Hero({ kicker, title, children, cta, secondary, home = false, titleClassName = 'font-serif', titleWeight = 'normal', canvas }: HeroProps) {
   const titleSize = home
     ? 'text-5xl sm:text-6xl lg:text-7xl leading-[1.04]'
     : 'text-4xl sm:text-5xl lg:text-6xl leading-[1.07]';
@@ -546,7 +553,7 @@ export function Hero({ kicker, title, children, cta, secondary, home = false, ti
       <Eyebrow as="p" className="mb-5 text-xs text-ink/45">
         {kicker}
       </Eyebrow>
-      <h1 className={cx(titleClassName, titleSize, 'max-w-4xl tracking-tight text-ink text-balance')}>{title}</h1>
+      <h1 className={cx(titleClassName, TITLE_WEIGHT[titleWeight], titleSize, 'max-w-4xl tracking-tight text-ink text-balance')}>{title}</h1>
       <div className="mt-6 max-w-xl font-sans text-lg leading-relaxed text-ink/65">{children}</div>
       {(cta || secondary) && (
         <div className="mt-9 flex flex-wrap items-center gap-3">
@@ -566,6 +573,7 @@ export type CtaBandProps = {
   body?: ReactNode;
   primary: CtaLink;
   secondary?: CtaLink;
+  titleWeight?: TitleWeight;
 };
 
 /** The default site CTA (dual: install ⇄ sample report). */
@@ -588,7 +596,7 @@ function CtaButton({ cta, variant }: { cta: CtaLink; variant: 'primary' | 'secon
   );
 }
 
-export function CtaBand({ eyebrow, title, body, primary, secondary }: CtaBandProps) {
+export function CtaBand({ eyebrow, title, body, primary, secondary, titleWeight = 'normal' }: CtaBandProps) {
   return (
     <div className="relative z-20 measure-frame">
       <div className="bg-paper-dark/40 border-x border-t border-line/[0.08] rounded-t-xl px-6 sm:px-8 lg:px-12">
@@ -598,7 +606,7 @@ export function CtaBand({ eyebrow, title, body, primary, secondary }: CtaBandPro
               {eyebrow}
             </Eyebrow>
           )}
-          <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl text-ink tracking-tight mb-6 text-balance">{title}</h2>
+          <h2 className={cx('font-serif', TITLE_WEIGHT[titleWeight], 'text-4xl sm:text-5xl lg:text-6xl text-ink tracking-tight mb-6 text-balance')}>{title}</h2>
           {body && <p className="font-sans text-base sm:text-lg text-ink/60 leading-relaxed mb-10 max-w-xl mx-auto">{body}</p>}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <CtaButton cta={primary} variant="primary" />

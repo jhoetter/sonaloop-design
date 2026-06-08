@@ -9,7 +9,8 @@ export const usage = {
     },
     {
       "name": "Blog Post",
-      "to": "/blog/:slug"
+      "to": "/blog/:slug",
+      "live": "/blog/the-pollyanna-problem"
     },
     {
       "name": "Home",
@@ -25,7 +26,8 @@ export const usage = {
     },
     {
       "name": "Method pages",
-      "to": "/methods/:slug"
+      "to": "/methods/:slug",
+      "live": "/methods/jtbd"
     },
     {
       "name": "Methods",
@@ -41,7 +43,8 @@ export const usage = {
     },
     {
       "name": "Product pages",
-      "to": "/products/:slug"
+      "to": "/products/:slug",
+      "live": "/products/open-core"
     },
     {
       "name": "Products",
@@ -57,7 +60,8 @@ export const usage = {
     },
     {
       "name": "Solution pages",
-      "to": "/solutions/:slug"
+      "to": "/solutions/:slug",
+      "live": "/solutions/focus-groups"
     },
     {
       "name": "Solutions",
@@ -72,7 +76,8 @@ export const usage = {
   "app-card": [
     {
       "name": "Product pages",
-      "to": "/products/:slug"
+      "to": "/products/:slug",
+      "live": "/products/open-core"
     }
   ],
   "related-rail": [
@@ -82,7 +87,8 @@ export const usage = {
     },
     {
       "name": "Method pages",
-      "to": "/methods/:slug"
+      "to": "/methods/:slug",
+      "live": "/methods/jtbd"
     },
     {
       "name": "Methods",
@@ -90,7 +96,8 @@ export const usage = {
     },
     {
       "name": "Product pages",
-      "to": "/products/:slug"
+      "to": "/products/:slug",
+      "live": "/products/open-core"
     },
     {
       "name": "Resources",
@@ -98,7 +105,8 @@ export const usage = {
     },
     {
       "name": "Solution pages",
-      "to": "/solutions/:slug"
+      "to": "/solutions/:slug",
+      "live": "/solutions/focus-groups"
     },
     {
       "name": "Solutions",
@@ -116,7 +124,8 @@ export const usage = {
     },
     {
       "name": "Method pages",
-      "to": "/methods/:slug"
+      "to": "/methods/:slug",
+      "live": "/methods/jtbd"
     },
     {
       "name": "Methods",
@@ -132,7 +141,8 @@ export const usage = {
     },
     {
       "name": "Product pages",
-      "to": "/products/:slug"
+      "to": "/products/:slug",
+      "live": "/products/open-core"
     },
     {
       "name": "Products",
@@ -148,7 +158,8 @@ export const usage = {
     },
     {
       "name": "Solution pages",
-      "to": "/solutions/:slug"
+      "to": "/solutions/:slug",
+      "live": "/solutions/focus-groups"
     },
     {
       "name": "Solutions",
@@ -167,7 +178,8 @@ export const usage = {
     },
     {
       "name": "Blog Post",
-      "to": "/blog/:slug"
+      "to": "/blog/:slug",
+      "live": "/blog/the-pollyanna-problem"
     },
     {
       "name": "Home",
@@ -183,7 +195,8 @@ export const usage = {
     },
     {
       "name": "Method pages",
-      "to": "/methods/:slug"
+      "to": "/methods/:slug",
+      "live": "/methods/jtbd"
     },
     {
       "name": "Methods",
@@ -199,7 +212,8 @@ export const usage = {
     },
     {
       "name": "Product pages",
-      "to": "/products/:slug"
+      "to": "/products/:slug",
+      "live": "/products/open-core"
     },
     {
       "name": "Products",
@@ -215,7 +229,8 @@ export const usage = {
     },
     {
       "name": "Solution pages",
-      "to": "/solutions/:slug"
+      "to": "/solutions/:slug",
+      "live": "/solutions/focus-groups"
     },
     {
       "name": "Solutions",
@@ -229,7 +244,8 @@ export const usage = {
   "product-showcase": [
     {
       "name": "Product pages",
-      "to": "/products/:slug"
+      "to": "/products/:slug",
+      "live": "/products/open-core"
     },
     {
       "name": "Sample Report",
@@ -237,7 +253,8 @@ export const usage = {
     },
     {
       "name": "Solution pages",
-      "to": "/solutions/:slug"
+      "to": "/solutions/:slug",
+      "live": "/solutions/focus-groups"
     }
   ],
   "canvas-showcase": [
@@ -258,61 +275,61 @@ export const source = {
   "navbar": {
     "export": "Navbar",
     "file": "src/website.tsx",
-    "line": 246,
-    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L246"
+    "line": 252,
+    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L252"
   },
   "mega-menu": {
     "export": "MegaMenuPanel",
     "file": "src/website.tsx",
-    "line": 385,
-    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L385"
+    "line": 391,
+    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L391"
   },
   "app-card": {
     "export": "FeatureCard",
     "file": "src/website.tsx",
-    "line": 132,
-    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L132"
+    "line": 138,
+    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L138"
   },
   "related-rail": {
     "export": "RelatedRail",
     "file": "src/website.tsx",
-    "line": 187,
-    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L187"
+    "line": 193,
+    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L193"
   },
   "hero": {
     "export": "Hero",
     "file": "src/website.tsx",
-    "line": 534,
-    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L534"
+    "line": 541,
+    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L541"
   },
   "cta-band": {
     "export": "CtaBand",
     "file": "src/website.tsx",
-    "line": 591,
-    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L591"
+    "line": 599,
+    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L599"
   },
   "footer": {
     "export": "Footer",
     "file": "src/website.tsx",
-    "line": 645,
-    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L645"
+    "line": 653,
+    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L653"
   },
   "product-showcase": {
     "export": "ProductShot",
     "file": "src/website.tsx",
-    "line": 724,
-    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L724"
+    "line": 732,
+    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L732"
   },
   "canvas-showcase": {
     "export": "CanvasShowcase",
     "file": "src/website.tsx",
-    "line": 763,
-    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L763"
+    "line": 771,
+    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L771"
   },
   "integration-showcase": {
     "export": "IntegrationShowcase",
     "file": "src/website.tsx",
-    "line": 801,
-    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L801"
+    "line": 809,
+    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L809"
   }
 };
