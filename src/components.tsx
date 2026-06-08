@@ -49,8 +49,12 @@ export function Pill({ className, ...rest }: HTMLAttributes<HTMLSpanElement>) {
 export function Chip({ className, ...rest }: HTMLAttributes<HTMLSpanElement>) {
   return <span className={cx('sl-chip', className)} {...rest} />;
 }
-export function Eyebrow({ className, ...rest }: HTMLAttributes<HTMLSpanElement>) {
-  return <span className={cx('sl-eyebrow', className)} {...rest} />;
+export interface EyebrowProps extends HTMLAttributes<HTMLElement> {
+  /** Element to render — `span` (inline, default), `p` or `div` (block). */
+  as?: 'span' | 'p' | 'div';
+}
+export function Eyebrow({ as: As = 'span', className, ...rest }: EyebrowProps) {
+  return <As className={cx('sl-eyebrow', className)} {...rest} />;
 }
 export function Kbd({ className, ...rest }: HTMLAttributes<HTMLElement>) {
   return <kbd className={cx('sl-kbd', className)} {...rest} />;
