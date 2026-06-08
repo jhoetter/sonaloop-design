@@ -22,10 +22,18 @@ const C = {
   blueD: '#5e9fe0', violetD: '#9a8cff', greenD: '#4cb782', amberD: '#d9a23b', redD: '#e0566a', skepD: '#d98a63',
 };
 
+// ── Fonts (shared: website Tailwind fontFamily + inspector body/--mono) ───────────
+export const fonts = {
+  sans: ['"Geist"', '"Inter"', 'system-ui', 'sans-serif'],
+  // serif kept as an alias to Geist so existing `font-serif` headline usages need no churn
+  serif: ['"Geist"', '"Inter"', 'system-ui', 'sans-serif'],
+  mono: ['"Geist Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+};
+
 // ── Theme-independent scales (emitted once into the inspector :root) ──────────────
 export const scales = {
   radius: '8px', 'radius-sm': '6px', 'row-h': '48px', ease: 'cubic-bezier(.4,0,.2,1)',
-  mono: '"Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace',
+  mono: fonts.mono.join(','),
   't-xs': '11px', 't-sm': '12px', 't-body': '13px', 't-md': '15px', 't-prose': '16px', 't-lg': '18px', 't-xl': '24px',
   's-1': '4px', 's-2': '8px', 's-3': '12px', 's-4': '16px', 's-5': '20px', 's-6': '24px', 's-8': '32px',
 };
