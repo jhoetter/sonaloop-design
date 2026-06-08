@@ -1,0 +1,79 @@
+/**
+ * sonaloop-design — shared component layer.
+ *
+ * One CSS file, applied to each stack's OWN markup, so React (website) and the
+ * Python-SSR app render identical components without sharing component code:
+ *   React:  <button className="sl-btn sl-btn--primary">
+ *   Python: h("button", {"class_": "sl-btn sl-btn--primary"}, …)
+ *
+ * Everything is driven by the canonical --sl-* tokens (emitted into both
+ * styles/tokens.css and py/sonaloop_icons/tokens.py from tokens.data.mjs), so the
+ * components are automatically theme-aware (light / dark) and never drift.
+ * Hand-authored — safe to edit. Class prefix `sl-` avoids clashing with either app.
+ */
+
+/* ── Buttons ─────────────────────────────────────────────────────────────────── */
+.sl-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  font: inherit; font-weight: 550; line-height: 1; white-space: nowrap; cursor: pointer;
+  padding: 8px 14px; border-radius: var(--sl-radius-sm); border: 1px solid transparent;
+  background: var(--sl-surface); color: var(--sl-ink); border-color: var(--sl-line);
+  transition: background .12s, border-color .12s, opacity .12s;
+}
+.sl-btn:hover { background: var(--sl-hover); }
+.sl-btn:focus-visible { outline: none; box-shadow: 0 0 0 2px color-mix(in srgb, var(--sl-accent) 45%, transparent); }
+.sl-btn--primary { background: var(--sl-ink); color: var(--sl-bg); border-color: transparent; }
+.sl-btn--primary:hover { background: var(--sl-ink); opacity: .88; }
+.sl-btn--accent { background: var(--sl-accent); color: var(--sl-accent-ink); border-color: transparent; }
+.sl-btn--accent:hover { filter: brightness(1.06); background: var(--sl-accent); opacity: 1; }
+.sl-btn--ghost { background: transparent; border-color: transparent; }
+.sl-btn--ghost:hover { background: var(--sl-hover); }
+.sl-btn--sm { padding: 5px 10px; font-size: .92em; }
+.sl-btn--lg { padding: 11px 18px; font-size: 1.05em; }
+
+/* ── Card ────────────────────────────────────────────────────────────────────── */
+.sl-card {
+  background: var(--sl-surface); border: 1px solid var(--sl-line);
+  border-radius: var(--sl-radius); padding: 16px;
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--sl-ink) 4%, transparent);
+}
+.sl-card__title { margin: 0 0 6px; font-weight: 600; color: var(--sl-ink); }
+.sl-card__body { margin: 0; color: var(--sl-muted); line-height: 1.5; }
+
+/* ── Eyebrow (mono label) ────────────────────────────────────────────────────── */
+.sl-eyebrow {
+  font-family: var(--sl-mono); font-size: .72em; font-weight: 500;
+  text-transform: uppercase; letter-spacing: .14em; color: var(--sl-muted);
+}
+
+/* ── Badge / Pill / Chip ─────────────────────────────────────────────────────── */
+.sl-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 2px 8px; border-radius: 999px; font-size: .82em; font-weight: 550;
+  background: var(--sl-surface-2); color: var(--sl-muted);
+}
+.sl-badge--accent { background: var(--sl-accent-weak); color: var(--sl-accent); }
+.sl-badge--positive { background: color-mix(in srgb, var(--sl-green) 14%, transparent); color: var(--sl-green); }
+.sl-badge--warning { background: color-mix(in srgb, var(--sl-amber) 16%, transparent); color: var(--sl-amber); }
+.sl-badge--negative { background: color-mix(in srgb, var(--sl-red) 14%, transparent); color: var(--sl-red); }
+.sl-pill { display: inline-flex; align-items: center; gap: 6px; padding: 3px 11px;
+  border: 1px solid var(--sl-line); border-radius: 999px; font-size: .9em; color: var(--sl-ink);
+  background: var(--sl-surface); }
+.sl-chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px;
+  border: 1px solid var(--sl-line); border-radius: var(--sl-radius-sm); font-size: .85em;
+  color: var(--sl-muted); background: var(--sl-surface); }
+.sl-chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--sl-accent); }
+
+/* ── Input ───────────────────────────────────────────────────────────────────── */
+.sl-input {
+  font: inherit; width: 100%; padding: 8px 11px; color: var(--sl-ink);
+  background: var(--sl-bg); border: 1px solid var(--sl-line); border-radius: var(--sl-radius-sm);
+}
+.sl-input::placeholder { color: var(--sl-faint); }
+.sl-input:focus, .sl-input:focus-visible { outline: none; border-color: var(--sl-accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--sl-accent) 25%, transparent); }
+
+/* ── kbd + divider ───────────────────────────────────────────────────────────── */
+.sl-kbd { font-family: var(--sl-mono); font-size: .8em; padding: 1px 6px;
+  border: 1px solid var(--sl-line); border-radius: 5px; background: var(--sl-surface-2); color: var(--sl-ink); }
+.sl-divider { height: 1px; border: 0; background: var(--sl-line); margin: 16px 0; }

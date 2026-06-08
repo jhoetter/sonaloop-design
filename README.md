@@ -26,6 +26,35 @@ tokens.data.mjs                 ← author colour here (single source of truth)
 Each consumer keeps its own var names; only the values live here. Change a colour once and
 the website + app both pick it up. The brand spec/rationale is in [`BRANDING.md`](BRANDING.md).
 
+## Components
+
+`styles/components.css` is the shared component layer (`.sl-btn`, `.sl-card`, `.sl-badge`,
+`.sl-pill`, `.sl-chip`, `.sl-eyebrow`, `.sl-input`, `.sl-kbd` …). It is driven by canonical
+`--sl-*` tokens (emitted into both token files), so the **same classes** render identically
+on each stack's own markup — no shared component code:
+
+```tsx
+// website (React):   <button className="sl-btn sl-btn--primary">Open</button>
+// app (Python-SSR):  h("button", {"class_": "sl-btn sl-btn--primary"}, "Open")
+```
+
+The website imports `sonaloop-design/components.css`; the app vendors it (via `make icons`)
+and prepends it. cloud / research inherit it automatically (they extend the core app's web).
+
+## Develop — component gallery
+
+```
+make install        # npm deps (also installs the pre-commit hook that keeps generated files fresh)
+make dev            # regenerate + serve the gallery → http://127.0.0.1:6006/gallery/
+make dev-forwarded  # same, bound to 0.0.0.0 for a forwarded port
+make gen            # regenerate icons + tokens + tailwind preset + components module
+make check          # drift guard: fail if any generated artifact is stale
+```
+
+The gallery (`gallery/`) renders every component live in two columns — **App** (dense,
+Python-SSR) and **Website** (airy, React/Tailwind) — with a light/dark toggle, so you see
+exactly how the shared design system looks in each surface.
+
 ```
 icons.data.mjs                  ← author icons here (the only source of truth)
    │  node scripts/gen.mjs

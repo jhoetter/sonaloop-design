@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>sonaloop-design · component gallery</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <!-- The actual design system: tokens (incl. canonical --sl-*) + the shared component layer. -->
+  <link rel="stylesheet" href="../styles/tokens.css" />
+  <link rel="stylesheet" href="../styles/components.css" />
+  <style>
+    /* Gallery chrome only — NOT part of the design system. */
+    body { margin: 0; font-family: "Geist", system-ui, sans-serif; background: var(--sl-bg); color: var(--sl-ink);
+      -webkit-font-smoothing: antialiased; letter-spacing: -.003em; }
+    .gx-top { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 14px;
+      padding: 12px 20px; background: var(--sl-surface); border-bottom: 1px solid var(--sl-line); }
+    .gx-top h1 { font-size: 15px; font-weight: 600; margin: 0; }
+    .gx-top .gx-sub { font-family: var(--sl-mono); font-size: 11px; text-transform: uppercase;
+      letter-spacing: .14em; color: var(--sl-muted); }
+    .gx-spacer { flex: 1; }
+    .gx-toggle { font: inherit; font-size: 13px; cursor: pointer; padding: 6px 12px; border-radius: 7px;
+      border: 1px solid var(--sl-line); background: var(--sl-bg); color: var(--sl-ink); }
+    .gx-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0; align-items: start; }
+    .gx-col { padding: 26px 28px; min-width: 0; }
+    .gx-col + .gx-col { border-left: 1px solid var(--sl-line); }
+    .gx-col h2 { margin: 0 0 4px; font-size: 1.1em; }
+    .gx-col .gx-flavor { font-family: var(--sl-mono); font-size: .72em; text-transform: uppercase;
+      letter-spacing: .14em; color: var(--sl-muted); margin-bottom: 22px; }
+    /* The two flavours: same components.css, different density context (em-scaled). */
+    .flavor-app { font-size: 13px; }            /* dense — the Python-SSR inspector */
+    .flavor-web { font-size: 16px; }            /* airy  — the React/Tailwind website */
+    .gx-group { margin: 0 0 26px; }
+    .gx-group > .gx-label { display: block; font-family: var(--sl-mono); font-size: .68em;
+      text-transform: uppercase; letter-spacing: .12em; color: var(--sl-faint); margin: 0 0 10px; }
+    .gx-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+    @media (max-width: 820px) { .gx-cols { grid-template-columns: 1fr; } .gx-col + .gx-col { border-left: 0; border-top: 1px solid var(--sl-line); } }
+  </style>
+</head>
+<body>
+  <header class="gx-top">
+    <h1>sonaloop-design</h1>
+    <span class="gx-sub">component gallery</span>
+    <span class="gx-spacer"></span>
+    <button class="gx-toggle" id="theme">◐ Toggle theme</button>
+  </header>
+
+  <main class="gx-cols">
+    <!-- Each column renders the SAME shared components (.sl-*) — only the density context differs. -->
+    <section class="gx-col flavor-app" id="col-app"></section>
+    <section class="gx-col flavor-web" id="col-web"></section>
+  </main>
+
+  <script>
+    // Render the same component markup into both columns; the column's flavour class scales it.
+    const components = `
+      <div class="gx-group"><span class="gx-label">Buttons</span>
+        <div class="gx-row">
+          <button class="sl-btn sl-btn--primary">Primary</button>
+          <button class="sl-btn">Secondary</button>
+          <button class="sl-btn sl-btn--accent">Accent</button>
+          <button class="sl-btn sl-btn--ghost">Ghost</button>
+          <button class="sl-btn sl-btn--sm">Small</button>
+          <button class="sl-btn sl-btn--lg">Large</button>
+        </div>
+      </div>
+      <div class="gx-group"><span class="gx-label">Badges</span>
+        <div class="gx-row">
+          <span class="sl-badge">Neutral</span>
+          <span class="sl-badge sl-badge--accent">Accent</span>
+          <span class="sl-badge sl-badge--positive">For</span>
+          <span class="sl-badge sl-badge--warning">Conditional</span>
+          <span class="sl-badge sl-badge--negative">Against</span>
+        </div>
+      </div>
+      <div class="gx-group"><span class="gx-label">Pills &amp; chips</span>
+        <div class="gx-row">
+          <span class="sl-pill">Council</span>
+          <span class="sl-pill">4 personas</span>
+          <span class="sl-chip">Theme: Planning</span>
+          <span class="sl-chip">Theme: Budget</span>
+        </div>
+      </div>
+      <div class="gx-group"><span class="gx-label">Card</span>
+        <div class="sl-card" style="max-width: 340px">
+          <span class="sl-eyebrow">Synthesis</span>
+          <h3 class="sl-card__title" style="margin-top:6px">Executive summary</h3>
+          <p class="sl-card__body">A memory-grounded council reached a clear verdict — broadly supportive, no real opposition.</p>
+          <hr class="sl-divider" />
+          <div class="gx-row">
+            <button class="sl-btn sl-btn--primary sl-btn--sm">Open</button>
+            <button class="sl-btn sl-btn--sm">Export</button>
+          </div>
+        </div>
+      </div>
+      <div class="gx-group"><span class="gx-label">Input &amp; kbd</span>
+        <div class="gx-row" style="max-width: 340px">
+          <input class="sl-input" placeholder="Search everything…" />
+        </div>
+        <div class="gx-row" style="margin-top:10px">
+          <span>Jump to anything <span class="sl-kbd">⌘</span> <span class="sl-kbd">K</span></span>
+        </div>
+      </div>`;
+
+    document.getElementById('col-app').innerHTML =
+      '<h2>App components</h2><div class="gx-flavor">Python-SSR inspector · dense</div>' + components;
+    document.getElementById('col-web').innerHTML =
+      '<h2>Website components</h2><div class="gx-flavor">React / Tailwind · airy</div>' + components;
+
+    const root = document.documentElement;
+    document.getElementById('theme').addEventListener('click', () => {
+      root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
+    });
+  </script>
+</body>
+</html>
