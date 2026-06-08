@@ -239,16 +239,8 @@ function pageTypography() {
     ${specimen('Sona Mono', 'var(--sl-mono)')}
 
     ${h2('type-pixel', 'Sona Pixel · display')}
-    ${p('A bitmap display face for special technical moments — loaders, council ids, a "research instrument" flourish. <b>Never for body text.</b>')}
-
-    <div class="ds-pixel-hero">
-      <div class="ds-pixel-hero-tag"><span class="sl-eyebrow">Sona Pixel</span> <span class="ds-pixel-badge">default · Line</span></div>
-      <div class="ds-pixel-hero-sample" style="font-family:'Sona Pixel'">SONALOOP</div>
-      <div class="ds-pixel-hero-sub" style="font-family:'Sona Pixel'">LOADING · council_24105090</div>
-      <p class="ds-pixel-hero-note">A finely-gridded bitmap face — Sona's letterforms rendered as pixels. Built on <b>Geist Pixel</b> (SIL OFL-1.1), renamed Geist → Sona, the same OFL-derived status as the Sona / Sona Mono text faces. The default <code>--sl-pixel</code> / <code>font-pixel</code> family is the <b>Line</b> fill — delicate outlined cells.</p>
-    </div>
-
-    ${p('Five fills share one design — pick per context. <code>--sl-pixel</code> defaults to <b>Line</b>; each fill is also exposed by name.')}
+    ${p('A finely-gridded bitmap display face — Sona\'s letterforms rendered as pixels — for special technical moments (loaders, council ids, a "research instrument" flourish). <b>Never for body text.</b> Built on Geist Pixel (SIL OFL-1.1), renamed Geist → Sona, the same OFL-derived status as the text faces.')}
+    ${p('Five fills share one design — pick per context. <code>--sl-pixel</code> / <code>font-pixel</code> defaults to <b>Line</b> (delicate outlined cells); each fill is also exposed by name.')}
     <div class="ds-pixel-grid">
       ${[
         ['Line', "'Sona Pixel Line'", 'Hollow outlined cells — delicate. ★ the default.'],
