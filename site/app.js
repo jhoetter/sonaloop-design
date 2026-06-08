@@ -685,13 +685,13 @@ const cBreadcrumb = () => componentPage({
   id: 'breadcrumb', title: 'Breadcrumb', desc: 'The compact ancestry trail in the inspector top bar — project → council → view. Truncates gracefully when space is tight.',
   demo: `<nav class="sl-breadcrumb" aria-label="Breadcrumb" style="font-size:1em">
       <a class="sl-breadcrumb__link" href="#/breadcrumb">Projects</a>
-      <span class="sl-breadcrumb__sep">/</span>
+      <span class="sl-breadcrumb__sep"></span>
       <a class="sl-breadcrumb__link" href="#/breadcrumb">Gesünder essen</a>
-      <span class="sl-breadcrumb__sep">/</span>
+      <span class="sl-breadcrumb__sep"></span>
       <span class="sl-breadcrumb__current">Evaluation</span>
     </nav>`,
   react: `import { Breadcrumb } from 'sonaloop-design/components';\n\n<Breadcrumb items={[\n  { label: 'Projects', href: '/projects' },\n  { label: 'Gesünder essen', href: '/projects/abc' },\n  { label: 'Evaluation' },\n]} />`,
-  markup: `<nav class="sl-breadcrumb">\n  <a class="sl-breadcrumb__link" href="…">Projects</a>\n  <span class="sl-breadcrumb__sep">/</span>\n  <span class="sl-breadcrumb__current">Evaluation</span>\n</nav>`,
+  markup: `<nav class="sl-breadcrumb">\n  <a class="sl-breadcrumb__link" href="…">Projects</a>\n  <span class="sl-breadcrumb__sep"></span>  <!-- glyph from CSS -->\n  <span class="sl-breadcrumb__current">Evaluation</span>\n</nav>`,
   python: `h("nav", {"class_": "sl-breadcrumb"}, *crumbs)`,
 });
 

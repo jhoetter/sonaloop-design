@@ -262,7 +262,7 @@ export function Breadcrumb({ items, className, ...rest }: BreadcrumbProps) {
     <nav className={cx('sl-breadcrumb', className)} aria-label="Breadcrumb" {...rest}>
       {items.map((c, i) => (
         <Fragment key={i}>
-          {i > 0 && <span className="sl-breadcrumb__sep" aria-hidden="true">/</span>}
+          {i > 0 && <span className="sl-breadcrumb__sep" aria-hidden="true" />}
           {c.href ? (
             <a className="sl-breadcrumb__link" href={c.href}>{c.label}</a>
           ) : (
