@@ -6,19 +6,20 @@
  *   React:  <button className="sl-btn sl-btn--primary">
  *   Python: h("button", {"class_": "sl-btn sl-btn--primary"}, …)
  *
- * Everything is driven by the canonical --sl-* tokens (emitted into both
- * styles/tokens.css and py/sonaloop_icons/tokens.py from tokens.data.mjs), so the
- * components are automatically theme-aware (light / dark) and never drift.
- * Hand-authored — safe to edit. Class prefix `sl-` avoids clashing with either app.
+ * Driven by the canonical --sl-* tokens (emitted into both styles/tokens.css and
+ * py/sonaloop_icons/tokens.py), so the components are theme-aware (light / dark) and
+ * never drift. Sizing is **em-based**, so the SAME class adapts to each surface's base
+ * font-size — dense in the 13px Python-SSR app, airy on the 16px website. Hand-authored.
+ * Class prefix `sl-` avoids clashing with either app.
  */
 
 /* ── Buttons ─────────────────────────────────────────────────────────────────── */
 .sl-btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  display: inline-flex; align-items: center; justify-content: center; gap: .5em;
   font: inherit; font-weight: 550; line-height: 1; white-space: nowrap; cursor: pointer;
-  padding: 8px 14px; border-radius: var(--sl-radius-sm); border: 1px solid transparent;
+  padding: .55em .95em; border-radius: var(--sl-radius-sm); border: 1px solid transparent;
   background: var(--sl-surface); color: var(--sl-ink); border-color: var(--sl-line);
-  transition: background .12s, border-color .12s, opacity .12s;
+  transition: background .12s, border-color .12s, opacity .12s, filter .12s;
 }
 .sl-btn:hover { background: var(--sl-hover); }
 .sl-btn:focus-visible { outline: none; box-shadow: 0 0 0 2px color-mix(in srgb, var(--sl-accent) 45%, transparent); }
@@ -28,16 +29,19 @@
 .sl-btn--accent:hover { filter: brightness(1.06); background: var(--sl-accent); opacity: 1; }
 .sl-btn--ghost { background: transparent; border-color: transparent; }
 .sl-btn--ghost:hover { background: var(--sl-hover); }
-.sl-btn--sm { padding: 5px 10px; font-size: .92em; }
-.sl-btn--lg { padding: 11px 18px; font-size: 1.05em; }
+.sl-btn--sm { padding: .35em .7em; font-size: .92em; }
+.sl-btn--lg { padding: .7em 1.15em; font-size: 1.05em; }
+.sl-btn.is-active { background: var(--sl-sel); border-color: var(--sl-line); }
+.sl-btn[disabled], .sl-btn.is-disabled { color: var(--sl-faint); cursor: default; opacity: .65; }
+.sl-btn[disabled]:hover, .sl-btn.is-disabled:hover { background: var(--sl-surface); }
 
 /* ── Card ────────────────────────────────────────────────────────────────────── */
 .sl-card {
   background: var(--sl-surface); border: 1px solid var(--sl-line);
-  border-radius: var(--sl-radius); padding: 16px;
+  border-radius: var(--sl-radius); padding: 1.05em;
   box-shadow: 0 1px 2px color-mix(in srgb, var(--sl-ink) 4%, transparent);
 }
-.sl-card__title { margin: 0 0 6px; font-weight: 600; color: var(--sl-ink); }
+.sl-card__title { margin: 0 0 .4em; font-weight: 600; color: var(--sl-ink); }
 .sl-card__body { margin: 0; color: var(--sl-muted); line-height: 1.5; }
 
 /* ── Eyebrow (mono label) ────────────────────────────────────────────────────── */
@@ -48,25 +52,25 @@
 
 /* ── Badge / Pill / Chip ─────────────────────────────────────────────────────── */
 .sl-badge {
-  display: inline-flex; align-items: center; gap: 5px;
-  padding: 2px 8px; border-radius: 999px; font-size: .82em; font-weight: 550;
+  display: inline-flex; align-items: center; gap: .35em;
+  padding: .15em .6em; border-radius: 999px; font-size: .82em; font-weight: 550;
   background: var(--sl-surface-2); color: var(--sl-muted);
 }
 .sl-badge--accent { background: var(--sl-accent-weak); color: var(--sl-accent); }
 .sl-badge--positive { background: color-mix(in srgb, var(--sl-green) 14%, transparent); color: var(--sl-green); }
 .sl-badge--warning { background: color-mix(in srgb, var(--sl-amber) 16%, transparent); color: var(--sl-amber); }
 .sl-badge--negative { background: color-mix(in srgb, var(--sl-red) 14%, transparent); color: var(--sl-red); }
-.sl-pill { display: inline-flex; align-items: center; gap: 6px; padding: 3px 11px;
+.sl-pill { display: inline-flex; align-items: center; gap: .45em; padding: .2em .8em;
   border: 1px solid var(--sl-line); border-radius: 999px; font-size: .9em; color: var(--sl-ink);
   background: var(--sl-surface); }
-.sl-chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px;
+.sl-chip { display: inline-flex; align-items: center; gap: .45em; padding: .2em .65em;
   border: 1px solid var(--sl-line); border-radius: var(--sl-radius-sm); font-size: .85em;
   color: var(--sl-muted); background: var(--sl-surface); }
-.sl-chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--sl-accent); }
+.sl-chip::before { content: ""; width: .5em; height: .5em; border-radius: 50%; background: var(--sl-accent); }
 
 /* ── Input ───────────────────────────────────────────────────────────────────── */
 .sl-input {
-  font: inherit; width: 100%; padding: 8px 11px; color: var(--sl-ink);
+  font: inherit; width: 100%; padding: .55em .8em; color: var(--sl-ink);
   background: var(--sl-bg); border: 1px solid var(--sl-line); border-radius: var(--sl-radius-sm);
 }
 .sl-input::placeholder { color: var(--sl-faint); }
@@ -74,6 +78,6 @@
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--sl-accent) 25%, transparent); }
 
 /* ── kbd + divider ───────────────────────────────────────────────────────────── */
-.sl-kbd { font-family: var(--sl-mono); font-size: .8em; padding: 1px 6px;
+.sl-kbd { font-family: var(--sl-mono); font-size: .8em; padding: .05em .45em;
   border: 1px solid var(--sl-line); border-radius: 5px; background: var(--sl-surface-2); color: var(--sl-ink); }
-.sl-divider { height: 1px; border: 0; background: var(--sl-line); margin: 16px 0; }
+.sl-divider { height: 1px; border: 0; background: var(--sl-line); margin: 1.1em 0; }
