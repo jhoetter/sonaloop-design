@@ -67,6 +67,19 @@
   border: 1px solid var(--sl-line); border-radius: var(--sl-radius-sm); font-size: .85em;
   color: var(--sl-muted); background: var(--sl-surface); }
 .sl-chip::before { content: ""; width: .5em; height: .5em; border-radius: 50%; background: var(--sl-accent); }
+/* Tag — a bordered, uppercase mono label (distinct from the filled .sl-badge). Tone tints the
+   border + fill; used for verdict tags, plan tiers, blog categories, …. */
+.sl-tag {
+  display: inline-flex; align-items: center; gap: .35em;
+  font-family: var(--sl-mono); font-size: .72em; font-weight: 500;
+  text-transform: uppercase; letter-spacing: .14em; padding: .25em .7em;
+  border-radius: var(--sl-radius-sm);
+  border: 1px solid color-mix(in srgb, var(--sl-accent) 38%, transparent);
+  background: color-mix(in srgb, var(--sl-accent) 9%, transparent); color: var(--sl-accent);
+}
+.sl-tag--neutral { border-color: var(--sl-line); background: var(--sl-surface-2); color: var(--sl-muted); }
+.sl-tag--warm { border-color: color-mix(in srgb, var(--sl-violet) 40%, transparent);
+  background: color-mix(in srgb, var(--sl-violet) 10%, transparent); color: var(--sl-ink); }
 
 /* ── Input ───────────────────────────────────────────────────────────────────── */
 .sl-input {

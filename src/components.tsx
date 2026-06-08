@@ -42,6 +42,15 @@ export function Badge({ tone = 'neutral', className, ...rest }: BadgeProps) {
   return <span className={cx('sl-badge', tone !== 'neutral' && `sl-badge--${tone}`, className)} {...rest} />;
 }
 
+/* ── Tag (bordered, uppercase — distinct from the filled Badge) ──────────────── */
+export type TagTone = 'accent' | 'neutral' | 'warm';
+export interface TagProps extends HTMLAttributes<HTMLSpanElement> {
+  tone?: TagTone;
+}
+export function Tag({ tone = 'accent', className, ...rest }: TagProps) {
+  return <span className={cx('sl-tag', tone !== 'accent' && `sl-tag--${tone}`, className)} {...rest} />;
+}
+
 /* ── Pill / Chip / Eyebrow / Kbd ─────────────────────────────────────────────── */
 export function Pill({ className, ...rest }: HTMLAttributes<HTMLSpanElement>) {
   return <span className={cx('sl-pill', className)} {...rest} />;
