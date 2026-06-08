@@ -29,6 +29,8 @@ const svgHifi = (name, cls = '') => {
 let uid = 0;
 const nextId = () => `dsx${++uid}`;
 
+const copyIco = () => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>';
+
 /* ── shared content builders ───────────────────────────────────────────────────── */
 function preview(inner, { center = false } = {}) {
   const id = nextId();
@@ -505,6 +507,182 @@ const cArrowLink = () => componentPage({
   python: `h("a", {"class_": "sl-arrow-link", "href": url}, "Open", arrow_svg)`,
 });
 
+const cStatusDot = () => componentPage({
+  id: 'status-dot', title: 'Status Dot', desc: 'A small coloured presence/verdict dot. The tones match the semantic palette, so a council voice or a live indicator reads instantly.',
+  demo: `<div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start;font-size:.95em">
+      <span style="display:inline-flex;align-items:center;gap:8px"><span class="sl-dot sl-dot--positive"></span> Supports</span>
+      <span style="display:inline-flex;align-items:center;gap:8px"><span class="sl-dot sl-dot--warning"></span> Conditional</span>
+      <span style="display:inline-flex;align-items:center;gap:8px"><span class="sl-dot sl-dot--negative"></span> Opposes</span>
+      <span style="display:inline-flex;align-items:center;gap:8px"><span class="sl-dot sl-dot--shift"></span> Stance shift</span>
+      <span style="display:inline-flex;align-items:center;gap:8px"><span class="sl-dot sl-dot--info"></span> Live</span>
+    </div>`,
+  variants: { cols: ['Class', 'Tone', 'Meaning'], rows: [
+    ['.sl-dot', 'Neutral', 'Generic / muted.'],
+    ['.sl-dot--positive', 'Positive', 'Support / online.'],
+    ['.sl-dot--warning', 'Warning', 'Conditional.'],
+    ['.sl-dot--negative', 'Negative', 'Opposition / error.'],
+    ['.sl-dot--shift', 'Shift', 'Stance change.'],
+    ['.sl-dot--info', 'Info', 'Informational / live.'],
+  ] },
+  react: `import { StatusDot } from 'sonaloop-design/components';\n\n<StatusDot tone="positive" /> Supports`,
+  markup: `<span class="sl-dot sl-dot--positive"></span>`,
+  python: `h("span", {"class_": "sl-dot sl-dot--positive"})`,
+});
+
+const cAvatar = () => componentPage({
+  id: 'avatar', title: 'Avatar', desc: 'A persona avatar — a generated portrait when available, otherwise tinted initials. Group them to show a council at a glance.',
+  demo: `<div style="display:flex;flex-direction:column;gap:18px;align-items:flex-start">
+      <div style="display:flex;gap:10px;align-items:center">
+        <span class="sl-avatar">LV</span>
+        <span class="sl-avatar sl-avatar--blue">TB</span>
+        <span class="sl-avatar sl-avatar--violet">MD</span>
+        <span class="sl-avatar sl-avatar--green">SK</span>
+        <span class="sl-avatar sl-avatar--amber sl-avatar--lg">AW</span>
+      </div>
+      <div class="sl-avatar-group">
+        <span class="sl-avatar sl-avatar--sm">LV</span>
+        <span class="sl-avatar sl-avatar--sm sl-avatar--blue">TB</span>
+        <span class="sl-avatar sl-avatar--sm sl-avatar--violet">MD</span>
+        <span class="sl-avatar sl-avatar--sm sl-avatar--green">SK</span>
+      </div>
+    </div>`,
+  variants: { cols: ['Class', 'Purpose'], rows: [
+    ['.sl-avatar', 'Round avatar — initials or an &lt;img&gt;.'],
+    ['.sl-avatar--sm / --lg', 'Size.'],
+    ['.sl-avatar--blue/violet/green/amber', 'Initials-background tone (persona accent).'],
+    ['.sl-avatar-group', 'Overlapping stack (a council).'],
+  ] },
+  react: `import { Avatar, AvatarGroup } from 'sonaloop-design/components';\n\n<Avatar name="Lena Vogt" tone="blue" />\n<Avatar name="Tom Berger" src="/avatars/tom.png" />\n\n<AvatarGroup>\n  <Avatar name="Lena Vogt" size="sm" />\n  <Avatar name="Tom Berger" size="sm" tone="violet" />\n</AvatarGroup>`,
+  markup: `<span class="sl-avatar sl-avatar--blue">LV</span>\n<span class="sl-avatar"><img src="/avatars/tom.png" alt="Tom Berger" /></span>`,
+  python: `h("span", {"class_": "sl-avatar sl-avatar--blue"}, "LV")`,
+});
+
+const cSegmented = () => componentPage({
+  id: 'segmented', title: 'Segmented · Tabs', desc: 'A compact control for switching between mutually-exclusive options — install clients on the site, theme & view switchers in the inspector. Horizontal by default; <code>--fill</code> stretches, <code>--stacked</code> puts the icon over the label.',
+  demo: `<div style="display:flex;flex-direction:column;gap:18px;align-items:flex-start">
+      <div class="sl-segmented" role="group" aria-label="Client">
+        <button class="sl-segmented__item is-active">npm</button>
+        <button class="sl-segmented__item">pnpm</button>
+        <button class="sl-segmented__item">yarn</button>
+      </div>
+      <div class="sl-segmented sl-segmented--stacked" role="group" aria-label="View" style="width:240px">
+        <button class="sl-segmented__item is-active">${svgReg('overview')}<span>Plan</span></button>
+        <button class="sl-segmented__item">${svgReg('squareGrid')}<span>Graph</span></button>
+        <button class="sl-segmented__item">${svgReg('analytics')}<span>Stats</span></button>
+      </div>
+    </div>`,
+  variants: { cols: ['Class', 'Modifier'], rows: [
+    ['.sl-segmented', 'The track.'],
+    ['.sl-segmented__item', 'An option; add .is-active for the selected one.'],
+    ['.sl-segmented--fill', 'Items stretch to fill the width.'],
+    ['.sl-segmented--stacked', 'Icon over label (inspector switchers).'],
+  ] },
+  react: `import { Segmented } from 'sonaloop-design/components';\n\nconst [client, setClient] = useState('npm');\n\n<Segmented\n  value={client}\n  onChange={setClient}\n  options={[{ value: 'npm' }, { value: 'pnpm' }, { value: 'yarn' }]}\n/>`,
+  markup: `<div class="sl-segmented" role="group">\n  <button class="sl-segmented__item is-active">npm</button>\n  <button class="sl-segmented__item">pnpm</button>\n</div>`,
+  python: `h("div", {"class_": "sl-segmented sl-segmented--stacked", "role": "group"},\n  h("a", {"class_": "sl-segmented__item is-active", "href": plan_url}, plan_icon, h("span", {}, "Plan")),\n  h("a", {"class_": "sl-segmented__item", "href": graph_url}, graph_icon, h("span", {}, "Graph")))`,
+});
+
+const cSnippet = () => componentPage({
+  id: 'snippet', title: 'Snippet · Code', desc: 'A one-line command bar and a multi-line code block, both with a copy button. Used for the install command on the site and code samples everywhere (including these docs).',
+  demo: `<div style="display:flex;flex-direction:column;gap:16px;width:100%;max-width:440px">
+      <div class="sl-snippet sl-snippet--cmd"><code class="sl-snippet__code">npx sonaloop init</code><button class="sl-copy" data-copy-text="npx sonaloop init" aria-label="Copy">${copyIco()}</button></div>
+      <div class="sl-code">
+        <div class="sl-code__head"><span class="sl-code__lang">tsx</span><button class="sl-copy" data-copy-text="import { Button } from 'sonaloop-design/components';" aria-label="Copy">${copyIco()}</button></div>
+        <pre><code>import { Button } from 'sonaloop-design/components';</code></pre>
+      </div>
+    </div>`,
+  react: `import { Snippet, CodeBlock } from 'sonaloop-design/components';\n\n<Snippet code="npx sonaloop init" />\n<CodeBlock lang="tsx" code={"import { Button } from 'sonaloop-design/components';"} />`,
+  markup: `<div class="sl-snippet sl-snippet--cmd">\n  <code class="sl-snippet__code">npx sonaloop init</code>\n  <button class="sl-copy">…</button>\n</div>`,
+  python: `# the inspector copies share .sl-copy / .sl-snippet too`,
+});
+
+const cNote = () => componentPage({
+  id: 'note', title: 'Note · Callout', desc: 'An accent-tinted info block to flag a constraint, a result or a caution. Tones reuse the semantic palette.',
+  demo: `<div style="display:flex;flex-direction:column;gap:12px;width:100%;max-width:520px">
+      <div class="sl-note"><span class="sl-note__icon">${svgReg('bulb')}</span><p class="sl-note__body"><b>One source, two consumers.</b> Edit the token once and both surfaces update.</p></div>
+      <div class="sl-note sl-note--positive"><span class="sl-note__icon">${svgReg('check')}</span><p class="sl-note__body">Council reached a clear verdict — broadly supportive.</p></div>
+      <div class="sl-note sl-note--warning"><span class="sl-note__icon">${svgReg('warning')}</span><p class="sl-note__body">Two voices were conditional — note the open questions.</p></div>
+    </div>`,
+  variants: { cols: ['Class', 'Tone'], rows: [
+    ['.sl-note', 'Accent (default).'], ['.sl-note--positive', 'Positive / result.'],
+    ['.sl-note--warning', 'Caution.'], ['.sl-note--negative', 'Error / blocker.'],
+  ] },
+  react: `import { Note } from 'sonaloop-design/components';\nimport { BulbIcon } from 'sonaloop-design';\n\n<Note icon={<BulbIcon />}>\n  <b>One source, two consumers.</b> Edit once, both update.\n</Note>`,
+  markup: `<div class="sl-note sl-note--positive">\n  <span class="sl-note__icon">…</span>\n  <p class="sl-note__body">Clear verdict.</p>\n</div>`,
+  python: `h("div", {"class_": "sl-note"}, h("span", {"class_": "sl-note__icon"}, icon), h("p", {"class_": "sl-note__body"}, text))`,
+});
+
+const cEmptyState = () => componentPage({
+  id: 'empty-state', title: 'Empty State', desc: 'A calm, centred card for “nothing here yet” and not-found views — a hi-fi product glyph, a title, a line of guidance and an optional action.',
+  demo: `<div class="sl-empty">
+      <div class="sl-empty__icon">${svgHifi('councils')}</div>
+      <h2 class="sl-empty__title">No councils yet</h2>
+      <p class="sl-empty__body">Run your first memory-grounded council to see verdicts and sentiment here.</p>
+      <button class="sl-btn sl-btn--primary">Run a council</button>
+    </div>`,
+  react: `import { EmptyState } from 'sonaloop-design/components';\nimport { CouncilsHifi } from 'sonaloop-design';\n\n<EmptyState icon={<CouncilsHifi />} title="No councils yet">\n  Run your first council to see verdicts here.\n</EmptyState>`,
+  markup: `<div class="sl-empty">\n  <div class="sl-empty__icon">…</div>\n  <h2 class="sl-empty__title">No councils yet</h2>\n  <p class="sl-empty__body">…</p>\n</div>`,
+  python: `_empty_state("No councils yet", "Run your first council…", icon="councils")`,
+});
+
+const cBreadcrumb = () => componentPage({
+  id: 'breadcrumb', title: 'Breadcrumb', desc: 'The compact ancestry trail in the inspector top bar — project → council → view. Truncates gracefully when space is tight.',
+  demo: `<nav class="sl-breadcrumb" aria-label="Breadcrumb" style="font-size:1em">
+      <a class="sl-breadcrumb__link" href="#/breadcrumb">Projects</a>
+      <span class="sl-breadcrumb__sep">/</span>
+      <a class="sl-breadcrumb__link" href="#/breadcrumb">Gesünder essen</a>
+      <span class="sl-breadcrumb__sep">/</span>
+      <span class="sl-breadcrumb__current">Evaluation</span>
+    </nav>`,
+  react: `import { Breadcrumb } from 'sonaloop-design/components';\n\n<Breadcrumb items={[\n  { label: 'Projects', href: '/projects' },\n  { label: 'Gesünder essen', href: '/projects/abc' },\n  { label: 'Evaluation' },\n]} />`,
+  markup: `<nav class="sl-breadcrumb">\n  <a class="sl-breadcrumb__link" href="…">Projects</a>\n  <span class="sl-breadcrumb__sep">/</span>\n  <span class="sl-breadcrumb__current">Evaluation</span>\n</nav>`,
+  python: `h("nav", {"class_": "sl-breadcrumb"}, *crumbs)`,
+});
+
+const cTable = () => componentPage({
+  id: 'table', title: 'Table', desc: 'A quiet hairline table for synthesis data and markdown tables. Hairline-only by default; <code>--bordered</code> boxes every cell.',
+  demo: `<table class="sl-table" style="max-width:480px">
+      <thead><tr><th>Persona</th><th>Verdict</th><th>Enthusiasm</th></tr></thead>
+      <tbody>
+        <tr><td>Lena Vogt</td><td>For</td><td>+72</td></tr>
+        <tr><td>Tom Berger</td><td>Conditional</td><td>+18</td></tr>
+        <tr><td>Mehmet Demir</td><td>For</td><td>+54</td></tr>
+        <tr><td>Sabine Kraus</td><td>Conditional</td><td>+9</td></tr>
+      </tbody>
+    </table>`,
+  variants: { cols: ['Class', 'Variant'], rows: [
+    ['.sl-table', 'Hairline rows (default).'], ['.sl-table--bordered', 'Every cell boxed (markdown tables).'],
+  ] },
+  react: `import { Table } from 'sonaloop-design/components';\n\n<Table>\n  <thead>…</thead>\n  <tbody>…</tbody>\n</Table>`,
+  markup: `<table class="sl-table">…</table>`,
+  python: `'<table class="sl-table sl-table--bordered">…</table>'  # markdown renderer`,
+});
+
+const cProgress = () => componentPage({
+  id: 'progress', title: 'Progress', desc: 'A thin progress bar for plan completion and any 0–100 ratio. The bar fills from <code>--sl-accent</code> over the quiet track.',
+  demo: `<div style="display:flex;flex-direction:column;gap:16px;width:100%;max-width:360px">
+      <div><div style="font-size:.8em;color:var(--sl-muted);margin-bottom:6px;font-family:var(--sl-mono)">Plan · 35%</div><div class="sl-progress"><div class="sl-progress__bar" style="width:35%"></div></div></div>
+      <div><div style="font-size:.8em;color:var(--sl-muted);margin-bottom:6px;font-family:var(--sl-mono)">Plan · 72%</div><div class="sl-progress"><div class="sl-progress__bar" style="width:72%"></div></div></div>
+      <div><div style="font-size:.8em;color:var(--sl-muted);margin-bottom:6px;font-family:var(--sl-mono)">Plan · 100%</div><div class="sl-progress"><div class="sl-progress__bar" style="width:100%"></div></div></div>
+    </div>`,
+  react: `import { Progress } from 'sonaloop-design/components';\n\n<Progress value={72} />`,
+  markup: `<div class="sl-progress"><div class="sl-progress__bar" style="width:72%"></div></div>`,
+  python: `h("div", {"class_": "sl-progress"}, h("div", {"class_": "sl-progress__bar", "style": f"width:{pct}%"}))`,
+});
+
+const cStat = () => componentPage({
+  id: 'stat', title: 'Stat', desc: 'A metric chip — a big number and a label — and a strip of them for the top of a project or persona page.',
+  demo: `<div class="sl-stats">
+      <div class="sl-stat"><span class="sl-stat__value">2</span><span class="sl-stat__label">councils</span></div>
+      <div class="sl-stat"><span class="sl-stat__value">4</span><span class="sl-stat__label">personas</span></div>
+      <div class="sl-stat"><span class="sl-stat__value">4</span><span class="sl-stat__label">syntheses</span></div>
+      <div class="sl-stat"><span class="sl-stat__value">+38</span><span class="sl-stat__label">avg enthusiasm</span></div>
+    </div>`,
+  react: `import { Stat, Stats } from 'sonaloop-design/components';\n\n<Stats>\n  <Stat value={2} label="councils" />\n  <Stat value={4} label="personas" />\n</Stats>`,
+  markup: `<div class="sl-stat"><span class="sl-stat__value">4</span><span class="sl-stat__label">personas</span></div>`,
+  python: `h("div", {"class_": "sl-stat"}, h("span", {"class_": "sl-stat__value"}, n), h("span", {"class_": "sl-stat__label"}, label))`,
+});
+
 /* ── nav model ─────────────────────────────────────────────────────────────────── */
 const NAV = [
   { label: 'Foundations', items: [
@@ -526,7 +704,17 @@ const NAV = [
     { id: 'tag', title: 'Tag', ico: 'tag', render: cTag },
     { id: 'pill', title: 'Pill', ico: 'circle', render: cPill },
     { id: 'chip', title: 'Chip', ico: 'diamond', render: cChip },
+    { id: 'status-dot', title: 'Status Dot', ico: 'dot', render: cStatusDot },
+    { id: 'avatar', title: 'Avatar', ico: 'contact', render: cAvatar },
     { id: 'card', title: 'Card', ico: 'rectangle', render: cCard },
+    { id: 'note', title: 'Note', ico: 'bulb', render: cNote },
+    { id: 'stat', title: 'Stat', ico: 'analytics', render: cStat },
+    { id: 'progress', title: 'Progress', ico: 'wave', render: cProgress },
+    { id: 'segmented', title: 'Segmented · Tabs', ico: 'squareCols', render: cSegmented },
+    { id: 'table', title: 'Table', ico: 'squareRows', render: cTable },
+    { id: 'breadcrumb', title: 'Breadcrumb', ico: 'caretRight', render: cBreadcrumb },
+    { id: 'empty-state', title: 'Empty State', ico: 'square', render: cEmptyState },
+    { id: 'snippet', title: 'Snippet · Code', ico: 'jtbd', render: cSnippet },
     { id: 'eyebrow', title: 'Eyebrow', ico: 'wave', render: cEyebrow },
     { id: 'input', title: 'Input', ico: 'search', render: cInput },
     { id: 'kbd', title: 'Kbd', ico: 'squareSplit', render: cKbd },
@@ -610,6 +798,12 @@ document.addEventListener('click', (e) => {
   }
   const swatch = e.target.closest('[data-copy-text]');
   if (swatch) { copyText(swatch.dataset.copyText); flash(swatch); return; }
+
+  const seg = e.target.closest('.sl-segmented__item');
+  if (seg && seg.closest('.ds-preview-stage')) {
+    seg.parentElement.querySelectorAll('.sl-segmented__item').forEach((b) => b.classList.toggle('is-active', b === seg));
+    return;
+  }
 
   const dens = e.target.closest('[data-density]');
   if (dens) {

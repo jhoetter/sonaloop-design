@@ -36,6 +36,8 @@ const SL_MAP = {
   bg: 'bg', surface: 'panel', 'surface-2': 'panel-2', ink: 'ink', muted: 'muted', faint: 'faint',
   line: 'line', accent: 'accent', 'accent-ink': 'accent-ink', 'accent-weak': 'accent-weak',
   hover: 'hover', sel: 'sel', green: 'green', amber: 'amber', red: 'red',
+  // extended semantic hues (avatar tones, status dots, note variants)
+  blue: 'blue', violet: 'violet', skep: 'skep',
 };
 const slDecls = (set) =>
   Object.entries(SL_MAP).map(([sl, k]) => `--sl-${sl}:${set[k]}`).join(';') +
