@@ -7,21 +7,26 @@
   "exports": {
     ".": "./src/index.ts",
     "./components": "./src/components.tsx",
+    "./charts": "./src/charts.tsx",
     "./components.css": "./styles/components.css",
     "./tokens.css": "./styles/tokens.css",
     "./fonts.css": "./styles/fonts.css",
     "./data": "./icons.data.mjs",
+    "./images": "./src/images.ts",
+    "./images/*": "./images/*",
     "./style.css": "./styles/hifi-anim.css"
   },
   "files": [
     "src",
     "icons.data.mjs",
     "styles",
-    "fonts"
+    "fonts",
+    "images"
   ],
   "scripts": {
     "gen": "node scripts/gen.mjs && node scripts/gen-tokens.mjs",
     "gen:tokens": "node scripts/gen-tokens.mjs",
+    "generate-canvas": "node scripts/generate-canvas.mjs",
     "prepare": "git config core.hooksPath .githooks || true",
     "check": "npm run gen && git diff --exit-code -- src/index.ts py/sonaloop_icons styles/tokens.css tailwind-preset.js",
     "capture": "node scripts/capture-anim.mjs",

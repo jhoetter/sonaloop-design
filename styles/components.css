@@ -218,3 +218,56 @@
   border-radius: var(--sl-radius-sm); background: var(--sl-surface); padding: .5em .8em; }
 .sl-stat__value { font-size: 1.35em; font-weight: 700; color: var(--sl-ink); line-height: 1; }
 .sl-stat__label { color: var(--sl-muted); font-size: .85em; }
+
+/* ── Charts (bar · pie/donut · effort·impact quadrant) ────────────────────────────────
+   Static, token-driven, print-safe (no hover-only data) so they render identically in the
+   app, the website, and headless-Chromium PDF/PPTX export. Markup is emitted by the React
+   (src/charts.tsx) and Python (py/sonaloop_icons/charts.py) wrappers; this is the one style
+   source. Series colours come from position (--c1..--c7) unless an item sets --c inline. */
+.sl-chart { margin: 0; --c1: var(--sl-accent); --c2: var(--sl-violet); --c3: var(--sl-blue);
+  --c4: var(--sl-green); --c5: var(--sl-amber); --c6: var(--sl-red); --c7: var(--sl-skep); }
+.sl-chart__title { font-size: .8em; font-weight: 650; text-transform: uppercase; letter-spacing: .04em;
+  color: var(--sl-muted); margin: 0 0 .8em; }
+
+/* Bar chart — horizontal labelled bars (ranking, counts) */
+.sl-bars { display: flex; flex-direction: column; gap: .5em; }
+.sl-bar { display: grid; grid-template-columns: minmax(4.5em, 10em) 1fr auto; align-items: center;
+  gap: .75em; font-size: .92em; }
+.sl-bar__label { color: var(--sl-ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sl-bar__track { height: .7em; border-radius: var(--sl-radius-full); background: var(--sl-surface-2); overflow: hidden; }
+.sl-bar__fill { height: 100%; width: var(--v, 0%); border-radius: var(--sl-radius-full); background: var(--c, var(--sl-accent)); }
+.sl-bar__val { color: var(--sl-muted); font-variant-numeric: tabular-nums; min-width: 2em; text-align: right; }
+
+/* Pie / donut — proportions (distribution, sentiment). `--slices` is set inline (conic-gradient). */
+.sl-pie-wrap { display: flex; align-items: center; gap: 1.3em; flex-wrap: wrap; }
+.sl-pie { width: 9.5em; height: 9.5em; flex: none; border-radius: 50%; background: var(--slices, var(--sl-surface-2)); }
+.sl-pie--donut { -webkit-mask: radial-gradient(circle, #0000 53%, #000 54%); mask: radial-gradient(circle, #0000 53%, #000 54%); }
+
+/* Legend — shared by pie + quadrant + multi-series bar */
+.sl-legend { display: flex; flex-direction: column; gap: .4em; font-size: .85em; min-width: 0; }
+.sl-legend--row { flex-direction: row; flex-wrap: wrap; gap: .25em 1.2em; }
+.sl-legend__item { display: flex; align-items: baseline; gap: .55em; color: var(--sl-muted); }
+.sl-legend__sw { width: .72em; height: .72em; flex: none; border-radius: 3px; background: var(--c, var(--sl-accent)); transform: translateY(.06em); }
+.sl-legend__num { width: 1.5em; height: 1.5em; flex: none; border-radius: 50%; display: inline-flex; align-items: center;
+  justify-content: center; font-size: .78em; font-weight: 700; color: var(--c, var(--sl-accent));
+  border: 1.5px solid var(--c, var(--sl-accent)); transform: translateY(.05em); }
+.sl-legend__label { color: var(--sl-ink); }
+.sl-legend__val { color: var(--sl-muted); font-variant-numeric: tabular-nums; margin-left: auto; padding-left: .6em; }
+
+/* Effort·impact — a 2×2 scatter. Dots positioned by --x/--y (%); origin bottom-left. */
+.sl-quad-wrap { display: grid; grid-template-columns: 1.3em 1fr; grid-template-rows: 1fr 1.3em; gap: .4em;
+  max-width: 32em; margin: 0 auto; }
+.sl-quad-ylab { grid-column: 1; grid-row: 1; writing-mode: vertical-rl; transform: rotate(180deg);
+  text-align: center; align-self: center; font-size: .78em; color: var(--sl-ink); }
+.sl-quad-xlab { grid-column: 2; grid-row: 2; text-align: center; font-size: .78em; color: var(--sl-ink); }
+.sl-quad { grid-column: 2; grid-row: 1; position: relative; aspect-ratio: 4 / 3;
+  border-left: 1px solid var(--sl-line); border-bottom: 1px solid var(--sl-line); }
+.sl-quad__gx { position: absolute; top: 0; bottom: 0; left: 50%; border-left: 1px dashed var(--sl-line); }
+.sl-quad__gy { position: absolute; left: 0; right: 0; top: 50%; border-top: 1px dashed var(--sl-line); }
+.sl-quad__q { position: absolute; font-size: .68em; color: var(--sl-faint); padding: .35em .5em; max-width: 48%; }
+.sl-quad__q--tl { top: 0; left: 0; } .sl-quad__q--tr { top: 0; right: 0; text-align: right; }
+.sl-quad__q--bl { bottom: 0; left: 0; } .sl-quad__q--br { bottom: 0; right: 0; text-align: right; }
+.sl-quad__dot { position: absolute; left: var(--x, 50%); top: var(--y, 50%); transform: translate(-50%, -50%);
+  width: 1.9em; height: 1.9em; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: .8em; font-weight: 700; color: var(--c, var(--sl-accent)); background: var(--sl-bg);
+  border: 1.8px solid var(--c, var(--sl-accent)); box-shadow: 0 0 0 3px var(--sl-bg); }
