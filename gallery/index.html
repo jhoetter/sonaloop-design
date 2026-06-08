@@ -94,8 +94,8 @@
       const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
       document.getElementById('icons-reg').innerHTML = Object.entries(regular).map(([name, spec]) =>
         `<div class="gx-ico" title="${esc(name)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">${spec.body}</svg><span>${esc(name)}</span></div>`).join('');
-      document.getElementById('icons-hifi').innerHTML = Object.entries(hifi).map(([name, body]) =>
-        `<div class="gx-ico gx-ico--hifi" title="${esc(name)}"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">${body}</svg><span>${esc(name)}</span></div>`).join('');
+      document.getElementById('icons-hifi').innerHTML = Object.entries(hifi).map(([name, spec]) =>
+        `<div class="gx-ico gx-ico--hifi" title="${esc(name)}"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">${spec.body}</svg><span>${esc(name)}</span></div>`).join('');
     }).catch((e) => { document.getElementById('icons-reg').textContent = 'Could not load icons.data.mjs (' + e + ')'; });
 
     // ── Components (same markup, two density columns) ──
