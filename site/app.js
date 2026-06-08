@@ -333,7 +333,7 @@ function pageBrand() {
       <div class="ds-brand-panel" style="flex-direction:column;gap:14px">${svgHifi('sonaloop-research')}<span class="mono" style="font-family:var(--sl-mono);font-size:12px;color:var(--sl-faint)">Sonaloop Research</span></div>
     </div>
 
-    ${h2('brand-dont', 'Clear space &amp; misuse')}
+    ${h2('brand-dont', 'Clear space & misuse')}
     <ul class="ds-ul">
       <li class="ds-li">Keep clear space around the lockup equal to the height of the mark.</li>
       <li class="ds-li">Don't recolour the mark, add gradients, or set it on the indigo accent.</li>
