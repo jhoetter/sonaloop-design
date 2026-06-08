@@ -80,15 +80,16 @@ Sona), swapping the underlying outlines never touches a component. **Phases 0–
   The binaries now genuinely report a Sona family — not just a CSS alias. *Outlines unchanged.*
 - **Phase 2 — bespoke glyphs, in code (IN PROGRESS).** Edit signature glyphs + metrics with
   fontTools so Sona stops *being* Geist and starts *being Sona* — no manual font editor.
-  - **Shipped: `Sona Pixel Loop`** — Sonaloop's *first 100%-own face*. A clean-room 5×7 pixel
-    font drawn entirely in code (`scripts/build_sona_pixel.py`), **zero Geist/third-party
-    outlines**, soft round dots echoing the loop mark. It's the end-state for the pixel slot:
-    once approved it replaces the Geist-derived Sona Pixel fills (and those binaries can go,
-    leaving the pixel slot fully license-clean). Proof that "own face, in code" works.
-  - **Next:** apply the same approach to the text faces — a Sonaloop `g`/`a`, the loop motif in
-    the `o` / ampersand / a logo ligature, a tightened spacing pass, `council_…` id ligatures.
-    Text outlines are harder than a pixel grid (this is where a type designer pairs with the
-    code path), so land it glyph by glyph; every export stays a drop-in.
+  - **Shipped: the whole `Sona Pixel` family is now 100%-own.** A clean-room 5×7 pixel face
+    drawn entirely in code (`scripts/build_sona_pixel.py`), **zero Geist/third-party outlines**,
+    in four fills from one bitmap source: **Loop** (round dots, brand-native), **Square** (solid,
+    default), **Grid** (gapped), **Line** (hollow). The Geist-derived `SonaPixel-*` binaries are
+    **retired** → the pixel slot is fully license-clean. Proof that "own face, in code" works.
+  - **Next: the text faces** (`Sona`, `Sona Mono`) — still Geist-derived. Apply the same code
+    approach: a Sonaloop `g`/`a`, the loop motif in the `o` / ampersand / a logo ligature, a
+    tightened spacing pass, `council_…` id ligatures. Text outlines are far harder than a pixel
+    grid (this is where a type designer pairs with the code path), so land it glyph by glyph;
+    every export stays a drop-in.
 - **Phase 3 — commission an original face (LATER, $20k–$100k+, months).** A type designer draws
   Sona from scratch once typography is a deliberate differentiator. Same drop-in when it lands.
 
@@ -116,10 +117,9 @@ To resemble Sonaloop, nudge it **warmer and a touch more humanist** without losi
   (the inspector is information-dense) yet elegant large (the airy marketing site).
 - **Sona Mono = the data voice.** Slightly humanist mono; great figures and id legibility
   (`council_24105090`); the existing eyebrow/tag usage is its home.
-- **Sona Pixel = the "research instrument" accent.** The brand-native choice is now
-  **Sona Pixel Loop** (our own clean-room face; round dots = the loop mark). Of the Geist-derived
-  fills, Circle is the closest and Square the safe neutral. Keep Pixel rare and deliberate
-  (loaders, ids), never for reading.
+- **Sona Pixel = the "research instrument" accent.** Our own clean-room family in four fills;
+  the brand-native choice is **Loop** (round dots = the loop mark), with **Square** the safe
+  neutral default. Keep Pixel rare and deliberate (loaders, ids), never for reading.
 - **Avoid:** anything cold/techy-generic, ultra-geometric, or a warm-display personality that
   fights the cool painterly canvases. Sona should feel like a *quiet, premium instrument*.
 

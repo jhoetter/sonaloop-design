@@ -7,6 +7,19 @@ export default {
   theme: {
     extend: {
       borderColor: { DEFAULT: 'rgb(var(--line) / 0.1)' },
+      // Radius scale → design-system tokens, so every `rounded-*` flows from --sl-radius*
+      // (one lever for the whole site; go sharp by changing the tokens in tokens.data.mjs).
+      borderRadius: {
+        none: '0',
+        sm: 'var(--sl-radius-sm)',
+        DEFAULT: 'var(--sl-radius-sm)',
+        md: 'var(--sl-radius-sm)',
+        lg: 'var(--sl-radius)',
+        xl: 'var(--sl-radius-lg)',
+        '2xl': 'var(--sl-radius-lg)',
+        '3xl': 'var(--sl-radius-lg)',
+        full: 'var(--sl-radius-full)',
+      },
       colors: {
         paper: { DEFAULT: 'rgb(var(--paper) / <alpha-value>)', dark: 'rgb(var(--paper-2) / <alpha-value>)' },
         ink: { DEFAULT: 'rgb(var(--ink) / <alpha-value>)', soft: 'rgb(var(--ink-2) / <alpha-value>)' },
@@ -21,7 +34,7 @@ export default {
         serif: ["\"Sona\"", "\"Geist\"", "\"Inter\"", "system-ui", "sans-serif"],
         sans: ["\"Sona\"", "\"Geist\"", "\"Inter\"", "system-ui", "sans-serif"],
         mono: ["\"Sona Mono\"", "\"Geist Mono\"", "ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
-        pixel: ["\"Sona Pixel\"", "\"Geist Pixel\"", "ui-monospace", "monospace"],
+        pixel: ["\"Sona Pixel\"", "ui-monospace", "monospace"],
       },
     },
   },

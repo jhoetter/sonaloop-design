@@ -1,25 +1,36 @@
 #!/usr/bin/env python3
-"""build_sona_pixel.py — Phase 2: Sonaloop's FIRST 100%-own typeface, drawn in code.
+"""build_sona_pixel.py — Phase 2: Sonaloop's own pixel typeface family, drawn in code.
 
-"Sona Pixel Loop" is a clean-room 5x7 bitmap display face. Every glyph is authored here as a
-pixel grid (below) and rendered to real outlines with fontTools — there is **no Geist (or any
-other) outline data in it**, so it is wholly Sonaloop's, under whatever license we choose.
+A clean-room 5x7 bitmap display family. Every glyph is authored here as a pixel grid (below)
+and rendered to real outlines with fontTools — there is **no Geist (or any other) outline data
+in it**, so it is wholly Sonaloop's, under whatever license we choose. Display ONLY (loaders,
+council ids, "SONALOOP") — caps-height; lowercase maps to the caps.
 
-On-brand by construction: each "pixel" is drawn as a soft round dot (the loop mark is a
-continuous loop of nodes), giving the Circle-fill warmth without depending on Geist Pixel.
-Display ONLY (loaders, council ids, "SONALOOP") — caps-height; lowercase maps to the caps.
+Four "fills" share one bitmap source; only how each on-pixel is rendered differs:
+  • Loop    soft round dots (the loop mark) — the brand-native default
+  • Square  solid blocks — crisp, neutral
+  • Grid    small blocks with gaps — schematic, blueprint-y
+  • Line    hollow outlined cells — lightest
 
-    python3 scripts/build_sona_pixel.py [--shape dot|square]
+    python3 scripts/build_sona_pixel.py [Loop Square Grid Line]   # default: all four
 
-Outputs fonts/SonaPixelLoop-Regular.woff2 (family "Sona Pixel Loop"). Requires fonttools+brotli.
+Outputs fonts/SonaPixel{Fill}-Regular.woff2. Requires fonttools + brotli.
 """
 from __future__ import annotations
-import sys, math, pathlib
+import sys, pathlib
 from fontTools.fontBuilder import FontBuilder
 from fontTools.pens.ttGlyphPen import TTGlyphPen
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-OUT = ROOT / "fonts" / "SonaPixelLoop-Regular.woff2"
+FONTS = ROOT / "fonts"
+
+# fill → (shape primitive, family name, output file)
+FILLS = {
+    "Loop":   ("dot",    "Sona Pixel Loop",   "SonaPixelLoop-Regular.woff2"),
+    "Square": ("square", "Sona Pixel Square", "SonaPixelSquare-Regular.woff2"),
+    "Grid":   ("grid",   "Sona Pixel Grid",   "SonaPixelGrid-Regular.woff2"),
+    "Line":   ("line",   "Sona Pixel Line",   "SonaPixelLine-Regular.woff2"),
+}
 
 CELL = 100            # units per pixel cell (UPM 1000)
 COLS, ROWS = 5, 7     # 5 wide x 7 tall
@@ -110,7 +121,17 @@ NAMES = {
 }
 
 
-def dot(pen, cx, cy, r):
+def _rect(pen, x0, y0, x1, y1, ccw=False):
+    pts = [(x0, y0), (x0, y1), (x1, y1), (x1, y0)]   # clockwise
+    if ccw:
+        pts.reverse()                                # counter-clockwise → cuts a hole (nonzero)
+    pen.moveTo(pts[0])
+    for p in pts[1:]:
+        pen.lineTo(p)
+    pen.closePath()
+
+
+def _dot(pen, cx, cy, r):
     k = 0.9142 * r                       # 4-segment quadratic ≈ circle
     pen.moveTo((cx + r, cy))
     pen.qCurveTo((cx + k, cy + k), (cx, cy + r))
@@ -120,27 +141,28 @@ def dot(pen, cx, cy, r):
     pen.closePath()
 
 
-def square(pen, x0, y0, x1, y1):
-    pen.moveTo((x0, y0)); pen.lineTo((x0, y1)); pen.lineTo((x1, y1)); pen.lineTo((x1, y0))
-    pen.closePath()
+def cell(pen, shape, cx, cy):
+    if shape == "dot":                                   # Loop — soft round dots (slight overlap)
+        _dot(pen, cx, cy, 52)
+    elif shape == "square":                              # Square — solid block, subtle gap
+        _rect(pen, cx - 46, cy - 46, cx + 46, cy + 46)
+    elif shape == "grid":                                # Grid — small block, big gap
+        _rect(pen, cx - 32, cy - 32, cx + 32, cy + 32)
+    elif shape == "line":                                # Line — hollow outlined cell
+        _rect(pen, cx - 46, cy - 46, cx + 46, cy + 46)
+        _rect(pen, cx - 28, cy - 28, cx + 28, cy + 28, ccw=True)
 
 
 def glyph(rows, shape):
     pen = TTGlyphPen(None)
     for i, row in enumerate(rows):
         for j, ch in enumerate(row):
-            if ch != "#":
-                continue
-            cx, cy = j * CELL + CELL // 2, (6 - i) * CELL + CELL // 2
-            if shape == "square":
-                square(pen, cx - 46, cy - 46, cx + 46, cy + 46)   # tiny gap → grid feel
-            else:
-                dot(pen, cx, cy, 52)                              # slight overlap → soft loop
+            if ch == "#":
+                cell(pen, shape, j * CELL + CELL // 2, (6 - i) * CELL + CELL // 2)
     return pen.glyph()
 
 
-def main() -> int:
-    shape = "square" if "--shape" in sys.argv and "square" in sys.argv else "dot"
+def build(fill, shape, family, out):
     fb = FontBuilder(1000, isTTF=True)
     chars = list(B.keys())
     order = [".notdef"] + [NAMES[c] for c in chars]
@@ -156,22 +178,31 @@ def main() -> int:
     fb.setupGlyf(glyphs)
     fb.setupHorizontalMetrics({n: (ADV, 0) for n in order})
     fb.setupHorizontalHeader(ascent=ASCENT, descent=DESCENT)
+    ps = family.replace(" ", "") + "-Regular"
     fb.setupNameTable({
-        "familyName": "Sona Pixel Loop",
+        "familyName": family,
         "styleName": "Regular",
-        "uniqueFontIdentifier": "Sonaloop;SonaPixelLoop-Regular;2026",
-        "fullName": "Sona Pixel Loop",
+        "uniqueFontIdentifier": f"Sonaloop;{ps};2026",
+        "fullName": family,
         "version": "Version 1.000",
-        "psName": "SonaPixelLoop-Regular",
-        "copyright": ("Copyright 2026 Sonaloop. Sona Pixel Loop is an original Sonaloop "
-                      "typeface (no third-party outlines). Licensed under SIL OFL 1.1."),
+        "psName": ps,
+        "copyright": (f"Copyright 2026 Sonaloop. {family} is an original Sonaloop typeface "
+                      "(no third-party outlines). Licensed under SIL OFL 1.1."),
     })
     fb.setupOS2(sTypoAscender=ASCENT, sTypoDescender=DESCENT, sTypoLineGap=0,
                 usWinAscent=ASCENT, usWinDescent=-DESCENT)
     fb.setupPost()
     fb.font.flavor = "woff2"
-    fb.font.save(OUT)
-    print(f"  ✓ {OUT.name}  ({shape})  {len(chars)} glyphs, 100% Sonaloop-owned")
+    fb.font.save(FONTS / out)
+    print(f"  ✓ {out:30} {family:20} ({fill})")
+
+
+def main() -> int:
+    wanted = [a for a in sys.argv[1:] if a in FILLS] or list(FILLS)
+    print(f"Building Sona Pixel ({len(list(B))} glyphs each, 100% Sonaloop-owned):")
+    for fill in wanted:
+        shape, family, out = FILLS[fill]
+        build(fill, shape, family, out)
     return 0
 
 
