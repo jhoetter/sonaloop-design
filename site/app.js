@@ -685,13 +685,13 @@ function pageBrand() {
 
     ${h2('brand-lockup', 'Primary lockup')}
     ${p('This is the live <a href="#/components/logo">Logo</a> component (<code>.sl-logo</code>) — the same lockup the website navbar/footer and the app sidebar render.')}
-    <div class="ds-brand-hero"><span class="sl-logo" style="font-size:32px"><span class="sl-logo__mark">${svgReg('sonaloop')}</span><span class="sl-logo__word">Sonaloop</span></span></div>
+    <div class="ds-brand-hero"><span class="sl-logo" style="font-size:32px"><span class="sl-logo__mark">${svgReg('sonaloop')}</span><span class="sl-logo__word">sona<span class="sl-logo__loop">loop</span></span></span></div>
 
     ${h2('brand-contrast', 'On light & dark')}
-    ${p('The mark carries the indigo accent; the wordmark is <code>--sl-ink</code>. Both are theme-aware, so the lockup inverts cleanly — never recolour it by hand or set it on busy imagery.')}
+    ${p('The whole lockup is monochrome <code>--sl-ink</code> — theme-aware, so it inverts cleanly. Never recolour it by hand or set it on busy imagery.')}
     <div class="ds-brand-clear">
-      <div class="ds-brand-panel"><span class="sl-logo" style="font-size:20px"><span class="sl-logo__mark">${svgReg('sonaloop')}</span><span class="sl-logo__word">Sonaloop</span></span></div>
-      <div class="ds-brand-panel on-dark" data-theme="dark"><span class="sl-logo" style="font-size:20px"><span class="sl-logo__mark">${svgReg('sonaloop')}</span><span class="sl-logo__word">Sonaloop</span></span></div>
+      <div class="ds-brand-panel"><span class="sl-logo" style="font-size:20px"><span class="sl-logo__mark">${svgReg('sonaloop')}</span><span class="sl-logo__word">sona<span class="sl-logo__loop">loop</span></span></span></div>
+      <div class="ds-brand-panel on-dark" data-theme="dark"><span class="sl-logo" style="font-size:20px"><span class="sl-logo__mark">${svgReg('sonaloop')}</span><span class="sl-logo__word">sona<span class="sl-logo__loop">loop</span></span></span></div>
     </div>
 
     ${h2('brand-family', 'Product family')}
@@ -874,16 +874,16 @@ const cArrowLink = () => componentPage({
 });
 
 const cLogo = () => componentPage({
-  id: 'logo', title: 'Logo', desc: 'The Sonaloop brand lockup — the loop <a href="#/brand">mark</a> paired with the mono <code>SONALOOP</code> wordmark. The single source of truth for the logo: the React <code>&lt;Logo&gt;</code> and the Python-SSR sidebar both apply <code>.sl-logo</code>, so it can never drift between surfaces. Em-based, so it scales with the host font-size; the mark lifts on hover when the lockup is a link. Use <code>--sm</code>/<code>--lg</code> to nudge the mark, <code>--plain</code> to drop the hover lift, and <code>--display</code> for the hero treatment — lowercase, tightly set, mono “sona” running into a Sona&nbsp;Pixel “loop” (whose cells echo the mark).',
+  id: 'logo', title: 'Logo', desc: 'The Sonaloop brand lockup — the loop <a href="#/brand">mark</a> + the <code>sonaloop</code> wordmark, lowercase and tightly set: <code>sona</code> in Sona&nbsp;Mono running straight into a Sona&nbsp;Pixel <code>loop</code> (whose cells echo the mark). The single source of truth for the logo: the React <code>&lt;Logo&gt;</code> and the Python-SSR sidebar both apply <code>.sl-logo</code>, so it never drifts. Monochrome <code>--sl-ink</code> (inverts cleanly), em-based, static. The mark sits on the baseline like a glyph; use <code>--sm</code>/<code>--lg</code> to nudge it. Needs the Sona&nbsp;Mono + Sona&nbsp;Pixel faces loaded.',
   demo: `<div style="display:flex;flex-direction:column;gap:24px;align-items:flex-start">
-      <a href="#/logo" class="sl-logo" style="font-size:18px"><span class="sl-logo__mark">${svgReg('sonaloop')}</span><span class="sl-logo__word">Sonaloop</span></a>
-      <span class="sl-logo sl-logo--lg"><span class="sl-logo__mark">${svgReg('sonaloop')}</span><span class="sl-logo__word">Sonaloop</span></span>
-      <span class="sl-logo sl-logo--sm sl-logo--plain"><span class="sl-logo__mark">${svgReg('sonaloop')}</span></span>
-      <span class="sl-logo sl-logo--display" style="font-size:34px"><span class="sl-logo__mark">${svgReg('sonaloop')}</span><span class="sl-logo__word">Sona<span class="sl-logo__loop">loop</span></span></span>
+      <a href="#/logo" class="sl-logo" style="font-size:30px"><span class="sl-logo__mark">${svgReg('sonaloop')}</span><span class="sl-logo__word">sona<span class="sl-logo__loop">loop</span></span></a>
+      <span class="sl-logo" style="font-size:18px"><span class="sl-logo__mark">${svgReg('sonaloop')}</span><span class="sl-logo__word">sona<span class="sl-logo__loop">loop</span></span></span>
+      <span class="sl-logo sl-logo--lg" style="font-size:48px"><span class="sl-logo__mark">${svgReg('sonaloop')}</span><span class="sl-logo__word">sona<span class="sl-logo__loop">loop</span></span></span>
+      <span class="sl-logo"><span class="sl-logo__mark">${svgReg('sonaloop')}</span></span>
     </div>`,
-  react: `import { Logo } from 'sonaloop-design/components';\n\n// Wrap in your router's link to make it navigable\n<Link to="/"><Logo /></Link>\n<Logo size="lg" />\n<Logo wordmark={false} />   // mark only\n<Logo display />            // hero: mono "Sona" + pixel "loop"`,
-  markup: `<a class="sl-logo" href="/">\n  <span class="sl-logo__mark"><!-- 24×24 SonaloopIcon SVG --></span>\n  <span class="sl-logo__word">Sonaloop</span>\n</a>\n\n<!-- Display lockup -->\n<span class="sl-logo sl-logo--display">\n  <span class="sl-logo__mark">…</span>\n  <span class="sl-logo__word">Sona<span class="sl-logo__loop">loop</span></span>\n</span>`,
-  python: `h("a", {"class_": "sl-logo", "href": "/"},\n  h("span", {"class_": "sl-logo__mark"}, icon("sonaloop")),\n  h("span", {"class_": "sl-logo__word"}, brand_name()))`,
+  react: `import { Logo } from 'sonaloop-design/components';\n\n// Wrap in your router's link to make it navigable\n<Link to="/"><Logo /></Link>\n<Logo size="lg" />\n<Logo wordmark={false} />   // mark only`,
+  markup: `<a class="sl-logo" href="/">\n  <span class="sl-logo__mark"><!-- 24×24 SonaloopIcon SVG --></span>\n  <span class="sl-logo__word">sona<span class="sl-logo__loop">loop</span></span>\n</a>`,
+  python: `h("a", {"class_": "sl-logo", "href": "/"},\n  h("span", {"class_": "sl-logo__mark"}, icon("sonaloop")),\n  h("span", {"class_": "sl-logo__word"}, "sona", h("span", {"class_": "sl-logo__loop"}, "loop")))`,
   notes: `<div class="ds-callout"><span class="ico">${svgReg('bulb')}</span><p>Usage rules (clear space, on-light/dark, the product-family badges) live on the <a href="#/brand">Brand</a> page — this component is just the canonical lockup every app renders.</p></div>`,
 });
 

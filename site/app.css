@@ -50,7 +50,7 @@ a { color: inherit; }
 /* The docs header dogfoods the shared .sl-logo lockup; this only sets header-specific
    scale + the muted "Design" suffix on the wordmark. */
 .ds-brand { font-size: 15px; min-width: calc(var(--ds-sidebar-w) - 20px); }
-.ds-brand .ds-brand-sub { color: var(--sl-muted); }
+.ds-brand .ds-brand-sub { color: var(--sl-muted); margin-left: .5em; }
 
 .ds-search {
   display: flex; align-items: center; gap: 9px; height: 34px; padding: 0 10px 0 11px;
