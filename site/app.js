@@ -10,7 +10,10 @@
 import { inspector, scales, fonts } from '/tokens.data.mjs';
 import { regular, hifi } from '/icons.data.mjs';
 import { blocks as websiteBlocks } from '/site/website.previews.mjs';
-import { usage as websiteUsage } from '/site/website.usage.mjs';
+import { usage as websiteUsage, source as websiteSource } from '/site/website.usage.mjs';
+
+// Where the local marketing site runs (its `npm run dev`), so the "Used on" chips open the real page.
+const WEBSITE_ORIGIN = 'http://localhost:3000';
 
 /* ── tiny helpers ──────────────────────────────────────────────────────────────── */
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -132,16 +135,29 @@ const USAGE_FALLBACK = {
   'mega-menu': 'Rendered inside the <b>Navbar</b> (opens on hover) — not imported directly by pages.',
   'cta-band': 'Embedded in the <b>Footer</b> by default; also drop-in standalone mid-page.',
 };
+// Dynamic :slug routes have no real URL — open the parent collection page instead.
+const liveHref = (to) => WEBSITE_ORIGIN + (to.replace(/\/:[^/]+$/, '') || '/');
+
 function websiteConsumers(block) {
   const list = websiteUsage[block] || [];
   if (!list.length) {
     const note = USAGE_FALLBACK[block];
     return note ? `${h2(`${block}-used`, 'Used on the website')}${p(note)}` : '';
   }
-  const chips = list.map((u) => `<span class="ds-usechip">${esc(u.name)}${u.to ? `<code>${esc(u.to)}</code>` : ''}</span>`).join('');
+  const chips = list.map((u) => u.to
+    ? `<a class="ds-usechip" href="${esc(liveHref(u.to))}" target="_blank" rel="noopener">${esc(u.name)}<code>${esc(u.to)}</code></a>`
+    : `<span class="ds-usechip">${esc(u.name)}</span>`).join('');
   return `${h2(`${block}-used`, 'Used on the website')}
-    ${p(`Auto-detected from the marketing site — <b>${list.length}</b> ${list.length === 1 ? 'page composes' : 'pages compose'} this block:`)}
+    ${p(`Auto-detected from the marketing site — <b>${list.length}</b> ${list.length === 1 ? 'page composes' : 'pages compose'} this block. Each opens the live page on your local dev server (<code>${esc(WEBSITE_ORIGIN)}</code>):`)}
     <div class="ds-usechips">${chips}</div>`;
+}
+
+// "Source" link — detected (scripts/gen-website-usage.mjs reads src/website.tsx), never hardcoded.
+function websiteSourceLink(block) {
+  const s = websiteSource[block];
+  if (!s) return '';
+  return `<p class="ds-source"><span class="ds-source__ico">${svgReg('jtbd')}</span>`
+    + `Source: <a href="${esc(s.href)}" target="_blank" rel="noopener"><code>${esc(s.file)}</code> › ${esc(s.export)}${s.line ? ` <span class="ds-source__line">L${s.line}</span>` : ''}</a></p>`;
 }
 
 /* Website-section page — a real shared component (sonaloop-design/website), shadcn-style. The
@@ -154,6 +170,7 @@ function websitePage({ id, block, title, desc, usage, notes }) {
     <p class="ds-eyebrow">Website</p>
     <h1 class="ds-h1">${esc(title)}</h1>
     <p class="ds-lead">${desc}</p>
+    ${websiteSourceLink(block)}
     <div class="ds-preview ds-preview--web">
       <div class="ds-preview-bar">
         <span class="ds-pv-label">Preview</span>

@@ -241,6 +241,18 @@ a { color: inherit; }
   font-family: var(--sl-mono); font-size: 11.5px; color: var(--sl-muted);
   background: var(--sl-surface-2); border: 1px solid var(--sl-line); border-radius: 5px; padding: 1px 6px;
 }
+a.ds-usechip { text-decoration: none; transition: border-color .12s, background .12s, color .12s; }
+a.ds-usechip:hover { border-color: color-mix(in srgb, var(--sl-accent) 50%, var(--sl-line)); background: var(--sl-hover); }
+a.ds-usechip:hover code { color: var(--sl-accent); border-color: color-mix(in srgb, var(--sl-accent) 35%, var(--sl-line)); }
+
+/* "Source" link — the component's location in the design-system repo (detected, not hardcoded). */
+.ds-source { display: flex; align-items: center; gap: 7px; margin: 14px 0 0; font-size: 13px; color: var(--sl-muted); }
+.ds-source__ico { line-height: 0; color: var(--sl-faint); }
+.ds-source__ico svg { width: 15px; height: 15px; }
+.ds-source a { color: var(--sl-muted); text-decoration: none; display: inline-flex; align-items: center; gap: 7px; }
+.ds-source a:hover { color: var(--sl-accent); }
+.ds-source code { font-family: var(--sl-mono); font-size: 12px; }
+.ds-source__line { font-family: var(--sl-mono); font-size: 11px; color: var(--sl-faint); }
 
 /* density toggle reused from .ds-seg, smaller text variant */
 .ds-seg.ds-seg--text .ds-seg-btn { width: auto; padding: 0 11px; font-size: 12px; font-weight: 550; }

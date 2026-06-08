@@ -1,64 +1,81 @@
 /**
- * gen-website-usage.mjs — auto-detect which marketing pages consume each shared website block.
+ * gen-website-usage.mjs — for each shared website block, detect (a) which marketing pages consume
+ * it and (b) where its source lives in the design system. Writes the committed site/website.usage.mjs
+ * that the docs "Website" section renders (consumer chips that link to the local marketing site, and
+ * a "Source" link to the component on GitHub).
  *
- * Scans the sibling marketing site (../sonaloop-website/src) for usages of every
- * sonaloop-design/website component and writes a committed map (docs block id -> consumer pages)
- * that the docs "Website" section renders as a "Used on the website" list. This is a docs aid, so
- * it degrades gracefully: if the sibling repo isn't present, it leaves the committed file as-is.
- *
- * Detection: a page/template "uses" a block if it both imports the component (directly from
- * sonaloop-design/website, or via the thin local wrapper, e.g. components/Nav) AND renders its JSX
- * tag. Page→route labels are derived from the website's App.tsx <Route> table; the 3 templates
- * (Solution/Method/Product) are mapped to their dynamic :slug routes.
+ *  - `source` is detected from the LOCAL src/website.tsx (always available) — never hardcoded.
+ *  - `usage` is scanned from the sibling marketing site (../sonaloop-website/src); if that repo
+ *    isn't present, the previously committed usage map is preserved (source still refreshes).
  */
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const outPath = path.join(root, 'site/website.usage.mjs');
 const siteSrc = path.resolve(root, '../sonaloop-website/src');
 
-if (!fs.existsSync(siteSrc)) {
-  console.log('gen-website-usage: ../sonaloop-website/src not found — keeping committed site/website.usage.mjs');
-  process.exit(0);
-}
+const REPO = 'https://github.com/jhoetter/sonaloop-design';
+const BRANCH = 'main';
 
-// docs block id -> JSX tags that mean "this block is used" (wrapper names + shared export names).
-const BLOCK_TAGS = {
-  navbar: ['Nav', 'Navbar'],
-  'mega-menu': ['MegaMenuPanel'],
-  'app-card': ['FeatureCard', 'CardGrid'],
-  'related-rail': ['RelatedRail'],
-  hero: ['HeroContent', 'Hero'],
-  'cta-band': ['CtaBand'],
-  footer: ['Footer'],
-  'product-showcase': ['ProductShot'],
-  'canvas-showcase': ['CanvasShowcase'],
-  'integration-showcase': ['IntegrationShowcase'],
+// docs block id -> the primary exported component (for the "Source" link) + the JSX tags that
+// mean "this block is used" (wrapper names + shared export names) for consumer detection.
+const BLOCKS = {
+  navbar: { export: 'Navbar', tags: ['Nav', 'Navbar'] },
+  'mega-menu': { export: 'MegaMenuPanel', tags: ['MegaMenuPanel'] },
+  'app-card': { export: 'FeatureCard', tags: ['FeatureCard', 'CardGrid'] },
+  'related-rail': { export: 'RelatedRail', tags: ['RelatedRail'] },
+  hero: { export: 'Hero', tags: ['HeroContent', 'Hero'] },
+  'cta-band': { export: 'CtaBand', tags: ['CtaBand'] },
+  footer: { export: 'Footer', tags: ['Footer'] },
+  'product-showcase': { export: 'ProductShot', tags: ['ProductShot'] },
+  'canvas-showcase': { export: 'CanvasShowcase', tags: ['CanvasShowcase'] },
+  'integration-showcase': { export: 'IntegrationShowcase', tags: ['IntegrationShowcase'] },
 };
 
-// The 3 templates render the dynamic :slug pages — label them as such.
+/* ── Source map (always, from the local component file) ──────────────────────────────────── */
+const websiteLines = fs.readFileSync(path.join(root, 'src/website.tsx'), 'utf8').split('\n');
+const exportLine = (name) => {
+  const re = new RegExp(`^export function ${name}\\b`);
+  const i = websiteLines.findIndex((l) => re.test(l));
+  return i >= 0 ? i + 1 : null;
+};
+const source = {};
+for (const [id, { export: name }] of Object.entries(BLOCKS)) {
+  const line = exportLine(name);
+  source[id] = { export: name, file: 'src/website.tsx', line, href: `${REPO}/blob/${BRANCH}/src/website.tsx${line ? `#L${line}` : ''}` };
+}
+
+/* ── Usage map (from the sibling site, or preserved) ────────────────────────────────────── */
+async function readExistingUsage() {
+  if (!fs.existsSync(outPath)) return {};
+  try {
+    const m = await import(`${pathToFileURL(outPath).href}?t=${Date.now()}`);
+    return m.usage ?? {};
+  } catch {
+    return {};
+  }
+}
+
+function pageRouteByBase() {
+  const app = fs.readFileSync(path.join(siteSrc, 'App.tsx'), 'utf8');
+  const importBase = {}; // imported component name -> file basename
+  for (const m of app.matchAll(/import\s+(\w+)\s+from\s+['"]([^'"]+)['"]/g)) importBase[m[1]] = m[2].split('/').pop();
+  const byBase = {};
+  for (const m of app.matchAll(/<Route\s+path="([^"]+)"\s+element=\{<(\w+)/g)) {
+    if (m[2] === 'Navigate') continue;
+    byBase[importBase[m[2]] ?? m[2]] = m[1];
+  }
+  return byBase;
+}
+
 const TEMPLATE_ROUTES = {
   SolutionTemplate: { name: 'Solution pages', to: '/solutions/:slug' },
   MethodTemplate: { name: 'Method pages', to: '/methods/:slug' },
   ProductTemplate: { name: 'Product pages', to: '/products/:slug' },
 };
-
-const humanize = (s) => s
-  .replace(/Page$/, '')
-  .replace(/([a-z])([A-Z])/g, '$1 $2')
-  .replace(/^./, (c) => c.toUpperCase());
-
-// page component name -> route, parsed from App.tsx (<Route path="x" element={<Comp …/>} />).
-function routeMap() {
-  const app = fs.readFileSync(path.join(siteSrc, 'App.tsx'), 'utf8');
-  const map = {};
-  for (const m of app.matchAll(/<Route\s+path="([^"]+)"\s+element=\{<(\w+)/g)) {
-    if (m[2] !== 'Navigate') map[m[2]] = m[1];
-  }
-  return map;
-}
+const humanize = (s) => s.replace(/Page$/, '').replace(/([a-z])([A-Z])/g, '$1 $2').replace(/^./, (c) => c.toUpperCase());
 
 function walk(dir) {
   let out = [];
@@ -70,36 +87,39 @@ function walk(dir) {
   return out;
 }
 
-const routes = routeMap();
-const files = walk(siteSrc).filter((f) => f.includes('/pages/') || f.includes('/components/templates/'));
+function computeUsage() {
+  const byBase = pageRouteByBase();
+  const files = walk(siteSrc).filter((f) => f.includes('/pages/') || f.includes('/components/templates/'));
+  const importsName = (src, n) => new RegExp(`import[^\\n]*\\b${n}\\b[^\\n]*from`).test(src) || new RegExp(`from ['"][^'"]*/${n}['"]`).test(src);
+  const usesTag = (src, n) => new RegExp(`<${n}[\\s/>]`).test(src);
+  const label = (file) => {
+    const base = path.basename(file, '.tsx');
+    if (TEMPLATE_ROUTES[base]) return TEMPLATE_ROUTES[base];
+    return { name: humanize(base), to: byBase[base] ?? '' };
+  };
 
-const importsName = (src, n) => new RegExp(`import[^\\n]*\\b${n}\\b[^\\n]*from`).test(src) || new RegExp(`from ['"][^'"]*/${n}['"]`).test(src);
-const usesTag = (src, n) => new RegExp(`<${n}[\\s/>]`).test(src);
-
-// Resolve a consumer source file to a { name, to } label.
-function label(file) {
-  const base = path.basename(file, '.tsx');
-  if (TEMPLATE_ROUTES[base]) return TEMPLATE_ROUTES[base];
-  const to = routes[base] ?? '';
-  return { name: humanize(base), to };
-}
-
-const usage = {};
-for (const id of Object.keys(BLOCK_TAGS)) usage[id] = [];
-
-for (const file of files) {
-  const src = fs.readFileSync(file, 'utf8');
-  const lbl = label(file);
-  for (const [id, tags] of Object.entries(BLOCK_TAGS)) {
-    if (tags.some((t) => usesTag(src, t) && importsName(src, t))) {
-      if (!usage[id].some((u) => u.name === lbl.name && u.to === lbl.to)) usage[id].push(lbl);
+  const usage = {};
+  for (const id of Object.keys(BLOCKS)) usage[id] = [];
+  for (const file of files) {
+    const src = fs.readFileSync(file, 'utf8');
+    const lbl = label(file);
+    for (const [id, { tags }] of Object.entries(BLOCKS)) {
+      if (tags.some((t) => usesTag(src, t) && importsName(src, t)) && !usage[id].some((u) => u.name === lbl.name && u.to === lbl.to)) {
+        usage[id].push(lbl);
+      }
     }
   }
+  for (const id of Object.keys(usage)) usage[id].sort((a, b) => a.name.localeCompare(b.name));
+  return usage;
 }
-for (const id of Object.keys(usage)) usage[id].sort((a, b) => a.name.localeCompare(b.name));
 
-const header = '/* GENERATED by scripts/gen-website-usage.mjs — which marketing pages consume each\n'
-  + '   shared block (scanned from ../sonaloop-website/src). Docs aid; not in the strict drift guard. */\n';
-fs.writeFileSync(outPath, header + 'export const usage = ' + JSON.stringify(usage, null, 2) + ';\n');
+const hasSibling = fs.existsSync(siteSrc);
+const usage = hasSibling ? computeUsage() : await readExistingUsage();
+if (!hasSibling) console.log('gen-website-usage: ../sonaloop-website not found — preserving committed usage, refreshing source links');
+
+const header = '/* GENERATED by scripts/gen-website-usage.mjs — `usage`: which marketing pages consume each\n'
+  + '   block (scanned from ../sonaloop-website); `source`: where each component lives in this repo.\n'
+  + '   Docs aid; not in the strict drift guard. */\n';
+fs.writeFileSync(outPath, `${header}export const usage = ${JSON.stringify(usage, null, 2)};\n\nexport const source = ${JSON.stringify(source, null, 2)};\n`);
 const total = Object.values(usage).reduce((s, a) => s + a.length, 0);
-console.log('site/website.usage.mjs written (%d blocks, %d consumer entries)', Object.keys(usage).length, total);
+console.log('site/website.usage.mjs written (usage: %d entries, source: %d blocks)', total, Object.keys(source).length);
