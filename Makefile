@@ -17,9 +17,12 @@ gen:
 check:
 	npm run check
 
-# Component gallery — tokens + icons + components rendered live, split into App (dense,
-# Python-SSR) and Website (airy, React/Tailwind) columns. `/` IS the gallery (no directory
-# listing). Regenerates first so it always reflects the current sources.
+# Design-system docs site — Foundations · Brands · Components, organised like the Geist
+# (Vercel) site: colours, typography, materials, layout, icons, brand assets and a live
+# per-component reference (each with an App-dense / Web-airy preview toggle), plus a ⌘K
+# search palette and a light/dark toggle. Everything renders LIVE from the single sources of
+# truth, so it can never drift. `/` IS the docs site (no directory listing). Regenerates
+# first so it always reflects the current tokens/icons/components.
 dev: gen
 	@python3 scripts/serve.py $(GALLERY_PORT) 127.0.0.1
 

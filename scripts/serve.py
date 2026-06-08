@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Tiny static server for the component gallery.
+"""Tiny static server for the design-system docs site.
 
-Serves the repo root (so /styles/*, /icons.data.mjs etc. resolve with absolute paths)
-but maps `/` → gallery/index.html, so `make dev` lands directly on the gallery instead of
-a directory listing. Sends a JS MIME for .mjs so the gallery's `import('/icons.data.mjs')`
-works. No dependencies.
+Serves the repo root (so /styles/*, /site/*, /tokens.data.mjs, /icons.data.mjs etc. resolve
+with absolute paths) but maps `/` → site/index.html, so `make dev` lands directly on the
+docs site (Foundations · Brands · Components) instead of a directory listing. Sends a JS
+MIME for .mjs so the site's `import` of the token/icon sources works. No dependencies.
 
     python3 scripts/serve.py [PORT] [BIND]
 """
@@ -32,12 +32,12 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
     def do_GET(self):
         if self.path in ("/", ""):
-            self.path = "/gallery/index.html"
+            self.path = "/site/index.html"
         return super().do_GET()
 
 
 socketserver.TCPServer.allow_reuse_address = True
 with socketserver.TCPServer((BIND, PORT), Handler) as httpd:
     shown = "127.0.0.1" if BIND == "0.0.0.0" else BIND
-    print(f"→ component gallery: http://{shown}:{PORT}/")
+    print(f"→ design-system docs: http://{shown}:{PORT}/")
     httpd.serve_forever()

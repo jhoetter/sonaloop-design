@@ -56,19 +56,30 @@ Available: `Button` (variant `default|primary|accent|ghost`, size `sm|md|lg`), `
 `Divider`. **Page-level compositions** (Footer, Hero, …) stay in each app and are built
 FROM these primitives + tokens — the design system shares primitives, not whole pages.
 
-## Develop — component gallery
+## Develop — the design-system docs site
 
 ```
 make install        # npm deps (also installs the pre-commit hook that keeps generated files fresh)
-make dev            # regenerate + serve the gallery → http://127.0.0.1:6006/gallery/
+make dev            # regenerate + serve the docs site → http://127.0.0.1:6006/
 make dev-forwarded  # same, bound to 0.0.0.0 for a forwarded port
 make gen            # regenerate icons + tokens + tailwind preset + components module
 make check          # drift guard: fail if any generated artifact is stale
 ```
 
-The gallery (`gallery/`) renders every component live in two columns — **App** (dense,
-Python-SSR) and **Website** (airy, React/Tailwind) — with a light/dark toggle, so you see
-exactly how the shared design system looks in each surface.
+`make dev` serves a full design-system documentation site (`site/`), organised the way the
+[Geist](https://vercel.com/geist/introduction) (Vercel) site is:
+
+- **Foundations** — Introduction, Colors, Typography, Materials, Layout, Icons.
+- **Brands** — the Sonaloop mark/wordmark, plus Sonaloop Cloud & Research.
+- **Components** — a live reference for every `.sl-*` primitive (Button, Badge, Tag, Pill,
+  Chip, Card, Eyebrow, Input, Kbd, Divider, Arrow Link), each with an **App-dense / Web-airy**
+  preview toggle and copy-ready React / class-contract / Python-SSR snippets.
+
+It has a ⌘K search palette and a light/dark toggle, and **every** swatch, icon and component
+is rendered live from the single sources of truth (`tokens.data.mjs`, `icons.data.mjs`,
+`styles/components.css`), so the docs can never drift from what ships. The chrome lives in
+`site/` (`index.html` + `app.css` + `app.js`); it is the only hand-authored part and is not
+itself part of the published package.
 
 ```
 icons.data.mjs                  ← author icons here (the only source of truth)
