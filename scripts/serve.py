@@ -25,6 +25,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         ".js": "text/javascript",
         ".css": "text/css",
         ".svg": "image/svg+xml",
+        ".woff2": "font/woff2",
     }
 
     def __init__(self, *args, **kwargs):

@@ -41,7 +41,7 @@ const SL_MAP = {
 };
 const slDecls = (set) =>
   Object.entries(SL_MAP).map(([sl, k]) => `--sl-${sl}:${set[k]}`).join(';') +
-  `;--sl-radius:${scales.radius};--sl-radius-sm:${scales['radius-sm']};--sl-mono:${scales.mono}`;
+  `;--sl-radius:${scales.radius};--sl-radius-sm:${scales['radius-sm']};--sl-sans:${scales.sans};--sl-mono:${scales.mono}`;
 
 // ── website: styles/tokens.css (R G B triplets; [data-theme] driven, default light) ──
 function genWebsiteCss() {

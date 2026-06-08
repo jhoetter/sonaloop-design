@@ -18,9 +18,9 @@ export default {
         dusk: { DEFAULT: '#101113', mid: '#16171a', light: '#1c1d21' },
       },
       fontFamily: {
-        serif: ["\"Geist\"", "\"Inter\"", "system-ui", "sans-serif"],
-        sans: ["\"Geist\"", "\"Inter\"", "system-ui", "sans-serif"],
-        mono: ["\"Geist Mono\"", "ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
+        serif: ["\"Sona\"", "\"Geist\"", "\"Inter\"", "system-ui", "sans-serif"],
+        sans: ["\"Sona\"", "\"Geist\"", "\"Inter\"", "system-ui", "sans-serif"],
+        mono: ["\"Sona Mono\"", "\"Geist Mono\"", "ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
       },
     },
   },

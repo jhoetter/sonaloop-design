@@ -51,12 +51,44 @@ accent `#7C84E8`. Product screenshots are captured in the app's dark theme.
 
 ## Typography
 
-- **Geist** (grotesk) — headlines + UI. **Geist Mono** — small labels / eyebrows / code.
-  Inter is a fallback only. (Loaded in `index.html`; mapped in `tailwind.config.ts`:
-  `font-serif` and `font-sans` both alias Geist, `font-mono` = Geist Mono.)
+**Sona** is Sonaloop's own typeface — the brand-stable name the whole system speaks in.
+
+- **Sona** (grotesk) — headlines + UI. **Sona Mono** — small labels / eyebrows / code.
+  Geist (then Inter / system-ui) are fallbacks only.
+- Self-hosted from this repo: the `.woff2` files live in `fonts/`, declared as the families
+  `Sona` / `Sona Mono` in `styles/fonts.css`. **No third-party (Google Fonts) dependency** —
+  everything needed to render the brand ships in this repo.
+- Referenced everywhere by NAME, never by the underlying face: tokens `--sl-sans` / `--sl-mono`
+  (`styles/tokens.css`), Tailwind `font-sans` / `font-serif` (= Sona) and `font-mono`
+  (= Sona Mono) (`tailwind-preset.js`). All authored once in `tokens.data.mjs` → `npm run gen`.
 - Headlines: large, left-aligned, tight tracking, `--ink`. Body: `--ink/65`, relaxed.
 - Eyebrows/labels: `font-mono`, uppercase, `tracking-[0.16em]`, `--ink/45`.
 - Body letter-spacing ~ `-0.006em`.
+
+### Sona — provenance & roadmap
+
+**Today (v0):** Sona is *built on* **Geist** (© 2023 Vercel + basement.studio), licensed
+**SIL OFL-1.1** (see `fonts/LICENSE-Geist.txt`). The vendored `.woff2` files are Geist's
+variable fonts, **unmodified** — we only assign them the family name `Sona` / `Sona Mono` in
+`styles/fonts.css`. This is legal under OFL (which permits redistribution and bundling), gives
+us a self-contained repo, and — crucially — lets the *whole system already speak "Sona"*.
+
+**The point of the indirection:** because nothing references "Geist" anymore (only `--sl-sans` /
+`--sl-mono` → "Sona"), swapping the underlying face is a **drop-in** with zero component churn.
+
+**Path to a truly bespoke Sona (when the brand warrants it):**
+1. **Fork & rename (days, ~free).** OFL explicitly *requires* a new name for modified versions —
+   so "Sona" is exactly the right move. Open the Geist sources in a font editor (FontForge / Glyphs),
+   make Sonaloop-specific tweaks (e.g. a custom `g`/`a`, the loop motif worked into a glyph or the
+   ampersand, tightened spacing, ligatures for `council_…` ids), set the font's internal name to
+   "Sona", keep the OFL + original copyright notice, export new `.woff2`, drop them in `fonts/`.
+   Update `fonts/LICENSE-Geist.txt` → note the derivation. **Nothing else changes.**
+2. **Commission an original face (months, $20k–$100k+).** A type designer draws Sona from scratch.
+   Only justified once typography is a deliberate differentiator. Same drop-in when it lands.
+
+**Constraints to honour:** keep the OFL text + Vercel/basement.studio copyright as long as any
+Geist-derived outlines remain; do **not** ship the binaries under the reserved name "Geist"; if we
+modify outlines, bump the internal font name so it's unambiguously "Sona".
 
 ## Surfaces, radius, elevation
 
@@ -118,7 +150,7 @@ fades, hover lifts. No bounce/spin/parallax theatrics.
 ## Extending to other repos
 
 - The **product/app surfaces** (`sonaloop` inspector, `sonaloop-cloud`, `sonaloop-research`)
-  should adopt the **shared tokens** (accent indigo, Geist where practical, the warm-neutral
+  should adopt the **shared tokens** (accent indigo, Sona where practical, the warm-neutral
   option) while staying functional and dense — a tool can stay cooler/whiter than the
   marketing site. Keep the icon library shared (already the case).
 - This file is the master. When a repo adopts the brand, link back here and record any

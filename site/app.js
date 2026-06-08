@@ -163,6 +163,33 @@ function pageColors() {
   `;
 }
 
+/* A full glyph specimen for one family — uppercase, lowercase, figures, punctuation.
+ * `fam` is any CSS font-family value (e.g. var(--sl-sans)); every cell copies its glyph. */
+function specimen(label, fam) {
+  const set = (chars) => chars.map((ch) =>
+    `<button class="ds-glyph" data-copy-text="${esc(ch)}" title="Copy &quot;${esc(ch)}&quot;">${esc(ch)}</button>`).join('');
+  const upper = [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'];
+  const lower = [...'abcdefghijklmnopqrstuvwxyz'];
+  const digits = [...'0123456789'];
+  const punct = [...'.,:;!?\'"·…—–-_(){}[]/\\&@#%*+=<>$€'];
+  const row = (title, chars) => `
+    <div class="ds-glyph-row">
+      <div class="ds-glyph-label">${esc(title)}</div>
+      <div class="ds-glyph-grid">${set(chars)}</div>
+    </div>`;
+  return `
+    <div class="ds-specimen" style="font-family:${fam}">
+      <div class="ds-specimen-head">
+        <span class="ds-specimen-name">${esc(label)}</span>
+        <span class="ds-specimen-aa">Aa</span>
+      </div>
+      ${row('Uppercase', upper)}
+      ${row('Lowercase', lower)}
+      ${row('Figures', digits)}
+      ${row('Punctuation', punct)}
+    </div>`;
+}
+
 function pageTypography() {
   const scaleRows = [
     ['t-xl', scales['t-xl'], 'Council verdict / page titles'],
@@ -182,23 +209,28 @@ function pageTypography() {
   return `
     <p class="ds-eyebrow">Foundations</p>
     <h1 class="ds-h1">Typography</h1>
-    <p class="ds-lead">Two typefaces do all the work: <b>Geist Sans</b> for everything readable and <b>Geist Mono</b> for eyebrows, tags, code and data. Designed for developers and designers — exactly the tone Sonaloop wants.</p>
+    <p class="ds-lead"><b>Sona</b> is Sonaloop's own typeface. Two cuts do all the work: <b>Sona</b> for everything readable and <b>Sona Mono</b> for eyebrows, tags, code and data. Both are self-hosted from this repo (<code>/fonts</code>) — no third-party dependency. <span style="color:var(--sl-muted)">Today Sona is built on <a href="https://vercel.com/font" target="_blank" rel="noopener">Geist</a> (SIL OFL-1.1); see the Sona roadmap in BRANDING.md for the path to a fully bespoke face.</span></p>
 
     ${h2('type-families', 'Families')}
     <div class="ds-grid-2">
       <div class="ds-tile" style="padding:28px">
-        <div class="lbl">Sans · UI &amp; prose</div>
-        <div style="font-size:40px;letter-spacing:-.03em;margin:10px 0 4px">Geist Sans</div>
+        <div class="lbl">Sona · UI &amp; prose</div>
+        <div style="font-size:40px;letter-spacing:-.03em;margin:10px 0 4px">Sona</div>
         <div style="font-size:14px;color:var(--sl-muted)">The quick brown fox jumps over 1,234 personas.</div>
         <div class="mono" style="font-family:var(--sl-mono);font-size:12px;color:var(--sl-faint);margin-top:10px">${esc(fonts.sans.join(', '))}</div>
       </div>
       <div class="ds-tile" style="padding:28px">
-        <div class="lbl">Mono · labels &amp; data</div>
-        <div style="font-family:var(--sl-mono);font-size:40px;letter-spacing:-.02em;margin:10px 0 4px">Geist Mono</div>
+        <div class="lbl">Sona Mono · labels &amp; data</div>
+        <div style="font-family:var(--sl-mono);font-size:40px;letter-spacing:-.02em;margin:10px 0 4px">Sona Mono</div>
         <div style="font-family:var(--sl-mono);font-size:14px;color:var(--sl-muted)">council_24105090 · 4 voices · ⌘K</div>
         <div class="mono" style="font-family:var(--sl-mono);font-size:12px;color:var(--sl-faint);margin-top:10px">${esc(fonts.mono.join(', '))}</div>
       </div>
     </div>
+
+    ${h2('type-specimen', 'Character set')}
+    ${p('Every glyph in both cuts — uppercase, lowercase, figures and punctuation. Use it to check letterforms, spacing and the sans-vs-mono difference. Click any glyph to copy it.')}
+    ${specimen('Sona', 'var(--sl-sans)')}
+    ${specimen('Sona Mono', 'var(--sl-mono)')}
 
     ${h2('type-scale', 'Type scale')}
     ${p('A compact scale tuned for an information-dense inspector that still breathes on the airy marketing site. Sizes are tokens, so a single edit re-tunes both.')}

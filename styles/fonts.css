@@ -1,0 +1,30 @@
+/* Sonaloop typeface — self-hosted webfonts. Part of the design system (ships in the package).
+ *
+ * "Sona" and "Sona Mono" are Sonaloop's OWN font names. They are the brand-stable families the
+ * whole system references via --sl-sans / --sl-mono and Tailwind font-sans / font-mono.
+ *
+ * IMPLEMENTATION NOTE: today Sona is *built on* Geist (© 2023 Vercel + basement.studio),
+ * licensed SIL OFL-1.1 — see fonts/LICENSE-Geist.txt. The .woff2 files in /fonts are Geist's
+ * variable fonts vendored UNMODIFIED; we only assign them the family name "Sona" here. Because
+ * everything downstream references "Sona", swapping in a true bespoke face later (see the Sona
+ * roadmap in BRANDING.md) means dropping new files in /fonts and editing only this file.
+ *
+ * Both are variable fonts (weight axis 100–900); the design system uses 400–800. */
+
+@font-face {
+  font-family: "Sona";
+  font-style: normal;
+  font-weight: 100 900;        /* variable weight axis */
+  font-display: swap;
+  src: url("/fonts/Sona-Variable.woff2") format("woff2-variations"),
+       url("/fonts/Sona-Variable.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Sona Mono";
+  font-style: normal;
+  font-weight: 100 900;        /* variable weight axis */
+  font-display: swap;
+  src: url("/fonts/SonaMono-Variable.woff2") format("woff2-variations"),
+       url("/fonts/SonaMono-Variable.woff2") format("woff2");
+}

@@ -23,16 +23,22 @@ const C = {
 };
 
 // ── Fonts (shared: website Tailwind fontFamily + inspector body/--mono) ───────────
+// "Sona" / "Sona Mono" are Sonaloop's OWN typeface names — the brand-stable vocabulary the
+// whole system speaks in. They are self-hosted from /fonts (styles/fonts.css). Today Sona is
+// *built on* Geist (SIL OFL-1.1, vendored unmodified); the Geist names stay in the stack as a
+// resilience fallback, then Inter / system-ui. Swapping the underlying face later (see the
+// "Sona roadmap" in BRANDING.md) touches only /fonts + styles/fonts.css — no component churn.
 export const fonts = {
-  sans: ['"Geist"', '"Inter"', 'system-ui', 'sans-serif'],
-  // serif kept as an alias to Geist so existing `font-serif` headline usages need no churn
-  serif: ['"Geist"', '"Inter"', 'system-ui', 'sans-serif'],
-  mono: ['"Geist Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+  sans: ['"Sona"', '"Geist"', '"Inter"', 'system-ui', 'sans-serif'],
+  // serif kept as an alias to Sona so existing `font-serif` headline usages need no churn
+  serif: ['"Sona"', '"Geist"', '"Inter"', 'system-ui', 'sans-serif'],
+  mono: ['"Sona Mono"', '"Geist Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
 };
 
 // ── Theme-independent scales (emitted once into the inspector :root) ──────────────
 export const scales = {
   radius: '8px', 'radius-sm': '6px', 'row-h': '48px', ease: 'cubic-bezier(.4,0,.2,1)',
+  sans: fonts.sans.join(','),
   mono: fonts.mono.join(','),
   't-xs': '11px', 't-sm': '12px', 't-body': '13px', 't-md': '15px', 't-prose': '16px', 't-lg': '18px', 't-xl': '24px',
   's-1': '4px', 's-2': '8px', 's-3': '12px', 's-4': '16px', 's-5': '20px', 's-6': '24px', 's-8': '32px',

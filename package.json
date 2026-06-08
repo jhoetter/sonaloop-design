@@ -9,13 +9,15 @@
     "./components": "./src/components.tsx",
     "./components.css": "./styles/components.css",
     "./tokens.css": "./styles/tokens.css",
+    "./fonts.css": "./styles/fonts.css",
     "./data": "./icons.data.mjs",
     "./style.css": "./styles/hifi-anim.css"
   },
   "files": [
     "src",
     "icons.data.mjs",
-    "styles"
+    "styles",
+    "fonts"
   ],
   "scripts": {
     "gen": "node scripts/gen.mjs && node scripts/gen-tokens.mjs",

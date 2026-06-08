@@ -21,7 +21,7 @@ html { scroll-behavior: smooth; }
 
 body {
   margin: 0;
-  font-family: "Geist", system-ui, -apple-system, sans-serif;
+  font-family: var(--sl-sans, "Sona", system-ui, -apple-system, sans-serif);
   background: var(--sl-bg);
   color: var(--sl-ink);
   -webkit-font-smoothing: antialiased;
@@ -212,6 +212,20 @@ a { color: inherit; }
 .ds-weights { display: flex; flex-wrap: wrap; gap: 26px; margin-top: 18px; }
 .ds-weights div { font-size: 30px; letter-spacing: -.02em; color: var(--sl-ink); }
 .ds-weights small { display: block; font-family: var(--sl-mono); font-size: 11px; color: var(--sl-faint); margin-top: 4px; text-transform: uppercase; letter-spacing: .1em; }
+
+/* Glyph specimen — full character set, one card per family */
+.ds-specimen { border: 1px solid var(--sl-line); border-radius: 12px; padding: 18px 20px 8px; margin-top: 16px; background: var(--sl-surface); }
+.ds-specimen + .ds-specimen { margin-top: 14px; }
+.ds-specimen-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--sl-line); }
+.ds-specimen-name { font-family: var(--sl-mono); font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: var(--sl-faint); }
+.ds-specimen-aa { font-size: 40px; line-height: 1; letter-spacing: -.02em; color: var(--sl-ink); }
+.ds-glyph-row { display: flex; align-items: flex-start; gap: 18px; padding: 12px 0; border-bottom: 1px solid var(--sl-line); }
+.ds-glyph-row:last-child { border-bottom: 0; }
+.ds-glyph-label { width: 92px; flex: none; font-family: var(--sl-mono); font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--sl-faint); padding-top: 10px; }
+.ds-glyph-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); gap: 4px; flex: 1; min-width: 0; }
+.ds-glyph { font: inherit; font-size: 22px; line-height: 1; color: var(--sl-ink); background: transparent; border: 1px solid transparent; border-radius: 8px; padding: 9px 0; cursor: pointer; transition: background .12s, border-color .12s, color .12s; }
+.ds-glyph:hover { background: var(--sl-hover); border-color: var(--sl-line); color: var(--sl-accent); }
+.ds-glyph:active { transform: translateY(1px); }
 
 /* ── Icon gallery ─────────────────────────────────────────────────────────────── */
 .ds-icon-search { display: flex; align-items: center; gap: 10px; margin: 18px 0 6px; max-width: 360px; }
