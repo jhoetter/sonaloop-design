@@ -94,3 +94,13 @@
 .sl-kbd { font-family: var(--sl-mono); font-size: .8em; padding: .05em .45em;
   border: 1px solid var(--sl-line); border-radius: 5px; background: var(--sl-surface-2); color: var(--sl-ink); }
 .sl-divider { height: 1px; border: 0; background: var(--sl-line); margin: 1.1em 0; }
+
+/* ── Arrow-link — a mono uppercase "more →" link whose gap widens on hover. Apply to the
+   app's own <a>/<Link>; works on self-hover or inside a Tailwind `group`. ──────────────── */
+.sl-arrow-link {
+  display: inline-flex; align-items: center; gap: .55em;
+  font-family: var(--sl-mono); font-size: .82em; font-weight: 500;
+  text-transform: uppercase; letter-spacing: .04em; color: var(--sl-accent);
+  text-decoration: none; transition: gap .15s ease;
+}
+.sl-arrow-link:hover, .group:hover .sl-arrow-link { gap: .85em; }
