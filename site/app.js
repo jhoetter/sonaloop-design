@@ -1106,13 +1106,41 @@ const FLAT = NAV.flatMap((g) => g.items);
 const byId = (id) => FLAT.find((i) => i.id === id);
 
 /* ── sidebar ──────────────────────────────────────────────────────────────────── */
+// Accordion nav: only the section you're currently in is open. Every group renders
+// collapsed; renderPage opens the active one (and collapses the rest) on each navigation.
 function renderSidebar() {
   $('#sidebar').innerHTML = NAV.map((g) => `
-    <div class="ds-nav-group">
-      <p class="ds-nav-label">${esc(g.label)}</p>
-      ${g.items.map((it) => `
-        <a class="ds-nav-item" href="#/${it.id}" data-nav="${it.id}">${esc(it.title)}</a>`).join('')}
-    </div>`).join('');
+    <section class="ds-nav-group is-collapsed" data-group="${esc(g.label)}">
+      <button type="button" class="ds-nav-label" data-nav-toggle="${esc(g.label)}" aria-expanded="false">
+        <span>${esc(g.label)}</span>
+        ${svgReg('chevron', 'ds-nav-chevron')}
+      </button>
+      <div class="ds-nav-items">
+        <div class="ds-nav-items-inner">
+          ${g.items.map((it) => `
+          <a class="ds-nav-item" href="#/${it.id}" data-nav="${it.id}">${esc(it.title)}</a>`).join('')}
+        </div>
+      </div>
+    </section>`).join('');
+}
+
+function setGroupCollapsed(sec, collapsed) {
+  sec.classList.toggle('is-collapsed', collapsed);
+  sec.querySelector('.ds-nav-label')?.setAttribute('aria-expanded', String(!collapsed));
+}
+
+// Clicking a section header toggles just that group (lets you peek without navigating).
+function toggleNavGroup(label) {
+  const sec = document.querySelector(`.ds-nav-group[data-group="${CSS.escape(label)}"]`);
+  if (sec) setGroupCollapsed(sec, !sec.classList.contains('is-collapsed'));
+}
+
+// On navigation, open the active page's group and collapse every other — so leaving a
+// section closes it again.
+function syncActiveGroup(id) {
+  const label = NAV.find((g) => g.items.some((it) => it.id === id))?.label;
+  document.querySelectorAll('.ds-nav-group').forEach((sec) =>
+    setGroupCollapsed(sec, sec.dataset.group !== label));
 }
 
 /* ── router ───────────────────────────────────────────────────────────────────── */
@@ -1134,6 +1162,7 @@ function renderPage() {
       <a class="ds-next" href="#/${next.id}"><small>Next</small><b>${esc(next.title)}</b></a>
     </div>`;
 
+  syncActiveGroup(id);
   document.querySelectorAll('.ds-nav-item').forEach((a) =>
     a.classList.toggle('is-active', a.dataset.nav === id));
   document.title = `${item.title} · Sonaloop Design`;
@@ -1174,6 +1203,9 @@ async function copyText(text, btn) {
 }
 
 document.addEventListener('click', (e) => {
+  const navToggle = e.target.closest('[data-nav-toggle]');
+  if (navToggle) { toggleNavGroup(navToggle.dataset.navToggle); return; }
+
   const copyBtn = e.target.closest('[data-copy]');
   if (copyBtn) {
     const codeEl = document.getElementById(copyBtn.dataset.copy);

@@ -87,11 +87,27 @@ a { color: inherit; }
   overflow-y: auto; padding: 22px 14px 60px; border-right: 1px solid var(--sl-line);
   background: var(--sl-bg);
 }
-.ds-nav-group + .ds-nav-group { margin-top: 22px; }
+.ds-nav-group + .ds-nav-group { margin-top: 14px; }
 .ds-nav-label {
+  display: flex; align-items: center; gap: 6px; width: 100%;
   font-family: var(--sl-mono); font-size: 11px; font-weight: 500; text-transform: uppercase;
-  letter-spacing: .12em; color: var(--sl-faint); padding: 0 10px; margin: 0 0 8px;
+  letter-spacing: .12em; color: var(--sl-faint); padding: 6px 10px; margin: 0 0 4px;
+  background: none; border: 0; cursor: pointer; text-align: left;
+  border-radius: 7px; transition: color .1s, background .1s;
 }
+.ds-nav-label > span { flex: 1; min-width: 0; }
+.ds-nav-label:hover { color: var(--sl-muted); background: var(--sl-hover); }
+.ds-nav-chevron {
+  width: 13px; height: 13px; flex: none; opacity: .7;
+  transition: transform .15s ease;
+}
+.ds-nav-group.is-collapsed .ds-nav-chevron { transform: rotate(-90deg); }
+.ds-nav-items {
+  display: grid; grid-template-rows: 1fr;
+  transition: grid-template-rows .18s ease;
+}
+.ds-nav-items-inner { min-height: 0; overflow: hidden; }
+.ds-nav-group.is-collapsed .ds-nav-items { grid-template-rows: 0fr; }
 .ds-nav-item {
   display: flex; align-items: center; padding: 6px 10px; border-radius: 7px;
   font-size: 13.5px; color: var(--sl-muted); text-decoration: none; cursor: pointer;
