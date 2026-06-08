@@ -10,21 +10,20 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import type { ReactElement } from 'react';
 import {
   Navbar,
-  MegaMenuPanel,
   Footer,
   Hero,
-  CtaBand,
-  DEFAULT_CTA,
   RelatedRail,
   CardGrid,
   FeatureCard,
   ProductShot,
   CanvasShowcase,
   IntegrationShowcase,
+  CommandPalettePanel,
   Icon,
   type MegaMenu,
   type FooterColumn,
   type RailItem,
+  type CommandGroup,
 } from '../src/website';
 
 /* ── demo data ───────────────────────────────────────────────────────────────────────────── */
@@ -71,6 +70,23 @@ const cards = (
   </CardGrid>
 );
 
+const paletteGroups: CommandGroup[] = [
+  { key: 'go', label: 'Jump to', items: [
+    { title: 'Solutions', subtitle: '/solutions', to: '/solutions', icon: 'compass' },
+    { title: 'Methods', subtitle: '/methods', to: '/methods', icon: 'jtbd' },
+    { title: 'Pricing', subtitle: '/pricing', to: '/pricing', icon: 'pricing-research' },
+  ] },
+  { key: 'products', label: 'Products', accent: 'var(--sl-violet)', items: [
+    { title: 'Open Core', subtitle: 'Run councils on your own AI', to: '/products/open-core', icon: 'open-core' },
+    { title: 'Cloud', subtitle: 'Hosted councils & memory', to: '/products/cloud', icon: 'cloud' },
+    { title: 'Research', subtitle: 'The lab', to: '/products/research', icon: 'research' },
+  ] },
+  { key: 'methods', label: 'Methods', accent: 'var(--sl-blue)', items: [
+    { title: 'Jobs to be done', subtitle: 'Interview the demand', to: '/methods/jtbd', icon: 'jtbd' },
+    { title: 'Positioning tests', subtitle: 'Pit messages against each other', to: '/methods/positioning', icon: 'positioning' },
+  ] },
+];
+
 /* ── blocks (+ optional enumerated controls) ─────────────────────────────────────────────── */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Opt = { key: string; label: string; value: any };
@@ -82,8 +98,9 @@ const onOff = (off = 'off', on = 'on'): Opt[] => [{ key: 'off', label: off, valu
 const weight: Control = { prop: 'titleWeight', label: 'weight', options: [{ key: 'normal', label: '400', value: 'normal' }, { key: 'medium', label: '500', value: 'medium' }, { key: 'semibold', label: '600', value: 'semibold' }] };
 
 const BLOCKS: Block[] = [
-  { id: 'navbar', controls: [{ prop: 'forceDark', label: 'forceDark', options: onOff() }], render: (p) => <Navbar menus={menus} {...p} /> },
-  { id: 'mega-menu', controls: [], render: () => <div className="measure-frame pt-2 pb-8"><MegaMenuPanel menu={menus[0]} /></div> },
+  // Navbar shown with its mega-menu open, so the mega-menu is visible in the preview (it never
+  // appears standalone on the site, so it has no page of its own).
+  { id: 'navbar', controls: [], render: () => <div className="pb-64"><Navbar menus={menus} initialOpenKey="solutions" /></div> },
   { id: 'app-card', controls: [], render: () => <div className="measure-frame py-8">{cards}</div> },
   { id: 'related-rail', controls: [], render: () => <div className="measure-frame py-8"><RelatedRail items={railItems} /></div> },
   {
@@ -95,8 +112,9 @@ const BLOCKS: Block[] = [
       </Hero>
     ),
   },
-  { id: 'cta-band', controls: [weight], render: (p) => <div className="pt-8"><CtaBand {...DEFAULT_CTA} {...p} /></div> },
-  { id: 'footer', controls: [{ prop: 'forceDark', label: 'forceDark', options: onOff() }], render: (p) => <Footer columns={footerColumns} cta={false} {...p} /> },
+  // The full site footer = the CTA band + the column nav together (they always ship as a pair;
+  // Footer embeds CtaBand via its default `cta`). The standalone CtaBand block documents mid-page use.
+  { id: 'footer', controls: [], render: () => <Footer columns={footerColumns} /> },
   {
     id: 'product-showcase',
     controls: [],
@@ -108,6 +126,7 @@ const BLOCKS: Block[] = [
   },
   { id: 'canvas-showcase', controls: [], render: () => <div className="py-8"><CanvasShowcase canvasLight="/images/canvas/dawn.jpg" canvasDark="/images/canvas/dusk.jpg" shotLight="/images/canvas/abstract-light.jpg" shotDark="/images/canvas/abstract-dark.jpg" /></div> },
   { id: 'integration-showcase', controls: [], render: () => <div className="measure-frame py-8"><IntegrationShowcase /></div> },
+  { id: 'command-palette', controls: [], render: () => <div className="py-8 px-4"><CommandPalettePanel groups={paletteGroups} inline selectedIndex={0} placeholder="Search Sonaloop…" /></div> },
 ];
 
 // Cartesian product of the controls' options → [{ key, props }] (key '' when no controls).

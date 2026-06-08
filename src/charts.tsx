@@ -10,8 +10,13 @@
  *   <StackedBarChart items={[{ label: 'Pricing', segments: [{ label: 'For', value: 6 }, { label: 'Against', value: 2 }] }]} />
  *   <PieChart items={[{ label: 'Support', value: 12 }, { label: 'Oppose', value: 4 }]} donut />
  *   <GaugeChart items={[{ label: 'Confidence', value: 72 }]} />
+ *   <DivergingBarChart items={[{ label: 'Pricing', positive: 6, negative: 2 }]} />
+ *   <HeatmapChart columns={['A', 'B']} rows={[{ label: 'Cost', values: [2, 5] }]} />
+ *   <DotPlotChart items={[{ label: 'Trust the AI', values: [2, 3, 3, 4, 5] }]} />
+ *   <LineChart series={[{ label: 'Confidence', points: [2, 3, 5, 4, 6] }]} labels={['R1', 'R2', 'R3', 'R4', 'R5']} />
  *   <EffortImpactChart items={[{ label: 'Auto shopping list', x: 2, y: 5 }]} />
  */
+import { Fragment } from 'react';
 import type { CSSProperties, HTMLAttributes, ReactNode } from 'react';
 
 const SERIES = ['var(--c1)', 'var(--c2)', 'var(--c3)', 'var(--c4)', 'var(--c5)', 'var(--c6)', 'var(--c7)'];
@@ -156,6 +161,146 @@ export function GaugeChart({ items, title, max = 100, showValues = true }:
           );
         })}
       </div>
+    </figure>
+  );
+}
+
+export interface DivergingItem { label: string; positive: number; negative: number }
+export function DivergingBarChart({ items, title, positiveLabel = 'Positive', negativeLabel = 'Negative',
+  positiveColor = 'var(--sl-green)', negativeColor = 'var(--sl-red)', maxValue, showValues = true }:
+  { items: DivergingItem[]; title?: string; positiveLabel?: string; negativeLabel?: string;
+    positiveColor?: string; negativeColor?: string; maxValue?: number; showValues?: boolean }) {
+  const rows = items.filter((it) => Number.isFinite(it.positive) || Number.isFinite(it.negative));
+  if (!rows.length) return null;
+  const mx = maxValue || Math.max(...rows.map((it) => Math.max(Math.abs(it.positive || 0), Math.abs(it.negative || 0)))) || 1;
+  return (
+    <figure className="sl-chart">
+      <Title title={title} />
+      <div className="sl-dbars">
+        {rows.map((it, i) => {
+          const pos = Math.max(0, it.positive || 0), neg = Math.max(0, it.negative || 0);
+          return (
+            <div className="sl-dbar" key={i}>
+              <MD t={it.label} className="sl-dbar__label" title={it.label} />
+              <span className="sl-dbar__neg"><span className="sl-dbar__fill" style={{ '--v': `${(neg / mx) * 100}%`, '--c': negativeColor } as Sv} /></span>
+              <span className="sl-dbar__pos"><span className="sl-dbar__fill" style={{ '--v': `${(pos / mx) * 100}%`, '--c': positiveColor } as Sv} /></span>
+              {showValues && <span className="sl-dbar__val">+{fmt(pos)} · −{fmt(neg)}</span>}
+            </div>
+          );
+        })}
+      </div>
+      <div className="sl-legend sl-legend--row" style={{ marginTop: '.9em' }}>
+        <span className="sl-legend__item"><span className="sl-legend__sw" style={{ '--c': positiveColor } as Sv} /><MD t={positiveLabel} className="sl-legend__label" /></span>
+        <span className="sl-legend__item"><span className="sl-legend__sw" style={{ '--c': negativeColor } as Sv} /><MD t={negativeLabel} className="sl-legend__label" /></span>
+      </div>
+    </figure>
+  );
+}
+
+export interface HeatmapRow { label: string; values: number[] }
+export function HeatmapChart({ columns, rows, title, minValue, maxValue, color = 'var(--sl-accent)', showValues = true }:
+  { columns: string[]; rows: HeatmapRow[]; title?: string; minValue?: number; maxValue?: number; color?: string; showValues?: boolean }) {
+  const data = rows.filter((r) => Array.isArray(r.values));
+  if (!data.length || !columns.length) return null;
+  const all = data.flatMap((r) => r.values).filter((v) => Number.isFinite(v));
+  const mn = minValue ?? Math.min(...all, 0);
+  const mx = maxValue ?? Math.max(...all, 1);
+  const tint = (v: number) => {
+    const p = mx === mn ? 0 : Math.max(0, Math.min(100, ((v - mn) / (mx - mn)) * 100));
+    return `color-mix(in srgb, ${color} ${p.toFixed(0)}%, var(--sl-surface-2))`;
+  };
+  return (
+    <figure className="sl-chart">
+      <Title title={title} />
+      <div className="sl-heat" style={{ gridTemplateColumns: `minmax(4.5em, auto) repeat(${columns.length}, minmax(2em, 1fr))` } as Sv}>
+        <span className="sl-heat__corner" />
+        {columns.map((c, i) => <MD key={`c${i}`} t={c} className="sl-heat__col" />)}
+        {data.map((r, ri) => (
+          <Fragment key={ri}>
+            <MD t={r.label} className="sl-heat__row" title={r.label} />
+            {columns.map((_, ci) => {
+              const v = r.values[ci];
+              return <span className="sl-heat__cell" key={ci}
+                style={Number.isFinite(v) ? { background: tint(v) } : undefined}>{Number.isFinite(v) && showValues ? fmt(v) : ''}</span>;
+            })}
+          </Fragment>
+        ))}
+      </div>
+    </figure>
+  );
+}
+
+export interface DotPlotItem { label: string; values: number[]; color?: string }
+export function DotPlotChart({ items, title, minValue = 1, maxValue = 5, showMean = true }:
+  { items: DotPlotItem[]; title?: string; minValue?: number; maxValue?: number; showMean?: boolean }) {
+  const rows = items.filter((it) => Array.isArray(it.values) && it.values.some((v) => Number.isFinite(v)));
+  if (!rows.length) return null;
+  const span = (maxValue - minValue) || 1;
+  const xOf = (v: number) => `${Math.max(0, Math.min(100, ((v - minValue) / span) * 100))}%`;
+  return (
+    <figure className="sl-chart">
+      <Title title={title} />
+      <div className="sl-dots">
+        {rows.map((it, i) => {
+          const vals = it.values.filter((v) => Number.isFinite(v));
+          const mean = Math.round((vals.reduce((s, v) => s + v, 0) / vals.length) * 10) / 10;
+          const c = it.color ?? SERIES[i % SERIES.length];
+          return (
+            <div className="sl-dot-row" key={i}>
+              <MD t={it.label} className="sl-dot-label" title={it.label} />
+              <span className="sl-dot-track">
+                {vals.map((v, j) => <span className="sl-dot-pt" key={j} style={{ left: xOf(v), '--c': c } as Sv} />)}
+                {showMean && <span className="sl-dot-mean" style={{ left: xOf(mean), '--c': c } as Sv} title={`mean ${fmt(mean)}`} />}
+              </span>
+              <span className="sl-dot-val">{fmt(mean)}</span>
+            </div>
+          );
+        })}
+      </div>
+      <div className="sl-dot-scale"><span /><span className="sl-dot-scale__axis"><span>{fmt(minValue)}</span><span>{fmt(maxValue)}</span></span><span /></div>
+    </figure>
+  );
+}
+
+export interface LineSeries { label: string; points: number[]; color?: string }
+export function LineChart({ series, title, labels, minValue, maxValue, showDots = true }:
+  { series: LineSeries[]; title?: string; labels?: string[]; minValue?: number; maxValue?: number; showDots?: boolean }) {
+  const lines = series.filter((s) => Array.isArray(s.points) && s.points.filter((v) => Number.isFinite(v)).length > 1);
+  if (!lines.length) return null;
+  const all = lines.flatMap((s) => s.points).filter((v) => Number.isFinite(v));
+  const mn = minValue ?? Math.min(...all);
+  const mx = maxValue ?? Math.max(...all);
+  const span = (mx - mn) || 1;
+  const W = 100, H = 40;
+  const xy = (pts: number[]) => pts.map((v, i) => [(i / (pts.length - 1)) * W, H - ((v - mn) / span) * H] as const);
+  return (
+    <figure className="sl-chart">
+      <Title title={title} />
+      <div className="sl-line">
+        <svg viewBox={`0 0 ${W} ${H}`} role="img">
+          <line className="sl-line__axis" x1="0" y1={H} x2={W} y2={H} />
+          {lines.map((s, i) => {
+            const pts = xy(s.points.filter((v) => Number.isFinite(v)));
+            return (
+              <g key={i} style={{ '--c': s.color ?? SERIES[i % SERIES.length] } as Sv}>
+                <polyline className="sl-line__path" points={pts.map(([x, y]) => `${x.toFixed(2)},${y.toFixed(2)}`).join(' ')} />
+                {showDots && pts.map(([x, y], j) => <circle className="sl-line__dot" key={j} cx={x.toFixed(2)} cy={y.toFixed(2)} r="1.4" />)}
+              </g>
+            );
+          })}
+        </svg>
+        {labels?.length ? <div className="sl-line__labels">{labels.map((l, i) => <span key={i}>{l}</span>)}</div> : null}
+      </div>
+      {lines.length > 1 && (
+        <div className="sl-legend sl-legend--row" style={{ marginTop: '.6em' }}>
+          {lines.map((s, i) => (
+            <span className="sl-legend__item" key={i}>
+              <span className="sl-legend__sw" style={{ '--c': s.color ?? SERIES[i % SERIES.length] } as Sv} />
+              <MD t={s.label} className="sl-legend__label" />
+            </span>
+          ))}
+        </div>
+      )}
     </figure>
   );
 }

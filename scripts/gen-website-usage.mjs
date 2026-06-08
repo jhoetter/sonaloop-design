@@ -32,6 +32,7 @@ const BLOCKS = {
   'product-showcase': { export: 'ProductShot', tags: ['ProductShot'] },
   'canvas-showcase': { export: 'CanvasShowcase', tags: ['CanvasShowcase'] },
   'integration-showcase': { export: 'IntegrationShowcase', tags: ['IntegrationShowcase'] },
+  'command-palette': { export: 'CommandPalette', tags: ['CommandPalette', 'CommandTrigger'] },
 };
 
 /* ── Source map (always, from the local component file) ──────────────────────────────────── */

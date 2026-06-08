@@ -15,7 +15,7 @@
  *        <SonaloopLinkProvider value={({ to, ...p }) => <RouterLink to={to} {...p} />}> … </SonaloopLinkProvider>
  *      This keeps the design system free of any router dependency (it's also consumed by SSR).
  */
-import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { createContext, Fragment, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import type { AnchorHTMLAttributes, CSSProperties, ReactNode } from 'react';
 import { Eyebrow, CopyButton, ThemeToggle } from './components';
 import { SonaloopIcon } from './index';
@@ -247,6 +247,12 @@ export interface NavbarProps {
   pricing?: NavLinkSpec;
   secondaryLink?: NavLinkSpec;
   primaryCta?: NavLinkSpec;
+  /** When set, renders a ⌘K search affordance (desktop chip + mobile icon) that calls this to
+      open the command palette. Omit to hide it. */
+  onSearch?: () => void;
+  searchLabel?: string;
+  /** Initial open mega-menu key — mainly for SSR/previews/tests that want the panel shown. */
+  initialOpenKey?: string | null;
 }
 
 export function Navbar({
@@ -258,9 +264,12 @@ export function Navbar({
   pricing = { to: '/pricing', label: 'Pricing' },
   secondaryLink = { to: '/sample-report', label: 'Sample report' },
   primaryCta = { to: '/install', label: 'Install MCP' },
+  onSearch,
+  searchLabel = 'Search',
+  initialOpenKey = null,
 }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false);
-  const [openKey, setOpenKey] = useState<string | null>(null);
+  const [openKey, setOpenKey] = useState<string | null>(initialOpenKey);
   const [mobileOpen, setMobileOpen] = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -329,6 +338,18 @@ export function Navbar({
               {pricing.label}
             </L>
 
+            {onSearch && (
+              <button
+                type="button"
+                onClick={onSearch}
+                aria-label={searchLabel}
+                className="ml-1 flex items-center gap-1.5 rounded-md border border-line/15 px-2.5 py-1.5 text-ink/55 transition-colors hover:border-line/30 hover:text-ink"
+              >
+                <SearchGlyph className="h-3.5 w-3.5" />
+                <kbd className="sl-kbd text-[11px]">⌘K</kbd>
+              </button>
+            )}
+
             <div className="w-px h-4 self-center bg-ink/15 mx-2" aria-hidden="true" />
 
             <L to={secondaryLink.to} className="font-sans text-[13px] text-ink/65 px-3 py-2 transition-colors hover:text-blueprint">
@@ -340,10 +361,16 @@ export function Navbar({
             </L>
           </div>
 
-          {/* Mobile: hamburger */}
+          {/* Mobile: search + hamburger */}
+          <div className="lg:hidden flex items-center">
+            {onSearch && (
+              <button type="button" onClick={onSearch} aria-label={searchLabel} className="p-2 text-ink/70 transition-colors hover:text-ink">
+                <SearchGlyph className="h-5 w-5" />
+              </button>
+            )}
           <button
             onClick={() => setMobileOpen((v) => !v)}
-            className="lg:hidden p-2 text-ink"
+            className="p-2 text-ink"
             aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={mobileOpen}
           >
@@ -362,6 +389,7 @@ export function Navbar({
               )}
             </svg>
           </button>
+          </div>
         </div>
       </div>
 
@@ -635,6 +663,10 @@ export interface FooterProps {
   copyright?: ReactNode;
   note?: ReactNode;
   brand?: NavLinkSpec;
+  /** When set, renders a ⌘K search trigger (CommandTrigger) in the brand column that calls this
+      to open the command palette. Omit to hide it. */
+  onSearch?: () => void;
+  searchLabel?: string;
 }
 
 const FOOTER_TAGS = ['non-directional', 'local-first', 'no PII', 'auditable'];
@@ -662,6 +694,8 @@ export function Footer({
   copyright,
   note = 'Local-first · your data stays yours',
   brand = { to: '/', label: 'Sonaloop' },
+  onSearch,
+  searchLabel = 'Search Sonaloop',
 }: FooterProps) {
   const ctaBand = cta === undefined ? DEFAULT_CTA : cta;
   const fade = {
@@ -699,6 +733,7 @@ export function Footer({
                       </span>
                     ))}
                   </div>
+                  {onSearch && <CommandTrigger onClick={onSearch} label={searchLabel} className="mt-6" />}
                 </div>
               </div>
 
@@ -867,6 +902,303 @@ function IntegrationRow({ dot, label, value }: { dot: string; label: string; val
       <span className={cx('h-2 w-2 rounded-full', dot)} />
       <span className="text-ink/80">{label}</span>
       <span className="text-ink/45">· {value}</span>
+    </div>
+  );
+}
+
+/* ── Command palette (⌘K) ────────────────────────────────────────────────────────────────────
+   A shared, router-aware command palette modelled on the Python-SSR app's: results grouped under
+   muted section headers, a leading icon per item, an optional right-aligned subtitle, full keyboard
+   nav (↑↓ · ↵ · esc) with mouse-hover sync, and a footer hint bar. Renders the `.sl-cmdk-*`
+   classes from sonaloop-design/components.css, so it's identical to the docs site's palette.
+
+   Data is prop-driven: pass static `groups` (nav commands), and optionally an async `onSearch`
+   for server-backed results (e.g. an /api/search). The host owns open state so it can wire its own
+   trigger; `hotkey` (default true) binds ⌘K / Ctrl-K to toggle it. */
+export type CommandItem = {
+  title: string;
+  subtitle?: string;
+  /** Internal route — navigated through the injected Link adapter (client-side in a router app). */
+  to?: string;
+  /** External link — opens in a new tab. */
+  href?: string;
+  /** A pure action (no navigation). Takes priority over `to`/`href`. */
+  onSelect?: () => void;
+  icon?: IconKey;
+  /** Extra text matched by the built-in client-side filter, beyond the title. */
+  keywords?: string;
+};
+export type CommandGroup = {
+  key: string;
+  label: string;
+  /** Optional CSS colour for this group's item icons (the Linear/Raycast type tint). */
+  accent?: string;
+  items: CommandItem[];
+};
+
+export interface CommandPaletteProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  groups: CommandGroup[];
+  /** Server-backed results for the current query. Merged after the client-filtered static groups. */
+  onSearch?: (query: string) => CommandGroup[] | Promise<CommandGroup[]>;
+  placeholder?: string;
+  emptyMessage?: string;
+  /** Bind ⌘K / Ctrl-K globally to toggle the palette. Default true. */
+  hotkey?: boolean;
+  /** Show the footer hint bar. Default true. */
+  footer?: boolean;
+}
+
+function SearchGlyph({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <circle cx="11" cy="11" r="7" />
+      <path d="m20 20-3.5-3.5" />
+    </svg>
+  );
+}
+
+/** A reusable button that opens the palette: search glyph · label · ⌘K hint. Drop it in a navbar. */
+export function CommandTrigger({ onClick, label = 'Search', className }: { onClick: () => void; label?: string; className?: string }) {
+  return (
+    <button type="button" className={cx('sl-cmdk-trigger', className)} onClick={onClick} aria-label={label}>
+      <SearchGlyph className="sl-cmdk-trigger-ico" />
+      <span>{label}</span>
+      <kbd className="sl-kbd">⌘K</kbd>
+    </button>
+  );
+}
+
+function CommandFooter() {
+  return (
+    <div className="sl-cmdk-foot">
+      <span><kbd className="sl-kbd">↑↓</kbd>Navigate</span>
+      <span><kbd className="sl-kbd">↵</kbd>Open</span>
+      <span><kbd className="sl-kbd">esc</kbd>Close</span>
+    </div>
+  );
+}
+
+function filterCommandGroups(groups: CommandGroup[], query: string): CommandGroup[] {
+  const q = query.toLowerCase();
+  return groups
+    .map((g) => ({ ...g, items: g.items.filter((it) => it.title.toLowerCase().includes(q) || (it.keywords?.toLowerCase().includes(q) ?? false)) }))
+    .filter((g) => g.items.length > 0);
+}
+
+type PanelRow =
+  | { kind: 'sec'; key: string; label: string }
+  | { kind: 'item'; key: string; item: CommandItem; accent?: string; i: number };
+
+function toRows(groups: CommandGroup[]): PanelRow[] {
+  const rows: PanelRow[] = [];
+  let i = 0;
+  for (const g of groups) {
+    if (!g.items.length) continue;
+    rows.push({ kind: 'sec', key: `sec-${g.key}`, label: g.label });
+    for (const item of g.items) {
+      rows.push({ kind: 'item', key: `${g.key}-${i}`, item, accent: g.accent, i });
+      i += 1;
+    }
+  }
+  return rows;
+}
+
+interface PanelProps {
+  groups: CommandGroup[];
+  query?: string;
+  onQueryChange?: (q: string) => void;
+  selectedIndex?: number;
+  onHover?: (i: number) => void;
+  onSelect?: () => void;
+  placeholder?: string;
+  emptyMessage?: string;
+  footer?: boolean;
+  inline?: boolean;
+  inputRef?: React.Ref<HTMLInputElement>;
+  listRef?: React.Ref<HTMLDivElement>;
+}
+
+/** The palette's presentational surface (input · grouped list · footer). Exported so it can be
+    embedded inline (docs preview, an inline search box) without the full-screen overlay. */
+export function CommandPalettePanel({
+  groups,
+  query = '',
+  onQueryChange,
+  selectedIndex = 0,
+  onHover,
+  onSelect,
+  placeholder = 'Search…',
+  emptyMessage = 'No results.',
+  footer = true,
+  inline = false,
+  inputRef,
+  listRef,
+}: PanelProps) {
+  const rows = useMemo(() => toRows(groups), [groups]);
+  const empty = rows.length === 0;
+
+  const renderItem = (row: Extract<PanelRow, { kind: 'item' }>) => {
+    const { item, accent, i } = row;
+    const className = cx('sl-cmdk-item', i === selectedIndex && 'is-active');
+    const ico = (
+      <span className="sl-cmdk-ico" style={accent ? { color: accent } : undefined}>
+        {item.icon ? <Icon name={item.icon} size={18} /> : null}
+      </span>
+    );
+    const body = (
+      <>
+        {ico}
+        <span className="sl-cmdk-title">{item.title}</span>
+        {item.subtitle ? <span className="sl-cmdk-sub">{item.subtitle}</span> : null}
+      </>
+    );
+    const onClick = () => {
+      item.onSelect?.();
+      onSelect?.();
+    };
+    const onMouseMove = () => onHover?.(i);
+    if (item.onSelect) return <button key={row.key} type="button" className={className} onClick={onClick} onMouseMove={onMouseMove}>{body}</button>;
+    if (item.to) return <L key={row.key} to={item.to} className={className} onClick={onClick} onMouseMove={onMouseMove}>{body}</L>;
+    if (item.href) return <a key={row.key} href={item.href} target="_blank" rel="noreferrer" className={className} onClick={onClick} onMouseMove={onMouseMove}>{body}</a>;
+    return <button key={row.key} type="button" className={className} onClick={onClick} onMouseMove={onMouseMove}>{body}</button>;
+  };
+
+  return (
+    <div className={cx('sl-cmdk-panel', inline && 'sl-cmdk-panel--inline')} role="dialog" aria-modal="true" aria-label="Command palette">
+      <div className="sl-cmdk-head">
+        <SearchGlyph className="sl-cmdk-head-ico" />
+        <input
+          ref={inputRef}
+          className="sl-cmdk-input"
+          type="text"
+          value={query}
+          onChange={(e) => onQueryChange?.(e.target.value)}
+          placeholder={placeholder}
+          autoComplete="off"
+          spellCheck={false}
+          aria-label={placeholder}
+        />
+      </div>
+      <div className="sl-cmdk-list" ref={listRef}>
+        {empty ? (
+          <div className="sl-cmdk-empty">{emptyMessage}</div>
+        ) : (
+          rows.map((row) => (row.kind === 'sec'
+            ? <div key={row.key} className="sl-cmdk-sec">{row.label}</div>
+            : <Fragment key={row.key}>{renderItem(row)}</Fragment>))
+        )}
+      </div>
+      {footer ? <CommandFooter /> : null}
+    </div>
+  );
+}
+
+export function CommandPalette({
+  open,
+  onOpenChange,
+  groups,
+  onSearch,
+  placeholder = 'Search…',
+  emptyMessage = 'No results.',
+  hotkey = true,
+  footer = true,
+}: CommandPaletteProps) {
+  const [query, setQuery] = useState('');
+  const [sel, setSel] = useState(0);
+  const [asyncGroups, setAsyncGroups] = useState<CommandGroup[] | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+
+  // ⌘K / Ctrl-K toggles the palette.
+  useEffect(() => {
+    if (!hotkey) return;
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K')) {
+        e.preventDefault();
+        onOpenChange(!open);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [hotkey, open, onOpenChange]);
+
+  // Reset + focus each time it opens.
+  useEffect(() => {
+    if (!open) return;
+    setQuery('');
+    setAsyncGroups(null);
+    setSel(0);
+    inputRef.current?.focus();
+  }, [open]);
+
+  const q = query.trim();
+  const staticVisible = useMemo(() => (q ? filterCommandGroups(groups, q) : groups), [groups, q]);
+
+  // Debounced server search, merged after the client-filtered static groups.
+  useEffect(() => {
+    if (!onSearch) return;
+    if (!q) {
+      setAsyncGroups(null);
+      return;
+    }
+    let live = true;
+    const timer = setTimeout(async () => {
+      try {
+        const r = await onSearch(q);
+        if (live) setAsyncGroups(r);
+      } catch {
+        if (live) setAsyncGroups(null);
+      }
+    }, 120);
+    return () => {
+      live = false;
+      clearTimeout(timer);
+    };
+  }, [q, onSearch]);
+
+  const visible = useMemo(() => (asyncGroups ? [...staticVisible, ...asyncGroups] : staticVisible), [staticVisible, asyncGroups]);
+  const flatCount = useMemo(() => visible.reduce((n, g) => n + g.items.length, 0), [visible]);
+
+  // Snap selection back to the top whenever the result set changes.
+  useEffect(() => { setSel(0); }, [visible]);
+
+  // Keep the active row in view.
+  useEffect(() => {
+    listRef.current?.querySelectorAll('.sl-cmdk-item')[sel]?.scrollIntoView({ block: 'nearest' });
+  }, [sel]);
+
+  if (!open) return null;
+
+  const close = () => onOpenChange(false);
+  const move = (d: number) => {
+    if (!flatCount) return;
+    setSel((s) => (s + d + flatCount) % flatCount);
+  };
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowDown') { e.preventDefault(); move(1); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); move(-1); }
+    else if (e.key === 'Enter') { e.preventDefault(); (listRef.current?.querySelectorAll('.sl-cmdk-item')[sel] as HTMLElement | undefined)?.click(); }
+    else if (e.key === 'Escape') { e.preventDefault(); close(); }
+  };
+
+  return (
+    <div className="sl-cmdk" onKeyDown={onKeyDown}>
+      <div className="sl-cmdk-backdrop" onClick={close} />
+      <CommandPalettePanel
+        groups={visible}
+        query={query}
+        onQueryChange={setQuery}
+        selectedIndex={sel}
+        onHover={setSel}
+        onSelect={close}
+        placeholder={placeholder}
+        emptyMessage={emptyMessage}
+        footer={footer}
+        inputRef={inputRef}
+        listRef={listRef}
+      />
     </div>
   );
 }

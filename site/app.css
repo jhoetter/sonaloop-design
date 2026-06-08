@@ -409,22 +409,10 @@ a.ds-usechip:hover code { color: var(--sl-accent); border-color: color-mix(in sr
 .ds-foot-meta { font-size: 13px; color: var(--sl-faint); }
 .ds-foot-meta a { color: var(--sl-accent); text-decoration: none; }
 
-/* ── Search palette ───────────────────────────────────────────────────────────── */
-.ds-palette { position: fixed; inset: 0; z-index: 300; display: flex; align-items: flex-start; justify-content: center; }
-.ds-palette[hidden] { display: none; }
-.ds-palette-backdrop { position: absolute; inset: 0; background: color-mix(in srgb, var(--sl-ink) 28%, transparent); backdrop-filter: blur(2px); }
-.ds-palette-box { position: relative; margin-top: 12vh; width: min(560px, 92vw); background: var(--sl-overlay, var(--sl-surface)); border: 1px solid var(--sl-line); border-radius: 14px; box-shadow: var(--sl-shadow-lg, 0 16px 50px rgba(0,0,0,.25)); overflow: hidden; }
-.ds-palette-head { display: flex; align-items: center; gap: 11px; padding: 14px 16px; border-bottom: 1px solid var(--sl-line); }
-.ds-palette-head .ds-search-ico { width: 17px; height: 17px; color: var(--sl-faint); }
-.ds-palette-head input { flex: 1; border: 0; outline: none; background: transparent; font: inherit; font-size: 15px; color: var(--sl-ink); }
-.ds-palette-head input::placeholder { color: var(--sl-faint); }
-.ds-palette-list { list-style: none; margin: 0; padding: 8px; max-height: 52vh; overflow-y: auto; }
-.ds-palette-list li { display: flex; align-items: center; gap: 11px; padding: 9px 12px; border-radius: 8px; cursor: pointer; font-size: 14px; color: var(--sl-ink); }
-.ds-palette-list li .pl-kind { margin-left: auto; font-family: var(--sl-mono); font-size: 10px; text-transform: uppercase; letter-spacing: .1em; color: var(--sl-faint); }
-.ds-palette-list li .pl-ico { width: 17px; height: 17px; color: var(--sl-muted); display: inline-flex; }
-.ds-palette-list li .pl-ico svg { width: 17px; height: 17px; }
-.ds-palette-list li.is-active, .ds-palette-list li:hover { background: var(--sl-hover); }
-.ds-palette-empty { padding: 22px; text-align: center; color: var(--sl-faint); font-size: 14px; }
+/* The ⌘K search palette is the shared `.sl-cmdk` component (styles/components.css) — the same
+   one the marketing website mounts. Its markup lives in index.html; behaviour in app.js. Only a
+   docs-specific :hover affordance on rows is layered here (the shared CSS drives selection state). */
+.sl-cmdk-list .sl-cmdk-item:hover { background: var(--sl-hover); }
 
 /* ── Misc ─────────────────────────────────────────────────────────────────────── */
 .ds-callout { display: flex; gap: 12px; padding: 14px 16px; border: 1px solid var(--sl-line); border-left: 3px solid var(--sl-accent); border-radius: 10px; background: var(--sl-surface); margin: 18px 0 0; }
