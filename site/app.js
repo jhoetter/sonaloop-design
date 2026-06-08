@@ -212,7 +212,7 @@ function pageTypography() {
     <p class="ds-lead"><b>Sona</b> is Sonaloop's own typeface. Two cuts do all the work: <b>Sona</b> for everything readable and <b>Sona Mono</b> for eyebrows, tags, code and data. Both are self-hosted from this repo (<code>/fonts</code>) — no third-party dependency. <span style="color:var(--sl-muted)">Today Sona is built on <a href="https://vercel.com/font" target="_blank" rel="noopener">Geist</a> (SIL OFL-1.1); see the Sona roadmap in BRANDING.md for the path to a fully bespoke face.</span></p>
 
     ${h2('type-families', 'Families')}
-    <div class="ds-grid-2">
+    <div class="ds-grid-3">
       <div class="ds-tile" style="padding:28px">
         <div class="lbl">Sona · UI &amp; prose</div>
         <div style="font-size:40px;letter-spacing:-.03em;margin:10px 0 4px">Sona</div>
@@ -225,12 +225,36 @@ function pageTypography() {
         <div style="font-family:var(--sl-mono);font-size:14px;color:var(--sl-muted)">council_24105090 · 4 voices · ⌘K</div>
         <div class="mono" style="font-family:var(--sl-mono);font-size:12px;color:var(--sl-faint);margin-top:10px">${esc(fonts.mono.join(', '))}</div>
       </div>
+      <div class="ds-tile" style="padding:28px">
+        <div class="lbl">Sona Pixel · display only</div>
+        <div style="font-family:var(--sl-pixel);font-size:40px;letter-spacing:.01em;margin:10px 0 4px">Sona</div>
+        <div style="font-family:var(--sl-pixel);font-size:14px;color:var(--sl-muted)">LOADING · 24105090</div>
+        <div class="mono" style="font-family:var(--sl-mono);font-size:12px;color:var(--sl-faint);margin-top:10px">${esc(fonts.pixel.join(', '))}</div>
+      </div>
     </div>
 
     ${h2('type-specimen', 'Character set')}
     ${p('Every glyph in both cuts — uppercase, lowercase, figures and punctuation. Use it to check letterforms, spacing and the sans-vs-mono difference. Click any glyph to copy it.')}
     ${specimen('Sona', 'var(--sl-sans)')}
     ${specimen('Sona Mono', 'var(--sl-mono)')}
+
+    ${h2('type-pixel', 'Sona Pixel · display')}
+    ${p('A bitmap display face for special technical moments — loaders, council ids, a "research instrument" flourish. <b>Never for body text.</b> It ships in five pixel "fills"; compare them below and pick the one that best resembles the brand (the loop mark leans soft &amp; rounded — see BRANDING.md). The default <code>--sl-pixel</code> family is the Square fill.')}
+    <div class="ds-pixel-grid">
+      ${[
+        ['Square', "'Sona Pixel'", 'Canonical pixel — crisp, technical, neutral.'],
+        ['Circle', "'Sona Pixel Circle'", 'Soft, rounded dots — closest to the loop mark. ★ brand-leaning.'],
+        ['Grid', "'Sona Pixel Grid'", 'Pixels with gaps — schematic, blueprint-y.'],
+        ['Line', "'Sona Pixel Line'", 'Lightest, most diagrammatic.'],
+        ['Triangle', "'Sona Pixel Triangle'", 'Most decorative / playful.'],
+      ].map(([name, fam, note]) => `
+        <div class="ds-pixel-card">
+          <div class="lbl">Sona Pixel · ${esc(name)}</div>
+          <div class="ds-pixel-sample" style="font-family:${fam}">SONALOOP</div>
+          <div class="ds-pixel-sub" style="font-family:${fam}">council_24105090<br>0123456789</div>
+          <div class="ds-pixel-note">${note}</div>
+        </div>`).join('')}
+    </div>
 
     ${h2('type-scale', 'Type scale')}
     ${p('A compact scale tuned for an information-dense inspector that still breathes on the airy marketing site. Sizes are tokens, so a single edit re-tunes both.')}

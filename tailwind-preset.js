@@ -21,6 +21,7 @@ export default {
         serif: ["\"Sona\"", "\"Geist\"", "\"Inter\"", "system-ui", "sans-serif"],
         sans: ["\"Sona\"", "\"Geist\"", "\"Inter\"", "system-ui", "sans-serif"],
         mono: ["\"Sona Mono\"", "\"Geist Mono\"", "ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
+        pixel: ["\"Sona Pixel\"", "\"Geist Pixel\"", "ui-monospace", "monospace"],
       },
     },
   },

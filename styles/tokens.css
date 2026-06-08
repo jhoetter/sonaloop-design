@@ -18,7 +18,7 @@
   --gold: 122 94 209;
   --gold-2: 238 234 248;
   /* canonical --sl-* aliases for components.css (hex, theme-aware) */
-  --sl-bg:#faf8f3;--sl-surface:#ffffff;--sl-surface-2:#f1efe8;--sl-ink:#1a1815;--sl-muted:#635e56;--sl-faint:#8c857a;--sl-line:#e9e5db;--sl-accent:#5e6ad2;--sl-accent-ink:#ffffff;--sl-accent-weak:#ecebf8;--sl-hover:#f4f1ea;--sl-sel:#ece9df;--sl-green:#3d9b6b;--sl-amber:#b87a25;--sl-red:#cf4d5f;--sl-blue:#3d7fc4;--sl-violet:#7a5ed1;--sl-skep:#c2683f;--sl-radius:8px;--sl-radius-sm:6px;--sl-sans:"Sona","Geist","Inter",system-ui,sans-serif;--sl-mono:"Sona Mono","Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sl-bg:#faf8f3;--sl-surface:#ffffff;--sl-surface-2:#f1efe8;--sl-ink:#1a1815;--sl-muted:#635e56;--sl-faint:#8c857a;--sl-line:#e9e5db;--sl-accent:#5e6ad2;--sl-accent-ink:#ffffff;--sl-accent-weak:#ecebf8;--sl-hover:#f4f1ea;--sl-sel:#ece9df;--sl-green:#3d9b6b;--sl-amber:#b87a25;--sl-red:#cf4d5f;--sl-blue:#3d7fc4;--sl-violet:#7a5ed1;--sl-skep:#c2683f;--sl-radius:8px;--sl-radius-sm:6px;--sl-sans:"Sona","Geist","Inter",system-ui,sans-serif;--sl-mono:"Sona Mono","Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace;--sl-pixel:"Sona Pixel","Geist Pixel",ui-monospace,monospace;
 }
 [data-theme="dark"] {
   --paper: 16 17 19;
@@ -35,5 +35,5 @@
   --gold: 154 140 255;
   --gold-2: 42 42 51;
   /* canonical --sl-* aliases for components.css (hex, theme-aware) */
-  --sl-bg:#101113;--sl-surface:#16171a;--sl-surface-2:#1c1d21;--sl-ink:#e6e7ea;--sl-muted:#8a8f98;--sl-faint:#6b7076;--sl-line:#23252a;--sl-accent:#7c84e8;--sl-accent-ink:#ffffff;--sl-accent-weak:#1d2030;--sl-hover:#1a1b1f;--sl-sel:#1f2128;--sl-green:#4cb782;--sl-amber:#d9a23b;--sl-red:#e0566a;--sl-blue:#5e9fe0;--sl-violet:#9a8cff;--sl-skep:#d98a63;--sl-radius:8px;--sl-radius-sm:6px;--sl-sans:"Sona","Geist","Inter",system-ui,sans-serif;--sl-mono:"Sona Mono","Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sl-bg:#101113;--sl-surface:#16171a;--sl-surface-2:#1c1d21;--sl-ink:#e6e7ea;--sl-muted:#8a8f98;--sl-faint:#6b7076;--sl-line:#23252a;--sl-accent:#7c84e8;--sl-accent-ink:#ffffff;--sl-accent-weak:#1d2030;--sl-hover:#1a1b1f;--sl-sel:#1f2128;--sl-green:#4cb782;--sl-amber:#d9a23b;--sl-red:#e0566a;--sl-blue:#5e9fe0;--sl-violet:#9a8cff;--sl-skep:#d98a63;--sl-radius:8px;--sl-radius-sm:6px;--sl-sans:"Sona","Geist","Inter",system-ui,sans-serif;--sl-mono:"Sona Mono","Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace;--sl-pixel:"Sona Pixel","Geist Pixel",ui-monospace,monospace;
 }

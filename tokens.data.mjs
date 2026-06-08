@@ -33,6 +33,9 @@ export const fonts = {
   // serif kept as an alias to Sona so existing `font-serif` headline usages need no churn
   serif: ['"Sona"', '"Geist"', '"Inter"', 'system-ui', 'sans-serif'],
   mono: ['"Sona Mono"', '"Geist Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+  // Sona Pixel — display/accent ONLY (loaders, council ids, "research instrument" flourishes).
+  // Built on Geist Pixel (same OFL). Default fill = Square; alt fills are separate families.
+  pixel: ['"Sona Pixel"', '"Geist Pixel"', 'ui-monospace', 'monospace'],
 };
 
 // ── Theme-independent scales (emitted once into the inspector :root) ──────────────
@@ -40,6 +43,7 @@ export const scales = {
   radius: '8px', 'radius-sm': '6px', 'row-h': '48px', ease: 'cubic-bezier(.4,0,.2,1)',
   sans: fonts.sans.join(','),
   mono: fonts.mono.join(','),
+  pixel: fonts.pixel.join(','),
   't-xs': '11px', 't-sm': '12px', 't-body': '13px', 't-md': '15px', 't-prose': '16px', 't-lg': '18px', 't-xl': '24px',
   's-1': '4px', 's-2': '8px', 's-3': '12px', 's-4': '16px', 's-5': '20px', 's-6': '24px', 's-8': '32px',
 };

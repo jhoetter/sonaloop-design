@@ -28,3 +28,34 @@
   src: url("/fonts/SonaMono-Variable.woff2") format("woff2-variations"),
        url("/fonts/SonaMono-Variable.woff2") format("woff2");
 }
+
+/* Sona Pixel — display / accent face (built on Geist Pixel, same OFL). A monospaced bitmap
+ * face for special technical moments: loading, council ids, "research instrument" flourishes.
+ * NOT for body text. Ships in five "fill" styles; the default family "Sona Pixel" is the
+ * Square fill. The four alternates are exposed as their own families so the brand can choose
+ * the fill that best fits Sonaloop (see the Typography page + BRANDING.md). */
+@font-face {
+  font-family: "Sona Pixel";           /* default = Square (canonical pixel) */
+  font-style: normal; font-weight: 400; font-display: swap;
+  src: url("/fonts/SonaPixel-Square.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Sona Pixel Circle";    /* soft, rounded — closest to the loop mark */
+  font-style: normal; font-weight: 400; font-display: swap;
+  src: url("/fonts/SonaPixel-Circle.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Sona Pixel Grid";
+  font-style: normal; font-weight: 400; font-display: swap;
+  src: url("/fonts/SonaPixel-Grid.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Sona Pixel Line";      /* lightest / most schematic */
+  font-style: normal; font-weight: 400; font-display: swap;
+  src: url("/fonts/SonaPixel-Line.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Sona Pixel Triangle";
+  font-style: normal; font-weight: 400; font-display: swap;
+  src: url("/fonts/SonaPixel-Triangle.woff2") format("woff2");
+}

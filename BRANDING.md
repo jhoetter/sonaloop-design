@@ -54,41 +54,68 @@ accent `#7C84E8`. Product screenshots are captured in the app's dark theme.
 **Sona** is Sonaloop's own typeface — the brand-stable name the whole system speaks in.
 
 - **Sona** (grotesk) — headlines + UI. **Sona Mono** — small labels / eyebrows / code.
-  Geist (then Inter / system-ui) are fallbacks only.
-- Self-hosted from this repo: the `.woff2` files live in `fonts/`, declared as the families
-  `Sona` / `Sona Mono` in `styles/fonts.css`. **No third-party (Google Fonts) dependency** —
-  everything needed to render the brand ships in this repo.
-- Referenced everywhere by NAME, never by the underlying face: tokens `--sl-sans` / `--sl-mono`
-  (`styles/tokens.css`), Tailwind `font-sans` / `font-serif` (= Sona) and `font-mono`
-  (= Sona Mono) (`tailwind-preset.js`). All authored once in `tokens.data.mjs` → `npm run gen`.
+  **Sona Pixel** — a bitmap *display-only* face for technical flourishes (loaders, council ids,
+  "research instrument" moments); never body text. Geist (then Inter / system-ui / mono) are
+  fallbacks only.
+- Self-hosted from this repo: the `.woff2` files live in `fonts/`, declared as families in
+  `styles/fonts.css`. **No third-party (Google Fonts) dependency** — everything needed to
+  render the brand ships in this repo. Provenance + reproduce steps: `fonts/SOURCES.md`.
+- Referenced everywhere by NAME, never the underlying face: tokens `--sl-sans` / `--sl-mono` /
+  `--sl-pixel` (`styles/tokens.css`), Tailwind `font-sans` / `font-serif` (= Sona), `font-mono`
+  (= Sona Mono), `font-pixel` (= Sona Pixel). Authored once in `tokens.data.mjs` → `npm run gen`.
 - Headlines: large, left-aligned, tight tracking, `--ink`. Body: `--ink/65`, relaxed.
 - Eyebrows/labels: `font-mono`, uppercase, `tracking-[0.16em]`, `--ink/45`.
 - Body letter-spacing ~ `-0.006em`.
 
 ### Sona — provenance & roadmap
 
-**Today (v0):** Sona is *built on* **Geist** (© 2023 Vercel + basement.studio), licensed
-**SIL OFL-1.1** (see `fonts/LICENSE-Geist.txt`). The vendored `.woff2` files are Geist's
-variable fonts, **unmodified** — we only assign them the family name `Sona` / `Sona Mono` in
-`styles/fonts.css`. This is legal under OFL (which permits redistribution and bundling), gives
-us a self-contained repo, and — crucially — lets the *whole system already speak "Sona"*.
+We are moving toward a **truly own face** in small, code-driven steps. Each phase is a
+drop-in: because nothing references "Geist" (only `--sl-sans` / `--sl-mono` / `--sl-pixel` →
+Sona), swapping the underlying outlines never touches a component. **Phases 0–1 are done.**
 
-**The point of the indirection:** because nothing references "Geist" anymore (only `--sl-sans` /
-`--sl-mono` → "Sona"), swapping the underlying face is a **drop-in** with zero component churn.
+- **Phase 0 — semantic alias (DONE).** Whole system speaks Sona; fonts self-hosted in `fonts/`.
+- **Phase 1 — fork & rename, in code (DONE).** `scripts/build_sona_fonts.py` (fontTools)
+  rewrites each binary's internal `name` table Geist → Sona, keeps the OFL + original copyright,
+  appends a derivation note, and re-exports woff2. Re-runnable / reversible; `--check` gates CI.
+  The binaries now genuinely report a Sona family — not just a CSS alias. *Outlines unchanged.*
+- **Phase 2 — bespoke glyphs, in code (NEXT).** Iteratively edit signature glyphs + metrics with
+  fontTools pens/`glyf` so Sona stops *being* Geist and starts *being Sona* — without a manual
+  font editor. Candidate first moves (see "What should Sona feel like" below): a Sonaloop `g`/`a`,
+  the loop motif worked into the `o` / ampersand / a logo ligature, slightly tightened default
+  spacing, `council_…`-style id ligatures, a Sona Pixel tuned to the loop dots. Land glyph by
+  glyph; every export is still a drop-in.
+- **Phase 3 — commission an original face (LATER, $20k–$100k+, months).** A type designer draws
+  Sona from scratch once typography is a deliberate differentiator. Same drop-in when it lands.
 
-**Path to a truly bespoke Sona (when the brand warrants it):**
-1. **Fork & rename (days, ~free).** OFL explicitly *requires* a new name for modified versions —
-   so "Sona" is exactly the right move. Open the Geist sources in a font editor (FontForge / Glyphs),
-   make Sonaloop-specific tweaks (e.g. a custom `g`/`a`, the loop motif worked into a glyph or the
-   ampersand, tightened spacing, ligatures for `council_…` ids), set the font's internal name to
-   "Sona", keep the OFL + original copyright notice, export new `.woff2`, drop them in `fonts/`.
-   Update `fonts/LICENSE-Geist.txt` → note the derivation. **Nothing else changes.**
-2. **Commission an original face (months, $20k–$100k+).** A type designer draws Sona from scratch.
-   Only justified once typography is a deliberate differentiator. Same drop-in when it lands.
+**Can Claude Code do Phase 2?** Yes for the mechanical/parametric parts — renaming (done),
+remixing/instancing axes, spacing/kerning passes, ligatures, simple geometric glyph edits, and
+*generating* a bespoke pixel face (pixel glyphs are just grids — fully codeable). What it can't
+do is *type design judgement*; for true original letterforms, pair the code path with a designer.
 
-**Constraints to honour:** keep the OFL text + Vercel/basement.studio copyright as long as any
-Geist-derived outlines remain; do **not** ship the binaries under the reserved name "Geist"; if we
-modify outlines, bump the internal font name so it's unambiguously "Sona".
+**OFL constraints to honour:** keep the OFL text + Vercel/basement.studio copyright as long as
+any Geist-derived outlines remain; never ship binaries under the reserved name "Geist"; once we
+modify outlines, the internal name must read unambiguously "Sona" (Phase 1 already ensures this).
+
+### What should Sona feel like (brand fit)
+
+Brand essence: *calm, intelligent, premium, honest — synthetic research that disagrees with you.*
+Geist is a strong base (neutral, engineered, developer-native) but reads slightly cold/corporate.
+To resemble Sonaloop, nudge it **warmer and a touch more humanist** without losing the precision:
+
+- **Humanist grotesk, not geometric.** Keep even, confident proportions; add a little warmth in
+  terminals and curves so it feels considered and human (we *disagree thoughtfully*, not robotic).
+- **The loop motif is the signature.** The mark is a continuous loop with three nodes — express it
+  in the `o`/`a` counters, a custom ampersand, or a logo ligature. One quiet signature beats many.
+- **Editorial intelligence.** Favour a double-story `a` and `g` (reads literate/considered) over
+  single-story geometric forms; tight but breathing tracking; restrained, legible at dense sizes
+  (the inspector is information-dense) yet elegant large (the airy marketing site).
+- **Sona Mono = the data voice.** Slightly humanist mono; great figures and id legibility
+  (`council_24105090`); the existing eyebrow/tag usage is its home.
+- **Sona Pixel = the "research instrument" accent.** Of the five fills, **Circle** is the most
+  on-brand — its rounded dots echo the loop mark and the soft-premium surfaces; Square is the safe
+  neutral default. Keep Pixel rare and deliberate (loaders, ids), never for reading.
+- **Avoid:** anything cold/techy-generic, ultra-geometric, or a warm-display personality that
+  fights the cool painterly canvases. Sona should feel like a *quiet, premium instrument*.
 
 ## Surfaces, radius, elevation
 
