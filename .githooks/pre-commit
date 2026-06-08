@@ -1,0 +1,10 @@
+#!/bin/sh
+# Keep generated design-system artifacts in lockstep with their sources, so a commit
+# never ships stale generated files. Regenerates icons + tokens + tailwind preset from
+# icons.data.mjs / tokens.data.mjs and re-stages them.
+# Installed automatically by the `prepare` npm script (sets core.hooksPath=.githooks).
+set -e
+node scripts/gen.mjs >/dev/null
+node scripts/gen-tokens.mjs >/dev/null
+git add src/index.ts py/sonaloop_icons/__init__.py py/sonaloop_icons/tokens.py \
+        styles/tokens.css tailwind-preset.js 2>/dev/null || true
