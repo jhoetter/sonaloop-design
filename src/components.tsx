@@ -887,29 +887,45 @@ export function Modal({ open, onClose, title, size = 'md', footer, hideClose, cl
 
 export type PopoverPlacement = 'bottom-start' | 'bottom-end' | 'top-start' | 'top-end';
 export interface PopoverProps {
-  open: boolean;
-  onClose: () => void;
-  /** The anchor (a button). The caller owns its click/aria; the panel anchors to it. */
-  trigger: ReactNode;
+  /** Controlled open state. Omit for an uncontrolled popover that tracks its own state —
+   *  drive it via the render-prop `trigger`/`children`. */
+  open?: boolean;
+  /** Close handler (controlled mode). */
+  onClose?: () => void;
+  /** The anchor. Either a node (you wire its onClick — controlled), or a render-prop receiving
+   *  `{ open, toggle }` to build an uncontrolled trigger. */
+  trigger: ReactNode | ((state: { open: boolean; toggle: () => void }) => ReactNode);
   placement?: PopoverPlacement;
   className?: string;
-  children?: ReactNode;
+  /** The panel content — a node, or a render-prop receiving a `close` callback (so a menu row can
+   *  close the popover when it's chosen). */
+  children?: ReactNode | ((close: () => void) => ReactNode);
 }
-/** A small anchored panel (menus, filters) positioned against its trigger. */
-export function Popover({ open, onClose, trigger, placement = 'bottom-start', className, children }: PopoverProps) {
+/** A small anchored panel (menus, filters) positioned against its trigger. Controlled (pass
+ *  `open`/`onClose`) or uncontrolled (omit them and drive it via the render-prop trigger/children). */
+export function Popover({ open: openProp, onClose, trigger, placement = 'bottom-start', className, children }: PopoverProps) {
+  const controlled = openProp !== undefined;
+  const [openState, setOpenState] = useState(false);
+  const open = controlled ? !!openProp : openState;
+  const close = useCallback(() => { if (controlled) onClose?.(); else setOpenState(false); }, [controlled, onClose]);
+  const toggle = useCallback(() => { if (controlled) { if (open) onClose?.(); } else setOpenState((o) => !o); }, [controlled, open, onClose]);
   const wrapRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!open) return;
-    const onDown = (e: MouseEvent) => { if (!wrapRef.current?.contains(e.target as Node)) onClose(); };
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    const onDown = (e: MouseEvent) => { if (!wrapRef.current?.contains(e.target as Node)) close(); };
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') close(); };
     document.addEventListener('mousedown', onDown);
     document.addEventListener('keydown', onKey);
     return () => { document.removeEventListener('mousedown', onDown); document.removeEventListener('keydown', onKey); };
-  }, [open, onClose]);
+  }, [open, close]);
   return (
     <div className="sl-popover-wrap" ref={wrapRef}>
-      {trigger}
-      {open ? <div className={cx('sl-popover', `sl-popover--${placement}`, className)} role="menu">{children}</div> : null}
+      {typeof trigger === 'function' ? trigger({ open, toggle }) : trigger}
+      {open ? (
+        <div className={cx('sl-popover', `sl-popover--${placement}`, className)} role="menu">
+          {typeof children === 'function' ? (children as (close: () => void) => ReactNode)(close) : children}
+        </div>
+      ) : null}
     </div>
   );
 }

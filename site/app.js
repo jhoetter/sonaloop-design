@@ -1520,7 +1520,7 @@ const cModal = () => componentPage({
 
 const cPopover = () => componentPage({
   id: 'popover', title: 'Popover · Menu',
-  desc: 'A small panel anchored to its trigger — row actions, filters, the account menu. Outside-click + ESC dismiss. Holds <code>.sl-menu-item</code> rows (icon · label), optional <code>.sl-menu-label</code> headers and <code>.sl-menu-sep</code> dividers. Four placements.',
+  desc: 'A small panel anchored to its trigger — row actions, filters, the account menu. Outside-click + ESC dismiss. Holds <code>.sl-menu-item</code> rows (icon · label), optional <code>.sl-menu-label</code> headers and <code>.sl-menu-sep</code> dividers. Four placements. <b>Controlled</b> (pass <code>open</code>/<code>onClose</code>) or <b>uncontrolled</b> — omit them and drive it with a render-prop <code>trigger={({open,toggle})=>…}</code> and <code>children={(close)=>…}</code> (handy so a row closes the menu when chosen).',
   demo: `<div class="sl-popover-wrap" style="margin-bottom:150px">
     <button class="sl-btn sl-btn--sm">Actions ▾</button>
     <div class="sl-popover sl-popover--bottom-start" style="animation:none">
@@ -1536,7 +1536,7 @@ const cPopover = () => componentPage({
     ['.sl-popover--bottom-end', 'Bottom-end', 'Below trigger, right-aligned.'],
     ['.sl-popover--top-start / --top-end', 'Top', 'Above the trigger.'],
   ] },
-  react: `import { Popover, MenuItem, Button } from 'sonaloop-design/components';\nimport { useState } from 'react';\n\nconst [open, setOpen] = useState(false);\n<Popover open={open} onClose={() => setOpen(false)} placement=\"bottom-start\"\n  trigger={<Button size=\"sm\" onClick={() => setOpen((o) => !o)}>Actions ▾</Button>}>\n  <MenuItem icon={<SearchIcon size={16} />}>Open</MenuItem>\n  <MenuItem icon={<PencilIcon size={16} />}>Rename</MenuItem>\n</Popover>`,
+  react: `import { Popover, MenuItem, Button } from 'sonaloop-design/components';\n\n// uncontrolled — the Popover owns its open state; the row closes it on select:\n<Popover placement=\"bottom-start\"\n  trigger={({ open, toggle }) => <Button size=\"sm\" onClick={toggle} aria-expanded={open}>Actions ▾</Button>}>\n  {(close) => <>\n    <MenuItem icon={<SearchIcon size={16} />} onClick={() => { open(); close(); }}>Open</MenuItem>\n    <MenuItem icon={<PencilIcon size={16} />} onClick={() => { rename(); close(); }}>Rename</MenuItem>\n  </>}\n</Popover>\n\n// or controlled — you own the open state:\n// <Popover open={open} onClose={() => setOpen(false)} trigger={<Button onClick={() => setOpen(true)}>…</Button>}>…</Popover>`,
   markup: `<div class="sl-popover-wrap">\n  <button class="sl-btn sl-btn--sm">Actions ▾</button>\n  <div class="sl-popover sl-popover--bottom-start">\n    <button class="sl-menu-item">…Open</button>\n    <div class="sl-menu-sep"></div>\n    <button class="sl-menu-item">…Favourite</button>\n  </div>\n</div>`,
   python: `# The sidebar account menu (.sl-um-pop) is this pattern, SSR-side.`,
 });
