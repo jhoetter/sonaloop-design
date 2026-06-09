@@ -1692,6 +1692,28 @@ const cImageLightbox = () => componentPage({
   python: `# Same .sl-lightbox class contract from the SSR app.`,
 });
 
+const cListPage = () => componentPage({
+  id: 'list-page', title: 'List Page',
+  desc: 'The index-page scaffold every list shares (projects · personas · councils · tickets): a header with a title + a muted <b>count</b> + an optional lead and trailing actions (a search box, a “New” button), then a list of <b>dense hairline rows</b> (each a leading slot · title · trailing metadata). Flatter than the bordered <a href="#/entity">Entity</a> — this is the Linear list, not a card grid.',
+  demo: `<div style="width:100%;max-width:620px">
+    <div class="sl-list-head">
+      <div>
+        <h1 class="sl-list-title">Personas <span class="sl-list-count">4</span></h1>
+        <p class="sl-list-lead">Synthetic customer profiles.</p>
+      </div>
+      <input class="sl-input" placeholder="Search personas…" style="width:180px">
+    </div>
+    <div class="sl-list">
+      <button class="sl-list-row"><span class="sl-avatar sl-avatar--sm">LV</span><span class="sl-list-row__title">Lena Vogt · Marketing-Managerin</span><span class="sl-list-row__trailing"><span class="sl-badge sl-badge--accent">466 events</span><span class="sl-badge">139 days</span></span></button>
+      <button class="sl-list-row"><span class="sl-avatar sl-avatar--sm sl-avatar--green">MD</span><span class="sl-list-row__title">Mehmet Demir · Student</span><span class="sl-list-row__trailing"><span class="sl-badge sl-badge--accent">10 events</span><span class="sl-badge">2 days</span></span></button>
+      <button class="sl-list-row"><span class="sl-avatar sl-avatar--sm sl-avatar--violet">TB</span><span class="sl-list-row__title">Tom Berger · Softwareentwickler</span><span class="sl-list-row__trailing"><span class="sl-badge sl-badge--accent">10 events</span><span class="sl-badge">2 days</span></span></button>
+    </div>
+  </div>`,
+  react: `import { ListPage, ListRow, Avatar, Badge } from 'sonaloop-design/components';\n\n<ListPage title=\"Personas\" count={total} lead=\"Synthetic customer profiles.\"\n  actions={<input className=\"sl-input\" placeholder=\"Search…\" />}>\n  {rows.map((p) => (\n    <ListRow key={p.slug} onClick={() => open(p.slug)}\n      leading={<Avatar name={p.name} src={p.avatarUrl} size={24} />}\n      trailing={<><Badge tone=\"accent\">{p.events} events</Badge><Badge>{p.days} days</Badge></>}>\n      {p.name} · {p.role}\n    </ListRow>\n  ))}\n</ListPage>`,
+  markup: `<div class="sl-list-head">\n  <h1 class="sl-list-title">Personas <span class="sl-list-count">4</span></h1>\n</div>\n<div class="sl-list">\n  <button class="sl-list-row">\n    <span class="sl-list-row__title">Lena Vogt</span>\n    <span class="sl-list-row__trailing">…</span>\n  </button>\n</div>`,
+  python: `# _list_page() in web/_components.py emits the same .sl-list* contract.`,
+});
+
 const NAV = [
   { label: 'Foundations', items: [
     { id: 'introduction', title: 'Introduction', ico: 'overview', render: pageIntroduction },
@@ -1760,6 +1782,7 @@ const NAV = [
     { id: 'image-lightbox', title: 'Image Lightbox', ico: 'panel', render: cImageLightbox },
     { id: 'popover', title: 'Popover · Menu', ico: 'squareSplit', render: cPopover },
     { id: 'detail-layout', title: 'Detail Layout', ico: 'squareRows', render: cDetailLayout },
+    { id: 'list-page', title: 'List Page', ico: 'squareRows', render: cListPage },
     { id: 'filter-bar', title: 'Filter Bar', ico: 'half', render: cFilterBar },
     { id: 'entity', title: 'Entity', ico: 'projects', render: cEntity },
     { id: 'field', title: 'Field · Fieldset', ico: 'settings', render: cField },

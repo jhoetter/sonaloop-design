@@ -1214,6 +1214,53 @@ export function PageHeader({ title, icon, sub, top, actions, className, ...rest 
   );
 }
 
+/* ── List page (index scaffold) ───────────────────────────────────────────────────
+   The shell every index page shares: title + count + lead + trailing actions, then a list
+   of dense hairline rows (ListRow). The rows are flatter than the bordered Entity. */
+export interface ListPageProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
+  title: ReactNode;
+  /** A muted count beside the title (e.g. how many items). */
+  count?: number;
+  lead?: ReactNode;
+  /** Trailing header actions — a search box, a "New" button. */
+  actions?: ReactNode;
+}
+export function ListPage({ title, count, lead, actions, className, children, ...rest }: ListPageProps) {
+  return (
+    <div className={cx('sl-list-page', className)} {...rest}>
+      <div className="sl-list-head">
+        <div>
+          <h1 className="sl-list-title">{title}{count != null ? <span className="sl-list-count">{count}</span> : null}</h1>
+          {lead ? <p className="sl-list-lead">{lead}</p> : null}
+        </div>
+        {actions ? <div className="sl-list-actions">{actions}</div> : null}
+      </div>
+      <div className="sl-list">{children}</div>
+    </div>
+  );
+}
+export interface ListRowProps extends HTMLAttributes<HTMLElement> {
+  /** A leading slot — an avatar, a status glyph. */
+  leading?: ReactNode;
+  /** Right-aligned metadata (badges, counts, a chevron). */
+  trailing?: ReactNode;
+  /** Render as a link instead of a button. */
+  href?: string;
+}
+/** A dense hairline list row — a leading slot + title + trailing metadata. Button by default. */
+export function ListRow({ leading, trailing, href, className, children, ...rest }: ListRowProps) {
+  const inner = (
+    <>
+      {leading}
+      <span className="sl-list-row__title">{children}</span>
+      {trailing ? <span className="sl-list-row__trailing">{trailing}</span> : null}
+    </>
+  );
+  return href
+    ? <a href={href} className={cx('sl-list-row', className)} {...(rest as HTMLAttributes<HTMLAnchorElement>)}>{inner}</a>
+    : <button type="button" className={cx('sl-list-row', className)} {...(rest as ButtonHTMLAttributes<HTMLButtonElement>)}>{inner}</button>;
+}
+
 /* ── Detail layout (content column + sticky aside) & the scrollspy page rail ─────── */
 export interface DetailLayoutProps extends HTMLAttributes<HTMLDivElement> {
   /** The sticky right column — a PageRail, a PropertyList, relations, … */
