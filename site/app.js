@@ -1572,7 +1572,7 @@ const cTabs = () => componentPage({
 
 const cPropertyList = () => componentPage({
   id: 'property-list', title: 'Property List',
-  desc: 'A Linear-style key/value panel — an icon + label + value per row. The metadata block on every detail page. Compose <code>&lt;Property&gt;</code> rows inside a <code>&lt;PropertyList&gt;</code>; pass <code>card</code> for a bordered surface. Empty rows are the caller’s to skip.',
+  desc: 'A Linear-style key/value panel — an icon + label + value per row. The metadata block on every detail page. Compose <code>&lt;Property&gt;</code> rows inside a <code>&lt;PropertyList&gt;</code>; pass <code>card</code> for a bordered surface, or <code>align="start"</code> (<code>.sl-props--start</code>) for a left-aligned label column instead of the right-aligned value. Empty rows are the caller’s to skip.',
   demo: `<div class="sl-props sl-props--card" style="width:100%;max-width:340px">
     <div class="sl-prop"><span class="sl-prop__k">${svgReg('projects')}Project</span><span class="sl-prop__v">Sonaloop Cloud</span></div>
     <div class="sl-prop"><span class="sl-prop__k">${svgReg('personas')}Personas</span><span class="sl-prop__v">4 voices</span></div>

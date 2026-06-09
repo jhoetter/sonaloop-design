@@ -986,6 +986,18 @@ export function ToolbarButton({ icon, active, className, children, ...rest }: To
   );
 }
 
+export interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  /** Borderless quiet style — inline row actions (edit · delete · close). Default is the bordered
+   *  toolbar style (the AppShell sidebar toggle). */
+  ghost?: boolean;
+  /** Tint the hover to the negative colour — a destructive action (delete). */
+  danger?: boolean;
+}
+/** A square icon-only button. `.sl-iconbtn` — bordered by default, quiet with `ghost`. */
+export function IconButton({ ghost, danger, className, ...rest }: IconButtonProps) {
+  return <button type="button" className={cx('sl-iconbtn', ghost && 'sl-iconbtn--ghost', danger && 'sl-iconbtn--danger', className)} {...rest} />;
+}
+
 /* ── Filter bar (faceted list filtering) ──────────────────────────────────────────
    Domain-agnostic: the host passes `facets` (each with its options, per-value counts and
    current selection); the bar renders the add-filter menu, the active chips and the clear
@@ -1123,9 +1135,12 @@ export function Tabs({ items, value, onChange, variant = 'underline', className,
 export interface PropertyListProps extends HTMLAttributes<HTMLDivElement> {
   /** Wrap the rows in a bordered card surface. */
   card?: boolean;
+  /** Row layout: `between` (value right-aligned, default) or `start` (a fixed label column with
+   *  the value beside it — Linear's issue rail). */
+  align?: 'between' | 'start';
 }
-export function PropertyList({ card, className, ...rest }: PropertyListProps) {
-  return <div className={cx('sl-props', card && 'sl-props--card', className)} {...rest} />;
+export function PropertyList({ card, align = 'between', className, ...rest }: PropertyListProps) {
+  return <div className={cx('sl-props', card && 'sl-props--card', align === 'start' && 'sl-props--start', className)} {...rest} />;
 }
 export interface PropertyProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
   icon?: ReactNode;

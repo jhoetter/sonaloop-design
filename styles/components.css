@@ -587,6 +587,10 @@ button.sl-navhead:hover { color: var(--sl-muted); }
   width: 28px; height: 28px; cursor: pointer; color: var(--sl-muted); flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; }
 .sl-iconbtn:hover { background: var(--sl-hover); color: var(--sl-ink); }
 .sl-iconbtn svg { width: 16px; height: 16px; }
+/* Ghost: a borderless quiet icon button for inline row actions (edit · delete · close). */
+.sl-iconbtn--ghost { border-color: transparent; background: none; }
+.sl-iconbtn--ghost:hover { background: var(--sl-hover); }
+.sl-iconbtn--danger:hover { color: var(--sl-red); }
 .sl-spacer { flex: 1; }
 .sl-tb-actions { display: flex; align-items: center; gap: 8px; }
 .sl-shell-body { flex: 1; min-height: 0; overflow: auto; }
@@ -733,6 +737,10 @@ button.sl-navhead:hover { color: var(--sl-muted); }
 .sl-prop__k { display: inline-flex; align-items: center; gap: 8px; color: var(--sl-muted); flex-shrink: 0; }
 .sl-prop__k svg { width: 14px; height: 14px; color: var(--sl-faint); }
 .sl-prop__v { color: var(--sl-ink); font-weight: 500; text-align: right; min-width: 0; overflow-wrap: anywhere; }
+/* Left-aligned variant — a fixed label column with the value beside it (Linear's issue rail). */
+.sl-props--start .sl-prop { justify-content: flex-start; align-items: center; }
+.sl-props--start .sl-prop__k { width: 5.5rem; }
+.sl-props--start .sl-prop__v { text-align: left; font-weight: 400; }
 
 /* ── Page header (the detail-page hero: top slot · icon · title · sub · actions) ─── */
 .sl-page-header { display: flex; align-items: flex-start; gap: 16px; }
