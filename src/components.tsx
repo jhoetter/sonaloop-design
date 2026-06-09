@@ -556,6 +556,8 @@ export interface AppShellUserMenu {
 }
 export interface AppShellProps {
   brand: ReactNode;
+  /** Pinned below the brand (under the border), above the nav — typically a <CommandTrigger> for ⌘K. */
+  search?: ReactNode;
   nav: AppShellNavSection[];
   userMenu?: AppShellUserMenu;
   /** Topbar content to the right of the sidebar-toggle (breadcrumb + actions). */
@@ -573,6 +575,7 @@ const SHELL_HIDE = 32;
 
 export function AppShell({
   brand,
+  search,
   nav,
   userMenu,
   topbar,
@@ -671,6 +674,7 @@ export function AppShell({
     >
       <aside className="sl-sidebar">
         <div className="sl-brand">{brand}</div>
+        {search && <div className="sl-sb-search">{search}</div>}
         <div className="sl-sb-scroll">
           {nav.map((sec, i) => (
             <Fragment key={i}>
