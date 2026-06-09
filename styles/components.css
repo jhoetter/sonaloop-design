@@ -543,7 +543,7 @@
   margin: 18px 9px 6px; font-weight: 650; }
 /* Collapsible section variant — the head is a caret toggle; .is-collapsed hides the items. */
 .sl-nav-group { display: flex; flex-direction: column; }
-button.sl-navhead { display: flex; align-items: center; gap: 6px; width: 100%; background: none; border: 0;
+button.sl-navhead { display: flex; align-items: center; gap: 6px; width: 100%; padding: 0; background: none; border: 0;
   cursor: pointer; text-align: left; font-family: inherit; }
 button.sl-navhead:hover { color: var(--sl-muted); }
 .sl-navhead__caret { margin-left: auto; display: inline-flex; color: var(--sl-faint); transition: transform .15s var(--sl-ease); }
