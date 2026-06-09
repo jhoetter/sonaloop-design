@@ -957,6 +957,20 @@ export function MenuItem({ icon, selected, count, className, children, ...rest }
   );
 }
 
+export interface MenuFieldProps extends HTMLAttributes<HTMLDivElement> {
+  label: ReactNode;
+}
+/** A labelled control row inside a Popover menu — `label` on the left, the control (a Select,
+ *  a Switch) on the right. The building block of a Display / settings menu. */
+export function MenuField({ label, className, children, ...rest }: MenuFieldProps) {
+  return (
+    <div className={cx('sl-menu-field', className)} {...rest}>
+      <span className="sl-menu-field__label">{label}</span>
+      {children}
+    </div>
+  );
+}
+
 export interface ToolbarButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   icon?: ReactNode;
   /** Pressed/selected state (a toggled toolbar control). */

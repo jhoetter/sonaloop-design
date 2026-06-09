@@ -669,6 +669,9 @@ button.sl-navhead:hover { color: var(--sl-muted); }
 .sl-menu-item__count { flex-shrink: 0; font-family: var(--sl-mono); font-size: .82em; color: var(--sl-faint); }
 .sl-menu-sep { height: 1px; background: var(--sl-line); margin: 5px 0; }
 .sl-menu-label { font-size: .6875em; letter-spacing: .02em; color: var(--sl-faint); font-weight: 600; padding: 4px 10px 2px; }
+/* A labelled control row inside a menu (a Select, a toggle) — Display / settings menus. */
+.sl-menu-field { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 5px 8px; }
+.sl-menu-field__label { font-size: .9em; color: var(--sl-muted); }
 
 /* Toolbar button — a quiet bordered pill that triggers a menu (Filter · Display · Views) or
    toggles a mode. Distinct from .sl-btn: smaller, muted, for dense list toolbars. */

@@ -1546,6 +1546,7 @@ const cPopover = () => componentPage({
     ['.sl-toolbtn', 'Trigger', 'The quiet bordered toolbar pill (also a mode toggle via <code>.is-active</code>).'],
     ['.sl-menu-item__check', 'Row', 'Leading check column — a selectable option / filter row.'],
     ['.sl-menu-item__count', 'Row', 'Trailing count (matches per facet).'],
+    ['.sl-menu-field', 'Row', 'A labelled control row (a Select / toggle) — Display / settings menus.'],
   ] },
   react: `import { Popover, MenuItem, ToolbarButton } from 'sonaloop-design/components';\n\n// a filter menu: ToolbarButton trigger + selectable rows with counts (row closes on select)\n<Popover placement=\"bottom-start\"\n  trigger={({ open, toggle }) => <ToolbarButton active={open} icon={<FilterIcon size={15} />} onClick={toggle}>Status</ToolbarButton>}>\n  {(close) => statuses.map((s) => (\n    <MenuItem key={s.id} selected={picked.has(s.id)} count={s.count} onClick={() => toggleStatus(s.id)}>{s.label}</MenuItem>\n  ))}\n</Popover>`,
   markup: `<button class="sl-toolbtn">Status</button>\n<div class="sl-popover sl-popover--bottom-start">\n  <button class="sl-menu-item">\n    <span class="sl-menu-item__check"><!-- check svg when selected --></span>\n    <span class="sl-menu-item__label">In progress</span>\n    <span class="sl-menu-item__count">8</span>\n  </button>\n</div>`,
