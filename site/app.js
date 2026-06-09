@@ -379,7 +379,7 @@ function pageIntroduction() {
     <h1 class="ds-h1">Sonaloop Design System</h1>
     <p class="ds-lead">The single source of truth for building consistent Sonaloop experiences — the React marketing site and the Python-SSR inspector, skinned from one set of tokens, icons and components.</p>
     <div class="ds-hero-grid">
-      ${cell('#/brand', `<div class="ds-canvas-brand">${svgReg('sonaloop')}<span>Sonaloop</span></div>`, 'Brand Assets', 'How to work with the Sonaloop mark and wordmark.')}
+      ${cell('#/brand', `<span class="sl-logo" style="font-size:34px"><span class="sl-logo__mark">${svgReg('sonaloop')}</span><span class="sl-logo__word">sona<span class="sl-logo__loop">loop</span></span></span>`, 'Brand Assets', 'How to work with the Sonaloop mark and wordmark.')}
       ${cell('#/icons', iconsCanvas, 'Icons', 'A stroke icon set tailored for research &amp; council tools.')}
       ${cell('#/button', compCanvas, 'Components', 'Building blocks shared across React and Python SSR.')}
       ${cell('#/colors', `<div class="ds-canvas-colors">${colorBars}</div>`, 'Colors', 'A near-white warm light + cool dark, accessible system.')}

@@ -87,9 +87,8 @@ a { color: inherit; }
 .ds-hero-cell p { font-size: 14px; line-height: 1.5; color: var(--sl-muted); margin: 0; }
 @media (max-width: 860px) { .ds-hero-grid { grid-template-columns: 1fr; } }
 
-/* hero canvases */
-.ds-canvas-brand { font-size: 46px; font-weight: 700; letter-spacing: -.04em; color: var(--sl-ink); display: flex; align-items: center; gap: 8px; }
-.ds-canvas-brand svg { width: 44px; height: 44px; }
+/* hero canvases — the Brand Assets cell renders the canonical .sl-logo lockup (same as the
+   sidebar/appshell), so no bespoke wordmark styling here. */
 .ds-canvas-icons { display: grid; grid-template-columns: repeat(8, 1fr); gap: 14px; color: var(--sl-ink); }
 .ds-canvas-icons svg { width: 22px; height: 22px; }
 .ds-canvas-colors { display: flex; gap: 12px; align-items: stretch; height: 96px; }
