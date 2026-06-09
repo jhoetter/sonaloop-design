@@ -52,10 +52,14 @@ import 'sonaloop-design/components.css';   // load the styles once
 ```
 
 Available: `Button` (variant `default|primary|accent|ghost`, size `sm|md|lg`), `Badge`
-(`tone`), `Pill`, `Chip`, `Eyebrow`, `Card` + `CardTitle`/`CardBody`, `Input`, `Textarea`,
+(`tone`, `dot`), `Pill`, `Chip`, `Eyebrow`, `Card` + `CardTitle`/`CardBody`, `Input`, `Textarea`,
 `Select`, `Checkbox`, `Radio`, `Switch`, `Field`/`Fieldset`, `Entity`/`EntityList`, `Kbd`,
-`Divider`. **Page-level compositions** (Footer, Hero, …) stay in each app and are built
-FROM these primitives + tokens — the design system shares primitives, not whole pages.
+`Divider`, plus the **overlays** `Drawer` (slide-over), `Modal` and `Popover`/`MenuItem`
+(one ESC-close · scroll-lock · focus-restore engine), and the **detail-page composites**
+`Tabs` (underline · pill), `PropertyList`/`Property`, `PageHeader`, and `DetailLayout` +
+`PageRail` (scrollspy minimap). Charts add `Sparkline` (`sonaloop-design/charts`).
+**Page-level compositions** (Footer, Hero, …) stay in each app and are built FROM these
+primitives + tokens — the design system shares primitives, not whole pages.
 
 ## Reference images
 
@@ -125,8 +129,12 @@ make check          # drift guard: fail if any generated artifact is stale
 - **Foundations** — Introduction, Colors, Typography, Materials, Layout, Icons.
 - **Brands** — the Sonaloop mark/wordmark, plus Sonaloop Cloud & Research.
 - **Components** — a live reference for every `.sl-*` primitive (Button, Badge, Tag, Pill,
-  Chip, Card, Eyebrow, Input, Kbd, Divider, Arrow Link), each with an **App-dense / Web-airy**
-  preview toggle and copy-ready React / class-contract / Python-SSR snippets.
+  Chip, Card, Eyebrow, Input, Kbd, Divider, Arrow Link, Tabs, Property List, Page Header …),
+  each with an **App-dense / Web-airy** preview toggle and copy-ready React / class-contract /
+  Python-SSR snippets.
+- **Composites** — the assembled patterns built from those primitives: App Shell, Command
+  Palette ⌘K, the overlays (Drawer · Modal · Popover) and Detail Layout, plus Entity, Field
+  and Empty State.
 - **Website** — the marketing-site blocks (Navbar + Mega Menu, Cards, Hero, CTA Band, Footer,
   Product · Canvas · Integration showcases, Related Rail) as **real, prop-driven React
   components**, shadcn-style: own-the-source, composed across the whole site many times, exported

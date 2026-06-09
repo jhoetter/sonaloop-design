@@ -15,6 +15,7 @@
  *   <DotPlotChart items={[{ label: 'Trust the AI', values: [2, 3, 3, 4, 5] }]} />
  *   <LineChart series={[{ label: 'Confidence', points: [2, 3, 5, 4, 6] }]} labels={['R1', 'R2', 'R3', 'R4', 'R5']} />
  *   <EffortImpactChart items={[{ label: 'Auto shopping list', x: 2, y: 5 }]} />
+ *   <Sparkline values={[3, 5, 4, 6, 5, 8]} />
  */
 import { Fragment } from 'react';
 import type { CSSProperties, HTMLAttributes, ReactNode } from 'react';
@@ -346,5 +347,32 @@ export function EffortImpactChart({ items, title, xLabel = 'Effort', yLabel = 'V
         })}
       </div>
     </figure>
+  );
+}
+
+/* ── Sparkline — a compact, label-less trend (filled area) for inline/cell use ──── */
+export interface SparklineProps extends HTMLAttributes<HTMLSpanElement> {
+  values: number[];
+  color?: string;
+  /** Fill the area under the line. Default true. */
+  fill?: boolean;
+  width?: number;
+  height?: number;
+}
+export function Sparkline({ values, color = 'var(--sl-accent)', fill = true, width = 96, height = 28, className, ...rest }: SparklineProps) {
+  const pts = values.filter((v) => Number.isFinite(v));
+  if (pts.length < 2) return null;
+  const mn = Math.min(...pts), mx = Math.max(...pts);
+  const span = (mx - mn) || 1;
+  const W = 100, H = 32, pad = 2;
+  const coords = pts.map((v, i) => [(i / (pts.length - 1)) * W, H - pad - ((v - mn) / span) * (H - pad * 2)] as const);
+  const line = coords.map(([x, y]) => `${x.toFixed(2)},${y.toFixed(2)}`).join(' ');
+  return (
+    <span className={`sl-spark${className ? ` ${className}` : ''}`} style={{ width, height }} {...rest}>
+      <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" role="img" style={{ '--c': color } as Sv}>
+        {fill ? <polygon className="sl-spark__fill" points={`0,${H} ${line} ${W},${H}`} /> : null}
+        <polyline className="sl-spark__line" points={line} />
+      </svg>
+    </span>
   );
 }

@@ -1469,6 +1469,155 @@ const cCommandPalette = () => componentPage({
   python: `# The inspector ships its own ⌘K (web/_palette.py) over the same .sl-cmdk classes.`,
 });
 
+const XGLYPH = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>`;
+
+const cDrawer = () => componentPage({
+  id: 'drawer', title: 'Drawer · Slide-over',
+  desc: 'A right/left slide-over peek panel — open a record’s detail over the current page without navigating away. Scrim · sticky header with title + close · scrollable body · optional sticky footer of actions. The React <code>&lt;Drawer&gt;</code> handles ESC-close, body scroll-lock and focus restore; the Python-SSR app opens the same <code>.sl-drawer</code> over any <code>[data-drawer]</code> link.',
+  demo: `<div style="position:relative;width:100%;max-width:560px;height:300px;border:1px solid var(--sl-line);border-radius:var(--sl-radius);overflow:hidden;background:var(--sl-bg)">
+    <div style="position:absolute;inset:0;background:color-mix(in srgb,#0a0c10 22%,transparent)"></div>
+    <aside class="sl-drawer__panel" style="position:absolute;top:0;right:0;height:100%;width:330px;animation:none">
+      <header class="sl-drawer__head"><span class="sl-drawer__title">Persona · Maya Chen</span><button class="sl-overlay-close" aria-label="Close">${XGLYPH}</button></header>
+      <div class="sl-drawer__body">
+        <p style="margin:0 0 14px;color:var(--sl-muted)">A peek panel layered over the page — close it and you’re exactly where you were.</p>
+        <div class="sl-props"><div class="sl-prop"><span class="sl-prop__k">${svgReg('contact')}Role</span><span class="sl-prop__v">Head of Product</span></div><div class="sl-prop"><span class="sl-prop__k">${svgReg('councils')}Councils</span><span class="sl-prop__v">3</span></div></div>
+      </div>
+      <footer class="sl-drawer__foot"><button class="sl-btn sl-btn--sm">Dismiss</button><button class="sl-btn sl-btn--sm sl-btn--primary">Open full page</button></footer>
+    </aside>
+  </div>`,
+  variants: { cols: ['Prop / class', 'Value', 'Effect'], rows: [
+    ['side', 'right · left', 'Edge the panel slides from (<code>.sl-drawer--left</code>).'],
+    ['width', 'CSS length', 'Panel width; default <code>min(620px, 94vw)</code>.'],
+    ['footer', 'ReactNode', 'A sticky action bar pinned to the bottom.'],
+  ] },
+  react: `import { Drawer, Button } from 'sonaloop-design/components';\nimport { useState } from 'react';\n\nconst [open, setOpen] = useState(false);\n<Button onClick={() => setOpen(true)}>Open persona</Button>\n<Drawer open={open} onClose={() => setOpen(false)} title=\"Persona · Maya Chen\"\n  footer={<><Button size=\"sm\" onClick={() => setOpen(false)}>Dismiss</Button><Button size=\"sm\" variant=\"primary\">Open full page</Button></>}>\n  …record detail…\n</Drawer>`,
+  markup: `<div class="sl-drawer"><div class="sl-drawer__scrim"></div>\n  <aside class="sl-drawer__panel" role="dialog" aria-modal="true">\n    <header class="sl-drawer__head"><span class="sl-drawer__title">Title</span>\n      <button class="sl-overlay-close" aria-label="Close">✕</button></header>\n    <div class="sl-drawer__body">…</div>\n    <footer class="sl-drawer__foot">…actions…</footer>\n  </aside>\n</div>`,
+  python: `# Any link opens its target page in the slide-over (web/_components.py):\nh("a", {"href": url, "data-drawer": url, "data-drawer-title": title}, label)`,
+});
+
+const cModal = () => componentPage({
+  id: 'modal', title: 'Modal · Dialog',
+  desc: 'A centered modal dialog for focused confirms and short forms. Shares the overlay engine with Drawer (ESC-close, scroll-lock, focus restore). Three sizes; pass <code>hideClose</code> for a forced-choice dialog. For a record peek, prefer the <a href="#/drawer">Drawer</a>.',
+  demo: `<div style="position:relative;width:100%;max-width:560px;height:280px;display:flex;align-items:center;justify-content:center;border:1px solid var(--sl-line);border-radius:var(--sl-radius);overflow:hidden;background:var(--sl-bg)">
+    <div style="position:absolute;inset:0;background:color-mix(in srgb,#0a0c10 26%,transparent)"></div>
+    <div class="sl-modal__panel" style="animation:none;width:360px">
+      <header class="sl-modal__head"><h2 class="sl-modal__title">Delete council?</h2><button class="sl-overlay-close" aria-label="Close">${XGLYPH}</button></header>
+      <div class="sl-modal__body">This permanently removes the “Pricing v2” council and its 3 sessions. This can’t be undone.</div>
+      <footer class="sl-modal__foot"><button class="sl-btn sl-btn--sm">Cancel</button><button class="sl-btn sl-btn--sm sl-btn--accent">Delete</button></footer>
+    </div>
+  </div>`,
+  variants: { cols: ['Prop / class', 'Value', 'Effect'], rows: [
+    ['size', 'sm · md · lg', 'Panel width (<code>.sl-modal--sm</code> / <code>--lg</code>).'],
+    ['hideClose', 'boolean', 'Drop the header ✕ for a forced choice.'],
+    ['footer', 'ReactNode', 'The action row (right-aligned).'],
+  ] },
+  react: `import { Modal, Button } from 'sonaloop-design/components';\nimport { useState } from 'react';\n\nconst [open, setOpen] = useState(false);\n<Modal open={open} onClose={() => setOpen(false)} title=\"Delete council?\" size=\"sm\"\n  footer={<><Button size=\"sm\" onClick={() => setOpen(false)}>Cancel</Button><Button size=\"sm\" variant=\"accent\">Delete</Button></>}>\n  This permanently removes the council and its sessions.\n</Modal>`,
+  markup: `<div class="sl-modal"><div class="sl-modal__scrim"></div>\n  <div class="sl-modal__panel" role="dialog" aria-modal="true">\n    <header class="sl-modal__head"><h2 class="sl-modal__title">Title</h2>\n      <button class="sl-overlay-close" aria-label="Close">✕</button></header>\n    <div class="sl-modal__body">…</div>\n    <footer class="sl-modal__foot">…actions…</footer>\n  </div>\n</div>`,
+  python: `# Same .sl-modal class contract from the Python-SSR app.`,
+});
+
+const cPopover = () => componentPage({
+  id: 'popover', title: 'Popover · Menu',
+  desc: 'A small panel anchored to its trigger — row actions, filters, the account menu. Outside-click + ESC dismiss. Holds <code>.sl-menu-item</code> rows (icon · label), optional <code>.sl-menu-label</code> headers and <code>.sl-menu-sep</code> dividers. Four placements.',
+  demo: `<div class="sl-popover-wrap" style="margin-bottom:150px">
+    <button class="sl-btn sl-btn--sm">Actions ▾</button>
+    <div class="sl-popover sl-popover--bottom-start" style="animation:none">
+      <div class="sl-menu-label">Council</div>
+      <button class="sl-menu-item">${svgReg('search')}Open</button>
+      <button class="sl-menu-item">${svgReg('pencil')}Rename</button>
+      <div class="sl-menu-sep"></div>
+      <button class="sl-menu-item">${svgReg('star')}Favourite</button>
+    </div>
+  </div>`,
+  variants: { cols: ['Class', 'Placement', 'Anchors'], rows: [
+    ['.sl-popover--bottom-start', 'Bottom-start', 'Below trigger, left-aligned (default).'],
+    ['.sl-popover--bottom-end', 'Bottom-end', 'Below trigger, right-aligned.'],
+    ['.sl-popover--top-start / --top-end', 'Top', 'Above the trigger.'],
+  ] },
+  react: `import { Popover, MenuItem, Button } from 'sonaloop-design/components';\nimport { useState } from 'react';\n\nconst [open, setOpen] = useState(false);\n<Popover open={open} onClose={() => setOpen(false)} placement=\"bottom-start\"\n  trigger={<Button size=\"sm\" onClick={() => setOpen((o) => !o)}>Actions ▾</Button>}>\n  <MenuItem icon={<SearchIcon size={16} />}>Open</MenuItem>\n  <MenuItem icon={<PencilIcon size={16} />}>Rename</MenuItem>\n</Popover>`,
+  markup: `<div class="sl-popover-wrap">\n  <button class="sl-btn sl-btn--sm">Actions ▾</button>\n  <div class="sl-popover sl-popover--bottom-start">\n    <button class="sl-menu-item">…Open</button>\n    <div class="sl-menu-sep"></div>\n    <button class="sl-menu-item">…Favourite</button>\n  </div>\n</div>`,
+  python: `# The sidebar account menu (.sl-um-pop) is this pattern, SSR-side.`,
+});
+
+const cTabs = () => componentPage({
+  id: 'tabs', title: 'Tabs',
+  desc: 'In-page section switching. The <b>underline</b> default for a page’s primary sections (docs, detail bodies); the <b>pill</b> variant for compact option sets (a calendar range). Buttons by default (controlled <code>value</code>/<code>onChange</code>); pass a per-item <code>href</code> for navigation tabs. For a settings theme/density toggle, prefer <a href="#/segmented">Segmented</a>.',
+  demo: `<div style="display:flex;flex-direction:column;gap:24px;width:100%;max-width:520px">
+    <div class="sl-tabs"><button class="sl-tab is-active">${svgReg('overview')}Overview</button><button class="sl-tab">${svgReg('councils')}Sessions</button><button class="sl-tab">Findings</button></div>
+    <div class="sl-tabs sl-tabs--pill" style="align-self:flex-start"><button class="sl-tab is-active">Day</button><button class="sl-tab">Week</button><button class="sl-tab">Month</button></div>
+  </div>`,
+  variants: { cols: ['Class', 'Variant', 'Use'], rows: [
+    ['.sl-tabs', 'Underline', 'A page’s primary sections.'],
+    ['.sl-tabs--pill', 'Pill', 'Compact, framed option sets.'],
+    ['.sl-tab.is-active', 'State', 'The selected tab.'],
+  ] },
+  react: `import { Tabs } from 'sonaloop-design/components';\nimport { useState } from 'react';\n\nconst [tab, setTab] = useState('overview');\n<Tabs value={tab} onChange={setTab} items={[\n  { key: 'overview', label: 'Overview', icon: <OverviewIcon size={15} /> },\n  { key: 'sessions', label: 'Sessions' },\n  { key: 'findings', label: 'Findings' },\n]} />\n\n// navigation tabs:\n<Tabs variant=\"pill\" value={range} items={[{ key: 'day', label: 'Day', href: '?range=day' }]} />`,
+  markup: `<div class="sl-tabs" role="tablist">\n  <button class="sl-tab is-active" role="tab" aria-selected="true">Overview</button>\n  <button class="sl-tab" role="tab">Sessions</button>\n</div>`,
+  python: `h("nav", {"class_": "sl-tabs"},\n  h("a", {"class_": "sl-tab on", "href": "?tab=overview"}, "Overview"))`,
+});
+
+const cPropertyList = () => componentPage({
+  id: 'property-list', title: 'Property List',
+  desc: 'A Linear-style key/value panel — an icon + label + value per row. The metadata block on every detail page. Compose <code>&lt;Property&gt;</code> rows inside a <code>&lt;PropertyList&gt;</code>; pass <code>card</code> for a bordered surface. Empty rows are the caller’s to skip.',
+  demo: `<div class="sl-props sl-props--card" style="width:100%;max-width:340px">
+    <div class="sl-prop"><span class="sl-prop__k">${svgReg('projects')}Project</span><span class="sl-prop__v">Sonaloop Cloud</span></div>
+    <div class="sl-prop"><span class="sl-prop__k">${svgReg('personas')}Personas</span><span class="sl-prop__v">4 voices</span></div>
+    <div class="sl-prop"><span class="sl-prop__k">${svgReg('clock')}Updated</span><span class="sl-prop__v">2h ago</span></div>
+    <div class="sl-prop"><span class="sl-prop__k">${svgReg('check')}Status</span><span class="sl-prop__v"><span class="sl-badge sl-badge--positive">Synthesised</span></span></div>
+  </div>`,
+  react: `import { PropertyList, Property } from 'sonaloop-design/components';\n\n<PropertyList card>\n  <Property icon={<ProjectsIcon size={14} />} label=\"Project\">Sonaloop Cloud</Property>\n  <Property icon={<PersonasIcon size={14} />} label=\"Personas\">4 voices</Property>\n  <Property icon={<ClockIcon size={14} />} label=\"Updated\">2h ago</Property>\n</PropertyList>`,
+  markup: `<div class="sl-props sl-props--card">\n  <div class="sl-prop"><span class="sl-prop__k">…Project</span><span class="sl-prop__v">Sonaloop Cloud</span></div>\n</div>`,
+  python: `h("div", {"class_": "sl-prop"},\n  h("span", {"class_": "sl-prop__k"}, icon, "Project"),\n  h("span", {"class_": "sl-prop__v"}, "Sonaloop Cloud"))`,
+});
+
+const cPageHeader = () => componentPage({
+  id: 'page-header', title: 'Page Header',
+  desc: 'The detail-page hero: an optional top slot (eyebrow · pill · breadcrumb), an icon + title, a sub line, and trailing actions kept on the right. The same header block on every record page, so titles and actions never drift.',
+  demo: `<div style="width:100%;max-width:560px">
+    <header class="sl-page-header">
+      <div class="sl-page-header__main">
+        <div class="sl-page-header__top"><span class="sl-eyebrow">Council</span><span class="sl-pill">4 personas</span></div>
+        <h1 class="sl-page-header__title">${svgReg('councils')}Pricing strategy v2</h1>
+        <p class="sl-page-header__sub">Should we move to usage-based pricing for the Cloud tier?</p>
+      </div>
+      <div class="sl-page-header__actions"><button class="sl-btn sl-btn--sm">Export</button><button class="sl-btn sl-btn--sm sl-btn--primary">Run again</button></div>
+    </header>
+  </div>`,
+  react: `import { PageHeader, Button, Eyebrow, Pill } from 'sonaloop-design/components';\n\n<PageHeader\n  top={<><Eyebrow>Council</Eyebrow><Pill>4 personas</Pill></>}\n  icon={<CouncilsIcon size={22} />}\n  title=\"Pricing strategy v2\"\n  sub=\"Should we move to usage-based pricing for the Cloud tier?\"\n  actions={<><Button size=\"sm\">Export</Button><Button size=\"sm\" variant=\"primary\">Run again</Button></>} />`,
+  markup: `<header class="sl-page-header">\n  <div class="sl-page-header__main">\n    <h1 class="sl-page-header__title">Pricing strategy v2</h1>\n    <p class="sl-page-header__sub">…</p>\n  </div>\n  <div class="sl-page-header__actions">…</div>\n</header>`,
+  python: `# _hero() in web/_components.py emits the same .sl-page-header block.`,
+});
+
+const cDetailLayout = () => componentPage({
+  id: 'detail-layout', title: 'Detail Layout',
+  desc: 'The record-page scaffold: a content column beside a sticky aside (a <a href="#/property-list">Property List</a>, relations, …), with the <code>&lt;PageRail&gt;</code> scrollspy minimap tracking the page’s section headings by id. The one shell every detail page extends — consistency by construction.',
+  demo: `<div class="sl-detail" style="width:100%;max-width:620px;gap:24px;grid-template-columns:minmax(0,1fr) 180px">
+    <div class="sl-detail__main">
+      <div><h3 style="margin:0 0 6px">Summary</h3><p style="margin:0;color:var(--sl-muted)">The panel converged on usage-based pricing with a per-seat floor.</p></div>
+      <div><h3 style="margin:0 0 6px">Findings</h3><p style="margin:0;color:var(--sl-muted)">Three of four voices supported the shift, conditional on a grandfather clause.</p></div>
+    </div>
+    <div class="sl-detail__aside">
+      <nav class="sl-rail"><div class="sl-rail__head">On this page</div><a class="sl-rail__item is-active">Summary</a><a class="sl-rail__item">Findings</a><a class="sl-rail__item">Voices</a></nav>
+      <div class="sl-props"><div class="sl-prop"><span class="sl-prop__k">${svgReg('clock')}Updated</span><span class="sl-prop__v">2h ago</span></div></div>
+    </div>
+  </div>`,
+  react: `import { DetailLayout, PageRail, PropertyList, Property } from 'sonaloop-design/components';\n\n<DetailLayout aside={<>\n  <PageRail heading=\"On this page\" items={[\n    { id: 'summary', label: 'Summary' },\n    { id: 'findings', label: 'Findings' },\n  ]} />\n  <PropertyList><Property icon={<ClockIcon size={14} />} label=\"Updated\">2h ago</Property></PropertyList>\n</>}>\n  <section id=\"summary\"><h3>Summary</h3>…</section>\n  <section id=\"findings\"><h3>Findings</h3>…</section>\n</DetailLayout>`,
+  markup: `<div class="sl-detail">\n  <div class="sl-detail__main"><section id="summary">…</section></div>\n  <aside class="sl-detail__aside">\n    <nav class="sl-rail"><a class="sl-rail__item is-active">Summary</a></nav>\n  </aside>\n</div>`,
+  python: `# detail_page() + _page_rail() in web/_detail.py emit .sl-detail / .sl-rail.`,
+});
+
+const cChartSparkline = () => componentPage({
+  id: 'chart-sparkline', title: 'Sparkline',
+  desc: 'A compact, label-less trend — a filled area line for inline metrics, table cells and stat rows. Auto-scales to its data; pass <code>fill={false}</code> for a bare line. Token-driven colour, print-safe.',
+  demo: `<div style="display:flex;align-items:center;gap:28px;flex-wrap:wrap">
+    <span class="sl-spark" style="width:130px;height:38px"><svg viewBox="0 0 100 32" preserveAspectRatio="none" style="--c:var(--sl-accent)"><polygon class="sl-spark__fill" points="0,32 0,20 20,24 40,10 60,16 80,5 100,12 100,32"/><polyline class="sl-spark__line" points="0,20 20,24 40,10 60,16 80,5 100,12"/></svg></span>
+    <span class="sl-spark" style="width:130px;height:38px"><svg viewBox="0 0 100 32" preserveAspectRatio="none" style="--c:var(--sl-green)"><polyline class="sl-spark__line" points="0,26 20,18 40,22 60,12 80,14 100,4"/></svg></span>
+  </div>`,
+  react: `import { Sparkline } from 'sonaloop-design/charts';\n\n<Sparkline values={[3, 5, 4, 6, 5, 8]} />\n<Sparkline values={[8, 6, 7, 4, 5, 2]} color=\"var(--sl-green)\" fill={false} width={130} />`,
+  markup: `<span class="sl-spark" style="width:130px;height:38px">\n  <svg viewBox="0 0 100 32" preserveAspectRatio="none" style="--c:var(--sl-accent)">\n    <polygon class="sl-spark__fill" points="0,32 0,20 …100,32"/>\n    <polyline class="sl-spark__line" points="0,20 …100,12"/>\n  </svg>\n</span>`,
+  python: `# charts.py renders the same .sl-spark SVG.`,
+});
+
 const NAV = [
   { label: 'Foundations', items: [
     { id: 'introduction', title: 'Introduction', ico: 'overview', render: pageIntroduction },
@@ -1498,6 +1647,7 @@ const NAV = [
     { id: 'stat', title: 'Stat', ico: 'analytics', render: cStat },
     { id: 'progress', title: 'Progress', ico: 'wave', render: cProgress },
     { id: 'segmented', title: 'Segmented · Tabs', ico: 'squareCols', render: cSegmented },
+    { id: 'tabs', title: 'Tabs', ico: 'squareCols', render: cTabs },
     { id: 'theme-toggle', title: 'Theme Toggle', ico: 'monitor', render: cThemeToggle },
     { id: 'table', title: 'Table', ico: 'squareRows', render: cTable },
     { id: 'breadcrumb', title: 'Breadcrumb', ico: 'caretRight', render: cBreadcrumb },
@@ -1512,6 +1662,8 @@ const NAV = [
     { id: 'kbd', title: 'Kbd', ico: 'squareSplit', render: cKbd },
     { id: 'divider', title: 'Divider', ico: 'exchange', render: cDivider },
     { id: 'arrow-link', title: 'Arrow Link', ico: 'arrowRight', render: cArrowLink },
+    { id: 'property-list', title: 'Property List', ico: 'squareRows', render: cPropertyList },
+    { id: 'page-header', title: 'Page Header', ico: 'panel', render: cPageHeader },
   ] },
   { label: 'Charts', items: [
     { id: 'chart-bar', title: 'Bar', ico: 'analytics', render: cChartBar },
@@ -1523,10 +1675,15 @@ const NAV = [
     { id: 'chart-heatmap', title: 'Heatmap · Matrix', ico: 'squareGrid', render: cChartHeatmap },
     { id: 'chart-dot-plot', title: 'Dot · Range', ico: 'wave', render: cChartDotPlot },
     { id: 'chart-line', title: 'Line · Trend', ico: 'analytics', render: cChartLine },
+    { id: 'chart-sparkline', title: 'Sparkline', ico: 'wave', render: cChartSparkline },
   ] },
   { label: 'Composites', items: [
     { id: 'app-shell', title: 'App Shell', ico: 'panel', render: cAppShell },
     { id: 'command-palette', title: 'Command Palette ⌘K', ico: 'search', render: cCommandPalette },
+    { id: 'drawer', title: 'Drawer · Slide-over', ico: 'panel', render: cDrawer },
+    { id: 'modal', title: 'Modal · Dialog', ico: 'square', render: cModal },
+    { id: 'popover', title: 'Popover · Menu', ico: 'squareSplit', render: cPopover },
+    { id: 'detail-layout', title: 'Detail Layout', ico: 'squareRows', render: cDetailLayout },
     { id: 'entity', title: 'Entity', ico: 'projects', render: cEntity },
     { id: 'field', title: 'Field · Fieldset', ico: 'settings', render: cField },
     { id: 'empty-state', title: 'Empty State', ico: 'square', render: cEmptyState },

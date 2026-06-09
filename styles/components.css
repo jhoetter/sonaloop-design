@@ -60,6 +60,7 @@
 .sl-badge--positive { background: color-mix(in srgb, var(--sl-green) 14%, transparent); color: var(--sl-green); }
 .sl-badge--warning { background: color-mix(in srgb, var(--sl-amber) 16%, transparent); color: var(--sl-amber); }
 .sl-badge--negative { background: color-mix(in srgb, var(--sl-red) 14%, transparent); color: var(--sl-red); }
+.sl-badge__dot { width: .5em; height: .5em; border-radius: var(--sl-radius-full); background: currentColor; flex-shrink: 0; opacity: .85; }
 .sl-pill { display: inline-flex; align-items: center; gap: .45em; padding: .2em .8em;
   border: 1px solid var(--sl-line); border-radius: var(--sl-radius-full); font-size: .9em; color: var(--sl-ink);
   background: var(--sl-surface); }
@@ -114,7 +115,9 @@
    static (no hover/animation). Em-based — mark + wordmark track the host font-size.
    Markup: a 24×24 SonaloopIcon SVG in `.sl-logo__mark`, and the wordmark with its final "loop"
    wrapped in `.sl-logo__loop`. The host must load the Sona Mono + Sona Pixel faces
-   (styles/fonts.css). Use --sm / --lg to nudge the mark. ──────────────────────────────────── */
+   (styles/fonts.css). Use --sm / --lg to nudge the mark. Product apps append a `.sl-logo__sub`
+   (a muted, lowercase product label — "design", "data", "tracker"); the core + marketing site
+   keep the bare lockup. ──────────────────────────────────────────────────────────────────── */
 .sl-logo {
   display: inline-flex; align-items: baseline; gap: .16em;
   color: var(--sl-ink); text-decoration: none; white-space: nowrap;
@@ -133,6 +136,12 @@
   letter-spacing: .01em; text-transform: lowercase;
 }
 .sl-logo__loop { font-family: var(--sl-pixel); font-size: 1.05em; letter-spacing: 0; text-transform: none; margin-left: .04em; }
+/* Product sub-label — a muted lowercase mono suffix beside the wordmark ("design", "data",
+   "tracker"). A sibling of the wordmark; the .sl-logo gap plus a small margin give it a touch
+   more breathing room than the mark↔wordmark gap. `text-transform: lowercase` normalises
+   whatever case the host passes. */
+.sl-logo__sub { align-self: baseline; margin-left: .2em; font-family: var(--sl-mono); font-weight: 500;
+  letter-spacing: .01em; text-transform: lowercase; color: var(--sl-muted); }
 .sl-logo--sm .sl-logo__mark svg { width: .92em; height: .92em; transform: translateY(.23em); }
 .sl-logo--lg .sl-logo__mark svg { width: 1.4em; height: 1.4em; transform: translateY(.35em); }
 
@@ -587,3 +596,123 @@ button.sl-navhead:hover { color: var(--sl-muted); }
   .sl-app-shell:not(.is-collapsed) .sl-sidebar { transform: translateX(0); box-shadow: var(--sl-shadow-lg); }
   .sl-resize { display: none; }
 }
+
+/* ── Overlays: Drawer · Modal · Popover ───────────────────────────────────────────
+   The shared overlay layer. The React wrappers mount on open (no exit animation, like
+   .sl-cmdk); the Python-SSR app toggles `.is-open` on a persistent root and gets the
+   same look. All three sit above the shell on z-index 120 / 60. */
+.sl-overlay-close { border: 0; background: none; cursor: pointer; color: var(--sl-muted);
+  border-radius: var(--sl-radius-sm); padding: 5px; line-height: 0; display: inline-flex; flex-shrink: 0; }
+.sl-overlay-close:hover { background: var(--sl-hover); color: var(--sl-ink); }
+.sl-overlay-close svg { width: 18px; height: 18px; }
+@keyframes sl-fade-in { from { opacity: 0; } }
+
+/* Drawer (right/left slide-over) */
+.sl-drawer { position: fixed; inset: 0; z-index: 120; display: flex; justify-content: flex-end; }
+.sl-drawer--left { justify-content: flex-start; }
+.sl-drawer__scrim { position: absolute; inset: 0; background: color-mix(in srgb, #0a0c10 32%, transparent);
+  animation: sl-fade-in .2s var(--sl-ease); }
+.sl-drawer__panel { position: relative; height: 100%; width: min(620px, 94vw); display: flex; flex-direction: column;
+  overflow: hidden; background: var(--sl-surface); border-left: 1px solid var(--sl-line);
+  box-shadow: var(--sl-shadow-lg); animation: sl-slide-r .24s var(--sl-ease); }
+.sl-drawer--left .sl-drawer__panel { border-left: 0; border-right: 1px solid var(--sl-line); animation-name: sl-slide-l; }
+@keyframes sl-slide-r { from { transform: translateX(100%); } }
+@keyframes sl-slide-l { from { transform: translateX(-100%); } }
+.sl-drawer__head { height: var(--sl-row-h); flex-shrink: 0; display: flex; align-items: center; gap: 8px;
+  padding: 0 8px 0 16px; border-bottom: 1px solid var(--sl-line); }
+.sl-drawer__title { font-weight: 600; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sl-drawer__body { flex: 1; min-height: 0; overflow-y: auto; padding: 18px 22px; }
+.sl-drawer__foot { flex-shrink: 0; border-top: 1px solid var(--sl-line); padding: 12px 16px;
+  display: flex; justify-content: flex-end; gap: 8px; }
+
+/* Modal (centered dialog) */
+.sl-modal { position: fixed; inset: 0; z-index: 120; display: flex; align-items: center; justify-content: center; padding: 24px; }
+.sl-modal__scrim { position: absolute; inset: 0; background: color-mix(in srgb, #0a0c10 38%, transparent);
+  animation: sl-fade-in .2s var(--sl-ease); }
+.sl-modal__panel { position: relative; width: min(520px, 100%); max-height: calc(100vh - 48px); display: flex;
+  flex-direction: column; overflow: hidden; background: var(--sl-surface); border: 1px solid var(--sl-line);
+  border-radius: var(--sl-radius-lg); box-shadow: var(--sl-shadow-lg); animation: sl-modal-in .18s var(--sl-ease); }
+.sl-modal--sm .sl-modal__panel { width: min(400px, 100%); }
+.sl-modal--lg .sl-modal__panel { width: min(720px, 100%); }
+@keyframes sl-modal-in { from { opacity: 0; transform: translateY(8px) scale(.98); } }
+.sl-modal__head { display: flex; align-items: flex-start; gap: 8px; padding: 16px 16px 0; }
+.sl-modal__title { font-weight: 600; font-size: 1.05em; flex: 1; min-width: 0; }
+.sl-modal__body { padding: 10px 16px 16px; overflow-y: auto; color: var(--sl-muted); }
+.sl-modal__foot { flex-shrink: 0; padding: 12px 16px; border-top: 1px solid var(--sl-line);
+  display: flex; justify-content: flex-end; gap: 8px; }
+
+/* Popover (anchored) + the menu rows it usually holds */
+.sl-popover-wrap { position: relative; display: inline-flex; }
+.sl-popover { position: absolute; z-index: 60; min-width: 180px; padding: 6px; background: var(--sl-overlay);
+  border: 1px solid var(--sl-line); border-radius: var(--sl-radius-lg); box-shadow: var(--sl-shadow-lg);
+  animation: sl-pop-in .12s var(--sl-ease); }
+.sl-popover[hidden] { display: none; }
+@keyframes sl-pop-in { from { opacity: 0; transform: translateY(-4px); } }
+.sl-popover--bottom-start { top: calc(100% + 6px); left: 0; }
+.sl-popover--bottom-end { top: calc(100% + 6px); right: 0; }
+.sl-popover--top-start { bottom: calc(100% + 6px); left: 0; }
+.sl-popover--top-end { bottom: calc(100% + 6px); right: 0; }
+.sl-menu-item { display: flex; align-items: center; gap: 9px; width: 100%; padding: 7px 10px; border: 0;
+  background: none; border-radius: var(--sl-radius-sm); font: inherit; color: var(--sl-ink); cursor: pointer;
+  text-align: left; text-decoration: none; }
+.sl-menu-item:hover { background: var(--sl-hover); }
+.sl-menu-item svg { width: 16px; height: 16px; color: var(--sl-muted); flex-shrink: 0; }
+.sl-menu-sep { height: 1px; background: var(--sl-line); margin: 5px 0; }
+.sl-menu-label { font-size: .6875em; letter-spacing: .02em; color: var(--sl-faint); font-weight: 600; padding: 4px 10px 2px; }
+
+/* ── Tabs (underline default · pill segmented) ────────────────────────────────────
+   Underline tabs for in-page section switching (docs, detail bodies); the pill variant
+   is the compact segmented look for small option sets (calendar ranges). For a settings
+   theme/density toggle, prefer .sl-segmented. */
+.sl-tabs { display: flex; gap: 4px; flex-wrap: wrap; border-bottom: 1px solid var(--sl-line); }
+.sl-tab { display: inline-flex; align-items: center; gap: 7px; padding: .6em .8em; font-size: .92em; font-weight: 500;
+  color: var(--sl-muted); background: none; border: 0; border-bottom: 2px solid transparent; margin-bottom: -1px;
+  cursor: pointer; text-decoration: none; transition: color .11s, border-color .11s; }
+.sl-tab:hover { color: var(--sl-ink); }
+.sl-tab.is-active { color: var(--sl-accent); border-bottom-color: var(--sl-accent); font-weight: 600; }
+.sl-tab svg { width: 15px; height: 15px; }
+.sl-tabs--pill { display: inline-flex; gap: 2px; flex-wrap: nowrap; padding: 2px; border: 1px solid var(--sl-line);
+  border-radius: var(--sl-radius); background: var(--sl-surface-2); }
+.sl-tabs--pill .sl-tab { border: 0; margin: 0; padding: .35em .8em; border-radius: var(--sl-radius-sm); }
+.sl-tabs--pill .sl-tab.is-active { background: var(--sl-surface); color: var(--sl-ink); box-shadow: 0 1px 2px rgba(0, 0, 0, .06); }
+
+/* ── Property list (Linear-style key/value rows) ──────────────────────────────────
+   icon · label · value per row; the detail-page Properties/metadata panel. */
+.sl-props { display: flex; flex-direction: column; }
+.sl-props--card { padding: 4px; background: var(--sl-surface); border: 1px solid var(--sl-line); border-radius: var(--sl-radius); }
+.sl-prop { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 7px 10px; font-size: .92em; }
+.sl-prop__k { display: inline-flex; align-items: center; gap: 8px; color: var(--sl-muted); flex-shrink: 0; }
+.sl-prop__k svg { width: 14px; height: 14px; color: var(--sl-faint); }
+.sl-prop__v { color: var(--sl-ink); font-weight: 500; text-align: right; min-width: 0; overflow-wrap: anywhere; }
+
+/* ── Page header (the detail-page hero: top slot · icon · title · sub · actions) ─── */
+.sl-page-header { display: flex; align-items: flex-start; gap: 16px; }
+.sl-page-header__main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.sl-page-header__top { display: flex; align-items: center; gap: 8px; }
+.sl-page-header__title { display: flex; align-items: center; gap: 10px; margin: 0; font-size: 1.55em; font-weight: 650;
+  line-height: 1.2; }
+.sl-page-header__title svg { width: 1.05em; height: 1.05em; flex-shrink: 0; color: var(--sl-muted); }
+.sl-page-header__sub { margin: 0; color: var(--sl-muted); max-width: 65ch; }
+.sl-page-header__actions { flex-shrink: 0; display: flex; align-items: center; gap: 8px; }
+
+/* ── Detail layout (content column + sticky aside) and the scrollspy page rail ───── */
+.sl-detail { display: grid; grid-template-columns: minmax(0, 1fr) 248px; gap: 32px; align-items: start; }
+.sl-detail__main { min-width: 0; display: flex; flex-direction: column; gap: 22px; }
+.sl-detail__aside { display: flex; flex-direction: column; gap: 20px; position: sticky; top: 16px; }
+@media (max-width: 900px) {
+  .sl-detail { grid-template-columns: 1fr; }
+  .sl-detail__aside { position: static; }
+}
+.sl-rail { display: flex; flex-direction: column; gap: 2px; font-size: .85em; }
+.sl-rail__head { font-size: .8em; letter-spacing: .02em; text-transform: uppercase; color: var(--sl-faint);
+  font-weight: 600; margin-bottom: 4px; }
+.sl-rail__item { color: var(--sl-muted); text-decoration: none; padding: 3px 0 3px 12px;
+  border-left: 2px solid var(--sl-line); transition: color .12s, border-color .12s; }
+.sl-rail__item:hover { color: var(--sl-ink); }
+.sl-rail__item.is-active { color: var(--sl-ink); border-left-color: var(--sl-accent); }
+
+/* ── Sparkline (compact inline trend) ─────────────────────────────────────────── */
+.sl-spark { display: inline-block; vertical-align: middle; line-height: 0; }
+.sl-spark svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.sl-spark__line { fill: none; stroke: var(--c); stroke-width: 1.5; vector-effect: non-scaling-stroke; stroke-linejoin: round; stroke-linecap: round; }
+.sl-spark__fill { fill: var(--c); opacity: .12; stroke: none; }

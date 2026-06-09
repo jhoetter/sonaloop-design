@@ -923,6 +923,9 @@
 .text-paper\/25 {
     color: rgb(var(--paper) / 0.25)
 }
+.underline {
+    text-decoration-line: underline
+}
 .accent-ink {
     accent-color: rgb(var(--ink) / 1)
 }

@@ -42,7 +42,6 @@ a { color: inherit; }
    a full-height sidebar (brand · search · collapsible nav · settings menu) + a topbar over
    the content. Only the docs-specific touches live here. */
 .sl-app-shell { --sl-sidebar-w: 264px; }
-.ds-brand-sub { color: var(--sl-muted); margin-left: .4em; }
 .sl-sb-search .sl-cmdk-trigger { font-size: 13px; }
 /* the docs nav has many sections — use the shared collapsible .sl-nav-group, denser rows */
 .sl-sb-scroll .sl-nav a { font-size: 13.5px; }

@@ -56,9 +56,16 @@ export function Button({ variant = 'default', size = 'md', className, ...rest }:
 export type BadgeTone = 'neutral' | 'accent' | 'positive' | 'warning' | 'negative';
 export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
   tone?: BadgeTone;
+  /** Prefix the label with a small dot in the tone's colour (verdict/status reads). */
+  dot?: boolean;
 }
-export function Badge({ tone = 'neutral', className, ...rest }: BadgeProps) {
-  return <span className={cx('sl-badge', tone !== 'neutral' && `sl-badge--${tone}`, className)} {...rest} />;
+export function Badge({ tone = 'neutral', dot, className, children, ...rest }: BadgeProps) {
+  return (
+    <span className={cx('sl-badge', tone !== 'neutral' && `sl-badge--${tone}`, className)} {...rest}>
+      {dot ? <span className="sl-badge__dot" aria-hidden="true" /> : null}
+      {children}
+    </span>
+  );
 }
 
 /* ── Tag (bordered, uppercase — distinct from the filled Badge) ──────────────── */
@@ -492,6 +499,8 @@ export interface LogoProps extends HTMLAttributes<HTMLSpanElement> {
   label?: string;
   /** Set false to render the loop mark on its own (no wordmark). */
   wordmark?: boolean;
+  /** Product sub-label after the wordmark, muted + lowercase (e.g. "data", "tracker"). */
+  sub?: string;
   size?: LogoSize;
 }
 /**
@@ -501,7 +510,7 @@ export interface LogoProps extends HTMLAttributes<HTMLSpanElement> {
  * app's own link to make it navigable — the layout lives in CSS, so the wrapper stays minimal:
  *   <L to="/"><Logo /></L>
  */
-export function Logo({ label = 'Sonaloop', wordmark = true, size = 'md', className, ...rest }: LogoProps) {
+export function Logo({ label = 'Sonaloop', wordmark = true, sub, size = 'md', className, ...rest }: LogoProps) {
   // The wordmark sets its trailing "loop" in the pixel face; the rest stays in the mono run.
   const word = /loop$/i.test(label)
     ? <>{label.slice(0, -4)}<span className="sl-logo__loop">{label.slice(-4)}</span></>
@@ -510,6 +519,7 @@ export function Logo({ label = 'Sonaloop', wordmark = true, size = 'md', classNa
     <span className={cx('sl-logo', size !== 'md' && `sl-logo--${size}`, className)} {...rest}>
       <span className="sl-logo__mark"><SonaloopIcon /></span>
       {wordmark && <span className="sl-logo__word">{word}</span>}
+      {sub && <span className="sl-logo__sub">{sub}</span>}
     </span>
   );
 }
@@ -744,6 +754,274 @@ export function AppShell({
         <div className="sl-shell-body">{children}</div>
       </div>
     </div>
+  );
+}
+
+/* ── Overlays: Drawer · Modal · Popover ──────────────────────────────────────────
+   The React wrappers mount on `open` (no exit animation, like CommandPalette). The
+   styling is the shared `.sl-*` overlay layer; the Python-SSR app ships its own opener
+   over the same classes. Drawer + Modal share ESC-close, body scroll-lock and focus
+   restore via useOverlayDismiss; Popover is anchored (outside-click + ESC, no lock). */
+const CloseGlyph = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" aria-hidden="true">
+    <path d="M6 6l12 12M18 6L6 18" />
+  </svg>
+);
+
+/** ESC-to-close + body scroll-lock + restore focus to the trigger, while `open`. */
+function useOverlayDismiss(open: boolean, onClose: () => void) {
+  const restore = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    if (!open) return;
+    restore.current = document.activeElement as HTMLElement | null;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') { e.preventDefault(); onClose(); } };
+    document.addEventListener('keydown', onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prev;
+      restore.current?.focus?.();
+    };
+  }, [open, onClose]);
+}
+
+export type DrawerSide = 'right' | 'left';
+export interface DrawerProps {
+  open: boolean;
+  onClose: () => void;
+  title?: ReactNode;
+  /** Edge the panel slides from. Default `right`. */
+  side?: DrawerSide;
+  /** Panel width (any CSS length). Default `min(620px, 94vw)`. */
+  width?: string;
+  /** A sticky footer bar — typically the primary/secondary actions. */
+  footer?: ReactNode;
+  className?: string;
+  children?: ReactNode;
+}
+/** A right/left slide-over peek panel — the detail-without-leaving-the-page pattern. */
+export function Drawer({ open, onClose, title, side = 'right', width, footer, className, children }: DrawerProps) {
+  useOverlayDismiss(open, onClose);
+  const panelRef = useRef<HTMLDivElement>(null);
+  useEffect(() => { if (open) panelRef.current?.focus(); }, [open]);
+  if (!open) return null;
+  return (
+    <div className={cx('sl-drawer', side === 'left' && 'sl-drawer--left', className)}>
+      <div className="sl-drawer__scrim" onClick={onClose} />
+      <aside className="sl-drawer__panel" role="dialog" aria-modal="true" ref={panelRef} tabIndex={-1} style={width ? { width } : undefined}>
+        <header className="sl-drawer__head">
+          <span className="sl-drawer__title">{title}</span>
+          <button type="button" className="sl-overlay-close" onClick={onClose} aria-label="Close"><CloseGlyph /></button>
+        </header>
+        <div className="sl-drawer__body">{children}</div>
+        {footer ? <footer className="sl-drawer__foot">{footer}</footer> : null}
+      </aside>
+    </div>
+  );
+}
+
+export type ModalSize = 'sm' | 'md' | 'lg';
+export interface ModalProps {
+  open: boolean;
+  onClose: () => void;
+  title?: ReactNode;
+  size?: ModalSize;
+  footer?: ReactNode;
+  /** Hide the header close button (a forced-choice / confirm dialog). */
+  hideClose?: boolean;
+  className?: string;
+  children?: ReactNode;
+}
+/** A centered modal dialog. Shares the overlay engine with Drawer. */
+export function Modal({ open, onClose, title, size = 'md', footer, hideClose, className, children }: ModalProps) {
+  useOverlayDismiss(open, onClose);
+  const panelRef = useRef<HTMLDivElement>(null);
+  useEffect(() => { if (open) panelRef.current?.focus(); }, [open]);
+  if (!open) return null;
+  return (
+    <div className={cx('sl-modal', size !== 'md' && `sl-modal--${size}`, className)}>
+      <div className="sl-modal__scrim" onClick={onClose} />
+      <div className="sl-modal__panel" role="dialog" aria-modal="true" ref={panelRef} tabIndex={-1}>
+        {(title || !hideClose) ? (
+          <header className="sl-modal__head">
+            <h2 className="sl-modal__title">{title}</h2>
+            {!hideClose ? <button type="button" className="sl-overlay-close" onClick={onClose} aria-label="Close"><CloseGlyph /></button> : null}
+          </header>
+        ) : null}
+        <div className="sl-modal__body">{children}</div>
+        {footer ? <footer className="sl-modal__foot">{footer}</footer> : null}
+      </div>
+    </div>
+  );
+}
+
+export type PopoverPlacement = 'bottom-start' | 'bottom-end' | 'top-start' | 'top-end';
+export interface PopoverProps {
+  open: boolean;
+  onClose: () => void;
+  /** The anchor (a button). The caller owns its click/aria; the panel anchors to it. */
+  trigger: ReactNode;
+  placement?: PopoverPlacement;
+  className?: string;
+  children?: ReactNode;
+}
+/** A small anchored panel (menus, filters) positioned against its trigger. */
+export function Popover({ open, onClose, trigger, placement = 'bottom-start', className, children }: PopoverProps) {
+  const wrapRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (e: MouseEvent) => { if (!wrapRef.current?.contains(e.target as Node)) onClose(); };
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('mousedown', onDown);
+    document.addEventListener('keydown', onKey);
+    return () => { document.removeEventListener('mousedown', onDown); document.removeEventListener('keydown', onKey); };
+  }, [open, onClose]);
+  return (
+    <div className="sl-popover-wrap" ref={wrapRef}>
+      {trigger}
+      {open ? <div className={cx('sl-popover', `sl-popover--${placement}`, className)} role="menu">{children}</div> : null}
+    </div>
+  );
+}
+
+export interface MenuItemProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  icon?: ReactNode;
+}
+/** A row inside a Popover menu — icon · label, full-width hover. */
+export function MenuItem({ icon, className, children, ...rest }: MenuItemProps) {
+  return <button type="button" className={cx('sl-menu-item', className)} role="menuitem" {...rest}>{icon}{children}</button>;
+}
+
+/* ── Tabs (underline · pill) ──────────────────────────────────────────────────────
+   In-page section switching. Buttons by default (controlled value/onChange); pass a
+   per-item `href` for navigation tabs (renders anchors). For a settings theme/density
+   toggle, prefer Segmented. */
+export type TabsVariant = 'underline' | 'pill';
+export interface TabItem {
+  key: string;
+  label: ReactNode;
+  icon?: ReactNode;
+  /** Render this tab as a link (navigation tabs) instead of a button. */
+  href?: string;
+}
+export interface TabsProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
+  items: TabItem[];
+  value: string;
+  onChange?: (key: string) => void;
+  variant?: TabsVariant;
+}
+export function Tabs({ items, value, onChange, variant = 'underline', className, ...rest }: TabsProps) {
+  return (
+    <div className={cx('sl-tabs', variant === 'pill' && 'sl-tabs--pill', className)} role="tablist" {...rest}>
+      {items.map((it) => {
+        const active = it.key === value;
+        const cls = cx('sl-tab', active && 'is-active');
+        const body = <>{it.icon}{it.label}</>;
+        return it.href
+          ? <a key={it.key} href={it.href} className={cls} role="tab" aria-selected={active}>{body}</a>
+          : <button key={it.key} type="button" className={cls} role="tab" aria-selected={active} onClick={() => onChange?.(it.key)}>{body}</button>;
+      })}
+    </div>
+  );
+}
+
+/* ── Property list (Linear-style key/value detail rows) ──────────────────────────── */
+export interface PropertyListProps extends HTMLAttributes<HTMLDivElement> {
+  /** Wrap the rows in a bordered card surface. */
+  card?: boolean;
+}
+export function PropertyList({ card, className, ...rest }: PropertyListProps) {
+  return <div className={cx('sl-props', card && 'sl-props--card', className)} {...rest} />;
+}
+export interface PropertyProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
+  icon?: ReactNode;
+  label: ReactNode;
+}
+export function Property({ icon, label, className, children, ...rest }: PropertyProps) {
+  return (
+    <div className={cx('sl-prop', className)} {...rest}>
+      <span className="sl-prop__k">{icon}{label}</span>
+      <span className="sl-prop__v">{children}</span>
+    </div>
+  );
+}
+
+/* ── Page header (the detail-page hero) ───────────────────────────────────────────
+   top slot (eyebrow/pill/breadcrumb) · icon + title · sub · trailing actions. */
+export interface PageHeaderProps extends Omit<HTMLAttributes<HTMLElement>, 'title'> {
+  title: ReactNode;
+  icon?: ReactNode;
+  sub?: ReactNode;
+  /** A slot above the title — an Eyebrow, a Pill row, a Breadcrumb. */
+  top?: ReactNode;
+  /** Trailing actions kept on the right (buttons, a menu trigger). */
+  actions?: ReactNode;
+}
+export function PageHeader({ title, icon, sub, top, actions, className, ...rest }: PageHeaderProps) {
+  return (
+    <header className={cx('sl-page-header', className)} {...rest}>
+      <div className="sl-page-header__main">
+        {top ? <div className="sl-page-header__top">{top}</div> : null}
+        <h1 className="sl-page-header__title">{icon}{title}</h1>
+        {sub ? <p className="sl-page-header__sub">{sub}</p> : null}
+      </div>
+      {actions ? <div className="sl-page-header__actions">{actions}</div> : null}
+    </header>
+  );
+}
+
+/* ── Detail layout (content column + sticky aside) & the scrollspy page rail ─────── */
+export interface DetailLayoutProps extends HTMLAttributes<HTMLDivElement> {
+  /** The sticky right column — a PageRail, a PropertyList, relations, … */
+  aside?: ReactNode;
+}
+export function DetailLayout({ aside, className, children, ...rest }: DetailLayoutProps) {
+  return (
+    <div className={cx('sl-detail', className)} {...rest}>
+      <div className="sl-detail__main">{children}</div>
+      {aside ? <aside className="sl-detail__aside">{aside}</aside> : null}
+    </div>
+  );
+}
+
+export interface RailItem {
+  /** The id of the section heading this tick links to / tracks. */
+  id: string;
+  label: ReactNode;
+}
+export interface PageRailProps extends HTMLAttributes<HTMLElement> {
+  items: RailItem[];
+  /** Optional heading above the ticks (e.g. "On this page"). */
+  heading?: ReactNode;
+}
+/** A right-edge minimap that scrollspies the page's section headings (by id). */
+export function PageRail({ items, heading, className, ...rest }: PageRailProps) {
+  const [active, setActive] = useState<string>(items[0]?.id ?? '');
+  // Re-observe only when the set of tracked ids changes.
+  const ids = items.map((it) => it.id).join('|');
+  useEffect(() => {
+    const els = ids.split('|').map((id) => document.getElementById(id)).filter((e): e is HTMLElement => !!e);
+    if (!els.length || typeof IntersectionObserver === 'undefined') return;
+    const obs = new IntersectionObserver(
+      (entries) => {
+        const vis = entries.filter((e) => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (vis[0]) setActive(vis[0].target.id);
+      },
+      { rootMargin: '0px 0px -70% 0px', threshold: 0 },
+    );
+    els.forEach((el) => obs.observe(el));
+    return () => obs.disconnect();
+  }, [ids]);
+  return (
+    <nav className={cx('sl-rail', className)} aria-label="On this page" {...rest}>
+      {heading ? <div className="sl-rail__head">{heading}</div> : null}
+      {items.map((it) => (
+        <a key={it.id} href={`#${it.id}`} className={cx('sl-rail__item', it.id === active && 'is-active')} onClick={() => setActive(it.id)}>
+          {it.label}
+        </a>
+      ))}
+    </nav>
   );
 }
 
