@@ -599,12 +599,13 @@ button.sl-navhead:hover { color: var(--sl-muted); }
 
 /* ── Overlays: Drawer · Modal · Popover ───────────────────────────────────────────
    The shared overlay layer. The React wrappers mount on open (no exit animation, like
-   .sl-cmdk); the Python-SSR app toggles `.is-open` on a persistent root and gets the
-   same look. All three sit above the shell on z-index 120 / 60. */
+   .sl-cmdk); an SSR app may keep a persistent root and toggle the `hidden` attribute
+   instead (the enter animation replays on un-hide). All sit above the shell, z-index 120 / 60. */
 .sl-overlay-close { border: 0; background: none; cursor: pointer; color: var(--sl-muted);
   border-radius: var(--sl-radius-sm); padding: 5px; line-height: 0; display: inline-flex; flex-shrink: 0; }
 .sl-overlay-close:hover { background: var(--sl-hover); color: var(--sl-ink); }
 .sl-overlay-close svg { width: 18px; height: 18px; }
+.sl-drawer[hidden], .sl-modal[hidden] { display: none; }
 @keyframes sl-fade-in { from { opacity: 0; } }
 
 /* Drawer (right/left slide-over) */
