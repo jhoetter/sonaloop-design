@@ -1414,7 +1414,7 @@ const cEntity = () => componentPage({
 });
 
 /* ── nav model ─────────────────────────────────────────────────────────────────── */
-// ── Patterns: compositions built FROM the components (not atomic). ──────────────────
+// ── Composites: components built FROM other components (not atomic primitives). ─────
 const _navIco = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/></svg>`;
 const cAppShell = () => componentPage({
   id: 'app-shell', title: 'App Shell',
@@ -1450,9 +1450,9 @@ const cAppShell = () => componentPage({
   python: `# web/_components.py:_layout emits the same .sl-app-shell markup;\n# resize / collapse / user-menu behaviour is _shell.SHELL_JS (vendored from sonaloop-design).\nh("div", {"class_": "sl-app-shell"},\n  h("aside", {"class_": "sl-sidebar"}, brand, nav, user_menu),\n  h("div", {"class_": "sl-resize"}),\n  h("div", {"class_": "sl-main"}, topbar, body)) + SHELL_JS`,
 });
 
-const cCommandMenu = () => componentPage({
-  id: 'command-menu', title: 'Command Menu ⌘K',
-  desc: 'The shared ⌘K palette for app shells — grouped results, a per-item icon + optional subtitle, full keyboard nav (↑↓ · ↵ · esc) with hover-sync, and a footer hint bar. Self-contained over the same <code>.sl-cmdk</code> classes the docs site runs; prop-driven with client-side filtering (title · subtitle · keywords). The host owns open state; <code>hotkey</code> (default on) binds ⌘K. The marketing site\'s <a href="#/web-command-palette">Command Palette</a> is the website-flavoured sibling (router links + async search).',
+const cCommandPalette = () => componentPage({
+  id: 'command-palette', title: 'Command Palette ⌘K',
+  desc: 'The ONE ⌘K palette, shared across every surface — grouped results, a per-item icon + optional subtitle, full keyboard nav (↑↓ · ↵ · esc) with hover-sync, a footer hint bar, optional async <code>onSearch</code> and router-aware links. It lives in one image-free module (<code>src/command.tsx</code>) and is exported from BOTH <code>sonaloop-design/components</code> (app shells) and <code>sonaloop-design/website</code> (marketing) — same component, no duplication; the Python-SSR app ships its own over the same <code>.sl-cmdk</code> classes.',
   demo: `<div class="sl-cmdk-panel sl-cmdk-panel--inline" style="max-width:520px;margin:0 auto;max-height:none">
     <div class="sl-cmdk-head"><svg class="sl-cmdk-head-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input class="sl-cmdk-input" placeholder="Search projects and tickets…" readonly></div>
     <div class="sl-cmdk-list">
@@ -1464,7 +1464,7 @@ const cCommandMenu = () => componentPage({
     </div>
     <div class="sl-cmdk-foot"><span><span class="sl-kbd">↑↓</span> navigate</span><span><span class="sl-kbd">↵</span> open</span><span><span class="sl-kbd">esc</span> close</span></div>
   </div>`,
-  react: `import { CommandMenu, CommandMenuTrigger, type CommandMenuGroup } from 'sonaloop-design/components';\nimport { useState } from 'react';\n\nconst groups: CommandMenuGroup[] = [\n  { key: 'projects', label: 'Projects', items: [\n    { title: 'sonaloop', subtitle: 'MCP server core', onSelect: () => open('sonaloop') },\n  ] },\n  { key: 'tickets', label: 'Tickets', items: [\n    { title: 'Publish on PyPI', subtitle: 'sonaloop', keywords: 'publish-on-pypi', onSelect: () => open(t) },\n  ] },\n];\n\nfunction App() {\n  const [open, setOpen] = useState(false);\n  return (<>\n    <CommandMenuTrigger onClick={() => setOpen(true)} label=\"Search\" />\n    <CommandMenu open={open} onOpenChange={setOpen} groups={groups} placeholder=\"Search…\" />\n  </>);\n}`,
+  react: `// app shells (e.g. the tracker):\nimport { CommandPalette, CommandTrigger, type CommandGroup } from 'sonaloop-design/components';\n// marketing site — the SAME component, re-exported:\n// import { CommandPalette } from 'sonaloop-design/website';\nimport { useState } from 'react';\n\nconst groups: CommandGroup[] = [\n  { key: 'projects', label: 'Projects', items: [\n    { title: 'sonaloop', subtitle: 'MCP server core', onSelect: () => open('sonaloop') },\n  ] },\n  { key: 'tickets', label: 'Tickets', items: [\n    { title: 'Publish on PyPI', subtitle: 'sonaloop', keywords: 'publish-on-pypi', onSelect: () => open(t) },\n  ] },\n];\n\nfunction App() {\n  const [open, setOpen] = useState(false);\n  return (<>\n    <CommandTrigger onClick={() => setOpen(true)} label=\"Search\" />\n    <CommandPalette open={open} onOpenChange={setOpen} groups={groups} placeholder=\"Search…\" />\n  </>);\n}`,
   markup: `<div class="sl-cmdk"><div class="sl-cmdk-backdrop"></div>\n  <div class="sl-cmdk-panel">\n    <div class="sl-cmdk-head">…search glyph… <input class="sl-cmdk-input"></div>\n    <div class="sl-cmdk-list">\n      <div class="sl-cmdk-sec">Projects</div>\n      <button class="sl-cmdk-item is-active"><span class="sl-cmdk-title">…</span><span class="sl-cmdk-sub">…</span></button>\n    </div>\n    <div class="sl-cmdk-foot">…hints…</div>\n  </div>\n</div>`,
   python: `# The inspector ships its own ⌘K (web/_palette.py) over the same .sl-cmdk classes.`,
 });
@@ -1494,7 +1494,6 @@ const NAV = [
     { id: 'avatar', title: 'Avatar', ico: 'contact', render: cAvatar },
     { id: 'logo', title: 'Logo', ico: 'sonaloop', render: cLogo },
     { id: 'card', title: 'Card', ico: 'rectangle', render: cCard },
-    { id: 'entity', title: 'Entity', ico: 'projects', render: cEntity },
     { id: 'note', title: 'Note', ico: 'bulb', render: cNote },
     { id: 'stat', title: 'Stat', ico: 'analytics', render: cStat },
     { id: 'progress', title: 'Progress', ico: 'wave', render: cProgress },
@@ -1502,7 +1501,6 @@ const NAV = [
     { id: 'theme-toggle', title: 'Theme Toggle', ico: 'monitor', render: cThemeToggle },
     { id: 'table', title: 'Table', ico: 'squareRows', render: cTable },
     { id: 'breadcrumb', title: 'Breadcrumb', ico: 'caretRight', render: cBreadcrumb },
-    { id: 'empty-state', title: 'Empty State', ico: 'square', render: cEmptyState },
     { id: 'snippet', title: 'Snippet · Code', ico: 'jtbd', render: cSnippet },
     { id: 'eyebrow', title: 'Eyebrow', ico: 'wave', render: cEyebrow },
     { id: 'input', title: 'Input', ico: 'search', render: cInput },
@@ -1511,7 +1509,6 @@ const NAV = [
     { id: 'checkbox', title: 'Checkbox', ico: 'check', render: cCheckbox },
     { id: 'radio', title: 'Radio', ico: 'circle', render: cRadio },
     { id: 'switch', title: 'Switch', ico: 'exchange', render: cSwitch },
-    { id: 'field', title: 'Field · Fieldset', ico: 'settings', render: cField },
     { id: 'kbd', title: 'Kbd', ico: 'squareSplit', render: cKbd },
     { id: 'divider', title: 'Divider', ico: 'exchange', render: cDivider },
     { id: 'arrow-link', title: 'Arrow Link', ico: 'arrowRight', render: cArrowLink },
@@ -1527,9 +1524,12 @@ const NAV = [
     { id: 'chart-dot-plot', title: 'Dot · Range', ico: 'wave', render: cChartDotPlot },
     { id: 'chart-line', title: 'Line · Trend', ico: 'analytics', render: cChartLine },
   ] },
-  { label: 'Patterns', items: [
+  { label: 'Composites', items: [
     { id: 'app-shell', title: 'App Shell', ico: 'panel', render: cAppShell },
-    { id: 'command-menu', title: 'Command Menu ⌘K', ico: 'search', render: cCommandMenu },
+    { id: 'command-palette', title: 'Command Palette ⌘K', ico: 'search', render: cCommandPalette },
+    { id: 'entity', title: 'Entity', ico: 'projects', render: cEntity },
+    { id: 'field', title: 'Field · Fieldset', ico: 'settings', render: cField },
+    { id: 'empty-state', title: 'Empty State', ico: 'square', render: cEmptyState },
   ] },
   { label: 'Website', items: [
     { id: 'web-navbar', title: 'Navbar', ico: 'panel', render: () => websitePage({
@@ -1560,10 +1560,6 @@ const NAV = [
       id: 'web-integration-showcase', block: 'integration-showcase', title: 'Integration Showcase',
       desc: 'A believable agent terminal floating on a painterly canvas — the “bring your own AI” moment, with a copyable MCP command and a live-looking council session.',
       usage: `import { IntegrationShowcase } from 'sonaloop-design/website';\n\n<IntegrationShowcase />\n// optional: <IntegrationShowcase command=\"claude mcp add …\" canvas={mist} />` }) },
-    { id: 'web-command-palette', title: 'Command Palette', ico: 'search', render: () => websitePage({
-      id: 'web-command-palette', block: 'command-palette', title: 'Command Palette ⌘K',
-      desc: 'The shared ⌘K palette — the same one this docs site runs (press ⌘K). Results grouped under muted section headers, a per-item icon, an optional subtitle, full keyboard nav (↑↓ · ↵ · esc) with hover-sync, and a footer hint bar. Prop-driven: pass static <code>groups</code> for nav commands and an optional async <code>onSearch</code> for server-backed results. The host owns open state; <code>hotkey</code> (default on) binds ⌘K.',
-      usage: `import { CommandPalette, CommandTrigger, type CommandGroup } from 'sonaloop-design/website';\nimport { useState } from 'react';\n\nconst groups: CommandGroup[] = [\n  { key: 'go', label: 'Jump to', items: [\n    { title: 'Solutions', subtitle: '/solutions', to: '/solutions', icon: 'compass' },\n    { title: 'Pricing',  subtitle: '/pricing',  to: '/pricing',  icon: 'pricing-research' },\n  ] },\n  { key: 'products', label: 'Products', accent: 'var(--sl-violet)', items: [\n    { title: 'Open Core', subtitle: 'Run councils on your own AI', to: '/products/open-core', icon: 'open-core' },\n    { title: 'Cloud',     subtitle: 'Hosted councils & memory',    to: '/products/cloud',     icon: 'cloud' },\n  ] },\n];\n\nfunction App() {\n  const [open, setOpen] = useState(false);\n  return (\n    <>\n      <CommandTrigger onClick={() => setOpen(true)} label=\"Search Sonaloop\" />\n      <CommandPalette open={open} onOpenChange={setOpen} groups={groups}\n        placeholder=\"Search Sonaloop…\"\n        // optional: onSearch={async (q) => fetch('/api/search?q=' + q).then(r => r.json())}\n      />\n    </>\n  );\n}` }) },
     { id: 'web-layout', title: 'Layout · Section', ico: 'squareRows', render: () => websitePage({
       id: 'web-layout', block: 'layout', title: 'Layout · Section',
       desc: 'The page scaffolding used on every page: <code>PageSection</code> (measure + vertical rhythm), <code>SectionIntro</code> (kicker · balanced title · lead), <code>NoteBand</code> (dashed mono aside) and <code>PageRuler</code> (a hairline divider on the measure).',

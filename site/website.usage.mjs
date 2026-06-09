@@ -452,125 +452,125 @@ export const source = {
   "navbar": {
     "export": "Navbar",
     "file": "src/website.tsx",
-    "line": 600,
-    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L600"
+    "line": 589,
+    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L589"
   },
   "mega-menu": {
     "export": "MegaMenuPanel",
     "file": "src/website.tsx",
-    "line": 739,
-    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L739"
+    "line": 728,
+    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L728"
   },
   "cards": {
     "content": {
       "export": "ContentCard",
       "file": "src/website.tsx",
-      "line": 154,
-      "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L154"
+      "line": 143,
+      "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L143"
     },
     "pricing": {
       "export": "PricingCard",
       "file": "src/website.tsx",
-      "line": 540,
-      "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L540"
+      "line": 529,
+      "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L529"
     },
     "ladder": {
       "export": "LadderCard",
       "file": "src/website.tsx",
-      "line": 546,
-      "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L546"
+      "line": 535,
+      "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L535"
     },
     "verdict": {
       "export": "VerdictCard",
       "file": "src/website.tsx",
-      "line": 344,
-      "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L344"
+      "line": 333,
+      "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L333"
     },
     "snippet": {
       "export": "SnippetCard",
       "file": "src/website.tsx",
-      "line": 439,
-      "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L439"
+      "line": 428,
+      "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L428"
     }
   },
   "hero": {
     "export": "Hero",
     "file": "src/website.tsx",
-    "line": 889,
-    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L889"
+    "line": 878,
+    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L878"
   },
   "cta-band": {
     "export": "CtaBand",
     "file": "src/website.tsx",
-    "line": 947,
-    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L947"
+    "line": 936,
+    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L936"
   },
   "footer": {
     "export": "Footer",
     "file": "src/website.tsx",
-    "line": 1005,
-    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L1005"
+    "line": 994,
+    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L994"
   },
   "product-showcase": {
     "export": "ProductShot",
     "file": "src/website.tsx",
-    "line": 1086,
-    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L1086"
+    "line": 1075,
+    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L1075"
   },
   "canvas-showcase": {
     "export": "CanvasShowcase",
     "file": "src/website.tsx",
-    "line": 1125,
-    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L1125"
+    "line": 1114,
+    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L1114"
   },
   "integration-showcase": {
     "export": "IntegrationShowcase",
     "file": "src/website.tsx",
-    "line": 1163,
-    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L1163"
+    "line": 1152,
+    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L1152"
   },
   "command-palette": {
     "export": "CommandPalette",
     "file": "src/website.tsx",
-    "line": 1417,
-    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L1417"
+    "line": null,
+    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx"
   },
   "layout": {
     "export": "PageSection",
     "file": "src/website.tsx",
-    "line": 218,
-    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L218"
+    "line": 207,
+    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L207"
   },
   "content-atoms": {
     "checklist": {
       "export": "CheckRow",
       "file": "src/website.tsx",
-      "line": 269,
-      "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L269"
+      "line": 258,
+      "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L258"
     },
     "steps": {
       "export": "StepRows",
       "file": "src/website.tsx",
-      "line": 281,
-      "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L281"
+      "line": 270,
+      "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L270"
     },
     "fields": {
       "export": "FieldList",
       "file": "src/website.tsx",
-      "line": 298,
-      "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L298"
+      "line": 287,
+      "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L287"
     }
   },
   "install-block": {
     "export": "InstallBlock",
     "file": "src/website.tsx",
-    "line": 319,
-    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L319"
+    "line": 308,
+    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L308"
   },
   "faq": {
     "export": "FaqList",
     "file": "src/website.tsx",
-    "line": 457,
-    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L457"
+    "line": 446,
+    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L446"
   }
 };
