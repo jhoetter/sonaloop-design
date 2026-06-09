@@ -38,10 +38,14 @@ const SL_MAP = {
   hover: 'hover', sel: 'sel', green: 'green', amber: 'amber', red: 'red',
   // extended semantic hues (avatar tones, status dots, note variants)
   blue: 'blue', violet: 'violet', skep: 'skep',
+  // app-shell surfaces (sidebar chrome, popover overlay, elevated shadow) so the
+  // shared .sl-app-shell layer works in both the website/Tailwind and the Python app.
+  sidebar: 'sidebar', overlay: 'overlay', 'shadow-lg': 'shadow-lg',
 };
 const slDecls = (set) =>
   Object.entries(SL_MAP).map(([sl, k]) => `--sl-${sl}:${set[k]}`).join(';') +
   `;--sl-radius-sm:${scales['radius-sm']};--sl-radius:${scales.radius};--sl-radius-lg:${scales['radius-lg']};--sl-radius-full:${scales['radius-full']}` +
+  `;--sl-row-h:${scales['row-h']};--sl-ease:${scales.ease}` +
   `;--sl-sans:${scales.sans};--sl-mono:${scales.mono};--sl-pixel:${scales.pixel}`;
 
 // ── website: styles/tokens.css (R G B triplets; [data-theme] driven, default light) ──

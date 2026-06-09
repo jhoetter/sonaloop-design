@@ -8,7 +8,7 @@
  *
  * Page-level compositions (Footer, Hero, …) stay in each app and are built FROM these.
  */
-import { Fragment, useState } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type {
   ButtonHTMLAttributes,
   FieldsetHTMLAttributes,
@@ -19,7 +19,7 @@ import type {
   TableHTMLAttributes,
   TextareaHTMLAttributes,
 } from 'react';
-import { MonitorIcon, MoonIcon, SunIcon, SonaloopIcon } from './index';
+import { ChevronIcon, MonitorIcon, MoonIcon, PanelIcon, SearchIcon, SunIcon, SonaloopIcon } from './index';
 import type { PersonaIcon } from './icon';
 
 const cx = (...c: Array<string | false | null | undefined>) => c.filter(Boolean).join(' ');
@@ -511,6 +511,344 @@ export function Logo({ label = 'Sonaloop', wordmark = true, size = 'md', classNa
       <span className="sl-logo__mark"><SonaloopIcon /></span>
       {wordmark && <span className="sl-logo__word">{word}</span>}
     </span>
+  );
+}
+
+/* ── Command menu (⌘K) ───────────────────────────────────────────────────────────
+   A self-contained Linear/Raycast-style palette over the shared .sl-cmdk classes:
+   grouped results, client-side filter (title + subtitle + keywords), full keyboard nav,
+   and a global ⌘K hotkey. Pair with <AppShell> + <CommandMenuTrigger>. */
+export interface CommandMenuItem {
+  title: string;
+  subtitle?: string;
+  /** Extra text matched by the filter beyond the title/subtitle. */
+  keywords?: string;
+  icon?: ReactNode;
+  onSelect: () => void;
+}
+export interface CommandMenuGroup {
+  key: string;
+  label: string;
+  items: CommandMenuItem[];
+}
+export interface CommandMenuProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  groups: CommandMenuGroup[];
+  placeholder?: string;
+  emptyMessage?: string;
+  /** Bind ⌘K / Ctrl-K globally to toggle the menu. Default true. */
+  hotkey?: boolean;
+  footer?: boolean;
+}
+
+export function CommandMenu({
+  open,
+  onOpenChange,
+  groups,
+  placeholder = 'Search…',
+  emptyMessage = 'No results.',
+  hotkey = true,
+  footer = true,
+}: CommandMenuProps) {
+  const [query, setQuery] = useState('');
+  const [sel, setSel] = useState(0);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!hotkey) return;
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K')) { e.preventDefault(); onOpenChange(!open); }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [hotkey, open, onOpenChange]);
+
+  useEffect(() => {
+    if (open) { setQuery(''); setSel(0); inputRef.current?.focus(); }
+  }, [open]);
+
+  const q = query.trim().toLowerCase();
+  const visible = useMemo(
+    () =>
+      groups
+        .map((g) => ({
+          ...g,
+          items: q
+            ? g.items.filter((it) => `${it.title} ${it.subtitle ?? ''} ${it.keywords ?? ''}`.toLowerCase().includes(q))
+            : g.items,
+        }))
+        .filter((g) => g.items.length > 0),
+    [groups, q],
+  );
+  const flat = useMemo(() => visible.flatMap((g) => g.items), [visible]);
+  useEffect(() => { setSel((s) => Math.min(s, Math.max(0, flat.length - 1))); }, [flat.length]);
+
+  if (!open) return null;
+
+  const close = () => onOpenChange(false);
+  const choose = (it: CommandMenuItem) => { it.onSelect(); close(); };
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowDown') { e.preventDefault(); setSel((s) => (flat.length ? (s + 1) % flat.length : 0)); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); setSel((s) => (flat.length ? (s - 1 + flat.length) % flat.length : 0)); }
+    else if (e.key === 'Enter') { e.preventDefault(); if (flat[sel]) choose(flat[sel]); }
+    else if (e.key === 'Escape') { e.preventDefault(); close(); }
+  };
+
+  let idx = -1;
+  return (
+    <div className="sl-cmdk" role="dialog" aria-modal="true">
+      <div className="sl-cmdk-backdrop" onClick={close} />
+      <div className="sl-cmdk-panel">
+        <div className="sl-cmdk-head">
+          <SearchIcon className="sl-cmdk-head-ico" />
+          <input
+            ref={inputRef}
+            className="sl-cmdk-input"
+            value={query}
+            placeholder={placeholder}
+            autoComplete="off"
+            spellCheck={false}
+            onChange={(e) => { setQuery(e.target.value); setSel(0); }}
+            onKeyDown={onKeyDown}
+          />
+        </div>
+        <div className="sl-cmdk-list">
+          {flat.length === 0 ? (
+            <div className="sl-cmdk-empty">{emptyMessage}</div>
+          ) : (
+            visible.map((g) => (
+              <Fragment key={g.key}>
+                <div className="sl-cmdk-sec">{g.label}</div>
+                {g.items.map((it) => {
+                  idx += 1;
+                  const i = idx;
+                  return (
+                    <button
+                      key={i}
+                      type="button"
+                      className={cx('sl-cmdk-item', i === sel && 'is-active')}
+                      onMouseMove={() => setSel(i)}
+                      onClick={() => choose(it)}
+                    >
+                      {it.icon && <span className="sl-cmdk-ico">{it.icon}</span>}
+                      <span className="sl-cmdk-title">{it.title}</span>
+                      {it.subtitle && <span className="sl-cmdk-sub">{it.subtitle}</span>}
+                    </button>
+                  );
+                })}
+              </Fragment>
+            ))
+          )}
+        </div>
+        {footer && (
+          <div className="sl-cmdk-foot">
+            <span><Kbd>↑↓</Kbd> navigate</span>
+            <span><Kbd>↵</Kbd> open</span>
+            <span><Kbd>esc</Kbd> close</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export function CommandMenuTrigger({ onClick, label = 'Search', className }: { onClick: () => void; label?: string; className?: string }) {
+  return (
+    <button type="button" className={cx('sl-cmdk-trigger', className)} onClick={onClick}>
+      <SearchIcon className="sl-cmdk-trigger-ico" />
+      <span>{label}</span>
+      <Kbd>⌘K</Kbd>
+    </button>
+  );
+}
+
+/* ── App shell ───────────────────────────────────────────────────────────────────
+   The product chrome shared with the Python-SSR app (same .sl-* classes): a collapsible
+   + drag-resizable sidebar (brand · nav sections · bottom user menu), a resize handle, and
+   a topbar (sidebar toggle · slot for breadcrumb + actions). Collapse + width persist to
+   localStorage. Pair with <CommandPalette> for ⌘K. */
+export interface AppShellNavItem {
+  label: ReactNode;
+  /** Optional leading icon — pass `animate` on it for the hover micro-interaction. */
+  icon?: ReactNode;
+  /** Render as a link (SSR-style nav) when set; otherwise a button driven by onSelect. */
+  href?: string;
+  active?: boolean;
+  /** Right-aligned trailing content (e.g. an open-count). */
+  meta?: ReactNode;
+  title?: string;
+  onSelect?: () => void;
+}
+export interface AppShellNavSection {
+  label?: ReactNode;
+  items: AppShellNavItem[];
+}
+export interface AppShellUserMenu {
+  label: ReactNode;
+  icon?: ReactNode;
+  /** Popover content (e.g. a theme switch). */
+  children: ReactNode;
+}
+export interface AppShellProps {
+  brand: ReactNode;
+  nav: AppShellNavSection[];
+  userMenu?: AppShellUserMenu;
+  /** Topbar content to the right of the sidebar-toggle (breadcrumb + actions). */
+  topbar?: ReactNode;
+  children: ReactNode;
+  /** localStorage key prefix for collapse/width persistence. */
+  storageKey?: string;
+  defaultWidth?: number;
+  className?: string;
+}
+
+const SHELL_MIN = 180;
+const SHELL_MAX = 480;
+const SHELL_HIDE = 32;
+
+export function AppShell({
+  brand,
+  nav,
+  userMenu,
+  topbar,
+  children,
+  storageKey = 'sl-shell',
+  defaultWidth = 248,
+  className,
+}: AppShellProps) {
+  // Lazy initialisers read persisted state before first paint (no collapse flash).
+  const [collapsed, setCollapsed] = useState(() => {
+    try { return localStorage.getItem(`${storageKey}:open`) === 'false'; } catch { return false; }
+  });
+  const [width, setWidth] = useState(() => {
+    try { return parseInt(localStorage.getItem(`${storageKey}:width`) || '', 10) || defaultWidth; } catch { return defaultWidth; }
+  });
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  const persistOpen = useCallback((open: boolean) => {
+    try { localStorage.setItem(`${storageKey}:open`, String(open)); } catch { /* ignore */ }
+  }, [storageKey]);
+  const toggle = useCallback(() => {
+    setCollapsed((c) => { persistOpen(c); return !c; });
+  }, [persistOpen]);
+
+  // `[` toggles the sidebar (Linear-style), unless the user is typing.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement | null)?.tagName?.toLowerCase();
+      if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+      if (e.key === '[') { e.preventDefault(); toggle(); }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [toggle]);
+
+  // User-menu popover closes on outside click / Escape.
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onDown = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false);
+    };
+    const onEsc = (e: KeyboardEvent) => { if (e.key === 'Escape') setMenuOpen(false); };
+    document.addEventListener('mousedown', onDown);
+    document.addEventListener('keydown', onEsc);
+    return () => { document.removeEventListener('mousedown', onDown); document.removeEventListener('keydown', onEsc); };
+  }, [menuOpen]);
+
+  // Drag-resize the sidebar; dragging past the hide threshold collapses it.
+  const onResizeDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const startX = e.clientX;
+    const startW = width || defaultWidth;
+    let last = startW;
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+    const move = (ev: PointerEvent) => {
+      const next = startW + (ev.clientX - startX);
+      if (next <= SHELL_HIDE) { setCollapsed(true); persistOpen(false); }
+      else {
+        last = Math.max(SHELL_MIN, Math.min(SHELL_MAX, next));
+        setWidth(last); setCollapsed(false); persistOpen(true);
+      }
+    };
+    const up = () => {
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+      try { localStorage.setItem(`${storageKey}:width`, String(last)); } catch { /* ignore */ }
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+  };
+
+  const renderItem = (it: AppShellNavItem, key: number) => {
+    const cls = cx('pi-hover', it.active && 'is-active');
+    const inner = (
+      <>
+        {it.icon}
+        <span>{it.label}</span>
+        {it.meta != null && <span className="sl-nav-meta">{it.meta}</span>}
+      </>
+    );
+    return it.href ? (
+      <a key={key} href={it.href} className={cls} title={it.title} onClick={it.onSelect}>{inner}</a>
+    ) : (
+      <button key={key} type="button" className={cls} title={it.title} onClick={it.onSelect}>{inner}</button>
+    );
+  };
+
+  return (
+    <div
+      className={cx('sl-app-shell', collapsed && 'is-collapsed', className)}
+      style={{ ['--sl-sidebar-w' as string]: `${width}px` } as React.CSSProperties}
+    >
+      <aside className="sl-sidebar">
+        <div className="sl-brand">{brand}</div>
+        <div className="sl-sb-scroll">
+          {nav.map((sec, i) => (
+            <Fragment key={i}>
+              {sec.label != null && <div className="sl-navhead">{sec.label}</div>}
+              <nav className="sl-nav">{sec.items.map(renderItem)}</nav>
+            </Fragment>
+          ))}
+        </div>
+        {userMenu && (
+          <div ref={menuRef} className={cx('sl-usermenu', menuOpen && 'is-open')}>
+            <div className="sl-um-pop" hidden={!menuOpen}>{userMenu.children}</div>
+            <button
+              type="button"
+              className="sl-um-trigger"
+              aria-haspopup="true"
+              aria-expanded={menuOpen}
+              onClick={() => setMenuOpen((o) => !o)}
+            >
+              <span className="sl-um-ava">{userMenu.icon}</span>
+              <span className="sl-um-name">{userMenu.label}</span>
+              <span className="sl-um-caret"><ChevronIcon size={16} /></span>
+            </button>
+          </div>
+        )}
+      </aside>
+      <div
+        className="sl-resize"
+        role="separator"
+        aria-orientation="vertical"
+        aria-label="Resize sidebar"
+        onPointerDown={onResizeDown}
+      />
+      <div className="sl-main">
+        <header className="sl-topbar">
+          <button type="button" className="sl-iconbtn" aria-label="Toggle sidebar" title="Toggle sidebar ([)" onClick={toggle}>
+            <PanelIcon size={16} />
+          </button>
+          {topbar}
+        </header>
+        <div className="sl-shell-body">{children}</div>
+      </div>
+    </div>
   );
 }
 

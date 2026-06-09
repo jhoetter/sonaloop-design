@@ -509,3 +509,70 @@
 .sl-cmdk-trigger:hover { border-color: color-mix(in srgb, var(--sl-ink) 22%, var(--sl-line)); }
 .sl-cmdk-trigger-ico { width: .95rem; height: .95rem; flex: none; }
 .sl-cmdk-trigger span { flex: 1; text-align: left; }
+
+/* ── App shell ──────────────────────────────────────────────────────────────────────
+   The product chrome: a collapsible + drag-resizable sidebar (brand · nav sections ·
+   bottom user menu), a resize handle, and a topbar (sidebar toggle · breadcrumb · actions).
+   Shared markup — the React <AppShell> (tsx consumers) and the Python-SSR app render these
+   same classes from one source, so the inspector and the tracker can never drift.
+   Sidebar width is a scoped custom property the resize JS writes; collapse via .is-collapsed. */
+.sl-app-shell { display: flex; height: 100vh; overflow: hidden; --sl-sidebar-w: 248px; }
+.sl-sidebar { width: var(--sl-sidebar-w); min-width: var(--sl-sidebar-w); background: var(--sl-sidebar);
+  border-right: 1px solid var(--sl-line); display: flex; flex-direction: column; flex-shrink: 0; overflow: hidden;
+  transition: width 200ms var(--sl-ease), min-width 200ms var(--sl-ease), border-right-width 200ms; }
+.sl-app-shell.is-collapsed .sl-sidebar { width: 0; min-width: 0; border-right-width: 0; }
+.sl-brand { height: var(--sl-row-h); flex-shrink: 0; display: flex; align-items: center; padding: 0 14px;
+  font-size: .8125rem; border-bottom: 1px solid var(--sl-line); }
+.sl-sb-scroll { overflow: auto; padding: 10px 8px; flex: 1; min-height: 0; }
+.sl-nav { display: flex; flex-direction: column; gap: 1px; }
+/* Items render as <a> in the SSR app and <button> in React consumers — both styled here. */
+.sl-nav a, .sl-nav button { display: flex; align-items: center; gap: 9px; width: 100%; padding: 5px 8px;
+  border: 0; background: transparent; border-radius: var(--sl-radius-sm); color: var(--sl-ink); font: inherit;
+  font-weight: 500; font-size: .8125rem; text-align: left; position: relative; min-height: 30px; text-decoration: none; cursor: pointer; }
+.sl-nav a svg, .sl-nav button svg { width: 16px; height: 16px; flex: none; color: var(--sl-faint); }
+.sl-nav a:hover, .sl-nav button:hover { background: var(--sl-hover); }
+.sl-nav a.is-active, .sl-nav button.is-active { background: var(--sl-sel); color: var(--sl-ink); font-weight: 600; }
+.sl-nav a.is-active::before, .sl-nav button.is-active::before { content: ''; position: absolute; left: -8px; top: 7px; bottom: 7px;
+  width: 2.5px; border-radius: 0 3px 3px 0; background: var(--sl-accent); }
+.sl-nav a.is-active svg, .sl-nav button.is-active svg { color: var(--sl-accent); }
+.sl-nav-meta { margin-left: auto; font-size: .7rem; color: var(--sl-faint); font-variant-numeric: tabular-nums; }
+.sl-navhead { font-size: .6875rem; letter-spacing: .05em; text-transform: uppercase; color: var(--sl-faint);
+  margin: 18px 9px 6px; font-weight: 650; }
+.sl-usermenu { position: relative; flex-shrink: 0; border-top: 1px solid var(--sl-line); padding: 8px; }
+.sl-um-trigger { width: 100%; display: flex; align-items: center; gap: 9px; padding: 6px 8px; border: 1px solid transparent;
+  border-radius: var(--sl-radius); background: transparent; cursor: pointer; color: var(--sl-ink); font: inherit; font-size: .8125rem; font-weight: 500; }
+.sl-um-trigger:hover { background: var(--sl-hover); }
+.sl-usermenu.is-open .sl-um-trigger { background: var(--sl-hover); }
+.sl-um-ava { display: flex; align-items: center; justify-content: center; width: 22px; height: 22px; flex-shrink: 0; color: var(--sl-muted); }
+.sl-um-ava svg { width: 18px; height: 18px; }
+.sl-um-name { flex: 1; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sl-um-caret { color: var(--sl-muted); display: inline-flex; transition: transform .15s var(--sl-ease); }
+.sl-um-caret svg { width: 16px; height: 16px; }
+.sl-usermenu.is-open .sl-um-caret { transform: rotate(180deg); }
+.sl-um-pop { position: absolute; left: 8px; right: 8px; bottom: calc(100% + 4px); background: var(--sl-overlay);
+  border: 1px solid var(--sl-line); border-radius: var(--sl-radius-lg); box-shadow: 0 16px 44px rgba(0, 0, 0, .22); padding: 10px; z-index: 60; }
+.sl-um-pop[hidden] { display: none; }
+.sl-um-sec { margin-bottom: 10px; }
+.sl-um-sec:last-child { margin-bottom: 0; }
+.sl-um-lbl { font-size: .6875rem; letter-spacing: .02em; color: var(--sl-faint); font-weight: 600; margin: 0 2px 6px; }
+.sl-resize { width: 8px; margin: 0 -4px; flex-shrink: 0; cursor: col-resize; position: relative; z-index: 10; }
+.sl-app-shell.is-collapsed .sl-resize { display: none; }
+.sl-resize::after { content: ''; position: absolute; inset: 0 50%; width: 2px; transform: translateX(-50%);
+  background: var(--sl-accent); opacity: 0; transition: opacity 150ms; }
+.sl-resize:hover::after { opacity: .4; }
+.sl-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+.sl-topbar { height: var(--sl-row-h); flex-shrink: 0; display: flex; align-items: center; gap: 10px; padding: 0 12px;
+  border-bottom: 1px solid var(--sl-line); background: var(--sl-surface); }
+.sl-iconbtn { border: 1px solid var(--sl-line); background: var(--sl-surface); border-radius: var(--sl-radius-sm);
+  width: 28px; height: 28px; cursor: pointer; color: var(--sl-muted); flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; }
+.sl-iconbtn:hover { background: var(--sl-hover); color: var(--sl-ink); }
+.sl-iconbtn svg { width: 16px; height: 16px; }
+.sl-spacer { flex: 1; }
+.sl-tb-actions { display: flex; align-items: center; gap: 8px; }
+.sl-shell-body { flex: 1; min-height: 0; overflow: auto; }
+@media (max-width: 760px) {
+  .sl-sidebar { position: fixed; top: 0; left: 0; height: 100vh; z-index: 100; width: 280px !important; min-width: 280px !important;
+    transform: translateX(-100%); transition: transform 220ms var(--sl-ease); }
+  .sl-app-shell:not(.is-collapsed) .sl-sidebar { transform: translateX(0); box-shadow: var(--sl-shadow-lg); }
+  .sl-resize { display: none; }
+}
