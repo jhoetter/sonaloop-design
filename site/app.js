@@ -1520,24 +1520,35 @@ const cModal = () => componentPage({
 
 const cPopover = () => componentPage({
   id: 'popover', title: 'Popover · Menu',
-  desc: 'A small panel anchored to its trigger — row actions, filters, the account menu. Outside-click + ESC dismiss. Holds <code>.sl-menu-item</code> rows (icon · label), optional <code>.sl-menu-label</code> headers and <code>.sl-menu-sep</code> dividers. Four placements. <b>Controlled</b> (pass <code>open</code>/<code>onClose</code>) or <b>uncontrolled</b> — omit them and drive it with a render-prop <code>trigger={({open,toggle})=>…}</code> and <code>children={(close)=>…}</code> (handy so a row closes the menu when chosen).',
-  demo: `<div class="sl-popover-wrap" style="margin-bottom:150px">
-    <button class="sl-btn sl-btn--sm">Actions ▾</button>
-    <div class="sl-popover sl-popover--bottom-start" style="animation:none">
-      <div class="sl-menu-label">Council</div>
-      <button class="sl-menu-item">${svgReg('search')}Open</button>
-      <button class="sl-menu-item">${svgReg('pencil')}Rename</button>
-      <div class="sl-menu-sep"></div>
-      <button class="sl-menu-item">${svgReg('star')}Favourite</button>
+  desc: 'A small panel anchored to its trigger — row actions, filters, the account menu. Outside-click + ESC dismiss. Triggered by a quiet <code>.sl-toolbtn</code> (or any control). Holds <code>.sl-menu-item</code> rows — an icon · label for actions, or a leading <b>check column</b> + trailing <b>count</b> for selectable option / filter menus — with optional <code>.sl-menu-label</code> headers and <code>.sl-menu-sep</code> dividers. Four placements. <b>Controlled</b> (pass <code>open</code>/<code>onClose</code>) or <b>uncontrolled</b> — omit them and drive it with a render-prop <code>trigger={({open,toggle})=>…}</code> and <code>children={(close)=>…}</code> (so a row closes the menu when chosen).',
+  demo: (() => { const chk = '<span class="sl-menu-item__check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>'; return `<div style="display:flex;gap:40px;flex-wrap:wrap;margin-bottom:170px">
+    <div class="sl-popover-wrap">
+      <button class="sl-toolbtn">${svgReg('settings')}Display</button>
+      <div class="sl-popover sl-popover--bottom-start" style="animation:none;min-width:13rem">
+        <div class="sl-menu-label">Show properties</div>
+        <button class="sl-menu-item">${chk}<span class="sl-menu-item__label">Priority</span></button>
+        <button class="sl-menu-item">${chk}<span class="sl-menu-item__label">Labels</span></button>
+        <button class="sl-menu-item"><span class="sl-menu-item__check"></span><span class="sl-menu-item__label">ID</span></button>
+      </div>
     </div>
-  </div>`,
-  variants: { cols: ['Class', 'Placement', 'Anchors'], rows: [
-    ['.sl-popover--bottom-start', 'Bottom-start', 'Below trigger, left-aligned (default).'],
-    ['.sl-popover--bottom-end', 'Bottom-end', 'Below trigger, right-aligned.'],
-    ['.sl-popover--top-start / --top-end', 'Top', 'Above the trigger.'],
+    <div class="sl-popover-wrap">
+      <button class="sl-toolbtn">${svgReg('search')}Status</button>
+      <div class="sl-popover sl-popover--bottom-start" style="animation:none;min-width:13rem">
+        <div class="sl-menu-label">Filter by status</div>
+        <button class="sl-menu-item">${chk}<span class="sl-menu-item__label">In progress</span><span class="sl-menu-item__count">8</span></button>
+        <button class="sl-menu-item"><span class="sl-menu-item__check"></span><span class="sl-menu-item__label">Backlog</span><span class="sl-menu-item__count">34</span></button>
+      </div>
+    </div>
+  </div>`; })(),
+  variants: { cols: ['Class', 'Part', 'Use'], rows: [
+    ['.sl-popover--bottom-start · --bottom-end', 'Placement', 'Below the trigger, left- or right-aligned.'],
+    ['.sl-popover--top-start · --top-end', 'Placement', 'Above the trigger.'],
+    ['.sl-toolbtn', 'Trigger', 'The quiet bordered toolbar pill (also a mode toggle via <code>.is-active</code>).'],
+    ['.sl-menu-item__check', 'Row', 'Leading check column — a selectable option / filter row.'],
+    ['.sl-menu-item__count', 'Row', 'Trailing count (matches per facet).'],
   ] },
-  react: `import { Popover, MenuItem, Button } from 'sonaloop-design/components';\n\n// uncontrolled — the Popover owns its open state; the row closes it on select:\n<Popover placement=\"bottom-start\"\n  trigger={({ open, toggle }) => <Button size=\"sm\" onClick={toggle} aria-expanded={open}>Actions ▾</Button>}>\n  {(close) => <>\n    <MenuItem icon={<SearchIcon size={16} />} onClick={() => { open(); close(); }}>Open</MenuItem>\n    <MenuItem icon={<PencilIcon size={16} />} onClick={() => { rename(); close(); }}>Rename</MenuItem>\n  </>}\n</Popover>\n\n// or controlled — you own the open state:\n// <Popover open={open} onClose={() => setOpen(false)} trigger={<Button onClick={() => setOpen(true)}>…</Button>}>…</Popover>`,
-  markup: `<div class="sl-popover-wrap">\n  <button class="sl-btn sl-btn--sm">Actions ▾</button>\n  <div class="sl-popover sl-popover--bottom-start">\n    <button class="sl-menu-item">…Open</button>\n    <div class="sl-menu-sep"></div>\n    <button class="sl-menu-item">…Favourite</button>\n  </div>\n</div>`,
+  react: `import { Popover, MenuItem, ToolbarButton } from 'sonaloop-design/components';\n\n// a filter menu: ToolbarButton trigger + selectable rows with counts (row closes on select)\n<Popover placement=\"bottom-start\"\n  trigger={({ open, toggle }) => <ToolbarButton active={open} icon={<FilterIcon size={15} />} onClick={toggle}>Status</ToolbarButton>}>\n  {(close) => statuses.map((s) => (\n    <MenuItem key={s.id} selected={picked.has(s.id)} count={s.count} onClick={() => toggleStatus(s.id)}>{s.label}</MenuItem>\n  ))}\n</Popover>`,
+  markup: `<button class="sl-toolbtn">Status</button>\n<div class="sl-popover sl-popover--bottom-start">\n  <button class="sl-menu-item">\n    <span class="sl-menu-item__check"><!-- check svg when selected --></span>\n    <span class="sl-menu-item__label">In progress</span>\n    <span class="sl-menu-item__count">8</span>\n  </button>\n</div>`,
   python: `# The sidebar account menu (.sl-um-pop) is this pattern, SSR-side.`,
 });
 

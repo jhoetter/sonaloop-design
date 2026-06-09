@@ -661,9 +661,23 @@ button.sl-navhead:hover { color: var(--sl-muted); }
   background: none; border-radius: var(--sl-radius-sm); font: inherit; color: var(--sl-ink); cursor: pointer;
   text-align: left; text-decoration: none; }
 .sl-menu-item:hover { background: var(--sl-hover); }
-.sl-menu-item svg { width: 16px; height: 16px; color: var(--sl-muted); flex-shrink: 0; }
+.sl-menu-item > svg { width: 16px; height: 16px; color: var(--sl-muted); flex-shrink: 0; }   /* the leading icon only */
+/* Selectable rows (option/filter menus): a leading check column + the label + a trailing count. */
+.sl-menu-item__check { width: 1.05em; flex-shrink: 0; display: inline-flex; justify-content: center; }
+.sl-menu-item__check svg { width: 13px; height: 13px; color: var(--sl-accent); }
+.sl-menu-item__label { flex: 1; min-width: 0; display: inline-flex; align-items: center; gap: 8px; }
+.sl-menu-item__count { flex-shrink: 0; font-family: var(--sl-mono); font-size: .82em; color: var(--sl-faint); }
 .sl-menu-sep { height: 1px; background: var(--sl-line); margin: 5px 0; }
 .sl-menu-label { font-size: .6875em; letter-spacing: .02em; color: var(--sl-faint); font-weight: 600; padding: 4px 10px 2px; }
+
+/* Toolbar button — a quiet bordered pill that triggers a menu (Filter · Display · Views) or
+   toggles a mode. Distinct from .sl-btn: smaller, muted, for dense list toolbars. */
+.sl-toolbtn { display: inline-flex; align-items: center; gap: .4em; padding: .25em .65em; font: inherit;
+  font-size: .92em; color: var(--sl-muted); background: none; border: 1px solid var(--sl-line);
+  border-radius: var(--sl-radius-sm); cursor: pointer; white-space: nowrap; transition: background .12s, color .12s; }
+.sl-toolbtn:hover { background: var(--sl-hover); color: var(--sl-ink); }
+.sl-toolbtn.is-active { color: var(--sl-ink); background: var(--sl-sel); }
+.sl-toolbtn svg { width: 15px; height: 15px; }
 
 /* ── Tabs (underline default · pill segmented) ────────────────────────────────────
    Underline tabs for in-page section switching (docs, detail bodies); the pill variant

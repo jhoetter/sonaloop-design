@@ -931,11 +931,45 @@ export function Popover({ open: openProp, onClose, trigger, placement = 'bottom-
 }
 
 export interface MenuItemProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  /** A leading icon (action menus). */
   icon?: ReactNode;
+  /** Render a leading check column (filled when `true`) — option / filter / multi-select menus.
+   *  Passing the prop at all reserves the column so rows align whether or not they're checked. */
+  selected?: boolean;
+  /** A trailing count (e.g. how many items match this facet). */
+  count?: number;
 }
-/** A row inside a Popover menu — icon · label, full-width hover. */
-export function MenuItem({ icon, className, children, ...rest }: MenuItemProps) {
-  return <button type="button" className={cx('sl-menu-item', className)} role="menuitem" {...rest}>{icon}{children}</button>;
+const MenuCheck = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M5 13l4 4L19 7" />
+  </svg>
+);
+/** A row inside a Popover menu — full-width hover, optional leading icon or check column and a
+ *  trailing count. With `selected` it becomes a selectable option row. */
+export function MenuItem({ icon, selected, count, className, children, ...rest }: MenuItemProps) {
+  return (
+    <button type="button" className={cx('sl-menu-item', selected && 'is-selected', className)} role={selected !== undefined ? 'menuitemcheckbox' : 'menuitem'} aria-checked={selected} {...rest}>
+      {selected !== undefined ? <span className="sl-menu-item__check">{selected ? <MenuCheck /> : null}</span> : null}
+      {icon}
+      <span className="sl-menu-item__label">{children}</span>
+      {count != null ? <span className="sl-menu-item__count">{count}</span> : null}
+    </button>
+  );
+}
+
+export interface ToolbarButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  icon?: ReactNode;
+  /** Pressed/selected state (a toggled toolbar control). */
+  active?: boolean;
+}
+/** A quiet bordered toolbar trigger — Filter · Display · Views, or a mode toggle. Smaller and
+ *  more muted than Button; pairs with Popover for menus. */
+export function ToolbarButton({ icon, active, className, children, ...rest }: ToolbarButtonProps) {
+  return (
+    <button type="button" className={cx('sl-toolbtn', active && 'is-active', className)} aria-pressed={active} {...rest}>
+      {icon}{children}
+    </button>
+  );
 }
 
 /* ── Tabs (underline · pill) ──────────────────────────────────────────────────────
