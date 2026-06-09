@@ -972,6 +972,106 @@ export function ToolbarButton({ icon, active, className, children, ...rest }: To
   );
 }
 
+/* ── Filter bar (faceted list filtering) ──────────────────────────────────────────
+   Domain-agnostic: the host passes `facets` (each with its options, per-value counts and
+   current selection); the bar renders the add-filter menu, the active chips and the clear
+   actions, and reports toggles/clears back. Built from ToolbarButton · Popover · MenuItem. */
+const FilterGlyph = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M4 5h16l-6 7.5V19l-4 2v-8.5z" />
+  </svg>
+);
+export interface FilterOption {
+  value: string;
+  /** Row content — may include a glyph/dot beside the text. */
+  label: ReactNode;
+  count?: number;
+}
+export interface FilterFacet {
+  key: string;
+  /** Facet name — the menu entry and the chip's key ("Status"). */
+  label: string;
+  /** Icon shown beside the facet in the add-filter menu. */
+  icon?: ReactNode;
+  options: FilterOption[];
+  /** Currently-selected option values. */
+  selected: string[];
+  /** Chip text summarising the selection. Defaults to `${selected.length} selected`. */
+  summary?: ReactNode;
+  /** Shown when the facet has no options. */
+  emptyText?: string;
+}
+export interface FilterBarProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onToggle'> {
+  facets: FilterFacet[];
+  onToggle: (facetKey: string, value: string) => void;
+  onClearFacet: (facetKey: string) => void;
+  onClearAll: () => void;
+  /** Add-filter button label. Default "Filter". */
+  addLabel?: string;
+}
+function FacetOptions({ facet, onToggle }: { facet: FilterFacet; onToggle: (k: string, v: string) => void }) {
+  if (!facet.options.length) return <div className="sl-filter-empty">{facet.emptyText ?? 'No options'}</div>;
+  return (
+    <>
+      {facet.options.map((o) => (
+        <MenuItem key={o.value} selected={facet.selected.includes(o.value)} count={o.count} onClick={() => onToggle(facet.key, o.value)}>
+          {o.label}
+        </MenuItem>
+      ))}
+    </>
+  );
+}
+function AddFilterMenu({ facets, onToggle }: { facets: FilterFacet[]; onToggle: (k: string, v: string) => void }) {
+  const [activeKey, setActiveKey] = useState<string | null>(null);
+  const facet = facets.find((f) => f.key === activeKey);
+  if (facet) {
+    return (
+      <>
+        <button type="button" className="sl-filter-back" onClick={() => setActiveKey(null)}>← {facet.label}</button>
+        <FacetOptions facet={facet} onToggle={onToggle} />
+      </>
+    );
+  }
+  return (
+    <>
+      {facets.map((f) => (
+        <MenuItem key={f.key} icon={f.icon} onClick={() => setActiveKey(f.key)}>{f.label}</MenuItem>
+      ))}
+    </>
+  );
+}
+/** A Linear-style faceted filter bar. Domain-agnostic — pass `facets` with options + selection. */
+export function FilterBar({ facets, onToggle, onClearFacet, onClearAll, addLabel = 'Filter', className, ...rest }: FilterBarProps) {
+  const active = facets.filter((f) => f.selected.length > 0);
+  return (
+    <div className={cx('sl-filter-bar', className)} {...rest}>
+      <Popover trigger={({ toggle }) => <ToolbarButton icon={<FilterGlyph />} onClick={toggle}>{addLabel}</ToolbarButton>}>
+        {() => <AddFilterMenu facets={facets} onToggle={onToggle} />}
+      </Popover>
+      {active.map((facet) => (
+        <Popover
+          key={facet.key}
+          trigger={({ toggle }) => (
+            <span className="sl-filter-chip">
+              <button type="button" className="sl-filter-chip__body" onClick={toggle}>
+                <span className="sl-filter-chip__key">{facet.label}</span>
+                <span className="sl-filter-chip__op">is</span>
+                <span className="sl-filter-chip__val">{facet.summary ?? `${facet.selected.length} selected`}</span>
+              </button>
+              <button type="button" className="sl-filter-chip__x" aria-label={`Clear ${facet.label} filter`} onClick={() => onClearFacet(facet.key)}>
+                <CloseGlyph />
+              </button>
+            </span>
+          )}
+        >
+          {() => <FacetOptions facet={facet} onToggle={onToggle} />}
+        </Popover>
+      ))}
+      {active.length > 0 ? <button type="button" className="sl-filter-clear" onClick={onClearAll}>Clear</button> : null}
+    </div>
+  );
+}
+
 /* ── Tabs (underline · pill) ──────────────────────────────────────────────────────
    In-page section switching. Buttons by default (controlled value/onChange); pass a
    per-item `href` for navigation tabs (renders anchors). For a settings theme/density

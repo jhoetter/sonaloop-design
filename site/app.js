@@ -1650,6 +1650,32 @@ const cProse = () => componentPage({
   python: `# The app renders Markdown into the same .sl-prose wrapper (web _md helper).`,
 });
 
+const cFilterBar = () => componentPage({
+  id: 'filter-bar', title: 'Filter Bar',
+  desc: 'A Linear-style faceted filter for a list. A quiet “+ Filter” <a href="#/popover">ToolbarButton</a> opens a two-level menu — pick a facet, then toggle its values (selectable <code>.sl-menu-item</code> rows with per-value counts) — and each non-empty facet becomes a removable chip (<code>.sl-filter-chip</code>) that reopens its value menu. <b>Domain-agnostic</b>: the host passes <code>facets</code> (options · counts · current selection) and gets <code>onToggle</code> / <code>onClearFacet</code> / <code>onClearAll</code> back, so the same bar drives tickets, councils or any other list.',
+  demo: (() => { const chk = '<span class="sl-menu-item__check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>'; return `<div style="width:100%;max-width:560px;margin-bottom:140px">
+    <div class="sl-filter-bar">
+      <div class="sl-popover-wrap">
+        <button class="sl-toolbtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16l-6 7.5V19l-4 2v-8.5z"/></svg>Filter</button>
+        <div class="sl-popover sl-popover--bottom-start" style="animation:none;min-width:13rem">
+          <button class="sl-filter-back">← Status</button>
+          <button class="sl-menu-item">${chk}<span class="sl-menu-item__label">In progress</span><span class="sl-menu-item__count">8</span></button>
+          <button class="sl-menu-item"><span class="sl-menu-item__check"></span><span class="sl-menu-item__label">Backlog</span><span class="sl-menu-item__count">34</span></button>
+          <button class="sl-menu-item"><span class="sl-menu-item__check"></span><span class="sl-menu-item__label">Done</span><span class="sl-menu-item__count">12</span></button>
+        </div>
+      </div>
+      <span class="sl-filter-chip">
+        <button class="sl-filter-chip__body"><span class="sl-filter-chip__key">Status</span><span class="sl-filter-chip__op">is</span><span class="sl-filter-chip__val">In progress</span></button>
+        <button class="sl-filter-chip__x" aria-label="Clear"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      </span>
+      <button class="sl-filter-clear">Clear</button>
+    </div>
+  </div>`; })(),
+  react: `import { FilterBar, type FilterFacet } from 'sonaloop-design/components';\n\nconst facets: FilterFacet[] = [{\n  key: 'statuses', label: 'Status', icon: <StatusGlyph status=\"todo\" />,\n  selected: filter.statuses,\n  summary: filter.statuses.map((s) => STATUS_LABEL[s]).join(', '),\n  options: STATUSES.map((s) => ({ value: s, count: countOf(s), label: <><StatusGlyph status={s} /> {STATUS_LABEL[s]}</> })),\n}];\n\n<FilterBar facets={facets}\n  onToggle={(key, v) => toggle(key, v)}\n  onClearFacet={(key) => clearFacet(key)}\n  onClearAll={() => setFilter(EMPTY)} />`,
+  markup: `<div class="sl-filter-bar">\n  <button class="sl-toolbtn">Filter</button>\n  <span class="sl-filter-chip">\n    <button class="sl-filter-chip__body">Status is In progress</button>\n    <button class="sl-filter-chip__x">✕</button>\n  </span>\n</div>`,
+  python: `# Same .sl-filter-bar / .sl-filter-chip + .sl-menu-item contract from the SSR app.`,
+});
+
 const NAV = [
   { label: 'Foundations', items: [
     { id: 'introduction', title: 'Introduction', ico: 'overview', render: pageIntroduction },
@@ -1717,6 +1743,7 @@ const NAV = [
     { id: 'modal', title: 'Modal · Dialog', ico: 'square', render: cModal },
     { id: 'popover', title: 'Popover · Menu', ico: 'squareSplit', render: cPopover },
     { id: 'detail-layout', title: 'Detail Layout', ico: 'squareRows', render: cDetailLayout },
+    { id: 'filter-bar', title: 'Filter Bar', ico: 'half', render: cFilterBar },
     { id: 'entity', title: 'Entity', ico: 'projects', render: cEntity },
     { id: 'field', title: 'Field · Fieldset', ico: 'settings', render: cField },
     { id: 'empty-state', title: 'Empty State', ico: 'square', render: cEmptyState },

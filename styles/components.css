@@ -679,6 +679,33 @@ button.sl-navhead:hover { color: var(--sl-muted); }
 .sl-toolbtn.is-active { color: var(--sl-ink); background: var(--sl-sel); }
 .sl-toolbtn svg { width: 15px; height: 15px; }
 
+/* ── Filter bar (faceted list filtering) ──────────────────────────────────────────
+   A "+ Filter" toolbar button opens a two-level facet menu (pick a facet, then its values
+   as selectable .sl-menu-item rows); each non-empty facet becomes a removable chip that
+   reopens its value menu. The chrome is here; the menu rows reuse .sl-menu-item. */
+.sl-filter-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.sl-filter-back { display: flex; width: 100%; align-items: center; gap: 6px; margin-bottom: 2px;
+  padding: 4px 10px 5px; border: 0; background: none; cursor: pointer; font: inherit; font-size: .72em;
+  text-transform: uppercase; letter-spacing: .04em; color: var(--sl-faint); text-align: left;
+  border-radius: var(--sl-radius-sm); }
+.sl-filter-back:hover { background: var(--sl-hover); color: var(--sl-muted); }
+.sl-filter-empty { padding: 8px 10px; font-size: .85em; color: var(--sl-faint); }
+.sl-filter-chip { display: inline-flex; align-items: center; overflow: hidden;
+  border: 1px solid var(--sl-line); border-radius: var(--sl-radius-sm); font-size: .85em; }
+.sl-filter-chip__body { display: inline-flex; align-items: center; gap: 6px; padding: .25em .45em .25em .65em;
+  border: 0; background: none; font: inherit; font-size: 1em; color: var(--sl-ink); cursor: pointer; }
+.sl-filter-chip__body:hover { background: var(--sl-hover); }
+.sl-filter-chip__key { color: var(--sl-muted); }
+.sl-filter-chip__op { color: var(--sl-faint); }
+.sl-filter-chip__val { max-width: 14rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sl-filter-chip__x { display: inline-flex; align-items: center; padding: .3em .4em; border: 0;
+  border-left: 1px solid var(--sl-line); background: none; color: var(--sl-faint); cursor: pointer; }
+.sl-filter-chip__x:hover { background: var(--sl-hover); color: var(--sl-ink); }
+.sl-filter-chip__x svg { width: 13px; height: 13px; }
+.sl-filter-clear { padding: 0 4px; border: 0; background: none; font: inherit; font-size: .85em;
+  color: var(--sl-muted); cursor: pointer; }
+.sl-filter-clear:hover { color: var(--sl-ink); text-decoration: underline; }
+
 /* ── Tabs (underline default · pill segmented) ────────────────────────────────────
    Underline tabs for in-page section switching (docs, detail bodies); the pill variant
    is the compact segmented look for small option sets (calendar ranges). For a settings
