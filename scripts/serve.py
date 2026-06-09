@@ -36,6 +36,11 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self.path = "/site/index.html"
         return super().do_GET()
 
+    def end_headers(self):
+        # Dev server: never let the browser serve a stale JS/CSS copy after an edit.
+        self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
+        super().end_headers()
+
 
 socketserver.TCPServer.allow_reuse_address = True
 with socketserver.TCPServer((BIND, PORT), Handler) as httpd:

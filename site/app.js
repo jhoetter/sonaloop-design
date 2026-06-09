@@ -71,6 +71,18 @@ function code(lang, src) {
   </div>`;
 }
 
+// Tabbed code blocks — one panel visible at a time. `tabs` = [{ label, lang, src }].
+function codeTabs(tabs) {
+  const items = tabs.filter(Boolean);
+  return `
+  <div class="ds-codetabs" data-codetabs>
+    <div class="ds-seg ds-seg--text ds-codetabs__tabs" role="tablist">
+      ${items.map((t, i) => `<button class="ds-seg-btn${i === 0 ? ' is-active' : ''}" role="tab" data-codetab="${i}">${esc(t.label)}</button>`).join('')}
+    </div>
+    ${items.map((t, i) => `<div class="ds-codetabs__panel${i === 0 ? '' : ' is-hidden'}" data-codepanel="${i}">${code(t.lang, t.src)}</div>`).join('')}
+  </div>`;
+}
+
 const table = (cols, rows) => `
   <table class="ds-table">
     <thead><tr>${cols.map((c) => `<th>${esc(c)}</th>`).join('')}</tr></thead>
@@ -330,11 +342,11 @@ function componentPage({ id, title, desc, demo, react, markup, python, variants,
     ${variants ? h2(`${id}-variants`, 'Variants') + table(variants.cols, variants.rows) : ''}
     ${h2(`${id}-usage`, 'Usage')}
     ${p(`The styling lives once in <code>styles/components.css</code> as <code>.sl-*</code> classes. The website uses the typed React wrapper; the Python-SSR inspector emits the same classes onto its own markup — identical rendering, no shared component code.`)}
-    <h3 class="ds-h3">React · sonaloop-design/components</h3>
-    ${code('tsx', react)}
-    <h3 class="ds-h3">Markup · class contract (any stack)</h3>
-    ${code('html', markup)}
-    ${python ? `<h3 class="ds-h3">Python SSR · sonaloop inspector</h3>${code('python', python)}` : ''}
+    ${codeTabs([
+      { label: 'React · sonaloop-design/components', lang: 'tsx', src: react },
+      { label: 'Markup · class contract (any stack)', lang: 'html', src: markup },
+      python ? { label: 'Python SSR · sonaloop inspector', lang: 'python', src: python } : null,
+    ])}
     ${notes || ''}
   `;
 }
@@ -1518,8 +1530,14 @@ const byId = (id) => FLAT.find((i) => i.id === id);
 /* ── sidebar ──────────────────────────────────────────────────────────────────── */
 // Accordion nav: only the section you're currently in is open. Every group renders
 // collapsed; renderPage opens the active one (and collapses the rest) on each navigation.
+// Components, Charts and Website list alphabetically in the nav; Foundations & Brands keep their curated order.
+const NAV_ALPHA = new Set(['Components', 'Charts', 'Website']);
 function renderSidebar() {
-  $('#sidebar').innerHTML = NAV.map((g) => `
+  $('#sidebar').innerHTML = NAV.map((g) => {
+    const items = NAV_ALPHA.has(g.label)
+      ? [...g.items].sort((a, b) => a.title.localeCompare(b.title))
+      : g.items;
+    return `
     <section class="ds-nav-group is-collapsed" data-group="${esc(g.label)}">
       <button type="button" class="ds-nav-label" data-nav-toggle="${esc(g.label)}" aria-expanded="false">
         <span>${esc(g.label)}</span>
@@ -1527,11 +1545,12 @@ function renderSidebar() {
       </button>
       <div class="ds-nav-items">
         <div class="ds-nav-items-inner">
-          ${g.items.map((it) => `
+          ${items.map((it) => `
           <a class="ds-nav-item" href="#/${it.id}" data-nav="${it.id}">${esc(it.title)}</a>`).join('')}
         </div>
       </div>
-    </section>`).join('');
+    </section>`;
+  }).join('');
 }
 
 function setGroupCollapsed(sec, collapsed) {
@@ -1628,6 +1647,15 @@ document.addEventListener('click', (e) => {
       return `${c.prop}:${active.dataset.wbOpt}`;
     }).join('|');
     root.querySelector('[data-wb-stage]').innerHTML = data.variants[key] ?? data.variants[data.defaultKey];
+    return;
+  }
+
+  const codeTab = e.target.closest('[data-codetab]');
+  if (codeTab) {
+    const root = codeTab.closest('[data-codetabs]');
+    const i = codeTab.dataset.codetab;
+    root.querySelectorAll('[data-codetab]').forEach((b) => b.classList.toggle('is-active', b === codeTab));
+    root.querySelectorAll('[data-codepanel]').forEach((p) => p.classList.toggle('is-hidden', p.dataset.codepanel !== i));
     return;
   }
 
