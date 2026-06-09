@@ -786,6 +786,25 @@ function useOverlayDismiss(open: boolean, onClose: () => void) {
   }, [open, onClose]);
 }
 
+/** Keep a node mounted across its close transition so it can animate out: `render` says whether to
+    mount the markup at all; `active` applies the visible/open class one frame later so the enter
+    transition runs from the closed state (and drops on close so the exit transition runs). */
+function useEnterExit(open: boolean, durationMs: number) {
+  const [render, setRender] = useState(open);
+  const [active, setActive] = useState(false);
+  useEffect(() => {
+    if (open) {
+      setRender(true);
+      const r = requestAnimationFrame(() => setActive(true));
+      return () => cancelAnimationFrame(r);
+    }
+    setActive(false);
+    const t = setTimeout(() => setRender(false), durationMs);
+    return () => clearTimeout(t);
+  }, [open, durationMs]);
+  return { render, active };
+}
+
 export type DrawerSide = 'right' | 'left';
 export interface DrawerProps {
   open: boolean;
@@ -797,25 +816,35 @@ export interface DrawerProps {
   width?: string;
   /** A sticky footer bar — typically the primary/secondary actions. */
   footer?: ReactNode;
+  /** Render no built-in header/body/footer — `children` own the entire panel (a custom peek
+   *  with its own header + scroll region). The Drawer still supplies the scrim, slide animation,
+   *  ESC/scroll-lock/focus. */
+  bare?: boolean;
   className?: string;
   children?: ReactNode;
 }
-/** A right/left slide-over peek panel — the detail-without-leaving-the-page pattern. */
-export function Drawer({ open, onClose, title, side = 'right', width, footer, className, children }: DrawerProps) {
+/** A right/left slide-over peek panel — the detail-without-leaving-the-page pattern. Animates in
+ *  and out (kept mounted across the close transition). */
+export function Drawer({ open, onClose, title, side = 'right', width, footer, bare, className, children }: DrawerProps) {
   useOverlayDismiss(open, onClose);
+  const { render, active } = useEnterExit(open, 240);
   const panelRef = useRef<HTMLDivElement>(null);
   useEffect(() => { if (open) panelRef.current?.focus(); }, [open]);
-  if (!open) return null;
+  if (!render) return null;
   return (
-    <div className={cx('sl-drawer', side === 'left' && 'sl-drawer--left', className)}>
+    <div className={cx('sl-drawer', active && 'is-open', side === 'left' && 'sl-drawer--left', className)} aria-hidden={!active}>
       <div className="sl-drawer__scrim" onClick={onClose} />
       <aside className="sl-drawer__panel" role="dialog" aria-modal="true" ref={panelRef} tabIndex={-1} style={width ? { width } : undefined}>
-        <header className="sl-drawer__head">
-          <span className="sl-drawer__title">{title}</span>
-          <button type="button" className="sl-overlay-close" onClick={onClose} aria-label="Close"><CloseGlyph /></button>
-        </header>
-        <div className="sl-drawer__body">{children}</div>
-        {footer ? <footer className="sl-drawer__foot">{footer}</footer> : null}
+        {bare ? children : (
+          <>
+            <header className="sl-drawer__head">
+              <span className="sl-drawer__title">{title}</span>
+              <button type="button" className="sl-overlay-close" onClick={onClose} aria-label="Close"><CloseGlyph /></button>
+            </header>
+            <div className="sl-drawer__body">{children}</div>
+            {footer ? <footer className="sl-drawer__foot">{footer}</footer> : null}
+          </>
+        )}
       </aside>
     </div>
   );

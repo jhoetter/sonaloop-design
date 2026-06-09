@@ -608,17 +608,21 @@ button.sl-navhead:hover { color: var(--sl-muted); }
 .sl-drawer[hidden], .sl-modal[hidden] { display: none; }
 @keyframes sl-fade-in { from { opacity: 0; } }
 
-/* Drawer (right/left slide-over) */
-.sl-drawer { position: fixed; inset: 0; z-index: 120; display: flex; justify-content: flex-end; }
+/* Drawer (right/left slide-over). A persistent root: when closed it's pointer-events:none with the
+   scrim faded and the panel translated off-screen; `.is-open` transitions it in, and removing the
+   class transitions it back out (a real exit animation). Both React (toggles the class on a kept-
+   mounted element) and the SSR app (toggles it in JS) drive it the same way. */
+.sl-drawer { position: fixed; inset: 0; z-index: 120; display: flex; justify-content: flex-end; pointer-events: none; }
+.sl-drawer.is-open { pointer-events: auto; }
 .sl-drawer--left { justify-content: flex-start; }
 .sl-drawer__scrim { position: absolute; inset: 0; background: color-mix(in srgb, #0a0c10 32%, transparent);
-  animation: sl-fade-in .2s var(--sl-ease); }
+  opacity: 0; transition: opacity .2s var(--sl-ease); }
+.sl-drawer.is-open .sl-drawer__scrim { opacity: 1; }
 .sl-drawer__panel { position: relative; height: 100%; width: min(620px, 94vw); display: flex; flex-direction: column;
   overflow: hidden; background: var(--sl-surface); border-left: 1px solid var(--sl-line);
-  box-shadow: var(--sl-shadow-lg); animation: sl-slide-r .24s var(--sl-ease); }
-.sl-drawer--left .sl-drawer__panel { border-left: 0; border-right: 1px solid var(--sl-line); animation-name: sl-slide-l; }
-@keyframes sl-slide-r { from { transform: translateX(100%); } }
-@keyframes sl-slide-l { from { transform: translateX(-100%); } }
+  box-shadow: var(--sl-shadow-lg); transform: translateX(100%); transition: transform .24s var(--sl-ease); }
+.sl-drawer--left .sl-drawer__panel { border-left: 0; border-right: 1px solid var(--sl-line); transform: translateX(-100%); }
+.sl-drawer.is-open .sl-drawer__panel { transform: none; }
 .sl-drawer__head { height: var(--sl-row-h); flex-shrink: 0; display: flex; align-items: center; gap: 8px;
   padding: 0 8px 0 16px; border-bottom: 1px solid var(--sl-line); }
 .sl-drawer__title { font-weight: 600; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

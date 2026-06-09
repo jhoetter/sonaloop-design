@@ -1473,10 +1473,10 @@ const XGLYPH = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strok
 
 const cDrawer = () => componentPage({
   id: 'drawer', title: 'Drawer · Slide-over',
-  desc: 'A right/left slide-over peek panel — open a record’s detail over the current page without navigating away. Scrim · sticky header with title + close · scrollable body · optional sticky footer of actions. The React <code>&lt;Drawer&gt;</code> handles ESC-close, body scroll-lock and focus restore; the Python-SSR app opens the same <code>.sl-drawer</code> over any <code>[data-drawer]</code> link.',
+  desc: 'A right/left slide-over peek panel — open a record’s detail over the current page without navigating away. Scrim · sticky header with title + close · scrollable body · optional sticky footer of actions. It <b>animates in and out</b> (a CSS transition driven by <code>.is-open</code>, kept mounted across the close). The React <code>&lt;Drawer&gt;</code> handles that plus ESC-close, body scroll-lock and focus restore; the Python-SSR app toggles the same <code>.sl-drawer</code> over any <code>[data-drawer]</code> link. Pass <code>bare</code> when the children own the whole panel.',
   demo: `<div style="position:relative;width:100%;max-width:560px;height:300px;border:1px solid var(--sl-line);border-radius:var(--sl-radius);overflow:hidden;background:var(--sl-bg)">
     <div style="position:absolute;inset:0;background:color-mix(in srgb,#0a0c10 22%,transparent)"></div>
-    <aside class="sl-drawer__panel" style="position:absolute;top:0;right:0;height:100%;width:330px;animation:none">
+    <aside class="sl-drawer__panel" style="position:absolute;top:0;right:0;height:100%;width:330px;transform:none">
       <header class="sl-drawer__head"><span class="sl-drawer__title">Persona · Maya Chen</span><button class="sl-overlay-close" aria-label="Close">${XGLYPH}</button></header>
       <div class="sl-drawer__body">
         <p style="margin:0 0 14px;color:var(--sl-muted)">A peek panel layered over the page — close it and you’re exactly where you were.</p>
@@ -1486,12 +1486,14 @@ const cDrawer = () => componentPage({
     </aside>
   </div>`,
   variants: { cols: ['Prop / class', 'Value', 'Effect'], rows: [
+    ['.is-open', 'State', 'Drives the slide-in/out — transitions both ways (React toggles it; the SSR app toggles it in JS).'],
     ['side', 'right · left', 'Edge the panel slides from (<code>.sl-drawer--left</code>).'],
     ['width', 'CSS length', 'Panel width; default <code>min(620px, 94vw)</code>.'],
     ['footer', 'ReactNode', 'A sticky action bar pinned to the bottom.'],
+    ['bare', 'boolean', 'No built-in header/body — children own the whole panel (a custom peek).'],
   ] },
   react: `import { Drawer, Button } from 'sonaloop-design/components';\nimport { useState } from 'react';\n\nconst [open, setOpen] = useState(false);\n<Button onClick={() => setOpen(true)}>Open persona</Button>\n<Drawer open={open} onClose={() => setOpen(false)} title=\"Persona · Maya Chen\"\n  footer={<><Button size=\"sm\" onClick={() => setOpen(false)}>Dismiss</Button><Button size=\"sm\" variant=\"primary\">Open full page</Button></>}>\n  …record detail…\n</Drawer>`,
-  markup: `<div class="sl-drawer"><div class="sl-drawer__scrim"></div>\n  <aside class="sl-drawer__panel" role="dialog" aria-modal="true">\n    <header class="sl-drawer__head"><span class="sl-drawer__title">Title</span>\n      <button class="sl-overlay-close" aria-label="Close">✕</button></header>\n    <div class="sl-drawer__body">…</div>\n    <footer class="sl-drawer__foot">…actions…</footer>\n  </aside>\n</div>`,
+  markup: `<!-- toggle .is-open to slide it in/out (CSS transition both ways) -->\n<div class="sl-drawer is-open"><div class="sl-drawer__scrim"></div>\n  <aside class="sl-drawer__panel" role="dialog" aria-modal="true">\n    <header class="sl-drawer__head"><span class="sl-drawer__title">Title</span>\n      <button class="sl-overlay-close" aria-label="Close">✕</button></header>\n    <div class="sl-drawer__body">…</div>\n    <footer class="sl-drawer__foot">…actions…</footer>\n  </aside>\n</div>`,
   python: `# Any link opens its target page in the slide-over (web/_components.py):\nh("a", {"href": url, "data-drawer": url, "data-drawer-title": title}, label)`,
 });
 
