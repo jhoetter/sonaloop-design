@@ -45,6 +45,7 @@ export const PressureTestIcon = personaIcon("PressureTestIcon", "<path d=\"M3.5 
 export const CheckIcon = personaIcon("CheckIcon", "<path d=\"M5 12.5l4.5 4.5L19 7\"/>", "check");
 export const CircleIcon = personaIcon("CircleIcon", "<circle cx=\"12\" cy=\"12\" r=\"7.5\"/>", "circle");
 export const HalfIcon = personaIcon("HalfIcon", "<circle cx=\"12\" cy=\"12\" r=\"7.5\"/><path d=\"M12 4.5a7.5 7.5 0 0 1 0 15z\" fill=\"currentColor\" stroke=\"none\"/>", "half");
+export const ThreeQuarterIcon = personaIcon("ThreeQuarterIcon", "<circle cx=\"12\" cy=\"12\" r=\"7.5\"/><path d=\"M12 12L12 4.5A7.5 7.5 0 1 1 4.5 12Z\" fill=\"currentColor\" stroke=\"none\"/>", "threeQuarter");
 export const AlertIcon = personaIcon("AlertIcon", "<path d=\"M12 4.5v8.5\"/><circle cx=\"12\" cy=\"17.6\" r=\"0.7\" fill=\"currentColor\" stroke=\"none\"/>", "alert");
 export const CloseIcon = personaIcon("CloseIcon", "<path d=\"M6 6l12 12M18 6L6 18\"/>", "close");
 export const PlusIcon = personaIcon("PlusIcon", "<path d=\"M12 5v14M5 12h14\"/>", "plus");

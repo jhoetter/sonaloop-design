@@ -201,6 +201,11 @@ export const regular = {
     label: 'HalfIcon',
     body: '<circle cx="12" cy="12" r="7.5"/><path d="M12 4.5a7.5 7.5 0 0 1 0 15z" fill="currentColor" stroke="none"/>',
   },
+  // Like HalfIcon but a 270° wedge — the next step along the progress ring (e.g. "in review").
+  threeQuarter: {
+    label: 'ThreeQuarterIcon',
+    body: '<circle cx="12" cy="12" r="7.5"/><path d="M12 12L12 4.5A7.5 7.5 0 1 1 4.5 12Z" fill="currentColor" stroke="none"/>',
+  },
   alert: {
     label: 'AlertIcon',
     body: '<path d="M12 4.5v8.5"/><circle cx="12" cy="17.6" r="0.7" fill="currentColor" stroke="none"/>',
