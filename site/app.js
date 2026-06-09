@@ -1677,6 +1677,24 @@ const cFilterBar = () => componentPage({
   python: `# Same .sl-filter-bar / .sl-filter-chip + .sl-menu-item contract from the SSR app.`,
 });
 
+const cIconButton = () => componentPage({
+  id: 'icon-button', title: 'Icon Button',
+  desc: 'A square icon-only button. <b>Bordered</b> by default (the AppShell sidebar toggle, toolbar actions), or <b>ghost</b> (borderless, quiet) for inline row actions — edit · delete · close. Pass <code>danger</code> to tint the hover to the negative colour for a destructive action.',
+  demo: `<div style="display:flex;align-items:center;gap:18px">
+    <span style="display:inline-flex;gap:6px"><button class="sl-iconbtn">${svgReg('search')}</button><button class="sl-iconbtn">${svgReg('settings')}</button></span>
+    <span style="width:1px;height:24px;background:var(--sl-line)"></span>
+    <span style="display:inline-flex;gap:2px"><button class="sl-iconbtn sl-iconbtn--ghost">${svgReg('pencil')}</button><button class="sl-iconbtn sl-iconbtn--ghost sl-iconbtn--danger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14M10 7V5h4v2M6 7l1 13h10l1-13"/></svg></button><button class="sl-iconbtn sl-iconbtn--ghost"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></span>
+  </div>`,
+  variants: { cols: ['Class', 'Variant', 'Use'], rows: [
+    ['.sl-iconbtn', 'Bordered', 'Toolbar / chrome actions (the default).'],
+    ['.sl-iconbtn--ghost', 'Ghost', 'Borderless, quiet — inline row actions.'],
+    ['.sl-iconbtn--danger', 'Danger', 'Negative hover tint — a destructive action.'],
+  ] },
+  react: `import { IconButton } from 'sonaloop-design/components';\n\n<IconButton aria-label="Settings"><SettingsIcon size={16} /></IconButton>\n<IconButton ghost aria-label="Edit"><PencilIcon size={16} /></IconButton>\n<IconButton ghost danger aria-label="Delete"><TrashIcon size={16} /></IconButton>`,
+  markup: `<button class="sl-iconbtn" aria-label="Settings">…</button>\n<button class="sl-iconbtn sl-iconbtn--ghost" aria-label="Edit">…</button>\n<button class="sl-iconbtn sl-iconbtn--ghost sl-iconbtn--danger" aria-label="Delete">…</button>`,
+  python: `h("button", {"class_": "sl-iconbtn", "aria-label": "Edit"}, icon)`,
+});
+
 const cImageLightbox = () => componentPage({
   id: 'image-lightbox', title: 'Image Lightbox',
   desc: 'A full-bleed image zoom — a backdrop-blurred overlay that fills the viewport with one image, dismissed by click or Esc, with an optional caption. Distinct from <a href="#/modal">Modal</a>: no panel chrome, it’s about the image (a persona portrait, a screenshot, an artifact).',
@@ -1774,6 +1792,7 @@ const NAV = [
     { id: 'radio', title: 'Radio', ico: 'circle', render: cRadio },
     { id: 'switch', title: 'Switch', ico: 'exchange', render: cSwitch },
     { id: 'kbd', title: 'Kbd', ico: 'squareSplit', render: cKbd },
+    { id: 'icon-button', title: 'Icon Button', ico: 'settings', render: cIconButton },
     { id: 'divider', title: 'Divider', ico: 'exchange', render: cDivider },
     { id: 'arrow-link', title: 'Arrow Link', ico: 'arrowRight', render: cArrowLink },
     { id: 'property-list', title: 'Property List', ico: 'squareRows', render: cPropertyList },
