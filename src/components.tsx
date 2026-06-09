@@ -11,6 +11,7 @@
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import type {
   ButtonHTMLAttributes,
+  CSSProperties,
   FieldsetHTMLAttributes,
   HTMLAttributes,
   InputHTMLAttributes,
@@ -131,16 +132,24 @@ export interface AvatarProps extends HTMLAttributes<HTMLSpanElement> {
   name?: string;
   src?: string;
   tone?: AvatarTone;
-  size?: AvatarSize;
+  /** A token size (`sm`/`md`/`lg`) or an explicit pixel diameter. */
+  size?: AvatarSize | number;
+  /** A custom initials background (e.g. a per-entity hashed colour) — overrides `tone`. */
+  color?: string;
 }
-export function Avatar({ name, src, tone = 'accent', size = 'md', className, ...rest }: AvatarProps) {
+export function Avatar({ name, src, tone = 'accent', size = 'md', color, className, style, ...rest }: AvatarProps) {
   const initials = name
     ? name.trim().split(/\s+/).map((w) => w[0]).slice(0, 2).join('').toUpperCase()
     : '';
+  const numeric = typeof size === 'number';
+  const styleObj: CSSProperties | undefined = (numeric || color)
+    ? { ...(numeric ? { width: size, height: size, fontSize: (size as number) * 0.4 } : null), ...(color ? { background: color } : null), ...style }
+    : style;
   return (
     <span
-      className={cx('sl-avatar', tone !== 'accent' && `sl-avatar--${tone}`, size !== 'md' && `sl-avatar--${size}`, className)}
+      className={cx('sl-avatar', !color && tone !== 'accent' && `sl-avatar--${tone}`, !numeric && size !== 'md' && `sl-avatar--${size}`, className)}
       title={name}
+      style={styleObj}
       {...rest}
     >
       {src ? <img src={src} alt={name ?? ''} /> : initials}
@@ -881,6 +890,32 @@ export function Modal({ open, onClose, title, size = 'md', footer, hideClose, cl
         <div className="sl-modal__body">{children}</div>
         {footer ? <footer className="sl-modal__foot">{footer}</footer> : null}
       </div>
+    </div>
+  );
+}
+
+export interface ImageLightboxProps {
+  src: string;
+  alt?: string;
+  /** A caption under the image (e.g. the subject + a close hint). */
+  caption?: ReactNode;
+  onClose: () => void;
+}
+/** A full-bleed image zoom — backdrop-blurred, click/Esc to close. Distinct from Modal (no chrome,
+ *  it's about the image). */
+export function ImageLightbox({ src, alt = '', caption, onClose }: ImageLightboxProps) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [onClose]);
+  return (
+    <div className="sl-lightbox" role="dialog" aria-modal="true" aria-label={alt || 'Image'} onClick={onClose}>
+      <figure className="sl-lightbox__fig" onClick={(e) => e.stopPropagation()}>
+        <img className="sl-lightbox__img" src={src} alt={alt} />
+        {caption ? <figcaption className="sl-lightbox__cap">{caption}</figcaption> : null}
+      </figure>
+      <button type="button" className="sl-lightbox__x" onClick={onClose} aria-label="Close">Esc</button>
     </div>
   );
 }

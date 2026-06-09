@@ -760,7 +760,7 @@ const cButton = () => componentPage({
 });
 
 const cBadge = () => componentPage({
-  id: 'badge', title: 'Badge', desc: 'A small filled status pill. The semantic tones map directly to council verdicts so support, conditional and opposition counts scan at a glance.',
+  id: 'badge', title: 'Badge', desc: 'A small filled status pill. The semantic tones map directly to council verdicts so support, conditional and opposition counts scan at a glance. Add <code>dot</code> for a leading status dot, or <code>.sl-badge--square</code> for a soft rectangular chip instead of the pill radius.',
   demo: `<span class="sl-badge">Neutral</span>
     <span class="sl-badge sl-badge--accent">Accent</span>
     <span class="sl-badge sl-badge--positive">For 3</span>
@@ -922,7 +922,7 @@ const cStatusDot = () => componentPage({
 });
 
 const cAvatar = () => componentPage({
-  id: 'avatar', title: 'Avatar', desc: 'A persona avatar — a generated portrait when available, otherwise tinted initials. Group them to show a council at a glance.',
+  id: 'avatar', title: 'Avatar', desc: 'A persona avatar — a generated portrait when available, otherwise tinted initials. Tones <code>sm/md/lg</code>, or pass a pixel <code>size</code> and a custom <code>color</code> (a per-entity hashed background). Group them to show a council at a glance.',
   demo: `<div style="display:flex;flex-direction:column;gap:18px;align-items:flex-start">
       <div style="display:flex;gap:10px;align-items:center">
         <span class="sl-avatar">LV</span>
@@ -1677,6 +1677,21 @@ const cFilterBar = () => componentPage({
   python: `# Same .sl-filter-bar / .sl-filter-chip + .sl-menu-item contract from the SSR app.`,
 });
 
+const cImageLightbox = () => componentPage({
+  id: 'image-lightbox', title: 'Image Lightbox',
+  desc: 'A full-bleed image zoom — a backdrop-blurred overlay that fills the viewport with one image, dismissed by click or Esc, with an optional caption. Distinct from <a href="#/modal">Modal</a>: no panel chrome, it’s about the image (a persona portrait, a screenshot, an artifact).',
+  demo: `<div style="position:relative;width:100%;max-width:560px;height:300px;display:flex;align-items:center;justify-content:center;border:1px solid var(--sl-line);border-radius:var(--sl-radius);overflow:hidden;background:color-mix(in srgb,#0a0c10 80%,transparent)">
+    <figure class="sl-lightbox__fig">
+      <div class="sl-lightbox__img" style="width:200px;height:140px;background:linear-gradient(135deg,var(--sl-accent),var(--sl-violet))"></div>
+      <figcaption class="sl-lightbox__cap">Maya Chen · Esc or click to close</figcaption>
+    </figure>
+    <button class="sl-lightbox__x">Esc</button>
+  </div>`,
+  react: `import { ImageLightbox } from 'sonaloop-design/components';\nimport { useState } from 'react';\n\nconst [zoom, setZoom] = useState(false);\n<img src={src} onClick={() => setZoom(true)} />\n{zoom && <ImageLightbox src={src} alt={name} caption={name + ' · Esc or click to close'} onClose={() => setZoom(false)} />}`,
+  markup: `<div class="sl-lightbox" role="dialog" aria-modal="true">\n  <figure class="sl-lightbox__fig">\n    <img class="sl-lightbox__img" src="…" alt="…">\n    <figcaption class="sl-lightbox__cap">…</figcaption>\n  </figure>\n  <button class="sl-lightbox__x">Esc</button>\n</div>`,
+  python: `# Same .sl-lightbox class contract from the SSR app.`,
+});
+
 const NAV = [
   { label: 'Foundations', items: [
     { id: 'introduction', title: 'Introduction', ico: 'overview', render: pageIntroduction },
@@ -1742,6 +1757,7 @@ const NAV = [
     { id: 'command-palette', title: 'Command Palette ⌘K', ico: 'search', render: cCommandPalette },
     { id: 'drawer', title: 'Drawer · Slide-over', ico: 'panel', render: cDrawer },
     { id: 'modal', title: 'Modal · Dialog', ico: 'square', render: cModal },
+    { id: 'image-lightbox', title: 'Image Lightbox', ico: 'panel', render: cImageLightbox },
     { id: 'popover', title: 'Popover · Menu', ico: 'squareSplit', render: cPopover },
     { id: 'detail-layout', title: 'Detail Layout', ico: 'squareRows', render: cDetailLayout },
     { id: 'filter-bar', title: 'Filter Bar', ico: 'half', render: cFilterBar },

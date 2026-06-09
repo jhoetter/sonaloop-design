@@ -61,6 +61,7 @@
 .sl-badge--warning { background: color-mix(in srgb, var(--sl-amber) 16%, transparent); color: var(--sl-amber); }
 .sl-badge--negative { background: color-mix(in srgb, var(--sl-red) 14%, transparent); color: var(--sl-red); }
 .sl-badge__dot { width: .5em; height: .5em; border-radius: var(--sl-radius-full); background: currentColor; flex-shrink: 0; opacity: .85; }
+.sl-badge--square { border-radius: var(--sl-radius-sm); }   /* a soft rectangular chip rather than a pill */
 .sl-pill { display: inline-flex; align-items: center; gap: .45em; padding: .2em .8em;
   border: 1px solid var(--sl-line); border-radius: var(--sl-radius-full); font-size: .9em; color: var(--sl-ink);
   background: var(--sl-surface); }
@@ -649,6 +650,19 @@ button.sl-navhead:hover { color: var(--sl-muted); }
 .sl-modal__body { padding: 10px 16px 16px; overflow-y: auto; color: var(--sl-muted); }
 .sl-modal__foot { flex-shrink: 0; padding: 12px 16px; border-top: 1px solid var(--sl-line);
   display: flex; justify-content: flex-end; gap: 8px; }
+
+/* Image lightbox — a full-bleed zoom view (distinct from Modal's chrome'd dialog). */
+.sl-lightbox { position: fixed; inset: 0; z-index: 130; display: flex; align-items: center; justify-content: center;
+  padding: 24px; background: color-mix(in srgb, #0a0c10 80%, transparent); backdrop-filter: blur(4px);
+  animation: sl-fade-in .2s var(--sl-ease); }
+.sl-lightbox__fig { display: flex; flex-direction: column; align-items: center; gap: 12px; max-height: 100%; margin: 0; }
+.sl-lightbox__img { max-width: 86vw; max-height: 82vh; object-fit: contain;
+  border-radius: var(--sl-radius-lg); box-shadow: var(--sl-shadow-lg); }
+.sl-lightbox__cap { font-family: var(--sl-mono); font-size: .8em; color: rgba(255, 255, 255, .72); }
+.sl-lightbox__x { position: absolute; top: 18px; right: 18px; padding: .25em .6em; font-family: var(--sl-mono);
+  font-size: .8em; color: rgba(255, 255, 255, .8); background: none; border: 1px solid rgba(255, 255, 255, .2);
+  border-radius: var(--sl-radius-sm); cursor: pointer; }
+.sl-lightbox__x:hover { background: rgba(255, 255, 255, .1); }
 
 /* Popover (anchored) + the menu rows it usually holds */
 .sl-popover-wrap { position: relative; display: inline-flex; }
