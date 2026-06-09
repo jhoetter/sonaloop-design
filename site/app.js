@@ -1414,6 +1414,61 @@ const cEntity = () => componentPage({
 });
 
 /* ── nav model ─────────────────────────────────────────────────────────────────── */
+// ── Patterns: compositions built FROM the components (not atomic). ──────────────────
+const _navIco = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/></svg>`;
+const cAppShell = () => componentPage({
+  id: 'app-shell', title: 'App Shell',
+  desc: 'The product chrome as ONE composition — a collapsible + drag-resizable sidebar (brand · nav sections with an accent active-bar + icon hover · a bottom user-menu), a resize handle, and a topbar (sidebar toggle · breadcrumb · actions). The sidebar, collapse state, resize and user-menu are tightly coupled (the handle writes <code>--sl-sidebar-w</code>; collapse is shared), so it ships as a single shell rather than loose Sidebar/Header parts. Same source on both stacks: the React <code>&lt;AppShell&gt;</code> and the Python-SSR <code>_layout</code> emit these <code>.sl-app-shell</code> classes; behaviour is <code>_shell.SHELL_JS</code> (vendored). Pair with the <a href="#/command-menu">Command Menu</a> for ⌘K.',
+  demo: `<div style="height:380px;border:1px solid var(--sl-line);border-radius:var(--sl-radius);overflow:hidden;font-size:13px">
+    <div class="sl-app-shell" style="height:100%;--sl-sidebar-w:208px">
+      <aside class="sl-sidebar">
+        <div class="sl-brand"><span style="font-weight:600">sonaloop</span></div>
+        <div class="sl-sb-scroll">
+          <div class="sl-navhead">Workspace</div>
+          <nav class="sl-nav">
+            <a class="is-active" href="#/app-shell">${_navIco}<span>Projects</span><span class="sl-nav-meta">3</span></a>
+            <a href="#/app-shell">${_navIco}<span>Personas</span></a>
+            <a href="#/app-shell">${_navIco}<span>Documentation</span></a>
+          </nav>
+          <div class="sl-navhead">Library</div>
+          <nav class="sl-nav">
+            <a href="#/app-shell">${_navIco}<span>Councils</span></a>
+            <a href="#/app-shell">${_navIco}<span>Reports</span></a>
+          </nav>
+        </div>
+        <div class="sl-usermenu"><button class="sl-um-trigger" type="button"><span class="sl-um-ava">${_navIco}</span><span class="sl-um-name">Settings</span><span class="sl-um-caret"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="m6 9 6 6 6-6"/></svg></span></button></div>
+      </aside>
+      <div class="sl-resize"></div>
+      <div class="sl-main">
+        <header class="sl-topbar"><button class="sl-iconbtn" type="button" data-sidebar-toggle><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg></button><nav class="sl-breadcrumb"><span class="sl-breadcrumb__current">Projects</span></nav><span class="sl-spacer"></span></header>
+        <div class="sl-shell-body" style="padding:22px"><p style="margin:0 0 6px;font-weight:600">Projects</p><p style="margin:0;color:var(--sl-muted)">Resize the sidebar from its right edge, or collapse it with <span class="sl-kbd">[</span>.</p></div>
+      </div>
+    </div>
+  </div>`,
+  react: `import { AppShell } from 'sonaloop-design/components';\nimport { ProjectsIcon, PersonasIcon, SettingsIcon } from 'sonaloop-design';\nimport { Logo, ThemeToggle, Breadcrumb } from 'sonaloop-design/components';\n\n<AppShell\n  brand={<Logo size=\"sm\" />}\n  nav={[{ label: 'Workspace', items: [\n    { label: 'Projects', icon: <ProjectsIcon size={16} animate />, active: true, meta: 3, onSelect: goProjects },\n    { label: 'Personas', icon: <PersonasIcon size={16} animate />, onSelect: goPersonas },\n  ] }]}\n  userMenu={{ label: 'Settings', icon: <SettingsIcon size={18} animate />,\n    children: <ThemeToggle value={theme} onChange={setTheme} /> }}\n  topbar={<><Breadcrumb items={[{ label: 'Projects' }]} /><span className=\"sl-spacer\" /></>}\n>\n  {/* main content */}\n</AppShell>`,
+  markup: `<div class="sl-app-shell">\n  <aside class="sl-sidebar">\n    <div class="sl-brand">…logo…</div>\n    <div class="sl-sb-scroll">\n      <div class="sl-navhead">Workspace</div>\n      <nav class="sl-nav"><a class="is-active">…</a><a>…</a></nav>\n    </div>\n    <div class="sl-usermenu">…</div>\n  </aside>\n  <div class="sl-resize"></div>\n  <div class="sl-main">\n    <header class="sl-topbar"><button class="sl-iconbtn" data-sidebar-toggle>…</button>…crumbs…</header>\n    …body…\n  </div>\n</div>`,
+  python: `# web/_components.py:_layout emits the same .sl-app-shell markup;\n# resize / collapse / user-menu behaviour is _shell.SHELL_JS (vendored from sonaloop-design).\nh("div", {"class_": "sl-app-shell"},\n  h("aside", {"class_": "sl-sidebar"}, brand, nav, user_menu),\n  h("div", {"class_": "sl-resize"}),\n  h("div", {"class_": "sl-main"}, topbar, body)) + SHELL_JS`,
+});
+
+const cCommandMenu = () => componentPage({
+  id: 'command-menu', title: 'Command Menu ⌘K',
+  desc: 'The shared ⌘K palette for app shells — grouped results, a per-item icon + optional subtitle, full keyboard nav (↑↓ · ↵ · esc) with hover-sync, and a footer hint bar. Self-contained over the same <code>.sl-cmdk</code> classes the docs site runs; prop-driven with client-side filtering (title · subtitle · keywords). The host owns open state; <code>hotkey</code> (default on) binds ⌘K. The marketing site\'s <a href="#/web-command-palette">Command Palette</a> is the website-flavoured sibling (router links + async search).',
+  demo: `<div class="sl-cmdk-panel sl-cmdk-panel--inline" style="max-width:520px;margin:0 auto;max-height:none">
+    <div class="sl-cmdk-head"><svg class="sl-cmdk-head-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input class="sl-cmdk-input" placeholder="Search projects and tickets…" readonly></div>
+    <div class="sl-cmdk-list">
+      <div class="sl-cmdk-sec">Projects</div>
+      <button class="sl-cmdk-item is-active" type="button"><span class="sl-cmdk-title">sonaloop</span><span class="sl-cmdk-sub">MCP server core</span></button>
+      <button class="sl-cmdk-item" type="button"><span class="sl-cmdk-title">sonaloop-cloud</span><span class="sl-cmdk-sub">SaaS control-plane</span></button>
+      <div class="sl-cmdk-sec">Tickets</div>
+      <button class="sl-cmdk-item" type="button"><span class="sl-cmdk-title">Publish on PyPI</span><span class="sl-cmdk-sub">sonaloop</span></button>
+    </div>
+    <div class="sl-cmdk-foot"><span><span class="sl-kbd">↑↓</span> navigate</span><span><span class="sl-kbd">↵</span> open</span><span><span class="sl-kbd">esc</span> close</span></div>
+  </div>`,
+  react: `import { CommandMenu, CommandMenuTrigger, type CommandMenuGroup } from 'sonaloop-design/components';\nimport { useState } from 'react';\n\nconst groups: CommandMenuGroup[] = [\n  { key: 'projects', label: 'Projects', items: [\n    { title: 'sonaloop', subtitle: 'MCP server core', onSelect: () => open('sonaloop') },\n  ] },\n  { key: 'tickets', label: 'Tickets', items: [\n    { title: 'Publish on PyPI', subtitle: 'sonaloop', keywords: 'publish-on-pypi', onSelect: () => open(t) },\n  ] },\n];\n\nfunction App() {\n  const [open, setOpen] = useState(false);\n  return (<>\n    <CommandMenuTrigger onClick={() => setOpen(true)} label=\"Search\" />\n    <CommandMenu open={open} onOpenChange={setOpen} groups={groups} placeholder=\"Search…\" />\n  </>);\n}`,
+  markup: `<div class="sl-cmdk"><div class="sl-cmdk-backdrop"></div>\n  <div class="sl-cmdk-panel">\n    <div class="sl-cmdk-head">…search glyph… <input class="sl-cmdk-input"></div>\n    <div class="sl-cmdk-list">\n      <div class="sl-cmdk-sec">Projects</div>\n      <button class="sl-cmdk-item is-active"><span class="sl-cmdk-title">…</span><span class="sl-cmdk-sub">…</span></button>\n    </div>\n    <div class="sl-cmdk-foot">…hints…</div>\n  </div>\n</div>`,
+  python: `# The inspector ships its own ⌘K (web/_palette.py) over the same .sl-cmdk classes.`,
+});
+
 const NAV = [
   { label: 'Foundations', items: [
     { id: 'introduction', title: 'Introduction', ico: 'overview', render: pageIntroduction },
@@ -1471,6 +1526,10 @@ const NAV = [
     { id: 'chart-heatmap', title: 'Heatmap · Matrix', ico: 'squareGrid', render: cChartHeatmap },
     { id: 'chart-dot-plot', title: 'Dot · Range', ico: 'wave', render: cChartDotPlot },
     { id: 'chart-line', title: 'Line · Trend', ico: 'analytics', render: cChartLine },
+  ] },
+  { label: 'Patterns', items: [
+    { id: 'app-shell', title: 'App Shell', ico: 'panel', render: cAppShell },
+    { id: 'command-menu', title: 'Command Menu ⌘K', ico: 'search', render: cCommandMenu },
   ] },
   { label: 'Website', items: [
     { id: 'web-navbar', title: 'Navbar', ico: 'panel', render: () => websitePage({
