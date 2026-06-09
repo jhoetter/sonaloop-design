@@ -11,6 +11,9 @@ import {
   SonaloopHifi,
   SonaloopCloudHifi,
   SonaloopResearchHifi,
+  SonaloopDataHifi,
+  SonaloopWebsiteHifi,
+  SonaloopDesignHifi,
   CouncilsHifi,
   PersonasHifi,
   MemoryHifi,
@@ -31,12 +34,44 @@ import {
   DesignThinkingHmwHifi,
   ContinuousDiscoveryHifi,
   PressureTestHifi,
+  // newer feature + chrome vocabulary
+  SoulHifi,
+  SentimentHifi,
+  QuoteHifi,
+  ChatHifi,
+  MicHifi,
+  SparklesHifi,
+  NetworkHifi,
+  AvatarHifi,
+  CalendarHifi,
+  ActivityHifi,
+  InboxHifi,
+  PackageHifi,
+  VerifiedHifi,
+  ShieldHifi,
+  ShieldCheckHifi,
+  LockHifi,
+  KeyHifi,
+  GlobeHifi,
+  TerminalHifi,
+  CommandHifi,
+  DatabaseHifi,
+  CreditCardHifi,
+  MailHifi,
+  BellHifi,
+  BookHifi,
+  RocketHifi,
+  TrendHifi,
+  PieChartHifi,
 } from './index';
 
 export type IconKey =
   | 'open-core'
   | 'cloud'
   | 'research'
+  | 'data'
+  | 'website'
+  | 'design'
   | 'councils'
   | 'personas'
   | 'memory'
@@ -56,7 +91,35 @@ export type IconKey =
   | 'positioning'
   | 'design-thinking-hmw'
   | 'continuous-discovery'
-  | 'pressure-test';
+  | 'pressure-test'
+  | 'soul'
+  | 'sentiment'
+  | 'quote'
+  | 'chat'
+  | 'mic'
+  | 'sparkles'
+  | 'network'
+  | 'avatar'
+  | 'calendar'
+  | 'activity'
+  | 'inbox'
+  | 'package'
+  | 'verified'
+  | 'shield'
+  | 'shield-check'
+  | 'lock'
+  | 'key'
+  | 'globe'
+  | 'terminal'
+  | 'command'
+  | 'database'
+  | 'credit-card'
+  | 'mail'
+  | 'bell'
+  | 'book'
+  | 'rocket'
+  | 'trend'
+  | 'pie-chart';
 
 type HifiComponent = ComponentType<{ size?: number | string; className?: string; animate?: boolean }>;
 
@@ -64,6 +127,9 @@ const MAP: Record<IconKey, HifiComponent> = {
   'open-core': SonaloopHifi,
   cloud: SonaloopCloudHifi,
   research: SonaloopResearchHifi,
+  data: SonaloopDataHifi,
+  website: SonaloopWebsiteHifi,
+  design: SonaloopDesignHifi,
   councils: CouncilsHifi,
   personas: PersonasHifi,
   memory: MemoryHifi,
@@ -84,6 +150,34 @@ const MAP: Record<IconKey, HifiComponent> = {
   'design-thinking-hmw': DesignThinkingHmwHifi,
   'continuous-discovery': ContinuousDiscoveryHifi,
   'pressure-test': PressureTestHifi,
+  soul: SoulHifi,
+  sentiment: SentimentHifi,
+  quote: QuoteHifi,
+  chat: ChatHifi,
+  mic: MicHifi,
+  sparkles: SparklesHifi,
+  network: NetworkHifi,
+  avatar: AvatarHifi,
+  calendar: CalendarHifi,
+  activity: ActivityHifi,
+  inbox: InboxHifi,
+  package: PackageHifi,
+  verified: VerifiedHifi,
+  shield: ShieldHifi,
+  'shield-check': ShieldCheckHifi,
+  lock: LockHifi,
+  key: KeyHifi,
+  globe: GlobeHifi,
+  terminal: TerminalHifi,
+  command: CommandHifi,
+  database: DatabaseHifi,
+  'credit-card': CreditCardHifi,
+  mail: MailHifi,
+  bell: BellHifi,
+  book: BookHifi,
+  rocket: RocketHifi,
+  trend: TrendHifi,
+  'pie-chart': PieChartHifi,
 };
 
 export type IconProps = { name: IconKey; size?: number; className?: string; animate?: boolean };
