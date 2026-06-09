@@ -41,6 +41,24 @@ on each stack's own markup — no shared component code:
 The website imports `sonaloop-design/components.css`; the app vendors it (via `make icons`)
 and prepends it. cloud / research inherit it automatically (they extend the core app's web).
 
+### Who consumes the design system
+
+The same `.sl-*` layer + tokens dress **two rendering worlds** — that split is why everything
+ships "both ways" (a `.sl-*` class contract *and* a typed React wrapper):
+
+| Consumer | Stack | How it uses this |
+| --- | --- | --- |
+| **sonaloop** (core) | Python-SSR | vendors the `.sl-*` CSS (`make icons`) and emits the classes |
+| **sonaloop-cloud / -research** | Python | **inherit** the core app's web — they ride on it, not separate |
+| **sonaloop-data** | Python + a small React `ui/` | both |
+| **sonaloop-website** | React (Vite + Tailwind) | imports the React wrappers via a Vite alias to `../sonaloop-design` |
+| **sonaloop-tracker** | React (Vite + Tailwind) | same — the React wrappers + the `.sl-*` CSS |
+
+So the family is bigger than "core + the ones that inherit it": there's a **React wing**
+(website, tracker, data's `ui/`) that consumes the typed wrappers, and a **Python-SSR wing**
+(core, cloud, research, data) that consumes the same classes. Neither shares component *code* —
+only the one CSS layer and the tokens, so they can't drift.
+
 **React primitives** (`sonaloop-design/components`) are thin typed wrappers that emit those
 same `.sl-*` classes, so React apps get an ergonomic API over one styling source:
 
