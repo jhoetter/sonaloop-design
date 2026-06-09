@@ -1692,6 +1692,23 @@ const cImageLightbox = () => componentPage({
   python: `# Same .sl-lightbox class contract from the SSR app.`,
 });
 
+const cCalendar = () => componentPage({
+  id: 'calendar', title: 'Calendar',
+  desc: 'The dense persona-activity calendar — three views over the same data: a <b>week</b> agenda (7 columns), a <b>month</b> grid, and a <b>year</b> heatmap (an indigo activity ramp). Event chips carry a type-coloured left rule; the view switch is a <a href="#/segmented">.sl-tabs--pill</a>. The host builds the grid per language (Python SSR · React); these <code>.sl-cal-*</code> / <code>.sl-cm-*</code> / <code>.sl-cw-*</code> / <code>.sl-cy-*</code> classes style it identically.',
+  demo: `<div style="width:100%;max-width:560px">
+    <div class="sl-cal-nav"><div class="sl-cal-nav-l"><span class="sl-cal-arrow">‹</span><span class="sl-cal-arrow">›</span><span class="sl-cal-title">June 2026</span></div></div>
+    <div class="sl-cal-month" style="grid-template-rows:auto repeat(2,1fr)">
+      ${['MO','DI','MI','DO','FR','SA','SO'].map((d,i)=>`<div class="sl-cm-wd${i>4?' we':''}">${d}</div>`).join('')}
+      ${[2,3,4,5,6,7,8].map((n,i)=>`<div class="sl-cm-cell${i>4?' we':''}"><span class="sl-cm-num${n===8?' today':''}">${n}</span>${n%3===0?'<span class="sl-cev focus"><span class="sl-cev-t">08:10</span>Focus</span><span class="sl-cev admin"><span class="sl-cev-t">11:30</span>Report</span>':''}</div>`).join('')}
+      ${[9,10,11,12,13,14,15].map((n,i)=>`<div class="sl-cm-cell${i>4?' we':''}"><span class="sl-cm-num">${n}</span>${n%4===0?'<span class="sl-cev meeting"><span class="sl-cev-t">09:00</span>Sync</span>':''}</div>`).join('')}
+    </div>
+    <div class="sl-cy-legend">less <span class="sl-cy-swatch l0"></span><span class="sl-cy-swatch l1"></span><span class="sl-cy-swatch l2"></span><span class="sl-cy-swatch l3"></span><span class="sl-cy-swatch l4"></span> more</div>
+  </div>`,
+  react: `// data/ui builds the grid in React; the SSR app (web/pages/_calendar.py) builds it in Python.\n// Both emit the same classes:\n<div class="sl-cal-month">\n  <div class="sl-cm-wd">MO</div>…\n  <div class="sl-cm-cell">\n    <span class="sl-cm-num today">8</span>\n    <span class="sl-cev focus"><span class="sl-cev-t">08:10</span> Focus</span>\n  </div>\n</div>`,
+  markup: `<!-- month -->\n<div class="sl-cal-month">…<div class="sl-cm-cell"><span class="sl-cm-num">8</span>…</div></div>\n<!-- week -->\n<div class="sl-cal-week"><div class="sl-cw-col">…</div></div>\n<!-- year heatmap -->\n<div class="sl-cy-grid"><a class="sl-cy-cell l3"></a>…</div>`,
+  python: `# _calendar.py renders the week/month/year markup over the same .sl-cal-* classes.`,
+});
+
 const cListPage = () => componentPage({
   id: 'list-page', title: 'List Page',
   desc: 'The index-page scaffold every list shares (projects · personas · councils · tickets): a header with a title + a muted <b>count</b> + an optional lead and trailing actions (a search box, a “New” button), then a list of <b>dense hairline rows</b> (each a leading slot · title · trailing metadata). Flatter than the bordered <a href="#/entity">Entity</a> — this is the Linear list, not a card grid.',
@@ -1783,6 +1800,7 @@ const NAV = [
     { id: 'popover', title: 'Popover · Menu', ico: 'squareSplit', render: cPopover },
     { id: 'detail-layout', title: 'Detail Layout', ico: 'squareRows', render: cDetailLayout },
     { id: 'list-page', title: 'List Page', ico: 'squareRows', render: cListPage },
+    { id: 'calendar', title: 'Calendar', ico: 'clock', render: cCalendar },
     { id: 'filter-bar', title: 'Filter Bar', ico: 'half', render: cFilterBar },
     { id: 'entity', title: 'Entity', ico: 'projects', render: cEntity },
     { id: 'field', title: 'Field · Fieldset', ico: 'settings', render: cField },
