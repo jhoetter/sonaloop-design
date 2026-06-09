@@ -1651,7 +1651,7 @@ function renderPage() {
     const sec = NAV.find((g) => g.items.some((it) => it.id === id))?.label || '';
     crumb.innerHTML = `<span class="sl-breadcrumb__link">${esc(sec)}</span><span class="sl-breadcrumb__sep" aria-hidden="true"></span><span class="sl-breadcrumb__current">${esc(item.title)}</span>`;
   }
-  document.title = `${item.title} · Sonaloop Design`;
+  document.title = `Design | sonaloop · ${item.title}`;
   main.scrollTo?.(0, 0);
   window.scrollTo(0, 0);
   wirePage(main);
