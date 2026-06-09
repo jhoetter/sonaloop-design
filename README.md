@@ -57,7 +57,8 @@ Available: `Button` (variant `default|primary|accent|ghost`, size `sm|md|lg`), `
 `Divider`, plus the **overlays** `Drawer` (slide-over), `Modal` and `Popover`/`MenuItem`
 (one ESC-close · scroll-lock · focus-restore engine), and the **detail-page composites**
 `Tabs` (underline · pill), `PropertyList`/`Property`, `PageHeader`, and `DetailLayout` +
-`PageRail` (scrollspy minimap). Charts add `Sparkline` (`sonaloop-design/charts`).
+`PageRail` (scrollspy minimap), and the `.sl-prose` layer for rendered Markdown /
+long-form content. Charts add `Sparkline` (`sonaloop-design/charts`).
 **Page-level compositions** (Footer, Hero, …) stay in each app and are built FROM these
 primitives + tokens — the design system shares primitives, not whole pages.
 

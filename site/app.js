@@ -1618,6 +1618,25 @@ const cChartSparkline = () => componentPage({
   python: `# charts.py renders the same .sl-spark SVG.`,
 });
 
+const cProse = () => componentPage({
+  id: 'prose', title: 'Prose',
+  desc: 'The one reading surface for rendered Markdown / long-form content — council findings, syntheses, SOUL docs, report bodies. Apply <code>.sl-prose</code> to the wrapper around the rendered HTML; headings, lists, links, inline <code>code</code>, fenced blocks, blockquotes and tables (via the shared <a href="#/table">Table</a>) are all token-driven, so the same content reads identically across the Python-SSR app and the React surfaces. Em-based — set the container’s <code>font-size</code> to scale the whole block; <code>.sl-prose--sm</code> is the denser inline/aside variant.',
+  demo: `<div class="sl-prose" style="max-width:520px">
+    <p>The panel converged on <strong>usage-based pricing</strong> with a per-seat floor — three of four voices supported the shift, <em>conditional</em> on a grandfather clause.</p>
+    <h3>Key findings</h3>
+    <ul><li>Pricing must stay legible to a non-technical buyer.</li><li>Migration needs a <code>grandfather</code> path for existing seats.</li></ul>
+    <blockquote>“I’d sign tomorrow if my current plan were protected.” — Maya, Head of Product</blockquote>
+  </div>`,
+  variants: { cols: ['Class', 'Variant', 'Use'], rows: [
+    ['.sl-prose', 'Default', 'Report / synthesis / finding bodies.'],
+    ['.sl-prose--sm', 'Dense', 'Inline/aside prose — a card body, a drawer.'],
+    ['.sl-prose .sl-table', 'Tables', 'GFM tables render through the shared Table.'],
+  ] },
+  react: `import 'sonaloop-design/components.css';\n\n// render trusted Markdown (e.g. with 'marked') into the prose surface:\n<div className=\"sl-prose\" dangerouslySetInnerHTML={{ __html: marked.parse(source) }} />`,
+  markup: `<div class="sl-prose">\n  <p>Body copy with <strong>bold</strong>, <a href="#">links</a> and <code>code</code>.</p>\n  <h3>Subheading</h3>\n  <ul><li>List item</li></ul>\n  <blockquote>A quoted voice.</blockquote>\n</div>`,
+  python: `# The app renders Markdown into the same .sl-prose wrapper (web _md helper).`,
+});
+
 const NAV = [
   { label: 'Foundations', items: [
     { id: 'introduction', title: 'Introduction', ico: 'overview', render: pageIntroduction },
@@ -1652,6 +1671,7 @@ const NAV = [
     { id: 'table', title: 'Table', ico: 'squareRows', render: cTable },
     { id: 'breadcrumb', title: 'Breadcrumb', ico: 'caretRight', render: cBreadcrumb },
     { id: 'snippet', title: 'Snippet · Code', ico: 'jtbd', render: cSnippet },
+    { id: 'prose', title: 'Prose', ico: 'report', render: cProse },
     { id: 'eyebrow', title: 'Eyebrow', ico: 'wave', render: cEyebrow },
     { id: 'input', title: 'Input', ico: 'search', render: cInput },
     { id: 'textarea', title: 'Textarea', ico: 'pencil', render: cTextarea },
