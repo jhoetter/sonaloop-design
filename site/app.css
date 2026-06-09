@@ -38,88 +38,22 @@ a { color: inherit; }
 }
 .ds-skip:focus { transform: none; }
 
-/* ── Top bar ──────────────────────────────────────────────────────────────────── */
-.ds-topbar {
-  position: fixed; top: 0; left: 0; right: 0; height: var(--ds-topbar-h); z-index: 100;
-  display: flex; align-items: center; gap: 18px; padding: 0 20px;
-  background: color-mix(in srgb, var(--sl-bg) 82%, transparent);
-  backdrop-filter: saturate(1.4) blur(12px);
-  -webkit-backdrop-filter: saturate(1.4) blur(12px);
-  border-bottom: 1px solid var(--sl-line);
-}
-/* The docs header dogfoods the shared .sl-logo lockup; this only sets header-specific
-   scale + the muted "Design" suffix on the wordmark. */
-.ds-brand { font-size: 15px; min-width: calc(var(--ds-sidebar-w) - 20px); }
-.ds-brand .ds-brand-sub { color: var(--sl-muted); margin-left: .5em; }
+/* ── App shell ── the docs site dogfoods the shared .sl-app-shell layout (components.css):
+   a full-height sidebar (brand · search · collapsible nav · settings menu) + a topbar over
+   the content. Only the docs-specific touches live here. */
+.sl-app-shell { --sl-sidebar-w: 264px; }
+.ds-brand-sub { color: var(--sl-muted); margin-left: .4em; }
+.sl-sb-search .sl-cmdk-trigger { font-size: 13px; }
+/* the docs nav has many sections — use the shared collapsible .sl-nav-group, denser rows */
+.sl-sb-scroll .sl-nav a { font-size: 13.5px; }
+/* settings popover: full-width theme segmented + the source link */
+.sl-um-pop .sl-segmented { width: 100%; }
+.sl-um-pop .sl-segmented__item svg { width: 16px; height: 16px; }
+.ds-um-link { color: var(--sl-muted); font-size: 13px; text-decoration: none; }
+.ds-um-link:hover { color: var(--sl-accent); }
 
-.ds-search {
-  display: flex; align-items: center; gap: 9px; height: 34px; padding: 0 10px 0 11px;
-  min-width: 280px; border-radius: 9px; cursor: text;
-  border: 1px solid var(--sl-line); background: var(--sl-surface); color: var(--sl-muted);
-  font: inherit; font-size: 13px; transition: border-color .12s, background .12s;
-}
-.ds-search:hover { border-color: color-mix(in srgb, var(--sl-ink) 22%, var(--sl-line)); }
-.ds-search-ico { width: 15px; height: 15px; flex: none; }
-.ds-search span { flex: 1; text-align: left; }
-.ds-search .sl-kbd { font-size: 11px; }
-
-.ds-top-spacer { flex: 1; }
-
-.ds-seg { display: inline-flex; padding: 2px; gap: 2px; border-radius: 9px; border: 1px solid var(--sl-line); background: var(--sl-surface); }
-.ds-seg-btn {
-  display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 26px;
-  border: 0; border-radius: 7px; background: transparent; color: var(--sl-faint); cursor: pointer;
-  transition: background .12s, color .12s;
-}
-.ds-seg-btn svg { width: 16px; height: 16px; }
-.ds-seg-btn:hover { color: var(--sl-ink); }
-.ds-seg-btn.is-active { background: var(--sl-bg); color: var(--sl-ink); box-shadow: var(--sl-shadow-sm, 0 1px 2px rgba(0,0,0,.06)); }
-/* The top-bar theme toggle is the real .sl-segmented contract; size its (svgReg) icons. */
-.ds-topbar .sl-segmented__item { padding: .34em .6em; }
-.ds-topbar .sl-segmented__item svg { width: 16px; height: 16px; }
-
-/* ── Shell: sidebar + main ────────────────────────────────────────────────────── */
-.ds-shell { display: flex; padding-top: var(--ds-topbar-h); }
-
-.ds-sidebar {
-  position: fixed; top: var(--ds-topbar-h); bottom: 0; left: 0; width: var(--ds-sidebar-w);
-  overflow-y: auto; padding: 22px 14px 60px; border-right: 1px solid var(--sl-line);
-  background: var(--sl-bg);
-}
-.ds-nav-group + .ds-nav-group { margin-top: 14px; }
-.ds-nav-label {
-  display: flex; align-items: center; gap: 6px; width: 100%;
-  font-family: var(--sl-mono); font-size: 11px; font-weight: 500; text-transform: uppercase;
-  letter-spacing: .12em; color: var(--sl-faint); padding: 6px 10px; margin: 0 0 4px;
-  background: none; border: 0; cursor: pointer; text-align: left;
-  border-radius: 7px; transition: color .1s, background .1s;
-}
-.ds-nav-label > span { flex: 1; min-width: 0; }
-.ds-nav-label:hover { color: var(--sl-muted); background: var(--sl-hover); }
-.ds-nav-chevron {
-  width: 13px; height: 13px; flex: none; opacity: .7;
-  transition: transform .15s ease;
-}
-.ds-nav-group.is-collapsed .ds-nav-chevron { transform: rotate(-90deg); }
-.ds-nav-items {
-  display: grid; grid-template-rows: 1fr;
-  transition: grid-template-rows .18s ease;
-}
-.ds-nav-items-inner { min-height: 0; overflow: hidden; }
-.ds-nav-group.is-collapsed .ds-nav-items { grid-template-rows: 0fr; }
-.ds-nav-item {
-  display: flex; align-items: center; padding: 6px 10px; border-radius: 7px;
-  font-size: 13.5px; color: var(--sl-muted); text-decoration: none; cursor: pointer;
-  transition: background .1s, color .1s;
-}
-.ds-nav-item:hover { background: var(--sl-hover); color: var(--sl-ink); }
-.ds-nav-item.is-active { background: var(--sl-sel); color: var(--sl-ink); font-weight: 550; }
-
-.ds-main {
-  flex: 1; min-width: 0; margin-left: var(--ds-sidebar-w);
-  padding: var(--ds-pad) var(--ds-pad) 96px;
-  outline: none;
-}
+/* content area inside the shell */
+.sl-shell-body { padding: var(--ds-pad) var(--ds-pad) 96px; }
 .ds-page { max-width: var(--ds-content-max); margin: 0 auto; }
 
 /* ── Page header / prose ──────────────────────────────────────────────────────── */
@@ -433,12 +367,9 @@ a.ds-usechip:hover code { color: var(--sl-accent); border-color: color-mix(in sr
 .ds-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 18px; }
 .ds-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: 18px; }
 @media (max-width: 980px) {
-  :root { --ds-sidebar-w: 0px; }
-  .ds-sidebar { display: none; }
-  .ds-brand { min-width: 0; }
-  .ds-main { margin-left: 0; padding: 24px 18px 80px; }
-  .ds-search { min-width: 0; }
-  .ds-search span { display: none; }
+  /* The .sl-app-shell sidebar collapses to a slide-in overlay below 760px (components.css);
+     here we only tighten the content padding and collapse the docs' own content grids. */
+  .sl-shell-body { padding: 24px 18px 80px; }
   .ds-grid-2, .ds-grid-3, .ds-brand-clear { grid-template-columns: 1fr; }
 }
 

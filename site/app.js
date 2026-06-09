@@ -1593,29 +1593,26 @@ function renderSidebar() {
       ? [...g.items].sort((a, b) => a.title.localeCompare(b.title))
       : g.items;
     return `
-    <section class="ds-nav-group is-collapsed" data-group="${esc(g.label)}">
-      <button type="button" class="ds-nav-label" data-nav-toggle="${esc(g.label)}" aria-expanded="false">
+    <div class="sl-nav-group is-collapsed" data-group="${esc(g.label)}">
+      <button type="button" class="sl-navhead" data-nav-toggle="${esc(g.label)}" aria-expanded="false">
         <span>${esc(g.label)}</span>
-        ${svgReg('chevron', 'ds-nav-chevron')}
+        <span class="sl-navhead__caret">${svgReg('chevron')}</span>
       </button>
-      <div class="ds-nav-items">
-        <div class="ds-nav-items-inner">
-          ${items.map((it) => `
-          <a class="ds-nav-item" href="#/${it.id}" data-nav="${it.id}">${esc(it.title)}</a>`).join('')}
-        </div>
-      </div>
-    </section>`;
+      <nav class="sl-nav">
+        ${items.map((it) => `<a href="#/${it.id}" data-nav="${it.id}">${esc(it.title)}</a>`).join('')}
+      </nav>
+    </div>`;
   }).join('');
 }
 
 function setGroupCollapsed(sec, collapsed) {
   sec.classList.toggle('is-collapsed', collapsed);
-  sec.querySelector('.ds-nav-label')?.setAttribute('aria-expanded', String(!collapsed));
+  sec.querySelector('.sl-navhead')?.setAttribute('aria-expanded', String(!collapsed));
 }
 
 // Clicking a section header toggles just that group (lets you peek without navigating).
 function toggleNavGroup(label) {
-  const sec = document.querySelector(`.ds-nav-group[data-group="${CSS.escape(label)}"]`);
+  const sec = document.querySelector(`.sl-nav-group[data-group="${CSS.escape(label)}"]`);
   if (sec) setGroupCollapsed(sec, !sec.classList.contains('is-collapsed'));
 }
 
@@ -1623,7 +1620,7 @@ function toggleNavGroup(label) {
 // section closes it again.
 function syncActiveGroup(id) {
   const label = NAV.find((g) => g.items.some((it) => it.id === id))?.label;
-  document.querySelectorAll('.ds-nav-group').forEach((sec) =>
+  document.querySelectorAll('.sl-nav-group').forEach((sec) =>
     setGroupCollapsed(sec, sec.dataset.group !== label));
 }
 
@@ -1647,8 +1644,13 @@ function renderPage() {
     </div>`;
 
   syncActiveGroup(id);
-  document.querySelectorAll('.ds-nav-item').forEach((a) =>
+  document.querySelectorAll('.sl-nav a').forEach((a) =>
     a.classList.toggle('is-active', a.dataset.nav === id));
+  const crumb = $('#crumb');
+  if (crumb) {
+    const sec = NAV.find((g) => g.items.some((it) => it.id === id))?.label || '';
+    crumb.innerHTML = `<span class="sl-breadcrumb__link">${esc(sec)}</span><span class="sl-breadcrumb__sep" aria-hidden="true"></span><span class="sl-breadcrumb__current">${esc(item.title)}</span>`;
+  }
   document.title = `${item.title} · Sonaloop Design`;
   main.scrollTo?.(0, 0);
   window.scrollTo(0, 0);
@@ -1861,9 +1863,71 @@ function renderPaletteList(q) {
 function paletteGo(el) { if (!el) return; location.hash = el.dataset.href; closePalette(); }
 
 /* ── boot ─────────────────────────────────────────────────────────────────────── */
+/* App-shell behaviour — the vanilla-JS counterpart of the React <AppShell> / SHELL_JS:
+   collapse ([ or the topbar toggle), drag-resize the sidebar, and the bottom settings popover. */
+function initShell() {
+  const app = $('#app');
+  const rz = $('#rz');
+  try {
+    if (localStorage.getItem('ds-shell:open') === 'false') app.classList.add('is-collapsed');
+    const w = localStorage.getItem('ds-shell:width');
+    if (w) app.style.setProperty('--sl-sidebar-w', `${w}px`);
+  } catch { /* ignore */ }
+  const toggle = () => {
+    app.classList.toggle('is-collapsed');
+    try { localStorage.setItem('ds-shell:open', String(!app.classList.contains('is-collapsed'))); } catch { /* ignore */ }
+  };
+  document.addEventListener('click', (e) => {
+    if (e.target.closest && e.target.closest('[data-sidebar-toggle]')) { e.preventDefault(); toggle(); }
+  });
+  document.addEventListener('keydown', (e) => {
+    const tag = (e.target.tagName || '').toLowerCase();
+    if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+    if (e.key === '[') { e.preventDefault(); toggle(); }
+  });
+
+  // bottom settings popover
+  const um = $('#usermenu');
+  const umb = $('#umbtn');
+  const ump = $('#umpop');
+  const setMenu = (open) => {
+    um.classList.toggle('is-open', open);
+    if (ump) ump.hidden = !open;
+    if (umb) umb.setAttribute('aria-expanded', String(open));
+  };
+  if (umb) umb.addEventListener('click', (e) => { e.stopPropagation(); setMenu(!um.classList.contains('is-open')); });
+  document.addEventListener('click', (e) => { if (um.classList.contains('is-open') && !um.contains(e.target)) setMenu(false); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setMenu(false); });
+
+  // drag-resize
+  if (rz) {
+    let sx = 0; let sw = 264; let resizing = false; let last = 264;
+    rz.addEventListener('pointerdown', (e) => {
+      e.preventDefault(); resizing = true; sx = e.clientX;
+      sw = parseInt(getComputedStyle(app).getPropertyValue('--sl-sidebar-w'), 10) || 264;
+      document.body.style.cursor = 'col-resize'; document.body.style.userSelect = 'none';
+      rz.setPointerCapture(e.pointerId);
+    });
+    rz.addEventListener('pointermove', (e) => {
+      if (!resizing) return;
+      const next = sw + (e.clientX - sx);
+      if (next <= 32) { app.classList.add('is-collapsed'); }
+      else { last = Math.max(200, Math.min(420, next)); app.style.setProperty('--sl-sidebar-w', `${last}px`); app.classList.remove('is-collapsed'); }
+    });
+    rz.addEventListener('pointerup', () => {
+      if (!resizing) return; resizing = false;
+      document.body.style.cursor = ''; document.body.style.userSelect = '';
+      try { localStorage.setItem('ds-shell:width', String(last)); } catch { /* ignore */ }
+    });
+  }
+}
+
 function boot() {
-  // brand mark
+  // brand mark + settings-menu glyphs
   $('#brand-mark').innerHTML = svgReg('sonaloop');
+  $('#um-ico').innerHTML = svgReg('settings');
+  $('#um-caret').innerHTML = svgReg('chevron');
+  initShell();
   // theme preference: stored → system (default). 'system' tracks the OS live.
   try { themePref = localStorage.getItem('ds-theme') || 'system'; } catch { /* ignore */ }
   if (!['light', 'dark', 'system'].includes(themePref)) themePref = 'system';

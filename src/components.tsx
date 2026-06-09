@@ -547,6 +547,10 @@ export interface AppShellNavItem {
 export interface AppShellNavSection {
   label?: ReactNode;
   items: AppShellNavItem[];
+  /** Render the section as a collapsible group (label becomes a caret toggle). Needs a `label`. */
+  collapsible?: boolean;
+  /** Start collapsed (only meaningful with `collapsible`). */
+  defaultCollapsed?: boolean;
 }
 export interface AppShellUserMenu {
   label: ReactNode;
@@ -592,6 +596,15 @@ export function AppShell({
     try { return parseInt(localStorage.getItem(`${storageKey}:width`) || '', 10) || defaultWidth; } catch { return defaultWidth; }
   });
   const [menuOpen, setMenuOpen] = useState(false);
+  const [collapsedSecs, setCollapsedSecs] = useState<Set<number>>(
+    () => new Set(nav.flatMap((s, i) => (s.collapsible && s.defaultCollapsed ? [i] : []))),
+  );
+  const toggleSec = (i: number) =>
+    setCollapsedSecs((prev) => {
+      const next = new Set(prev);
+      next.has(i) ? next.delete(i) : next.add(i);
+      return next;
+    });
   const menuRef = useRef<HTMLDivElement>(null);
 
   const persistOpen = useCallback((open: boolean) => {
@@ -676,12 +689,26 @@ export function AppShell({
         <div className="sl-brand">{brand}</div>
         {search && <div className="sl-sb-search">{search}</div>}
         <div className="sl-sb-scroll">
-          {nav.map((sec, i) => (
-            <Fragment key={i}>
-              {sec.label != null && <div className="sl-navhead">{sec.label}</div>}
-              <nav className="sl-nav">{sec.items.map(renderItem)}</nav>
-            </Fragment>
-          ))}
+          {nav.map((sec, i) => {
+            if (sec.collapsible && sec.label != null) {
+              const collapsed = collapsedSecs.has(i);
+              return (
+                <div key={i} className={cx('sl-nav-group', collapsed && 'is-collapsed')}>
+                  <button type="button" className="sl-navhead" aria-expanded={!collapsed} onClick={() => toggleSec(i)}>
+                    <span>{sec.label}</span>
+                    <span className="sl-navhead__caret"><ChevronIcon size={13} /></span>
+                  </button>
+                  <nav className="sl-nav">{sec.items.map(renderItem)}</nav>
+                </div>
+              );
+            }
+            return (
+              <Fragment key={i}>
+                {sec.label != null && <div className="sl-navhead">{sec.label}</div>}
+                <nav className="sl-nav">{sec.items.map(renderItem)}</nav>
+              </Fragment>
+            );
+          })}
         </div>
         {userMenu && (
           <div ref={menuRef} className={cx('sl-usermenu', menuOpen && 'is-open')}>

@@ -541,6 +541,14 @@
 .sl-nav-meta { margin-left: auto; font-size: .7rem; color: var(--sl-faint); font-variant-numeric: tabular-nums; }
 .sl-navhead { font-size: .6875rem; letter-spacing: .05em; text-transform: uppercase; color: var(--sl-faint);
   margin: 18px 9px 6px; font-weight: 650; }
+/* Collapsible section variant — the head is a caret toggle; .is-collapsed hides the items. */
+.sl-nav-group { display: flex; flex-direction: column; }
+button.sl-navhead { display: flex; align-items: center; gap: 6px; width: 100%; background: none; border: 0;
+  cursor: pointer; text-align: left; font-family: inherit; }
+button.sl-navhead:hover { color: var(--sl-muted); }
+.sl-navhead__caret { margin-left: auto; display: inline-flex; color: var(--sl-faint); transition: transform .15s var(--sl-ease); }
+.sl-nav-group.is-collapsed .sl-navhead__caret { transform: rotate(-90deg); }
+.sl-nav-group.is-collapsed .sl-nav { display: none; }
 .sl-usermenu { position: relative; flex-shrink: 0; border-top: 1px solid var(--sl-line); padding: 8px; }
 .sl-um-trigger { width: 100%; display: flex; align-items: center; gap: 9px; padding: 6px 8px; border: 1px solid transparent;
   border-radius: var(--sl-radius); background: transparent; cursor: pointer; color: var(--sl-ink); font: inherit; font-size: .8125rem; font-weight: 500; }

@@ -288,6 +288,256 @@ export const regular = {
     body: '<path d="M4 20l1-4L16 5l3 3L8 19z"/><path d="M14 7l3 3"/>',
   },
 
+  // ── Persona & simulation (product core) ──────────────────────────────────────
+  // The lived-memory vocabulary: a persona's SOUL, their calendar/activity,
+  // inner thoughts, verbatim evidence, sentiment, and council dialogue.
+  soul: {
+    label: 'SoulIcon',
+    // SOUL.md — the persona's core. A heart (the affective centre we simulate).
+    body: '<path data-part="heart" d="M12 20.3C12 20.3 3.5 15 3.5 8.9A4.7 4.7 0 0 1 12 6.1a4.7 4.7 0 0 1 8.5 2.8C20.5 15 12 20.3 12 20.3z"/>',
+  },
+  calendar: {
+    label: 'CalendarIcon',
+    // timestamped calendars — one "today" day marked.
+    body: '<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 9.5h17"/><path d="M8 3.5v3M16 3.5v3"/><circle data-part="day" cx="8.5" cy="14" r="1.1" fill="currentColor" stroke="none"/>',
+  },
+  activity: {
+    label: 'ActivityIcon',
+    // activity logs — a heartbeat/pulse trace.
+    body: '<path d="M3 12h4l2.5-7 4 14 2.5-7H21"/>',
+  },
+  thought: {
+    label: 'ThoughtIcon',
+    // inner thoughts — a thought cloud with trailing bubbles.
+    body: '<path data-part="cloud" d="M7.5 15.5a4 4 0 0 1-1-7.9 4.5 4.5 0 0 1 8.5-1.4A3.8 3.8 0 0 1 16.5 15.5z"/><circle data-part="d1" cx="6" cy="18" r="1.1" fill="currentColor" stroke="none"/><circle data-part="d2" cx="3.8" cy="20.6" r="0.8" fill="currentColor" stroke="none"/>',
+  },
+  quote: {
+    label: 'QuoteIcon',
+    // evidence — a verbatim quotation (the customer's own words).
+    body: '<path d="M4 13.5c0-3.6 1.6-5.9 5-6.5v2.4C7.2 9.9 6.4 11 6.4 12.5H9V18H4zM14 13.5c0-3.6 1.6-5.9 5-6.5v2.4c-1.8.5-2.6 1.6-2.6 3.1H19V18h-5z"/>',
+  },
+  sentiment: {
+    label: 'SentimentIcon',
+    // sentiment breakdown — a mood face (the felt response to a concept).
+    body: '<circle cx="12" cy="12" r="9"/><path data-part="mouth" d="M8.5 14.5a4.5 4.5 0 0 0 7 0"/><circle cx="9" cy="10" r="0.9" fill="currentColor" stroke="none"/><circle cx="15" cy="10" r="0.9" fill="currentColor" stroke="none"/>',
+  },
+  chat: {
+    label: 'ChatIcon',
+    // a single dialogue turn — a speech bubble with two text lines.
+    body: '<path data-part="bubble" d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path data-part="lines" d="M7 9h10M7 12.5h6"/>',
+  },
+  messages: {
+    label: 'MessagesIcon',
+    // a back-and-forth — two overlapping bubbles (the council exchange).
+    body: '<path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"/><path data-part="b2" d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/>',
+  },
+  mic: {
+    label: 'MicIcon',
+    // synthetic respondents / interviews — a microphone on its stand.
+    body: '<rect data-part="capsule" x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5V21M9 21h6"/>',
+  },
+  sparkles: {
+    label: 'SparklesIcon',
+    // AI generation / synthesis spark — a large 4-point star + a small one.
+    body: '<path data-part="spark" d="M12 3l1.7 4.8L18.5 9.5 13.7 11.2 12 16l-1.7-4.8L5.5 9.5 10.3 7.8z"/><path d="M18 14l.8 2.2 2.2.8-2.2.8L18 20l-.8-2.2L15 17l2.2-.8z"/>',
+  },
+  network: {
+    label: 'NetworkIcon',
+    // the research graph — three nodes wired into one structure.
+    body: '<circle cx="6" cy="7" r="2.4"/><circle cx="18" cy="7" r="2.4"/><circle cx="12" cy="18" r="2.4"/><path d="M8.3 7.3h7.4M7.3 9l3.5 6.7M16.7 9l-3.5 6.7"/>',
+  },
+  avatar: {
+    label: 'AvatarIcon',
+    // a generated persona portrait — a figure framed in a rounded card.
+    body: '<rect x="4" y="4" width="16" height="16" rx="4"/><circle cx="12" cy="10" r="2.6"/><path d="M7 17.8a5 5 0 0 1 10 0"/>',
+  },
+  clipboard: {
+    label: 'ClipboardIcon',
+    // a study / survey instrument — a clipboard with text lines.
+    body: '<rect x="5" y="5" width="14" height="16" rx="2"/><path d="M9 5V4.2A1.2 1.2 0 0 1 10.2 3h3.6A1.2 1.2 0 0 1 15 4.2V5z"/><path data-part="lines" d="M8.5 11h7M8.5 14.5h5"/>',
+  },
+
+  // ── Operations pipeline (intake → quote → delivered) ─────────────────────────
+  inbox: {
+    label: 'InboxIcon',
+    // intake — a new request lands in the tray.
+    body: '<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path data-part="tray" d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>',
+  },
+  invoice: {
+    label: 'InvoiceIcon',
+    // the quote / offer — a receipt with a torn foot and line items.
+    body: '<path d="M5 3.5h14v17l-2.3-1.3-2.3 1.3-2.4-1.3-2.4 1.3-2.3-1.3L5 20.5z"/><path data-part="lines" d="M8.5 8h7M8.5 11.5h7M8.5 15h4"/>',
+  },
+  package: {
+    label: 'PackageIcon',
+    // the delivered study — a sealed box.
+    body: '<path d="M16.5 9.4 7.5 4.21"/><path data-part="box" d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>',
+  },
+  verified: {
+    label: 'VerifiedIcon',
+    // accepted / verified — a scalloped seal with a check.
+    body: '<path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"/><path data-part="check" d="m9 12 2 2 4-4"/>',
+  },
+
+  // ── Cloud · SaaS · privacy · CLI/MCP ─────────────────────────────────────────
+  cloud: {
+    label: 'CloudIcon',
+    body: '<path data-part="cloud" d="M7 18.5h10.2a4 4 0 0 0 .3-8A6 6 0 0 0 6.2 9.4 3.8 3.8 0 0 0 7 18.5z"/>',
+  },
+  shield: {
+    label: 'ShieldIcon',
+    // privacy is the core promise (no server-side text-LLM calls).
+    body: '<path data-part="shield" d="M12 3l8 3v5.6c0 4.9-3.4 8.3-8 9.4-4.6-1.1-8-4.5-8-9.4V6z"/>',
+  },
+  shieldCheck: {
+    label: 'ShieldCheckIcon',
+    body: '<path data-part="shield" d="M12 3l8 3v5.6c0 4.9-3.4 8.3-8 9.4-4.6-1.1-8-4.5-8-9.4V6z"/><path data-part="check" d="M9 11.8l2 2 4-4"/>',
+  },
+  lock: {
+    label: 'LockIcon',
+    body: '<rect x="4.5" y="10.5" width="15" height="10" rx="2.2"/><path data-part="shackle" d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.5" r="1.1" fill="currentColor" stroke="none"/>',
+  },
+  key: {
+    label: 'KeyIcon',
+    // API keys / access tokens.
+    body: '<circle data-part="bow" cx="8" cy="15.5" r="4"/><path d="M10.8 12.7L20 3.5"/><path d="M16.5 7l2.6 2.6M13.7 9.8l2 2"/>',
+  },
+  creditCard: {
+    label: 'CreditCardIcon',
+    // billing / subscription.
+    body: '<rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="M3 10h18"/><path data-part="chip" d="M7 14.5h3.5"/>',
+  },
+  upload: {
+    label: 'UploadIcon',
+    body: '<path data-part="arrow" d="M12 16V4M7.5 8.5L12 4l4.5 4.5"/><path d="M4.5 16.5V18a2.5 2.5 0 0 0 2.5 2.5h10a2.5 2.5 0 0 0 2.5-2.5v-1.5"/>',
+  },
+  download: {
+    label: 'DownloadIcon',
+    body: '<path data-part="arrow" d="M12 4v12M7.5 11.5L12 16l4.5-4.5"/><path d="M4.5 16.5V18a2.5 2.5 0 0 0 2.5 2.5h10a2.5 2.5 0 0 0 2.5-2.5v-1.5"/>',
+  },
+  sync: {
+    label: 'SyncIcon',
+    // refresh / CRON re-sync (the persona DB is kept current).
+    body: '<path d="M20.5 11.5A8.5 8.5 0 0 0 6 6.2L3.5 8.5"/><path d="M3.5 12.5A8.5 8.5 0 0 0 18 17.8l2.5-2.3"/><path d="M3.5 4.5v4h4M20.5 19.5v-4h-4"/>',
+  },
+  globe: {
+    label: 'GlobeIcon',
+    body: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><ellipse cx="12" cy="12" rx="4" ry="9"/>',
+  },
+  terminal: {
+    label: 'TerminalIcon',
+    // the sonaloop CLI.
+    body: '<rect x="3" y="4" width="18" height="16" rx="2.5"/><path data-part="prompt" d="M7 9l3.2 3-3.2 3"/><path d="M12.5 15h4.5"/>',
+  },
+  command: {
+    label: 'CommandIcon',
+    // the MCP / command surface.
+    body: '<path d="M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 3 3 0 0 0-3-3z"/>',
+  },
+  database: {
+    label: 'DatabaseIcon',
+    // sonaloop-data — the persona catalog.
+    body: '<ellipse cx="12" cy="6" rx="7.5" ry="3"/><path d="M4.5 6v6c0 1.66 3.36 3 7.5 3s7.5-1.34 7.5-3V6"/><path d="M4.5 12v6c0 1.66 3.36 3 7.5 3s7.5-1.34 7.5-3v-6"/>',
+  },
+
+  // ── General chrome (cross-product UI controls) ───────────────────────────────
+  mail: {
+    label: 'MailIcon',
+    body: '<rect x="3" y="5" width="18" height="14" rx="2.5"/><path data-part="flap" d="M3.5 7.5l8.5 5.5 8.5-5.5"/>',
+  },
+  send: {
+    label: 'SendIcon',
+    body: '<path data-part="plane" d="M21 3.5L3 10.2l7.2 2.6L13 20z"/><path d="M21 3.5L10.2 12.8"/>',
+  },
+  bell: {
+    label: 'BellIcon',
+    body: '<path data-part="bell" d="M6 17V10a6 6 0 0 1 12 0v7l1.5 2h-15z"/><path d="M10 19.5a2.2 2.2 0 0 0 4 0"/>',
+  },
+  filter: {
+    label: 'FilterIcon',
+    body: '<path d="M3.5 5.5h17l-6.5 8v5l-4 2v-7z"/>',
+  },
+  sort: {
+    label: 'SortIcon',
+    body: '<path d="M7 4.5v15M7 19.5l-2.6-2.6M7 19.5l2.6-2.6"/><path d="M17 19.5v-15M17 4.5l-2.6 2.6M17 4.5l2.6 2.6"/>',
+  },
+  more: {
+    label: 'MoreIcon',
+    body: '<circle cx="12" cy="5" r="1.6" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="12" cy="19" r="1.6" fill="currentColor" stroke="none"/>',
+  },
+  info: {
+    label: 'InfoIcon',
+    body: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="7.9" r="0.8" fill="currentColor" stroke="none"/>',
+  },
+  help: {
+    label: 'HelpIcon',
+    body: '<circle cx="12" cy="12" r="9"/><path d="M9.4 9.3a2.7 2.7 0 0 1 5.2 1c0 1.8-2.6 2-2.6 4"/><circle cx="12" cy="17.4" r="0.8" fill="currentColor" stroke="none"/>',
+  },
+  trash: {
+    label: 'TrashIcon',
+    body: '<path data-part="lid" d="M4 6.5h16M9 6.5V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v1.5"/><path d="M6.5 6.5l1 12.2A2 2 0 0 0 9.5 20.5h5a2 2 0 0 0 2-1.8l1-12.2"/><path d="M10 10.5v6M14 10.5v6"/>',
+  },
+  copy: {
+    label: 'CopyIcon',
+    body: '<rect data-part="sheet" x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V5.5A1.5 1.5 0 0 0 14.5 4H5.5A1.5 1.5 0 0 0 4 5.5v9A1.5 1.5 0 0 0 5.5 16H8"/>',
+  },
+  file: {
+    label: 'FileIcon',
+    body: '<path d="M6 3h7l5 5v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path data-part="fold" d="M13 3v5h5"/>',
+  },
+  home: {
+    label: 'HomeIcon',
+    body: '<path data-part="roof" d="M3.5 11.5L12 4l8.5 7.5"/><path d="M5.5 10.2V19a1 1 0 0 0 1 1H10v-5.5h4V20h3.5a1 1 0 0 0 1-1v-8.8"/>',
+  },
+  play: {
+    label: 'PlayIcon',
+    body: '<path d="M7 5.2l11.5 6.8L7 18.8z"/>',
+  },
+  pause: {
+    label: 'PauseIcon',
+    body: '<rect x="7" y="5" width="3.5" height="14" rx="1.2"/><rect x="13.5" y="5" width="3.5" height="14" rx="1.2"/>',
+  },
+  eye: {
+    label: 'EyeIcon',
+    body: '<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle data-part="pupil" cx="12" cy="12" r="2.8"/>',
+  },
+  bookmark: {
+    label: 'BookmarkIcon',
+    body: '<path data-part="mark" d="M6 4h12a1 1 0 0 1 1 1v15.5l-7-4-7 4V5a1 1 0 0 1 1-1z"/>',
+  },
+  flag: {
+    label: 'FlagIcon',
+    body: '<path d="M5 21V4"/><path data-part="cloth" d="M5 4.5h12.5l-2.2 3.5 2.2 3.5H5z"/>',
+  },
+  list: {
+    label: 'ListIcon',
+    body: '<path data-part="lines" d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1.1" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1.1" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.1" fill="currentColor" stroke="none"/>',
+  },
+  book: {
+    label: 'BookIcon',
+    // docs / knowledge base.
+    body: '<path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H18a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H6.5A1.5 1.5 0 0 0 5 20.5z"/><path data-part="cover" d="M5 17.5A1.5 1.5 0 0 1 6.5 16H19"/>',
+  },
+  rocket: {
+    label: 'RocketIcon',
+    // get started / launch — an upright rocket (twin of RocketHifi).
+    body: '<path data-part="rocket" d="M12 2.5c2.6 2.7 3.7 5.8 3.7 9.5V16H8.3v-4c0-3.7 1.1-6.8 3.7-9.5z"/><path d="M8.3 13l-2.8 2.2v3l2.8-1.6M15.7 13l2.8 2.2v3l-2.8-1.6"/><circle cx="12" cy="9" r="1.6"/><path data-part="flame" d="M10.3 19c0 1.7 1.7 3.2 1.7 3.2s1.7-1.5 1.7-3.2z" fill="currentColor" stroke="none"/>',
+  },
+  trend: {
+    label: 'TrendIcon',
+    // line chart trending up — outcomes over time.
+    body: '<path data-part="line" d="M3 17l5-5 3.5 3L20 6"/><path d="M20 11V6h-5"/>',
+  },
+  pieChart: {
+    label: 'PieChartIcon',
+    // breakdown / share — a pie with one highlighted wedge.
+    body: '<circle cx="12" cy="12" r="9"/><path data-part="slice" d="M12 12V3a9 9 0 0 1 7.8 4.5z"/>',
+  },
+  zap: {
+    label: 'ZapIcon',
+    body: '<path d="M12.5 3L5 13h6l-1 8 8-11h-6z"/>',
+  },
+
   // ── Brand ────────────────────────────────────────────────────────────────────
   // sonaloop — the company logo. A continuous lobed "loop" (rounded-triangle
   // ribbon) binding three nodes; line-art twin of the hi-fi mark. Sized with edge
@@ -660,6 +910,237 @@ export const hifi = {
       '<path data-part="pencil" d="M9 39l2.5-8.5L31 11l6 6L17.5 36.5z" fill="currentColor" fill-opacity="0.1" stroke-width="2"/>' +
       '<path data-part="pencil" d="M27 15l6 6" stroke-width="1.75"/>' +
       '<path data-part="pencil" d="M9 39l2.5-8.5" stroke-width="2"/>',
+  },
+
+  // ── Persona & simulation (48×48 twins) ───────────────────────────────────────
+  soul: {
+    label: 'SoulHifi',
+    body:
+      '<circle cx="24" cy="24" r="20" fill="currentColor" fill-opacity="0.05" stroke="none"/>' +
+      '<path data-part="heart" d="M24 40C24 40 7 29.5 7 17.8A9.4 9.4 0 0 1 24 12.2 9.4 9.4 0 0 1 41 17.8C41 29.5 24 40 24 40z" fill="currentColor" fill-opacity="0.1" stroke-width="2" stroke-linejoin="round"/>',
+  },
+  calendar: {
+    label: 'CalendarHifi',
+    body:
+      '<rect x="7" y="10" width="34" height="31" rx="4" fill="currentColor" fill-opacity="0.06" stroke-width="2"/>' +
+      '<path d="M7 19h34" stroke-width="2"/>' +
+      '<path d="M16 6v6M32 6v6" stroke-width="2"/>' +
+      '<rect data-part="day" x="14" y="25" width="8" height="8" rx="2" fill="currentColor" fill-opacity="0.85" stroke="none"/>',
+  },
+  activity: {
+    label: 'ActivityHifi',
+    body:
+      '<circle cx="24" cy="24" r="20" fill="currentColor" fill-opacity="0.05" stroke="none"/>' +
+      '<path d="M7 24h7l5-13 8 26 5-13h7" stroke-width="2.25"/>',
+  },
+  thought: {
+    label: 'ThoughtHifi',
+    body:
+      '<path data-part="cloud" d="M16 31a8 8 0 0 1-2-15.8 9 9 0 0 1 17-2.8A7.6 7.6 0 0 1 33 31z" fill="currentColor" fill-opacity="0.08" stroke-width="2" stroke-linejoin="round"/>' +
+      '<circle data-part="d1" cx="13" cy="37" r="2.4" fill="currentColor" fill-opacity="0.1" stroke-width="1.75"/>' +
+      '<circle data-part="d2" cx="8" cy="42" r="1.6" fill="currentColor" fill-opacity="0.1" stroke-width="1.5"/>',
+  },
+  quote: {
+    label: 'QuoteHifi',
+    body:
+      '<circle cx="24" cy="24" r="20" fill="currentColor" fill-opacity="0.05" stroke="none"/>' +
+      '<path d="M9 27c0-7 3-11.5 10-13v4.5c-3.5 1-5 3-5 6h5V36H9zM24 27c0-7 3-11.5 10-13v4.5c-3.5 1-5 3-5 6h5V36H24z" fill="currentColor" fill-opacity="0.1" stroke-width="2" stroke-linejoin="round"/>',
+  },
+  sentiment: {
+    label: 'SentimentHifi',
+    body:
+      '<circle cx="24" cy="24" r="19" fill="currentColor" fill-opacity="0.08" stroke-width="2"/>' +
+      '<path data-part="mouth" d="M16 28a9 9 0 0 0 16 0" stroke-width="2"/>' +
+      '<circle cx="18" cy="20" r="1.8" fill="currentColor" stroke="none"/>' +
+      '<circle cx="30" cy="20" r="1.8" fill="currentColor" stroke="none"/>',
+  },
+  chat: {
+    label: 'ChatHifi',
+    body:
+      '<path data-part="bubble" d="M42 30a4 4 0 0 1-4 4H14l-8 8V10a4 4 0 0 1 4-4h28a4 4 0 0 1 4 4z" fill="currentColor" fill-opacity="0.08" stroke-width="2" stroke-linejoin="round"/>' +
+      '<path data-part="lines" d="M14 18h20M14 25h12" stroke-width="1.75" stroke-opacity="0.6"/>',
+  },
+  messages: {
+    label: 'MessagesHifi',
+    body:
+      '<path d="M28 19a3 3 0 0 1-3 3H12l-7 7V9a3 3 0 0 1 3-3h17a3 3 0 0 1 3 3z" fill="currentColor" fill-opacity="0.1" stroke-width="2" stroke-linejoin="round"/>' +
+      '<path data-part="b2" d="M35 18h4a3 3 0 0 1 3 3v21l-7-7H22a3 3 0 0 1-3-3v-2" fill="currentColor" fill-opacity="0.06" stroke-width="2" stroke-linejoin="round"/>',
+  },
+  mic: {
+    label: 'MicHifi',
+    body:
+      '<rect data-part="capsule" x="18" y="6" width="12" height="22" rx="6" fill="currentColor" fill-opacity="0.1" stroke-width="2"/>' +
+      '<path d="M11 22a13 13 0 0 0 26 0" stroke-width="2"/>' +
+      '<path d="M24 35v7M16 42h16" stroke-width="2"/>',
+  },
+  sparkles: {
+    label: 'SparklesHifi',
+    body:
+      '<path data-part="spark" d="M24 5l3.4 9.6L37 18l-9.6 3.4L24 31l-3.4-9.6L11 18l9.6-3.4z" fill="currentColor" fill-opacity="0.1" stroke-width="2" stroke-linejoin="round"/>' +
+      '<path d="M36 28l1.6 4.4L42 34l-4.4 1.6L36 40l-1.6-4.4L30 34l4.4-1.6z" fill="currentColor" fill-opacity="0.1" stroke-width="1.75" stroke-linejoin="round"/>',
+  },
+  network: {
+    label: 'NetworkHifi',
+    body:
+      '<circle cx="24" cy="24" r="20" fill="currentColor" fill-opacity="0.05" stroke="none"/>' +
+      '<path d="M14 15.5l20 0M14.5 17l8 15M33.5 17l-8 15" stroke-width="1.75" stroke-opacity="0.6"/>' +
+      '<circle data-part="node" cx="12" cy="14" r="4.5" fill="currentColor" fill-opacity="0.1" stroke-width="2"/>' +
+      '<circle data-part="node" cx="36" cy="14" r="4.5" fill="currentColor" fill-opacity="0.1" stroke-width="2"/>' +
+      '<circle data-part="node" cx="24" cy="36" r="4.5" fill="currentColor" fill-opacity="0.1" stroke-width="2"/>',
+  },
+  avatar: {
+    label: 'AvatarHifi',
+    body:
+      '<rect x="7" y="7" width="34" height="34" rx="9" fill="currentColor" fill-opacity="0.06" stroke-width="2"/>' +
+      '<circle cx="24" cy="20" r="5.5" fill="currentColor" fill-opacity="0.1" stroke-width="2"/>' +
+      '<path d="M13.5 37a10.5 10.5 0 0 1 21 0" stroke-width="2"/>',
+  },
+  clipboard: {
+    label: 'ClipboardHifi',
+    body:
+      '<rect x="9" y="9" width="30" height="33" rx="4" fill="currentColor" fill-opacity="0.06" stroke-width="2"/>' +
+      '<rect x="17" y="5" width="14" height="8" rx="2.5" fill="currentColor" fill-opacity="0.1" stroke-width="2"/>' +
+      '<path data-part="lines" d="M16 23h16M16 30h11" stroke-width="1.75" stroke-opacity="0.6"/>',
+  },
+
+  // ── Operations pipeline (48×48 twins) ────────────────────────────────────────
+  inbox: {
+    label: 'InboxHifi',
+    body:
+      '<path data-part="tray" d="M11 9.5 4.5 23v13a4 4 0 0 0 4 4h31a4 4 0 0 0 4-4V23l-6.5-13.5A4 4 0 0 0 37.4 7H14.6a4 4 0 0 0-3.6 2.5z" fill="currentColor" fill-opacity="0.06" stroke-width="2" stroke-linejoin="round"/>' +
+      '<path d="M4.5 23h11l3 5h11l3-5h11" stroke-width="2" stroke-linejoin="round"/>',
+  },
+  invoice: {
+    label: 'InvoiceHifi',
+    body:
+      '<path d="M10 6h28v36l-4.7-2.7-4.6 2.7-4.7-2.7-4.7 2.7-4.6-2.7L10 42z" fill="currentColor" fill-opacity="0.06" stroke-width="2" stroke-linejoin="round"/>' +
+      '<path data-part="lines" d="M17 16h14M17 23h14M17 30h8" stroke-width="1.75" stroke-opacity="0.6"/>',
+  },
+  package: {
+    label: 'PackageHifi',
+    body:
+      '<path data-part="box" d="M42 32V16a3 3 0 0 0-1.5-2.6l-14-8a3 3 0 0 0-3 0l-14 8A3 3 0 0 0 8 16v16a3 3 0 0 0 1.5 2.6l14 8a3 3 0 0 0 3 0l14-8A3 3 0 0 0 42 32z" fill="currentColor" fill-opacity="0.08" stroke-width="2" stroke-linejoin="round"/>' +
+      '<path d="M8.5 14.5 24 23l15.5-8.5M24 23v18" stroke-width="1.75" stroke-opacity="0.6"/>' +
+      '<path d="M16 9.5 32 18.5" stroke-width="1.75" stroke-opacity="0.6"/>',
+  },
+  verified: {
+    label: 'VerifiedHifi',
+    body:
+      '<path d="M7.7 17.2a8 8 0 0 1 9.5-9.5 8 8 0 0 1 13.5 0 8 8 0 0 1 9.6 9.6 8 8 0 0 1 0 13.4 8 8 0 0 1-9.5 9.6 8 8 0 0 1-13.5 0 8 8 0 0 1-9.6-9.5 8 8 0 0 1 0-13.6z" fill="currentColor" fill-opacity="0.1" stroke-width="2" stroke-linejoin="round"/>' +
+      '<path data-part="check" d="M18 24l4 4 8-8" stroke-width="2.25"/>',
+  },
+
+  // ── Cloud · SaaS · privacy · CLI/MCP (48×48 twins) ───────────────────────────
+  cloud: {
+    label: 'CloudHifi',
+    body:
+      '<circle cx="24" cy="24" r="20" fill="currentColor" fill-opacity="0.05" stroke="none"/>' +
+      '<path data-part="cloud" d="M15 35h19a7 7 0 0 0 .5-14A10.5 10.5 0 0 0 13.3 17 6.6 6.6 0 0 0 15 35z" fill="currentColor" fill-opacity="0.1" stroke-width="2" stroke-linejoin="round"/>',
+  },
+  shield: {
+    label: 'ShieldHifi',
+    body:
+      '<path data-part="shield" d="M24 5l15 5.5v10.5c0 9.5-6.4 16-15 18-8.6-2-15-8.5-15-18V10.5z" fill="currentColor" fill-opacity="0.1" stroke-width="2" stroke-linejoin="round"/>',
+  },
+  shieldCheck: {
+    label: 'ShieldCheckHifi',
+    body:
+      '<path data-part="shield" d="M24 5l15 5.5v10.5c0 9.5-6.4 16-15 18-8.6-2-15-8.5-15-18V10.5z" fill="currentColor" fill-opacity="0.1" stroke-width="2" stroke-linejoin="round"/>' +
+      '<path data-part="check" d="M17.5 23.5l4.5 4.5 9-9" stroke-width="2.25"/>',
+  },
+  lock: {
+    label: 'LockHifi',
+    body:
+      '<rect x="9" y="21" width="30" height="20" rx="4.5" fill="currentColor" fill-opacity="0.08" stroke-width="2"/>' +
+      '<path data-part="shackle" d="M16 21v-6a8 8 0 0 1 16 0v6" stroke-width="2"/>' +
+      '<circle cx="24" cy="31" r="2.3" fill="currentColor" stroke="none"/>',
+  },
+  key: {
+    label: 'KeyHifi',
+    body:
+      '<circle cx="24" cy="24" r="20" fill="currentColor" fill-opacity="0.05" stroke="none"/>' +
+      '<circle data-part="bow" cx="17" cy="31" r="8" fill="currentColor" fill-opacity="0.1" stroke-width="2"/>' +
+      '<path d="M22.7 25.3 39 9" stroke-width="2"/>' +
+      '<path d="M33 11l5 5M28 16l4 4" stroke-width="2"/>',
+  },
+  creditCard: {
+    label: 'CreditCardHifi',
+    body:
+      '<rect x="5" y="11" width="38" height="26" rx="4.5" fill="currentColor" fill-opacity="0.08" stroke-width="2"/>' +
+      '<path d="M5 20h38" stroke-width="2"/>' +
+      '<path data-part="chip" d="M12 30h9" stroke-width="2" stroke-opacity="0.7"/>',
+  },
+  globe: {
+    label: 'GlobeHifi',
+    body:
+      '<circle cx="24" cy="24" r="19" fill="currentColor" fill-opacity="0.06" stroke-width="2"/>' +
+      '<path d="M5 24h38" stroke-width="1.75" stroke-opacity="0.7"/>' +
+      '<ellipse cx="24" cy="24" rx="8.5" ry="19" stroke-width="1.75" stroke-opacity="0.7"/>',
+  },
+  terminal: {
+    label: 'TerminalHifi',
+    body:
+      '<rect x="6" y="9" width="36" height="30" rx="4" fill="currentColor" fill-opacity="0.06" stroke-width="2"/>' +
+      '<path data-part="prompt" d="M14 19l6 5-6 5" stroke-width="2"/>' +
+      '<path d="M24 30h9" stroke-width="2"/>',
+  },
+  command: {
+    label: 'CommandHifi',
+    body:
+      '<circle cx="24" cy="24" r="20" fill="currentColor" fill-opacity="0.05" stroke="none"/>' +
+      '<path d="M31 12a5 5 0 0 0-5 5v14a5 5 0 0 0 5 5 5 5 0 0 0 5-5 5 5 0 0 0-5-5H17a5 5 0 0 0-5 5 5 5 0 0 0 5 5 5 5 0 0 0 5-5V17a5 5 0 0 0-5-5 5 5 0 0 0-5 5 5 5 0 0 0 5 5h14a5 5 0 0 0 5-5 5 5 0 0 0-5-5z" fill="currentColor" fill-opacity="0.08" stroke-width="2" stroke-linejoin="round"/>',
+  },
+  database: {
+    label: 'DatabaseHifi',
+    body:
+      '<ellipse data-part="lid" cx="24" cy="11" rx="15" ry="6" fill="currentColor" fill-opacity="0.1" stroke-width="2"/>' +
+      '<path d="M9 11v12c0 3.3 6.7 6 15 6s15-2.7 15-6V11" fill="currentColor" fill-opacity="0.05" stroke-width="2"/>' +
+      '<path d="M9 23v12c0 3.3 6.7 6 15 6s15-2.7 15-6V23" stroke-width="2"/>',
+  },
+
+  // ── General chrome (48×48 twins, where the icon reads as a tile) ─────────────
+  mail: {
+    label: 'MailHifi',
+    body:
+      '<rect x="5" y="10" width="38" height="28" rx="4.5" fill="currentColor" fill-opacity="0.06" stroke-width="2"/>' +
+      '<path data-part="flap" d="M6 14l18 12 18-12" stroke-width="2"/>',
+  },
+  bell: {
+    label: 'BellHifi',
+    body:
+      '<circle cx="24" cy="24" r="20" fill="currentColor" fill-opacity="0.05" stroke="none"/>' +
+      '<path data-part="bell" d="M13 32V21a11 11 0 0 1 22 0v11l3 4H10z" fill="currentColor" fill-opacity="0.1" stroke-width="2" stroke-linejoin="round"/>' +
+      '<path d="M20 38a4.5 4.5 0 0 0 8 0" stroke-width="2"/>',
+  },
+  book: {
+    label: 'BookHifi',
+    body:
+      '<path d="M10 8.5A2.5 2.5 0 0 1 12.5 6H38a2 2 0 0 1 2 2v28a2 2 0 0 1-2 2H12.5A2.5 2.5 0 0 0 10 40.5z" fill="currentColor" fill-opacity="0.06" stroke-width="2" stroke-linejoin="round"/>' +
+      '<path data-part="cover" d="M10 35.5A2.5 2.5 0 0 1 12.5 33H40" stroke-width="2"/>' +
+      '<path d="M19 14h13" stroke-width="1.75" stroke-opacity="0.6"/>',
+  },
+  rocket: {
+    label: 'RocketHifi',
+    body:
+      '<circle cx="24" cy="24" r="20" fill="currentColor" fill-opacity="0.05" stroke="none"/>' +
+      '<path data-part="rocket" d="M24 4c5 5 7 11 7 18v8H17v-8c0-7 2-13 7-18z" fill="currentColor" fill-opacity="0.1" stroke-width="2" stroke-linejoin="round"/>' +
+      '<path d="M17 24l-5 4v6l5-3M31 24l5 4v6l-5-3" fill="currentColor" fill-opacity="0.08" stroke-width="2" stroke-linejoin="round"/>' +
+      '<circle cx="24" cy="17" r="3" stroke-width="2"/>' +
+      '<path data-part="flame" d="M21 38c0 3 3 6 3 6s3-3 3-6z" fill="currentColor" fill-opacity="0.12" stroke-width="2" stroke-linejoin="round"/>',
+  },
+  trend: {
+    label: 'TrendHifi',
+    body:
+      '<circle cx="24" cy="24" r="20" fill="currentColor" fill-opacity="0.05" stroke="none"/>' +
+      '<path data-part="line" d="M8 32l9-9 7 6 12-13" stroke-width="2.25"/>' +
+      '<path d="M36 16h-9M36 16v9" stroke-width="2.25"/>',
+  },
+  pieChart: {
+    label: 'PieChartHifi',
+    body:
+      '<circle cx="24" cy="24" r="19" fill="currentColor" fill-opacity="0.06" stroke-width="2"/>' +
+      '<path data-part="slice" d="M24 24V5a19 19 0 0 1 16.5 9.5z" fill="currentColor" fill-opacity="0.18" stroke-width="2" stroke-linejoin="round"/>' +
+      '<path d="M24 5v19l16.5 9.5" stroke-width="1.5" stroke-opacity="0.5"/>',
   },
 
   // ── Brand ────────────────────────────────────────────────────────────────────

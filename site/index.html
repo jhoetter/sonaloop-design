@@ -26,32 +26,65 @@
 <body>
   <a class="ds-skip" href="#main">Skip to content</a>
 
-  <header class="ds-topbar">
-    <a class="ds-brand sl-logo" href="#/introduction" aria-label="Sonaloop Design home">
-      <span class="sl-logo__mark" id="brand-mark"></span>
-      <span class="sl-logo__word">sona<span class="sl-logo__loop">loop</span> <span class="ds-brand-sub">Design</span></span>
-    </a>
+  <!-- The docs site dogfoods the shared .sl-app-shell layout (styles/components.css):
+       a full-height sidebar (brand · search · collapsible nav · settings menu), a resize
+       handle, and a topbar over the content. -->
+  <div class="sl-app-shell" id="app">
+    <aside class="sl-sidebar">
+      <div class="sl-brand">
+        <a class="sl-logo" href="#/introduction" aria-label="Sonaloop Design home">
+          <span class="sl-logo__mark" id="brand-mark"></span>
+          <span class="sl-logo__word">sona<span class="sl-logo__loop">loop</span> <span class="ds-brand-sub">Design</span></span>
+        </a>
+      </div>
 
-    <button class="ds-search" id="search-open" aria-label="Search the design system">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="ds-search-ico"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-      <span>Search Sonaloop</span>
-      <kbd class="sl-kbd">⌘K</kbd>
-    </button>
+      <div class="sl-sb-search">
+        <button class="sl-cmdk-trigger" id="search-open" type="button" aria-label="Search the design system">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="sl-cmdk-trigger-ico"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <span>Search</span>
+          <kbd class="sl-kbd">⌘K</kbd>
+        </button>
+      </div>
 
-    <span class="ds-top-spacer"></span>
+      <nav class="sl-sb-scroll" id="sidebar" aria-label="Sections"></nav>
 
-    <!-- The real ThemeToggle contract (.sl-segmented), dogfooded: Light · System · Dark, with
-         the canonical sun · monitor · moon glyphs injected from the icon set in app.js. -->
-    <div class="sl-segmented" role="group" aria-label="Color scheme">
-      <button type="button" class="sl-segmented__item" data-theme-set="light" data-theme-ico="sun" title="Light" aria-label="Light theme"></button>
-      <button type="button" class="sl-segmented__item" data-theme-set="system" data-theme-ico="monitor" title="System" aria-label="System theme"></button>
-      <button type="button" class="sl-segmented__item" data-theme-set="dark" data-theme-ico="moon" title="Dark" aria-label="Dark theme"></button>
+      <!-- Bottom settings menu — the real .sl-segmented ThemeToggle (Light · System · Dark,
+           canonical sun/monitor/moon glyphs injected in app.js), dogfooded. -->
+      <div class="sl-usermenu" id="usermenu">
+        <div class="sl-um-pop" id="umpop" hidden>
+          <div class="sl-um-sec">
+            <div class="sl-um-lbl">Theme</div>
+            <div class="sl-segmented sl-segmented--fill" role="group" aria-label="Color scheme">
+              <button type="button" class="sl-segmented__item" data-theme-set="light" data-theme-ico="sun" title="Light" aria-label="Light theme"></button>
+              <button type="button" class="sl-segmented__item" data-theme-set="system" data-theme-ico="monitor" title="System" aria-label="System theme"></button>
+              <button type="button" class="sl-segmented__item" data-theme-set="dark" data-theme-ico="moon" title="Dark" aria-label="Dark theme"></button>
+            </div>
+          </div>
+          <div class="sl-um-sec">
+            <div class="sl-um-lbl">Source</div>
+            <a class="ds-um-link" href="https://github.com/jhoetter/sonaloop-design" target="_blank" rel="noreferrer">sonaloop-design ↗</a>
+          </div>
+        </div>
+        <button class="sl-um-trigger" id="umbtn" type="button" aria-haspopup="true" aria-expanded="false">
+          <span class="sl-um-ava" id="um-ico"></span>
+          <span class="sl-um-name">Settings</span>
+          <span class="sl-um-caret" id="um-caret"></span>
+        </button>
+      </div>
+    </aside>
+
+    <div class="sl-resize" id="rz" role="separator" aria-orientation="vertical" aria-label="Resize sidebar"></div>
+
+    <div class="sl-main">
+      <header class="sl-topbar">
+        <button class="sl-iconbtn" id="sbt" type="button" data-sidebar-toggle aria-label="Toggle sidebar" title="Toggle sidebar ([)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg>
+        </button>
+        <nav class="sl-breadcrumb" id="crumb" aria-label="Breadcrumb"></nav>
+        <span class="sl-spacer"></span>
+      </header>
+      <main class="sl-shell-body" id="main" tabindex="-1"></main>
     </div>
-  </header>
-
-  <div class="ds-shell">
-    <aside class="ds-sidebar" id="sidebar"></aside>
-    <main class="ds-main" id="main" tabindex="-1"></main>
   </div>
 
   <!-- Search palette — the shared .sl-cmdk command palette (sonaloop-design/components.css),
