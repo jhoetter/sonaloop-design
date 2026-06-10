@@ -140,6 +140,31 @@ function planeEllipse(P, cx, cy, z, r, attrs) {
   return `<ellipse cx="${ex}" cy="${ey}" rx="${num(r * ERX)}" ry="${num(r * ERY)}" ${attrs}/>`;
 }
 
+/**
+ * A box whose square footprint is rotated 45° in plan (half-diagonal k, so the
+ * corners point along the plan axes). Under this camera it projects to an
+ * axis-aligned rectangle — the block reads as FACING the viewer head-on, the
+ * one orientation the iso-aligned volumes can never take. Used for the
+ * dissenting voice.
+ */
+function rot45Box(P, cx, cy, k, h, r) {
+  const [X, Y] = P(cx, cy, 0);
+  const w2 = num(k * ISO_X);
+  const top = num(Y - k * ISO_Y - h);
+  const lid = num(Y + k * ISO_Y - h); // front edge of the top face
+  const bot = num(Y + k * ISO_Y);
+  let out = path(
+    ring([[X - w2, top], [X + w2, top], [X + w2, bot], [X - w2, bot]], r),
+    `${SIL} style="fill:var(--sl-fig-surface,transparent)"`,
+  );
+  out += path(seg([X - w2 + r, lid], [X + w2 - r, lid]), EDGE);
+  out += path(
+    ring([[X - w2, top], [X + w2, top], [X + w2, lid], [X - w2, lid]], r),
+    'fill="currentColor" fill-opacity="0.04" stroke="none"',
+  );
+  return out;
+}
+
 /* ── FIG 0.1 · loop — the layered, longitudinal memory ──────────────────── */
 /* An exploded stack: five strata fused into a column, a floating lid carrying
    the Sonaloop loop-and-three-nodes mark in plan view, dotted lift lines. */
@@ -234,6 +259,134 @@ function figSignal() {
   return out;
 }
 
+/* ── FIG 0.4 · dissent — disagrees with you, on the record ──────────────── */
+/* A tight cluster of iso-aligned volumes, and one voice rotated 45° in plan —
+   so it alone faces the viewer — sitting apart, addressed by dotted ground
+   lines, three dots on its face: the objection, spoken and recorded. */
+function figDissent() {
+  const P = projector(242, 125);
+  const a = { px: 0, py: 0, w: 79, d: 79, h: 95 };
+  const b = { px: 92, py: 9, w: 68, d: 68, h: 59 };
+  const c = { px: 7, py: 92, w: 70, d: 70, h: 44 };
+  const block = (o, part, vent) =>
+    `<g data-part="${part}">${isoBox(P, o.px, o.py, o.w, o.d, o.h, 8)}${vent || ''}</g>`;
+
+  // the dissenter — rot-45, apart, front-and-center
+  const [DX, DY] = [236, 209];
+  const K = 47;
+  const H = 66;
+  let lone = rot45Box(P, DX, DY, K, H, 8);
+  const [lx, ly] = P(DX, DY, 0);
+  for (const dx of [-10, 0, 10]) {
+    lone += `<circle cx="${num(lx + dx)}" cy="${num(ly + K * ISO_Y - H + 15)}" r="1.2" fill="currentColor" fill-opacity="0.5" stroke="none"/>`;
+  }
+  lone = `<g data-part="lone">${lone}</g>`;
+
+  // dotted address lines, cluster → dissenter (ground level)
+  let tether = path(seg(P(b.px + b.w, b.py + b.d, 0), [num(lx + K * ISO_X * 0.6), num(ly + K * ISO_Y - H - 4)]),
+    'stroke-opacity="0.5" stroke-dasharray="0.2 3.2" stroke-linecap="round"');
+  tether += path(seg(P(c.px + c.w, c.py + c.d, 0), [num(lx - K * ISO_X * 0.7), num(ly + K * ISO_Y - H - 4)]),
+    'stroke-opacity="0.5" stroke-dasharray="0.2 3.2" stroke-linecap="round"');
+  tether = `<g data-part="tether">${tether}</g>`;
+
+  return (
+    block(a, 'blk-a', vents(P, a.px, a.py, a.h, 14, 14, 3, 3)) +
+    block(c, 'blk-c') +
+    block(b, 'blk-b') +
+    tether +
+    lone
+  );
+}
+
+/* ── FIG 1.1 · convene — the council seated on the loop ─────────────────── */
+/* The mark as architecture: member volumes arranged on the projected loop
+   ring, the three node positions seated taller, the matter at hand a bare
+   platform at the center. */
+function figConvene() {
+  const P = projector(240, 226);
+  const R = 118;
+  const NODE_ANGLES = [90, 210, 330]; // the mark's three nodes
+
+  let ringPaths = planeEllipse(P, 0, 0, 0, R, 'stroke-opacity="0.3"');
+  ringPaths += planeEllipse(P, 0, 0, 0, 86, `${HAIR} stroke-dasharray="0.2 5" stroke-linecap="round"`);
+  ringPaths = `<g data-part="ring">${ringPaths}</g>`;
+
+  const members = [];
+  for (const deg of [30, 90, 150, 210, 270, 330]) {
+    const t = (deg * Math.PI) / 180;
+    const cx = R * Math.cos(t);
+    const cy = R * Math.sin(t);
+    const node = NODE_ANGLES.includes(deg);
+    const w = node ? 46 : 44;
+    const h = node ? 52 : 28;
+    members.push({ deg, cx, cy, w, h, node, sum: cx + cy });
+  }
+  members.sort((m, n) => m.sum - n.sum); // back-to-front
+
+  let out = ringPaths;
+  let placedPlatform = false;
+  for (const [i, m] of members.entries()) {
+    if (!placedPlatform && m.sum >= 0) {
+      out += `<g data-part="platform">${isoBox(P, -32, -32, 64, 64, 10, 6)}</g>`;
+      placedPlatform = true;
+    }
+    let g = isoBox(P, m.cx - m.w / 2, m.cy - m.w / 2, m.w, m.w, m.h, 6);
+    if (m.node) g += vents(P, m.cx - m.w / 2, m.cy - m.w / 2, m.h, 12, 12, 2, 2);
+    out += `<g data-part="m-${i + 1}">${g}</g>`;
+  }
+  return out;
+}
+
+/* ── FIG 3.3 · core-sample — deep research as geology ───────────────────── */
+/* A ground plane with a square borehole; the extracted column — fine strata,
+   a few load-bearing findings — risen above it on dotted lift lines (the same
+   lines that float FIG 0.1's lid). */
+function figCoreSample() {
+  const P = projector(240, 271);
+  const HW = 28;       // borehole / column half-footprint
+  const LIFT = 52;     // column base height
+  const COL = 170;     // column height
+
+  // survey cross — hairlines along the plan axes, engraved on the ground,
+  // breaking at the borehole
+  let survey = '';
+  for (const [a, b] of [
+    [[-110, 0], [-HW - 8, 0]], [[HW + 8, 0], [110, 0]],
+    [[0, -85], [0, -HW - 8]], [[0, HW + 8], [0, 85]],
+  ]) {
+    survey += path(seg(P(a[0], a[1], 12), P(b[0], b[1], 12)), 'stroke-opacity="0.14"');
+  }
+  const ground = `<g data-part="ground">${isoBox(P, -120, -95, 240, 190, 12, 9)}${survey}</g>`;
+
+  const holePts = [P(-HW, -HW, 12), P(HW, -HW, 12), P(HW, HW, 12), P(-HW, HW, 12)];
+  let bore = path(ring(holePts, 5), 'stroke-opacity="0.45" style="fill:var(--sl-fig-surface,transparent)"');
+  bore += path(
+    ring([P(-HW + 5, -HW + 5, 12), P(HW - 5, -HW + 5, 12), P(HW - 5, HW - 5, 12), P(-HW + 5, HW - 5, 12)], 4),
+    `${HAIR} stroke-dasharray="0.2 4.4" stroke-linecap="round"`,
+  );
+  bore = `<g data-part="bore">${bore}</g>`;
+
+  let links = '';
+  for (const [x, y] of [[-HW, -HW], [HW, -HW], [HW, HW], [-HW, HW]]) {
+    links += path(seg(P(x, y, LIFT - 4), P(x, y, 16)),
+      'stroke-opacity="0.5" stroke-dasharray="0.2 3.4" stroke-linecap="round"');
+  }
+  links = `<g data-part="links">${links}</g>`;
+
+  let column = isoBox(P, -HW, -HW, HW * 2, HW * 2, COL, 5, LIFT);
+  for (let z = 8.5; z < COL - 4; z += 8.5) {
+    const key = [34, 85, 136].some((k) => Math.abs(z - k) < 4.25);
+    column += path(
+      bend([P(HW, -HW, LIFT + z), P(HW, HW, LIFT + z), P(-HW, HW, LIFT + z)], 3),
+      key ? 'stroke-opacity="0.4"' : 'stroke-opacity="0.14"',
+    );
+  }
+  column += vents(P, -HW, -HW, LIFT + COL, 12, 12, 2, 2);
+  column = `<g data-part="column">${column}</g>`;
+
+  return ground + bore + links + column;
+}
+
 /* ── the figures ────────────────────────────────────────────────────────── */
 /* Order defines the plate numbering (FIG 0.1 …). `label` is the React export;
    `title` + `note` are the canonical plate caption copy. */
@@ -258,5 +411,26 @@ export const figures = {
     title: 'Signal over noise',
     note: 'Deliberation damps the noise; what remains settles into the signal you act on.',
     body: figSignal(),
+  },
+  dissent: {
+    label: 'DissentFigure',
+    fig: '0.4',
+    title: 'Disagrees with you, on the record',
+    note: 'One voice faces you and holds its ground — the objection is spoken, and it stays.',
+    body: figDissent(),
+  },
+  convene: {
+    label: 'ConveneFigure',
+    fig: '1.1',
+    title: 'The council convenes',
+    note: 'Personas take their seats on the loop; the matter at hand sits in the middle.',
+    body: figConvene(),
+  },
+  coreSample: {
+    label: 'CoreSampleFigure',
+    fig: '3.3',
+    title: 'Research goes deep',
+    note: 'A longitudinal core, drawn from the ground it grew in — every stratum a session, a few load-bearing.',
+    body: figCoreSample(),
   },
 };

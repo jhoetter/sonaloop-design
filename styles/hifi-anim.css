@@ -610,13 +610,14 @@
      triggered by the svg's own :hover/:focus-visible or a `.pi-hover` ancestor.
      ════════════════════════════════════════════════════════════════════════ */
   .pi-fig [data-part] { transform-box: fill-box; transition: transform .8s cubic-bezier(.4, 0, .2, 1), opacity .8s ease; }
+  .pi-fig [data-part] :is(path, ellipse) { transition: stroke-opacity .8s ease; }
 
   /* loop — the lid lifts away and the strata breathe apart; lift lines firm up */
   .pi-fig-loop.pi-animate:is(:hover, :focus-visible) :is([data-part="lid"], [data-part="mark"]), .pi-hover:hover .pi-fig-loop.pi-animate :is([data-part="lid"], [data-part="mark"]) { transform: translateY(-7px); }
   .pi-fig-loop.pi-animate:is(:hover, :focus-visible) [data-part="slab-5"], .pi-hover:hover .pi-fig-loop.pi-animate [data-part="slab-5"] { transform: translateY(-3.5px); }
   .pi-fig-loop.pi-animate:is(:hover, :focus-visible) [data-part="slab-4"], .pi-hover:hover .pi-fig-loop.pi-animate [data-part="slab-4"] { transform: translateY(-2px); }
   .pi-fig-loop.pi-animate:is(:hover, :focus-visible) [data-part="slab-3"], .pi-hover:hover .pi-fig-loop.pi-animate [data-part="slab-3"] { transform: translateY(-1px); }
-  .pi-fig-loop.pi-animate:is(:hover, :focus-visible) [data-part="links"], .pi-hover:hover .pi-fig-loop.pi-animate [data-part="links"] { stroke-opacity: .8; }
+  .pi-fig-loop.pi-animate:is(:hover, :focus-visible) [data-part="links"], .pi-hover:hover .pi-fig-loop.pi-animate [data-part="links"] path { stroke-opacity: .8; }
 
   /* council — the voices rise to the table, one after another; the absent one firms up */
   .pi-fig-council.pi-animate:is(:hover, :focus-visible) [data-part="blk-a"], .pi-hover:hover .pi-fig-council.pi-animate [data-part="blk-a"] { transform: translateY(-4px); }
@@ -624,6 +625,25 @@
   .pi-fig-council.pi-animate:is(:hover, :focus-visible) [data-part="blk-c"], .pi-hover:hover .pi-fig-council.pi-animate [data-part="blk-c"] { transform: translateY(-2px); transition-delay: .04s; }
   .pi-fig-council.pi-animate:is(:hover, :focus-visible) [data-part="blk-d"], .pi-hover:hover .pi-fig-council.pi-animate [data-part="blk-d"] { transform: translateY(-2.5px); transition-delay: .11s; }
   .pi-fig-council.pi-animate:is(:hover, :focus-visible) [data-part="ghost"], .pi-hover:hover .pi-fig-council.pi-animate [data-part="ghost"] { opacity: .55; transition-delay: .15s; }
+
+  /* dissent — the cluster rises; the lone voice holds its ground; the address lines firm up */
+  .pi-fig-dissent.pi-animate:is(:hover, :focus-visible) [data-part="blk-a"], .pi-hover:hover .pi-fig-dissent.pi-animate [data-part="blk-a"] { transform: translateY(-4px); }
+  .pi-fig-dissent.pi-animate:is(:hover, :focus-visible) [data-part="blk-b"], .pi-hover:hover .pi-fig-dissent.pi-animate [data-part="blk-b"] { transform: translateY(-3px); transition-delay: .06s; }
+  .pi-fig-dissent.pi-animate:is(:hover, :focus-visible) [data-part="blk-c"], .pi-hover:hover .pi-fig-dissent.pi-animate [data-part="blk-c"] { transform: translateY(-2.5px); transition-delay: .03s; }
+  .pi-fig-dissent.pi-animate:is(:hover, :focus-visible) [data-part="tether"], .pi-hover:hover .pi-fig-dissent.pi-animate [data-part="tether"] path { stroke-opacity: .8; }
+
+  /* convene — the members take their seats, one after another around the loop */
+  .pi-fig-convene.pi-animate:is(:hover, :focus-visible) [data-part^="m-"], .pi-hover:hover .pi-fig-convene.pi-animate [data-part^="m-"] { animation: pi-fig-ripple 1.2s cubic-bezier(.4, 0, .2, 1) both; }
+  .pi-fig-convene.pi-animate:is(:hover, :focus-visible) [data-part="m-2"], .pi-hover:hover .pi-fig-convene.pi-animate [data-part="m-2"] { animation-delay: .08s; }
+  .pi-fig-convene.pi-animate:is(:hover, :focus-visible) [data-part="m-3"], .pi-hover:hover .pi-fig-convene.pi-animate [data-part="m-3"] { animation-delay: .16s; }
+  .pi-fig-convene.pi-animate:is(:hover, :focus-visible) [data-part="m-4"], .pi-hover:hover .pi-fig-convene.pi-animate [data-part="m-4"] { animation-delay: .24s; }
+  .pi-fig-convene.pi-animate:is(:hover, :focus-visible) [data-part="m-5"], .pi-hover:hover .pi-fig-convene.pi-animate [data-part="m-5"] { animation-delay: .32s; }
+  .pi-fig-convene.pi-animate:is(:hover, :focus-visible) [data-part="m-6"], .pi-hover:hover .pi-fig-convene.pi-animate [data-part="m-6"] { animation-delay: .4s; }
+  .pi-fig-convene.pi-animate:is(:hover, :focus-visible) [data-part="ring"], .pi-hover:hover .pi-fig-convene.pi-animate [data-part="ring"] ellipse { stroke-opacity: .55; }
+
+  /* coreSample — the extraction continues; the lift lines firm up */
+  .pi-fig-coreSample.pi-animate:is(:hover, :focus-visible) [data-part="column"], .pi-hover:hover .pi-fig-coreSample.pi-animate [data-part="column"] { transform: translateY(-7px); }
+  .pi-fig-coreSample.pi-animate:is(:hover, :focus-visible) [data-part="links"], .pi-hover:hover .pi-fig-coreSample.pi-animate [data-part="links"] path { stroke-opacity: .8; }
 
   /* signal — one quiet pulse runs down the waveform */
   .pi-fig-signal.pi-animate:is(:hover, :focus-visible) [data-part], .pi-hover:hover .pi-fig-signal.pi-animate [data-part] { animation: pi-fig-ripple 1.2s cubic-bezier(.4, 0, .2, 1) both; }
