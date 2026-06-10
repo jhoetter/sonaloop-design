@@ -91,13 +91,17 @@ consumers by `npm run gen`, drawn entirely on `currentColor` (one asset serves
 light and dark), with an opt-in pure-CSS ambient hover gesture in
 `styles/hifi-anim.css` (reduced-motion safe).
 
-Three launch figures, mapping the brand's three claims:
+The family is numbered by tier — **FIG 0** brand claims (home), **FIG 1** the
+mechanism (how it works), **FIG 2** formats, **FIG 3** products:
 
 | key | plate | motif |
 | --- | --- | --- |
-| `loop`    | FIG 0.1 · Built for the long run | exploded layer stack, the loop mark engraved on the floating lid |
-| `council` | FIG 0.2 · Deliberation, not consensus | a cluster of independent volumes + one faint echo block |
-| `signal`  | FIG 0.3 · Signal over noise | a damped waveform of upright panels settling flat |
+| `loop`       | FIG 0.1 · Built for the long run | exploded layer stack, the loop mark engraved on the floating lid |
+| `council`    | FIG 0.2 · Deliberation, not consensus | a cluster of independent volumes + one faint echo block |
+| `signal`     | FIG 0.3 · Signal over noise | a damped waveform of upright panels settling flat |
+| `dissent`    | FIG 0.4 · Disagrees with you, on the record | one voice rotated 45° in plan — the only viewer-facing block — apart and holding its ground |
+| `convene`    | FIG 1.1 · The council convenes | member volumes seated on the projected loop ring, the three node positions taller |
+| `coreSample` | FIG 3.3 · Research goes deep | a borehole in a surveyed ground plane, the extracted strata column risen on dotted lift lines |
 
 ```tsx
 import { LoopFigure } from 'sonaloop-design';      // CouncilFigure, SignalFigure

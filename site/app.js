@@ -778,9 +778,17 @@ function pageFigures() {
     <h1 class="ds-h1">Figures</h1>
     <p class="ds-lead">The system's high-fidelity illustrative plates — large, technical, fine-line isometric drawings that anchor feature sections on marketing pages and docs. They sit above icons in fidelity but work exactly like them under the hood: authored once in <code>figures.data.mjs</code>, generated into both stacks, drawn entirely on <code>currentColor</code> so one asset serves light and dark. Hover a plate for its ambient gesture.</p>
 
-    ${h2('figures-plates', 'The plates')}
-    ${p('Each figure ships with its canonical plate caption — a mono <code>FIG 0.x</code> id, a title and a one-line note — the composition marketing sections reproduce. The motifs are the brand’s three claims: the layered longitudinal <strong>memory</strong>, the deliberating <strong>council</strong>, and the <strong>signal</strong> settling out of noise.')}
-    <div class="ds-fig-grid">${Object.keys(figures).map(plate).join('')}</div>
+    ${p('Each figure ships with its canonical plate caption — a mono <code>FIG n.x</code> id, a title and a one-line note — the composition marketing sections reproduce. The family is numbered by tier: <strong>FIG 0</strong> the brand claims (home), <strong>FIG 1</strong> the mechanism (how it works), <strong>FIG 2</strong> the formats, <strong>FIG 3</strong> the products.')}
+    ${[
+      ['0', 'figures-claims', 'FIG 0 · Brand claims', 'What Sonaloop believes — the home-page plates: layered longitudinal memory, the deliberating council, signal out of noise, and the voice that disagrees on the record.'],
+      ['1', 'figures-mechanism', 'FIG 1 · The mechanism', 'How a study actually runs — plates for <code>/how-it-works</code> and <code>/install</code>: the council convenes on the loop.'],
+      ['2', 'figures-formats', 'FIG 2 · Formats', 'The session shapes — head-to-head, red-team, pricing pressure.'],
+      ['3', 'figures-products', 'FIG 3 · Products', 'One signature plate per product page — Research drills the longitudinal core.'],
+    ].map(([tier, id, heading, intro]) => {
+      const keys = Object.keys(figures).filter((k) => figures[k].fig.split('.')[0] === tier);
+      if (!keys.length) return '';
+      return `${h2(id, heading)}${p(intro)}<div class="ds-fig-grid">${keys.map(plate).join('')}</div>`;
+    }).join('')}
 
     ${h2('figures-usage', 'Usage')}
     ${p('Import from the main barrel like any icon. Figures are wireframes by default; set <code>--sl-fig-surface</code> to the plate’s background colour and the volumes occlude each other (the reference look). <code>animate</code> opts into the slow hover gesture (needs <code>sonaloop-design/style.css</code>; respects reduced motion).')}
