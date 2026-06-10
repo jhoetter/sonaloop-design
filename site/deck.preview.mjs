@@ -147,9 +147,10 @@ const PAINTERS = {
 
   summary(s, title) {
     const n = (s.items || []).length, cols = 2, rows = Math.ceil(n / cols);
-    const gap = 0.25, cw = (W - 2 * M - gap) / 2, chh = (H - F.contentTop - 0.85 - gap * (rows - 1)) / rows;
+    const top = F.contentTop + 0.1; // mirrors _pptx._grid_cells (cards start at 1.75in)
+    const gap = 0.25, cw = (W - 2 * M - gap) / 2, chh = (H - top - 0.85 - gap * (rows - 1)) / rows;
     const cells = (s.items || []).map((it, i) => {
-      const cx = M + (i % cols) * (cw + gap), cy = F.contentTop + 0.1 + Math.floor(i / cols) * (chh + gap);
+      const cx = M + (i % cols) * (cw + gap), cy = top + Math.floor(i / cols) * (chh + gap);
       return `<div style="${box(cx, cy, cw, chh)}background:${P.panel};border:1px solid ${P.line};border-radius:${IN(0.12)};padding:${IN(0.22)} ${IN(0.26)};box-sizing:border-box;">
           <div style="display:flex;gap:${IN(0.14)};align-items:baseline;">
             <span style="display:inline-block;flex:none;width:${IN(0.05)};height:${IN(0.21)};background:${P.accent};border-radius:${IN(0.03)};align-self:center;"></span>
@@ -189,9 +190,10 @@ const PAINTERS = {
   voices(s, title) {
     const SENT = { support: P.green, conditional: P.amber, opposed: P.red, neutral: P.muted };
     const items = s.items || [], cols = 2, rows = Math.ceil(items.length / cols);
-    const gap = 0.25, cw = (W - 2 * M - gap) / 2, chh = (H - F.contentTop - 0.85 - gap * (rows - 1)) / rows;
+    const top = F.contentTop + 0.1; // mirrors _pptx._grid_cells (cards start at 1.75in)
+    const gap = 0.25, cw = (W - 2 * M - gap) / 2, chh = (H - top - 0.85 - gap * (rows - 1)) / rows;
     const cards = items.map((it, i) => {
-      const cx = M + (i % cols) * (cw + gap), cy = F.contentTop + 0.1 + Math.floor(i / cols) * (chh + gap);
+      const cx = M + (i % cols) * (cw + gap), cy = top + Math.floor(i / cols) * (chh + gap);
       const sc = SENT[it.sentiment] || P.muted;
       return `<div style="${box(cx, cy, cw, chh)}background:${P.panel};border:1px solid ${P.line};border-radius:${IN(0.12)};padding:${IN(0.18)} ${IN(0.24)};box-sizing:border-box;">
           <div style="display:flex;align-items:center;gap:${IN(0.14)};">
@@ -288,6 +290,10 @@ const PAINTERS = {
       + footer(title);
   },
 };
+
+// recommendation/risk are the insight painter with a tone — same aliasing as _pptx.py.
+PAINTERS.recommendation = PAINTERS.insight;
+PAINTERS.risk = PAINTERS.insight;
 
 /** One slide, painted from its slide dict. `deckTitle` feeds the running footer. */
 export function renderDeckSlide(sample, deckTitle = 'Report') {
