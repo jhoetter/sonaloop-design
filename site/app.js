@@ -199,16 +199,20 @@ function chartDotPlot(items, { title = '', min = 1, max = 5 } = {}) {
   return `<figure class="sl-chart">${chTitle(title)}<div class="sl-dots">${rows}</div>${scale}</figure>`;
 }
 
+const chGrid = (W, H) => [0.25, 0.5, 0.75].map((q) => `<line class="sl-line__grid" x1="0" y1="${(H * q).toFixed(1)}" x2="${W}" y2="${(H * q).toFixed(1)}"></line>`).join('');
+
 function chartLine(series, { title = '', labels = null } = {}) {
   const all = series.flatMap((s) => s.points).filter((v) => Number.isFinite(v));
   const mn = Math.min(...all), mx = Math.max(...all), span = (mx - mn) || 1, W = 100, H = 40;
   const xy = (pts) => pts.map((v, i) => [(i / (pts.length - 1)) * W, H - ((v - mn) / span) * H]);
   const paths = series.map((s, i) => {
     const c = s.color || CHART_SERIES[i % CHART_SERIES.length]; const pts = xy(s.points.filter((v) => Number.isFinite(v)));
+    const poly = pts.map(([x, y]) => `${x.toFixed(2)},${y.toFixed(2)}`).join(' ');
+    const area = series.length === 1 ? `<polygon class="sl-line__area" points="0,${H} ${poly} ${pts[pts.length - 1][0].toFixed(2)},${H}"></polygon>` : '';
     const dots = pts.map(([x, y]) => `<circle class="sl-line__dot" cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" r="1.4"></circle>`).join('');
-    return `<g style="--c:${c}"><polyline class="sl-line__path" points="${pts.map(([x, y]) => `${x.toFixed(2)},${y.toFixed(2)}`).join(' ')}"></polyline>${dots}</g>`;
+    return `<g style="--c:${c}">${area}<polyline class="sl-line__path" points="${poly}"></polyline>${dots}</g>`;
   }).join('');
-  const svg = `<svg viewBox="0 0 ${W} ${H}" role="img"><line class="sl-line__axis" x1="0" y1="${H}" x2="${W}" y2="${H}"></line>${paths}</svg>`;
+  const svg = `<svg viewBox="0 0 ${W} ${H}" role="img">${chGrid(W, H)}<line class="sl-line__axis" x1="0" y1="${H}" x2="${W}" y2="${H}"></line>${paths}</svg>`;
   const labs = labels ? `<div class="sl-line__labels">${labels.map((l) => `<span>${esc(l)}</span>`).join('')}</div>` : '';
   const legend = series.length > 1 ? `<div class="sl-legend sl-legend--row" style="margin-top:.6em">${series.map((s, i) => `<span class="sl-legend__item"><span class="sl-legend__sw" style="--c:${s.color || CHART_SERIES[i % CHART_SERIES.length]}"></span><span class="sl-legend__label">${chMd(s.label)}</span></span>`).join('')}</div>` : '';
   return `<figure class="sl-chart">${chTitle(title)}<div class="sl-line">${svg}${labs}</div>${legend}</figure>`;
@@ -253,7 +257,7 @@ function chartBurnup(series, { title = '', labels = null, target = null, now = n
     return `<g style="--c:${c}"><polygon class="sl-line__area" points="0,${H} ${poly} ${pts[pts.length - 1][0].toFixed(2)},${H}"></polygon><polyline class="sl-line__path" points="${poly}"></polyline>${dots}</g>`;
   }).join('');
   const nowLine = xNow !== null ? `<line class="sl-line__now" x1="${xNow.toFixed(2)}" y1="0" x2="${xNow.toFixed(2)}" y2="${H}"></line>` : '';
-  const svg = `<svg viewBox="0 0 ${W} ${H}" role="img"><line class="sl-line__axis" x1="0" y1="${H}" x2="${W}" y2="${H}"></line>${pre}${paths}${nowLine}</svg>`;
+  const svg = `<svg viewBox="0 0 ${W} ${H}" role="img">${chGrid(W, H)}<line class="sl-line__axis" x1="0" y1="${H}" x2="${W}" y2="${H}"></line>${pre}${paths}${nowLine}</svg>`;
   const labs = labels ? `<div class="sl-line__labels">${labels.map((l) => `<span>${esc(l)}</span>`).join('')}</div>` : '';
   const legend = series.length > 1 ? `<div class="sl-legend sl-legend--row" style="margin-top:.6em">${series.map((s, i) => `<span class="sl-legend__item"><span class="sl-legend__sw" style="--c:${s.color || CHART_SERIES[i % CHART_SERIES.length]}"></span><span class="sl-legend__label">${chMd(s.label)}</span></span>`).join('')}</div>` : '';
   return `<figure class="sl-chart">${chTitle(title)}<div class="sl-line">${svg}${labs}</div>${legend}</figure>`;
@@ -274,7 +278,7 @@ function chartStackedArea(series, { title = '', labels = null } = {}) {
     prev = top;
     return `<g style="--c:${s.color || CHART_SERIES[k % CHART_SERIES.length]}"><polygon class="sl-area__band" points="${upper} ${lower}"></polygon><polyline class="sl-area__edge" points="${upper}"></polyline></g>`;
   }).join('');
-  const svg = `<svg viewBox="0 0 ${W} ${H}" role="img"><line class="sl-line__axis" x1="0" y1="${H}" x2="${W}" y2="${H}"></line>${groups}</svg>`;
+  const svg = `<svg viewBox="0 0 ${W} ${H}" role="img">${chGrid(W, H)}<line class="sl-line__axis" x1="0" y1="${H}" x2="${W}" y2="${H}"></line>${groups}</svg>`;
   const labs = labels ? `<div class="sl-line__labels">${labels.map((l) => `<span>${esc(l)}</span>`).join('')}</div>` : '';
   const legend = `<div class="sl-legend sl-legend--row" style="margin-top:.6em">${series.map((s, i) => `<span class="sl-legend__item"><span class="sl-legend__sw" style="--c:${s.color || CHART_SERIES[i % CHART_SERIES.length]}"></span><span class="sl-legend__label">${chMd(s.label)}</span></span>`).join('')}</div>`;
   return `<figure class="sl-chart">${chTitle(title)}<div class="sl-line">${svg}${labs}</div>${legend}</figure>`;
@@ -1469,16 +1473,20 @@ const cChartDotPlot = () => componentPage({
 
 const cChartLine = () => componentPage({
   id: 'chart-line', title: 'Line · Trend Chart',
-  desc: 'A <b>trend over a sequence</b> — confidence across council rounds, a metric over time. A static inline-SVG polyline per series (the one chart that needs SVG), still print- and PDF-safe. Multi-series gets a legend.',
-  demo: `<div style="width:100%;max-width:520px">
+  desc: 'A <b>trend over a sequence</b> — confidence across council rounds, a metric over time. A static inline-SVG polyline per series over quiet hairline gridlines, still print- and PDF-safe. A <b>single series gets a soft band fill</b>; multi-series stays clean and gets a legend. Pass <code>target</code> for a dotted horizontal reference line.',
+  demo: `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:34px;width:100%">
       ${chartLine([
         { label: 'Confidence', points: [2, 3, 3, 4, 5, 6] },
         { label: 'Coverage', points: [1, 2, 4, 4, 5, 5], color: 'var(--sl-violet)' },
       ], { title: 'Across council rounds', labels: ['R1', 'R2', 'R3', 'R4', 'R5', 'R6'] })}
+      ${chartLine([
+        { label: 'NPS', points: [12, 18, 25, 31, 38] },
+      ], { title: 'Single series · band fill', labels: ['Q1', 'Q2', 'Q3', 'Q4', 'Q5'] })}
     </div>`,
   variants: { cols: ['Prop', 'Type', 'Effect'], rows: [
-    ['series', '{label, points: number[], color?}[]', 'One polyline per series (needs ≥ 2 points).'],
+    ['series', '{label, points: number[], color?}[]', 'One polyline per series (needs ≥ 2 points); a single series adds the band fill.'],
     ['labels', 'string[]', 'Optional x-axis tick labels.'],
+    ['target', 'number', 'Dotted horizontal reference line (goal, benchmark); stretches the y scale.'],
     ['minValue / maxValue', 'number', 'Fix the y-range (else derived from the data).'],
     ['showDots', 'boolean = true', 'Draw a marker at each point.'],
   ] },

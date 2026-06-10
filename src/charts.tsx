@@ -271,11 +271,15 @@ export function DotPlotChart({ items, title, minValue = 1, maxValue = 5, showMea
 }
 
 export interface LineSeries { label: string; points: number[]; color?: string }
-export function LineChart({ series, title, labels, minValue, maxValue, showDots = true }:
-  { series: LineSeries[]; title?: string; labels?: string[]; minValue?: number; maxValue?: number; showDots?: boolean }) {
+const Grid = ({ w, h }: { w: number; h: number }) => (
+  <>{[0.25, 0.5, 0.75].map((q) => <line className="sl-line__grid" key={q} x1="0" y1={(h * q).toFixed(1)} x2={w} y2={(h * q).toFixed(1)} />)}</>
+);
+export function LineChart({ series, title, labels, minValue, maxValue, showDots = true, target }:
+  { series: LineSeries[]; title?: string; labels?: string[]; minValue?: number; maxValue?: number; showDots?: boolean; target?: number }) {
   const lines = series.filter((s) => Array.isArray(s.points) && s.points.filter((v) => Number.isFinite(v)).length > 1);
   if (!lines.length) return null;
   const all = lines.flatMap((s) => s.points).filter((v) => Number.isFinite(v));
+  if (Number.isFinite(target)) all.push(target!);
   const mn = minValue ?? Math.min(...all);
   const mx = maxValue ?? Math.max(...all);
   const span = (mx - mn) || 1;
@@ -286,12 +290,19 @@ export function LineChart({ series, title, labels, minValue, maxValue, showDots 
       <Title title={title} />
       <div className="sl-line">
         <svg viewBox={`0 0 ${W} ${H}`} role="img">
+          <Grid w={W} h={H} />
           <line className="sl-line__axis" x1="0" y1={H} x2={W} y2={H} />
+          {Number.isFinite(target) && (() => {
+            const y = (H - ((target! - mn) / span) * H).toFixed(2);
+            return <line className="sl-line__ref" x1="0" y1={y} x2={W} y2={y} />;
+          })()}
           {lines.map((s, i) => {
             const pts = xy(s.points.filter((v) => Number.isFinite(v)));
+            const poly = pts.map(([x, y]) => `${x.toFixed(2)},${y.toFixed(2)}`).join(' ');
             return (
               <g key={i} style={{ '--c': s.color ?? SERIES[i % SERIES.length] } as Sv}>
-                <polyline className="sl-line__path" points={pts.map(([x, y]) => `${x.toFixed(2)},${y.toFixed(2)}`).join(' ')} />
+                {lines.length === 1 && <polygon className="sl-line__area" points={`0,${H} ${poly} ${pts[pts.length - 1][0].toFixed(2)},${H}`} />}
+                <polyline className="sl-line__path" points={poly} />
                 {showDots && pts.map(([x, y], j) => <circle className="sl-line__dot" key={j} cx={x.toFixed(2)} cy={y.toFixed(2)} r="1.4" />)}
               </g>
             );
@@ -386,6 +397,7 @@ export function BurnupChart({ series, title, labels, target, now, minValue, maxV
       <Title title={title} />
       <div className="sl-line">
         <svg viewBox={`0 0 ${W} ${H}`} role="img">
+          <Grid w={W} h={H} />
           <line className="sl-line__axis" x1="0" y1={H} x2={W} y2={H} />
           {xNow !== null && xNow < W && <rect className="sl-burnup__future" x={xNow.toFixed(2)} y="0" width={(W - xNow).toFixed(2)} height={H} />}
           {hatch}
@@ -450,6 +462,7 @@ export function StackedAreaChart({ series, title, labels, maxValue }:
       <Title title={title} />
       <div className="sl-line">
         <svg viewBox={`0 0 ${W} ${H}`} role="img">
+          <Grid w={W} h={H} />
           <line className="sl-line__axis" x1="0" y1={H} x2={W} y2={H} />
           {groups}
         </svg>

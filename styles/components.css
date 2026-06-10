@@ -386,7 +386,7 @@
 .sl-bar__label { color: var(--sl-ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .sl-bar__track { display: block; height: .7em; border-radius: var(--sl-radius-full); background: var(--sl-surface-2); overflow: hidden; }
 .sl-bar__fill { display: block; height: 100%; width: var(--v, 0%); border-radius: var(--sl-radius-full); background: var(--c, var(--sl-accent)); }
-.sl-bar__val { color: var(--sl-muted); font-variant-numeric: tabular-nums; min-width: 2em; text-align: right; }
+.sl-bar__val { color: var(--sl-muted); font-variant-numeric: tabular-nums; min-width: 2em; text-align: right; font-size: .85em; }
 /* Stacked bar — the fill is sized to the bar total (--v); inner --seg-s split it by series value. */
 .sl-bar__fill--stack { display: flex; background: none; overflow: hidden; }
 .sl-bar__seg { height: 100%; flex-basis: 0; background: var(--c, var(--sl-accent)); }
@@ -411,7 +411,7 @@
 .sl-dbar__neg { justify-content: flex-end; border-radius: var(--sl-radius-full) 0 0 var(--sl-radius-full); }
 .sl-dbar__pos { justify-content: flex-start; border-radius: 0 var(--sl-radius-full) var(--sl-radius-full) 0; border-left: 1px solid var(--sl-line); }
 .sl-dbar__fill { width: var(--v, 0%); height: 100%; background: var(--c, var(--sl-accent)); border-radius: inherit; }
-.sl-dbar__val { color: var(--sl-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.sl-dbar__val { color: var(--sl-muted); font-variant-numeric: tabular-nums; white-space: nowrap; font-size: .85em; }
 
 /* Heatmap / matrix — option × criteria (or persona × theme); cells tinted by value via color-mix.
    `grid-template-columns` and each cell's tint background are set inline. */
@@ -432,14 +432,17 @@
   width: .72em; height: .72em; border-radius: 50%; background: var(--c, var(--sl-accent)); opacity: .55; }
 .sl-dot-mean { position: absolute; top: 50%; left: var(--x); transform: translate(-50%, -50%);
   width: .26em; height: 1.3em; border-radius: 2px; background: var(--c, var(--sl-accent)); box-shadow: 0 0 0 2px var(--sl-bg); }
-.sl-dot-val { color: var(--sl-muted); font-variant-numeric: tabular-nums; min-width: 2em; text-align: right; }
+.sl-dot-val { color: var(--sl-muted); font-variant-numeric: tabular-nums; min-width: 2em; text-align: right; font-size: .85em; }
 .sl-dot-scale { display: grid; grid-template-columns: minmax(4.5em, 10em) 1fr auto; gap: .75em; margin-top: .35em; }
 .sl-dot-scale__axis { display: flex; justify-content: space-between; font-size: .75em; color: var(--sl-faint); }
 
 /* Line / trend — a static inline-SVG polyline (the one chart that needs SVG). `--c` carries the
-   series colour; non-scaling strokes keep the line crisp at any render size. */
+   series colour; non-scaling strokes keep the line crisp at any render size. Quiet quarter-height
+   gridlines (`.sl-line__grid`) sit under every SVG chart, Linear-style. */
 .sl-line svg { width: 100%; height: auto; display: block; overflow: visible; }
 .sl-line__axis { stroke: var(--sl-line); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.sl-line__grid { stroke: color-mix(in srgb, var(--sl-line) 55%, transparent); stroke-width: 1;
+  vector-effect: non-scaling-stroke; }
 .sl-line__path { fill: none; stroke: var(--c, var(--sl-accent)); stroke-width: 1.75;
   vector-effect: non-scaling-stroke; stroke-linejoin: round; stroke-linecap: round; }
 .sl-line__dot { fill: var(--c, var(--sl-accent)); }
