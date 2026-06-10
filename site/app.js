@@ -2181,7 +2181,7 @@ function deckLayoutPage(l, i) {
 
 const DECK_ICO = { cover: 'star', agenda: 'squareRows', section: 'squareSplit', 'canvas-section': 'compass', pillars: 'network', summary: 'bulb',
   insight: 'target', recommendation: 'check', risk: 'diamond', quote: 'contact', voices: 'projects',
-  stats: 'analytics', chart: 'wave', comparison: 'squareCols', timeline: 'clock', closing: 'sonaloop',
+  stats: 'analytics', chart: 'wave', charts: 'pieChart', table: 'squareGrid', comparison: 'squareCols', timeline: 'clock', closing: 'sonaloop',
   content: 'report', image: 'panel' };
 
 const NAV = [

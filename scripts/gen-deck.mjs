@@ -20,7 +20,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '..');
 const { palette, frame, type, tones, layouts, deckTitle,
         deckIcons, deckIconTints, deckLogos, deckCanvases } = await import(resolve(root, 'deck.data.mjs'));
-const { hifi } = await import(resolve(root, 'icons.data.mjs'));
+const { regular, hifi } = await import(resolve(root, 'icons.data.mjs'));
 
 // JSON → Python literal (true/false/null → True/False/None); JSON.stringify gives us
 // stable escaping, the replacements only touch bare literals (\b guards key collisions).
@@ -84,17 +84,26 @@ async function iconPng(spec, hex) {
 const ICONS = {};
 for (const name of deckIcons) {
   const spec = hifi[name];
-  if (!spec) { console.warn(`deck icon missing from hifi set: ${name}`); continue; }
+  // hard fail: the deck set is curated — a vanished icon must break the build, not the deck
+  if (!spec) throw new Error(`deck icon missing from hifi set: ${name}`);
   ICONS[name] = {};
   for (const tint of deckIconTints) {
     ICONS[name][tint] = (await iconPng(spec, palette[tint])).toString('base64');
   }
 }
+// Logos use the REGULAR icon set — the canonical .sl-logo lockup mark (24×24, stroke 1.75),
+// not the hi-fi twin (user feedback: the deck logo must match the sidebar/website lockup).
+async function logoPng(spec, hex) {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="${ICON_PX}" height="${ICON_PX}"`
+    + ` fill="none" stroke="${hex}" color="${hex}" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">${spec.body}</svg>`;
+  return (await sharp(Buffer.from(svg)).png()).toBuffer();
+}
+
 const LOGOS = {};
 for (const name of deckLogos) {
-  const spec = hifi[name];
-  if (!spec) { console.warn(`deck logo missing from hifi set: ${name}`); continue; }
-  LOGOS[name] = (await iconPng(spec, palette.ink)).toString('base64');
+  const spec = regular[name];
+  if (!spec) throw new Error(`deck logo missing from regular set: ${name}`);
+  LOGOS[name] = (await logoPng(spec, palette.ink)).toString('base64');
 }
 const CANVASES = {};
 for (const [name, file] of Object.entries(deckCanvases)) {

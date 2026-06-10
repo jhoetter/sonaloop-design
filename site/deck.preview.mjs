@@ -9,7 +9,7 @@
  */
 import { palette as P, frame as F, type as T, tones as TONES, deckCanvases } from '/deck.data.mjs';
 import { fonts } from '/tokens.data.mjs';
-import { hifi } from '/icons.data.mjs';
+import { regular, hifi } from '/icons.data.mjs';
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 // single-quote the family names — these stacks land inside style="…" attributes
@@ -61,10 +61,17 @@ const hifiSvg = (name, hex, sizeIn) => {
 };
 const canvasUrl = (name) => (deckCanvases[name] ? `/images/canvas/${deckCanvases[name]}` : '');
 
-// the brand moment: mark + wordmark ("sona" ink · "loop" muted), top-left of cover/closing
+// regular icon as inline SVG — the canonical .sl-logo lockup mark (24×24, stroke 1.75)
+const regSvg = (name, hex, sizeIn) => {
+  const spec = regular[name];
+  if (!spec) return '';
+  return `<svg viewBox="0 0 24 24" style="width:${IN(sizeIn)};height:${IN(sizeIn)};color:${hex};" fill="none" stroke="${hex}" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">${spec.body}</svg>`;
+};
+
+// the brand moment: the .sl-logo lockup mark + wordmark ("sona" ink · "loop" muted)
 const logoRow = (x, y, markIn = 0.42) =>
   `<div style="${box(x, y, 4.0, markIn + 0.08)}display:flex;align-items:center;gap:${IN(0.14)};">
-     ${hifiSvg('sonaloop', P.ink, markIn)}
+     ${regSvg('sonaloop', P.ink, markIn)}
      <span style="${ts('attribution', { size: 16 })}">sona<span style="color:${P.muted};">loop</span></span>
    </div>`;
 
@@ -150,7 +157,8 @@ const PAINTERS = {
   },
 
   'canvas-section'(s, title) {
-    return `<div style="position:absolute;inset:0;background:url('${canvasUrl(s.canvas)}') center/cover;"></div>`
+    const cu = canvasUrl(s.canvas);
+    return (cu ? `<div style="position:absolute;inset:0;background:url('${cu}') center/cover;"></div>` : '')
       + `<div style="${box(0.9, H - 2.65, 6.4, 1.75)}background:${P.panel};border-radius:${IN(0.16)};box-shadow:0 ${IN(0.08)} ${IN(0.3)} rgba(26,24,21,.18);padding:${IN(0.28)} ${IN(0.34)};box-sizing:border-box;">
           ${s.num ? `<div style="${ts('num', { size: 13, color: P.accent })}letter-spacing:.06em;">${esc(s.num)}</div>` : ''}
           <div style="${ts('title', { lh: 1.15 })}margin-top:${IN(0.06)};">${esc(s.title || '')}</div>
@@ -267,6 +275,32 @@ const PAINTERS = {
   chart(s, title) {
     return header(s.num, s.heading)
       + chartSlot(s.chart, M, F.contentTop + 0.15, W - 2 * M, H - F.contentTop - 1.25)
+      + (s.footnote ? `<div style="${box(M, H - 0.72, W - 2 * M, 0.4)}${ts('caption', { italic: true })}">${esc(s.footnote)}</div>` : '')
+      + footer(title);
+  },
+
+  charts(s, title) {
+    const items = s.items || [], n = Math.max(items.length, 1);
+    const gap = 0.4, cw = (W - 2 * M - gap * (n - 1)) / n, top = F.contentTop + 0.1;
+    const ch = H - top - 0.5 - (s.footnote ? 1.3 : 1.0);
+    const cols = items.map((it, i) => {
+      const x = M + i * (cw + gap);
+      return `<div style="${box(x, top, cw, 0.35)}${ts('body', { size: 13, bold: true })}">${esc(it.title || '')}</div>`
+        + chartSlot(it.chart, x, top + 0.5, cw, ch);
+    }).join('');
+    return header(s.num, s.heading) + cols
+      + (s.footnote ? `<div style="${box(M, H - 0.72, W - 2 * M, 0.4)}${ts('caption', { italic: true })}">${esc(s.footnote)}</div>` : '')
+      + footer(title);
+  },
+
+  table(s, title) {
+    const cols = s.columns || [], rows = s.rows || [], top = F.contentTop + 0.15;
+    const cell = (txt, style) => `<td style="padding:${IN(0.1)} ${IN(0.16)};border-bottom:1px solid ${P.line};${style}">${esc(txt)}</td>`;
+    const head = `<tr>${cols.map((c) => cell(c, `${ts('body', { size: 11.5, bold: true })}background:${P.accentWeak};`)).join('')}</tr>`;
+    const body = rows.map((r, i) => `<tr style="background:${i % 2 ? P.panel : 'transparent'};">${r.map((c, j) =>
+      cell(c, ts('body', { size: 11.5, bold: j === 0, color: j === 0 ? P.ink : P.muted }))).join('')}</tr>`).join('');
+    return header(s.num, s.heading)
+      + `<div style="${box(M, top, W - 2 * M, H - top - 1.0)}"><table style="width:100%;border-collapse:collapse;">${head}${body}</table></div>`
       + (s.footnote ? `<div style="${box(M, H - 0.72, W - 2 * M, 0.4)}${ts('caption', { italic: true })}">${esc(s.footnote)}</div>` : '')
       + footer(title);
   },
