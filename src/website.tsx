@@ -193,7 +193,7 @@ export function CardGrid({ children, className = '' }: { children: ReactNode; cl
 
 /* ── Layout primitives (page scaffolding) ────────────────────────────────────────────────── */
 /** A hairline section divider (a clean rule; `muted`/`dark` tune the opacity & colour). */
-export function RulerDivider({ className = '', muted = false, dark = false }: { className?: string; muted?: boolean; dark?: boolean; labels?: string[] }) {
+export function RulerDivider({ className = '', muted = false, dark = false }: { className?: string; muted?: boolean; dark?: boolean }) {
   const color = dark ? (muted ? 'bg-paper/[0.06]' : 'bg-paper/10') : (muted ? 'bg-line/[0.05]' : 'bg-line/[0.08]');
   return (
     <div className={className} aria-hidden="true">
@@ -209,8 +209,8 @@ export function PageSection({ children, id, className = '', spacing = 'normal' }
 }
 
 /** A full-bleed section divider on the measure (wraps RulerDivider). */
-export function PageRuler({ className = '', muted = false, dark = false, labels }: { className?: string; muted?: boolean; dark?: boolean; labels?: string[] }) {
-  return <RulerDivider className={cx('measure-frame', className)} muted={muted} dark={dark} labels={labels} />;
+export function PageRuler({ className = '', muted = false, dark = false }: { className?: string; muted?: boolean; dark?: boolean }) {
+  return <RulerDivider className={cx('measure-frame', className)} muted={muted} dark={dark} />;
 }
 
 /** A section header: a kicker (optional index), a balanced serif title, and optional lead copy. */
