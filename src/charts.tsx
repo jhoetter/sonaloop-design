@@ -15,6 +15,8 @@
  *   <DotPlotChart items={[{ label: 'Trust the AI', values: [2, 3, 3, 4, 5] }]} />
  *   <LineChart series={[{ label: 'Confidence', points: [2, 3, 5, 4, 6] }]} labels={['R1', 'R2', 'R3', 'R4', 'R5']} />
  *   <EffortImpactChart items={[{ label: 'Auto shopping list', x: 2, y: 5 }]} />
+ *   <BurnupChart series={[{ label: 'Done', points: [0, 2, 5, 8] }]} target={12} now={3} />
+ *   <StackedAreaChart series={[{ label: 'For', points: [2, 4, 6] }, { label: 'Against', points: [3, 2, 1] }]} />
  *   <ColumnChart items={[{ label: '1', value: 2 }, { label: '2', value: 5 }]} table />
  *   <StripChart items={[{ label: 'WTP', values: [9, 12, 15, 29] }]} unit="€" />
  *   <StatsChart items={[{ label: 'Personas', value: 16 }, { label: 'Agreement', value: '72%', sub: '+9 vs R1' }]} />
@@ -350,6 +352,116 @@ export function EffortImpactChart({ items, title, xLabel = 'Effort', yLabel = 'V
             </span>
           );
         })}
+      </div>
+    </figure>
+  );
+}
+
+/* ── Burnup — progress over time: band-filled lines, dotted target, hatched future ─ */
+export function BurnupChart({ series, title, labels, target, now, minValue, maxValue, showDots = true }:
+  { series: LineSeries[]; title?: string; labels?: string[]; target?: number; now?: number;
+    minValue?: number; maxValue?: number; showDots?: boolean }) {
+  const lines = series.filter((s) => Array.isArray(s.points) && s.points.filter((v) => Number.isFinite(v)).length > 1);
+  if (!lines.length) return null;
+  const all = lines.flatMap((s) => s.points).filter((v) => Number.isFinite(v));
+  if (Number.isFinite(target)) all.push(target!);
+  const mn = minValue ?? Math.min(...all, 0);
+  const mx = maxValue ?? Math.max(...all);
+  const span = (mx - mn) || 1;
+  const W = 100, H = 40;
+  const yOf = (v: number) => H - ((v - mn) / span) * H;
+  const n = Math.max(...lines.map((s) => s.points.filter((v) => Number.isFinite(v)).length));
+  const xNow = Number.isFinite(now) && n > 1 ? Math.max(0, Math.min(W, (now! / (n - 1)) * W)) : null;
+  const hatch: ReactNode[] = [];
+  if (xNow !== null && xNow < W) {
+    for (let b = Math.floor(xNow) - H; b < W; b += 6) {
+      const x1 = Math.max(b, xNow), x2 = Math.min(b + H, W);
+      if (x2 > x1) hatch.push(<line className="sl-burnup__hatch" key={b}
+        x1={x1.toFixed(2)} y1={(H - (x1 - b)).toFixed(2)} x2={x2.toFixed(2)} y2={(H - (x2 - b)).toFixed(2)} />);
+    }
+  }
+  const firstPt = lines[0].points.find((v) => Number.isFinite(v))!;
+  return (
+    <figure className="sl-chart">
+      <Title title={title} />
+      <div className="sl-line">
+        <svg viewBox={`0 0 ${W} ${H}`} role="img">
+          <line className="sl-line__axis" x1="0" y1={H} x2={W} y2={H} />
+          {xNow !== null && xNow < W && <rect className="sl-burnup__future" x={xNow.toFixed(2)} y="0" width={(W - xNow).toFixed(2)} height={H} />}
+          {hatch}
+          {Number.isFinite(target) && <line className="sl-line__ref" x1="0" y1={yOf(firstPt).toFixed(2)} x2={W} y2={yOf(target!).toFixed(2)} />}
+          {lines.map((s, i) => {
+            const pts = s.points.filter((v) => Number.isFinite(v)).map((v, j, arr) => [(j / (arr.length - 1)) * W, yOf(v)] as const);
+            const poly = pts.map(([x, y]) => `${x.toFixed(2)},${y.toFixed(2)}`).join(' ');
+            return (
+              <g key={i} style={{ '--c': s.color ?? SERIES[i % SERIES.length] } as Sv}>
+                <polygon className="sl-line__area" points={`0,${H} ${poly} ${pts[pts.length - 1][0].toFixed(2)},${H}`} />
+                <polyline className="sl-line__path" points={poly} />
+                {showDots && pts.map(([x, y], j) => <circle className="sl-line__dot" key={j} cx={x.toFixed(2)} cy={y.toFixed(2)} r="1.4" />)}
+              </g>
+            );
+          })}
+          {xNow !== null && <line className="sl-line__now" x1={xNow.toFixed(2)} y1="0" x2={xNow.toFixed(2)} y2={H} />}
+        </svg>
+        {labels?.length ? <div className="sl-line__labels">{labels.map((l, i) => <span key={i}>{l}</span>)}</div> : null}
+      </div>
+      {lines.length > 1 && (
+        <div className="sl-legend sl-legend--row" style={{ marginTop: '.6em' }}>
+          {lines.map((s, i) => (
+            <span className="sl-legend__item" key={i}>
+              <span className="sl-legend__sw" style={{ '--c': s.color ?? SERIES[i % SERIES.length] } as Sv} />
+              <MD t={s.label} className="sl-legend__label" />
+            </span>
+          ))}
+        </div>
+      )}
+    </figure>
+  );
+}
+
+/* ── Stacked area — composition over a sequence (cumulative flow) ────────────────── */
+export function StackedAreaChart({ series, title, labels, maxValue }:
+  { series: LineSeries[]; title?: string; labels?: string[]; maxValue?: number }) {
+  const bands = series.filter((s) => Array.isArray(s.points) && s.points.some((v) => Number.isFinite(v)));
+  if (!bands.length) return null;
+  const len = Math.min(...bands.map((s) => s.points.length));
+  if (len < 2) return null;
+  const vals = bands.map((s) => Array.from({ length: len }, (_, i) => Math.max(0, Number.isFinite(s.points[i]) ? s.points[i] : 0)));
+  const totals = Array.from({ length: len }, (_, i) => vals.reduce((sum, v) => sum + v[i], 0));
+  const mx = maxValue || Math.max(...totals) || 1;
+  const W = 100, H = 40;
+  const xOf = (i: number) => (i / (len - 1)) * W;
+  const yOf = (v: number) => H - Math.min(1, v / mx) * H;
+  let prev = Array.from({ length: len }, () => 0);
+  const groups = bands.map((s, k) => {
+    const top = prev.map((p, i) => p + vals[k][i]);
+    const upper = top.map((v, i) => `${xOf(i).toFixed(2)},${yOf(v).toFixed(2)}`).join(' ');
+    const lower = [...prev].reverse().map((v, ri) => `${xOf(len - 1 - ri).toFixed(2)},${yOf(v).toFixed(2)}`).join(' ');
+    prev = top;
+    return (
+      <g key={k} style={{ '--c': s.color ?? SERIES[k % SERIES.length] } as Sv}>
+        <polygon className="sl-area__band" points={`${upper} ${lower}`} />
+        <polyline className="sl-area__edge" points={upper} />
+      </g>
+    );
+  });
+  return (
+    <figure className="sl-chart">
+      <Title title={title} />
+      <div className="sl-line">
+        <svg viewBox={`0 0 ${W} ${H}`} role="img">
+          <line className="sl-line__axis" x1="0" y1={H} x2={W} y2={H} />
+          {groups}
+        </svg>
+        {labels?.length ? <div className="sl-line__labels">{labels.map((l, i) => <span key={i}>{l}</span>)}</div> : null}
+      </div>
+      <div className="sl-legend sl-legend--row" style={{ marginTop: '.6em' }}>
+        {bands.map((s, i) => (
+          <span className="sl-legend__item" key={i}>
+            <span className="sl-legend__sw" style={{ '--c': s.color ?? SERIES[i % SERIES.length] } as Sv} />
+            <MD t={s.label} className="sl-legend__label" />
+          </span>
+        ))}
       </div>
     </figure>
   );

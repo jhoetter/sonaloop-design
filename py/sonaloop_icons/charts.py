@@ -15,6 +15,8 @@ identically in the Python-SSR app, on the website, and in headless-Chromium PDF/
     dot_plot_chart([{"label": "Trust the AI", "values": [2, 3, 3, 4, 5]}])  # spread of voices on 1..5
     line_chart([{"label": "Confidence", "points": [2, 3, 5, 4, 6]}], labels=["R1", "R2", "R3", "R4", "R5"])
     effort_impact([{"label": "Auto shopping list", "x": 2, "y": 5}])  # x=effort, y=value (1..5)
+    burnup_chart([{"label": "Done", "points": [0, 2, 5, 8]}], target=12, now=3)  # cycle progress
+    stacked_area_chart([{"label": "For", "points": [2, 4, 6]}, {"label": "Against", "points": [3, 2, 1]}])
     column_chart([{"label": "1", "value": 2}, {"label": "2", "value": 5}], table=True)  # vertical bars
     strip_chart([{"label": "WTP", "values": [9, 12, 15, 29]}], unit="€")  # continuous dot strip
     stats_chart([{"label": "Personas", "value": 16}, {"label": "Agreement", "value": "72%", "sub": "+9 vs R1"}])
@@ -346,6 +348,127 @@ def effort_impact(items: Sequence[dict], *, title: str = "", x_label: str = "Eff
             f'{"".join(dots)}</div><div class="sl-quad-xlab">{_esc(x_label)}</div></div>')
     return (f'<figure class="sl-chart">{_title(title)}{quad}'
             f'<div class="sl-legend" style="margin-top:.9em">{"".join(legend)}</div></figure>')
+
+
+def burnup_chart(series: Sequence[dict], *, title: str = "", labels: Sequence[str] | None = None,
+                 target: Any = None, now: Any = None, min_value: float | None = None,
+                 max_value: float | None = None, show_dots: bool = True) -> str:
+    """Progress over time, Linear-cycle style — cumulative lines with a soft band fill under each,
+    an optional dotted ideal line rising to `target`, and an optional `now` marker (a point index)
+    that hatches the future region. series: [{label, points: [num], color?}]; the y scale reads
+    from 0 (or min_value) and stretches to include `target`. "" when empty."""
+    lines = [s for s in series if isinstance(s.get("points"), (list, tuple))
+             and len([p for p in s["points"] if _num(p) is not None]) > 1]
+    if not lines:
+        return ""
+    tgt = _num(target)
+    allv = [_num(p) for s in lines for p in s["points"] if _num(p) is not None]
+    if tgt is not None:
+        allv.append(tgt)
+    mn = min_value if min_value is not None else min(allv + [0.0])
+    mx = max_value if max_value is not None else max(allv)
+    span = (mx - mn) or 1
+    w, h = 100, 40
+    n = max(len([p for p in s["points"] if _num(p) is not None]) for s in lines)
+
+    def y_of(v: float) -> float:
+        return h - (v - mn) / span * h
+
+    def xy(pts: list[float]) -> list[tuple[float, float]]:
+        return [((i / (len(pts) - 1)) * w, y_of(v)) for i, v in enumerate(pts)]
+
+    parts = []
+    # Future region first so the data draws over it: a faint wash + 45° hatch, clipped by hand
+    # (no <clipPath> — ids would collide when several charts share a page).
+    now_i = _num(now)
+    if now_i is not None and n > 1:
+        x_now = max(0.0, min(float(w), now_i / (n - 1) * w))
+        if x_now < w:
+            parts.append(f'<rect class="sl-burnup__future" x="{x_now:.2f}" y="0" '
+                         f'width="{w - x_now:.2f}" height="{h}"></rect>')
+            b = int(x_now) - h
+            hatch = []
+            while b < w:
+                x1 = max(float(b), x_now)
+                x2 = min(float(b + h), float(w))
+                if x2 > x1:
+                    hatch.append(f'<line class="sl-burnup__hatch" x1="{x1:.2f}" y1="{h - (x1 - b):.2f}" '
+                                 f'x2="{x2:.2f}" y2="{h - (x2 - b):.2f}"></line>')
+                b += 6
+            parts.extend(hatch)
+    if tgt is not None:
+        first = next(_num(p) for p in lines[0]["points"] if _num(p) is not None)
+        parts.append(f'<line class="sl-line__ref" x1="0" y1="{y_of(first):.2f}" '
+                     f'x2="{w}" y2="{y_of(tgt):.2f}"></line>')
+    for i, s in enumerate(lines):
+        pts = xy([_num(p) for p in s["points"] if _num(p) is not None])
+        c = s.get("color") or _SERIES[i % len(_SERIES)]
+        poly = " ".join(f"{x:.2f},{y:.2f}" for x, y in pts)
+        area = f"0,{h} {poly} {pts[-1][0]:.2f},{h}"
+        dots = ("".join(f'<circle class="sl-line__dot" cx="{x:.2f}" cy="{y:.2f}" r="1.4"></circle>'
+                        for x, y in pts) if show_dots else "")
+        parts.append(f'<g style="--c:{c}"><polygon class="sl-line__area" points="{area}"></polygon>'
+                     f'<polyline class="sl-line__path" points="{poly}"></polyline>{dots}</g>')
+    if now_i is not None and n > 1:
+        x_now = max(0.0, min(float(w), now_i / (n - 1) * w))
+        parts.append(f'<line class="sl-line__now" x1="{x_now:.2f}" y1="0" x2="{x_now:.2f}" y2="{h}"></line>')
+    svg = (f'<svg viewBox="0 0 {w} {h}" role="img">'
+           f'<line class="sl-line__axis" x1="0" y1="{h}" x2="{w}" y2="{h}"></line>{"".join(parts)}</svg>')
+    labs = ('<div class="sl-line__labels">'
+            + "".join(f"<span>{_esc(lab)}</span>" for lab in labels) + "</div>") if labels else ""
+    legend = ""
+    if len(lines) > 1:
+        legend = ('<div class="sl-legend sl-legend--row" style="margin-top:.6em">' + "".join(
+            f'<span class="sl-legend__item"><span class="sl-legend__sw" '
+            f'style="--c:{s.get("color") or _SERIES[i % len(_SERIES)]}"></span>'
+            f'<span class="sl-legend__label">{_md(s.get("label"))}</span></span>'
+            for i, s in enumerate(lines)) + "</div>")
+    return f'<figure class="sl-chart">{_title(title)}<div class="sl-line">{svg}{labs}</div>{legend}</figure>'
+
+
+def stacked_area_chart(series: Sequence[dict], *, title: str = "", labels: Sequence[str] | None = None,
+                       max_value: float | None = None) -> str:
+    """Composition over an ordered sequence (cumulative flow) — one soft band per series, stacked
+    in order, each with a hairline top edge. series: [{label, points: [num], color?}]; points are
+    aligned on the shortest series (missing values can't stack). "" when fewer than 2 shared points."""
+    bands = [s for s in series if isinstance(s.get("points"), (list, tuple))
+             and any(_num(p) is not None for p in s["points"])]
+    if not bands:
+        return ""
+    length = min(len(s["points"]) for s in bands)
+    if length < 2:
+        return ""
+    vals = [[max(0.0, _num(s["points"][i]) or 0.0) for i in range(length)] for s in bands]
+    totals = [sum(v[i] for v in vals) for i in range(length)]
+    mx = max_value if max_value else max(totals) or 1
+    w, h = 100, 40
+
+    def x_of(i: int) -> float:
+        return i / (length - 1) * w
+
+    def y_of(v: float) -> float:
+        return h - min(1.0, v / mx) * h
+
+    parts = []
+    prev = [0.0] * length
+    for k, s in enumerate(bands):
+        top = [prev[i] + vals[k][i] for i in range(length)]
+        c = s.get("color") or _SERIES[k % len(_SERIES)]
+        upper = " ".join(f"{x_of(i):.2f},{y_of(top[i]):.2f}" for i in range(length))
+        lower = " ".join(f"{x_of(i):.2f},{y_of(prev[i]):.2f}" for i in range(length - 1, -1, -1))
+        parts.append(f'<g style="--c:{c}"><polygon class="sl-area__band" points="{upper} {lower}"></polygon>'
+                     f'<polyline class="sl-area__edge" points="{upper}"></polyline></g>')
+        prev = top
+    svg = (f'<svg viewBox="0 0 {w} {h}" role="img">'
+           f'<line class="sl-line__axis" x1="0" y1="{h}" x2="{w}" y2="{h}"></line>{"".join(parts)}</svg>')
+    labs = ('<div class="sl-line__labels">'
+            + "".join(f"<span>{_esc(lab)}</span>" for lab in labels) + "</div>") if labels else ""
+    legend = ('<div class="sl-legend sl-legend--row" style="margin-top:.6em">' + "".join(
+        f'<span class="sl-legend__item"><span class="sl-legend__sw" '
+        f'style="--c:{s.get("color") or _SERIES[i % len(_SERIES)]}"></span>'
+        f'<span class="sl-legend__label">{_md(s.get("label"))}</span></span>'
+        for i, s in enumerate(bands)) + "</div>")
+    return f'<figure class="sl-chart">{_title(title)}<div class="sl-line">{svg}{labs}</div>{legend}</figure>'
 
 
 def column_chart(items: Sequence[dict], *, title: str = "", max_value: float | None = None,

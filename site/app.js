@@ -226,6 +226,60 @@ function chartEffort(items, { title = '', xLabel = 'Effort', yLabel = 'Value', q
     + `<div class="sl-quad-xlab">${esc(xLabel)}</div></div><div class="sl-legend" style="margin-top:.9em">${legend}</div></figure>`;
 }
 
+function chartBurnup(series, { title = '', labels = null, target = null, now = null } = {}) {
+  const all = series.flatMap((s) => s.points).filter((v) => Number.isFinite(v));
+  if (Number.isFinite(target)) all.push(target);
+  const mn = Math.min(...all, 0), mx = Math.max(...all), span = (mx - mn) || 1, W = 100, H = 40;
+  const yOf = (v) => H - ((v - mn) / span) * H;
+  const n = Math.max(...series.map((s) => s.points.length));
+  const xNow = Number.isFinite(now) && n > 1 ? Math.max(0, Math.min(W, (now / (n - 1)) * W)) : null;
+  let pre = '';
+  if (xNow !== null && xNow < W) {
+    pre += `<rect class="sl-burnup__future" x="${xNow.toFixed(2)}" y="0" width="${(W - xNow).toFixed(2)}" height="${H}"></rect>`;
+    for (let b = Math.floor(xNow) - H; b < W; b += 6) {
+      const x1 = Math.max(b, xNow), x2 = Math.min(b + H, W);
+      if (x2 > x1) pre += `<line class="sl-burnup__hatch" x1="${x1.toFixed(2)}" y1="${(H - (x1 - b)).toFixed(2)}" x2="${x2.toFixed(2)}" y2="${(H - (x2 - b)).toFixed(2)}"></line>`;
+    }
+  }
+  if (Number.isFinite(target)) {
+    const first = series[0].points.find((v) => Number.isFinite(v));
+    pre += `<line class="sl-line__ref" x1="0" y1="${yOf(first).toFixed(2)}" x2="${W}" y2="${yOf(target).toFixed(2)}"></line>`;
+  }
+  const paths = series.map((s, i) => {
+    const c = s.color || CHART_SERIES[i % CHART_SERIES.length];
+    const pts = s.points.filter((v) => Number.isFinite(v)).map((v, j, arr) => [(j / (arr.length - 1)) * W, yOf(v)]);
+    const poly = pts.map(([x, y]) => `${x.toFixed(2)},${y.toFixed(2)}`).join(' ');
+    const dots = pts.map(([x, y]) => `<circle class="sl-line__dot" cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" r="1.4"></circle>`).join('');
+    return `<g style="--c:${c}"><polygon class="sl-line__area" points="0,${H} ${poly} ${pts[pts.length - 1][0].toFixed(2)},${H}"></polygon><polyline class="sl-line__path" points="${poly}"></polyline>${dots}</g>`;
+  }).join('');
+  const nowLine = xNow !== null ? `<line class="sl-line__now" x1="${xNow.toFixed(2)}" y1="0" x2="${xNow.toFixed(2)}" y2="${H}"></line>` : '';
+  const svg = `<svg viewBox="0 0 ${W} ${H}" role="img"><line class="sl-line__axis" x1="0" y1="${H}" x2="${W}" y2="${H}"></line>${pre}${paths}${nowLine}</svg>`;
+  const labs = labels ? `<div class="sl-line__labels">${labels.map((l) => `<span>${esc(l)}</span>`).join('')}</div>` : '';
+  const legend = series.length > 1 ? `<div class="sl-legend sl-legend--row" style="margin-top:.6em">${series.map((s, i) => `<span class="sl-legend__item"><span class="sl-legend__sw" style="--c:${s.color || CHART_SERIES[i % CHART_SERIES.length]}"></span><span class="sl-legend__label">${chMd(s.label)}</span></span>`).join('')}</div>` : '';
+  return `<figure class="sl-chart">${chTitle(title)}<div class="sl-line">${svg}${labs}</div>${legend}</figure>`;
+}
+
+function chartStackedArea(series, { title = '', labels = null } = {}) {
+  const len = Math.min(...series.map((s) => s.points.length));
+  const vals = series.map((s) => s.points.slice(0, len).map((v) => Math.max(0, v || 0)));
+  const totals = Array.from({ length: len }, (_, i) => vals.reduce((sum, v) => sum + v[i], 0));
+  const mx = Math.max(...totals) || 1, W = 100, H = 40;
+  const xOf = (i) => (i / (len - 1)) * W;
+  const yOf = (v) => H - Math.min(1, v / mx) * H;
+  let prev = Array.from({ length: len }, () => 0);
+  const groups = series.map((s, k) => {
+    const top = prev.map((p, i) => p + vals[k][i]);
+    const upper = top.map((v, i) => `${xOf(i).toFixed(2)},${yOf(v).toFixed(2)}`).join(' ');
+    const lower = [...prev].reverse().map((v, ri) => `${xOf(len - 1 - ri).toFixed(2)},${yOf(v).toFixed(2)}`).join(' ');
+    prev = top;
+    return `<g style="--c:${s.color || CHART_SERIES[k % CHART_SERIES.length]}"><polygon class="sl-area__band" points="${upper} ${lower}"></polygon><polyline class="sl-area__edge" points="${upper}"></polyline></g>`;
+  }).join('');
+  const svg = `<svg viewBox="0 0 ${W} ${H}" role="img"><line class="sl-line__axis" x1="0" y1="${H}" x2="${W}" y2="${H}"></line>${groups}</svg>`;
+  const labs = labels ? `<div class="sl-line__labels">${labels.map((l) => `<span>${esc(l)}</span>`).join('')}</div>` : '';
+  const legend = `<div class="sl-legend sl-legend--row" style="margin-top:.6em">${series.map((s, i) => `<span class="sl-legend__item"><span class="sl-legend__sw" style="--c:${s.color || CHART_SERIES[i % CHART_SERIES.length]}"></span><span class="sl-legend__label">${chMd(s.label)}</span></span>`).join('')}</div>`;
+  return `<figure class="sl-chart">${chTitle(title)}<div class="sl-line">${svg}${labs}</div>${legend}</figure>`;
+}
+
 function chartColumn(items, { title = '', table = false } = {}) {
   const keys = [];
   for (const it of items) for (const s of it.segments || []) if (!keys.includes(s.label)) keys.push(s.label);
@@ -1434,6 +1488,51 @@ const cChartLine = () => componentPage({
   notes: chartFigureNote('<code>{kind:"chart", of:"line", labels:[…], series:[{label, points}]}</code>'),
 });
 
+const cChartBurnup = () => componentPage({
+  id: 'chart-burnup', title: 'Burn-up · Progress',
+  desc: 'The <b>Linear cycle chart</b>: progress over time as band-filled cumulative lines, a <b>dotted ideal line</b> rising to <code>target</code>, and a <code>now</code> marker that washes + hatches the future region. Confidence accumulating across council rounds, scope vs. completed across a study.',
+  demo: `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:34px;width:100%">
+      ${chartBurnup([
+        { label: 'Completed', points: [0, 1, 3, 5, 8, 8], color: 'var(--sl-green)' },
+        { label: 'Started', points: [1, 3, 5, 7, 9, 10], color: 'var(--sl-amber)' },
+      ], { title: 'Cycle progress', labels: ['W1', 'W2', 'W3', 'W4', 'W5', 'W6'], target: 14, now: 4 })}
+      ${chartBurnup([
+        { label: 'Consensus', points: [10, 25, 40, 55, 72] },
+      ], { title: 'Consensus across rounds', labels: ['R1', 'R2', 'R3', 'R4', 'R5'], target: 80 })}
+    </div>`,
+  variants: { cols: ['Prop', 'Type', 'Effect'], rows: [
+    ['series', '{label, points: number[], color?}[]', 'Cumulative lines, each with a soft band fill.'],
+    ['target', 'number', 'Dotted ideal line from the first point up to the target; stretches the y scale.'],
+    ['now', 'number', 'Point index of “today” — vertical marker; everything after it is washed + hatched.'],
+    ['labels', 'string[]', 'X-axis tick labels.'],
+  ] },
+  react: `import { BurnupChart } from 'sonaloop-design/charts';\n\n<BurnupChart title="Cycle progress" target={14} now={4}\n  labels={['W1', 'W2', 'W3', 'W4', 'W5', 'W6']}\n  series={[{ label: 'Completed', points: [0, 1, 3, 5, 8, 8] }]}\n/>`,
+  markup: `<figure class="sl-chart">\n  <div class="sl-line">\n    <svg viewBox="0 0 100 40" role="img">\n      <rect class="sl-burnup__future" x="80" width="20" height="40"></rect>\n      <line class="sl-burnup__hatch" …></line>\n      <line class="sl-line__ref" x1="0" y1="40" x2="100" y2="0"></line>\n      <g style="--c:var(--sl-green)">\n        <polygon class="sl-line__area" points="0,40 …"></polygon>\n        <polyline class="sl-line__path" points="0,40 …"></polyline>\n      </g>\n      <line class="sl-line__now" x1="80" y1="0" x2="80" y2="40"></line>\n    </svg>\n  </div>\n</figure>`,
+  python: `from sonaloop_icons.charts import burnup_chart\n\nburnup_chart([{"label": "Completed", "points": [0, 1, 3, 5, 8, 8]}],\n             labels=["W1", "W2", "W3", "W4", "W5", "W6"], target=14, now=4)`,
+  notes: chartFigureNote('<code>{kind:"chart", of:"burnup", series:[{label, points}], target:14, now:4}</code>'),
+});
+
+const cChartStackedArea = () => componentPage({
+  id: 'chart-stacked-area', title: 'Stacked Area · Flow',
+  desc: 'Composition over an ordered sequence — a <b>cumulative-flow</b> diagram of soft stacked bands, each with a hairline top edge. How stance, theme volume or segment share <b>shifts</b> across rounds; the calm execution of Jira’s CFD on Sonaloop tokens.',
+  demo: `<div style="width:100%;max-width:520px">
+      ${chartStackedArea([
+        { label: 'For', points: [2, 4, 6, 8, 9], color: 'var(--sl-green)' },
+        { label: 'Conditional', points: [3, 4, 4, 3, 4], color: 'var(--sl-amber)' },
+        { label: 'Against', points: [5, 4, 3, 2, 1], color: 'var(--sl-red)' },
+      ], { title: 'Stance composition across rounds', labels: ['R1', 'R2', 'R3', 'R4', 'R5'] })}
+    </div>`,
+  variants: { cols: ['Prop', 'Type', 'Effect'], rows: [
+    ['series', '{label, points: number[], color?}[]', 'One band per series, stacked in order; points align on the shortest series.'],
+    ['labels', 'string[]', 'X-axis tick labels.'],
+    ['maxValue', 'number', 'Fix the y scale (else the largest stacked total).'],
+  ] },
+  react: `import { StackedAreaChart } from 'sonaloop-design/charts';\n\n<StackedAreaChart title="Stance across rounds" labels={['R1', 'R2', 'R3', 'R4', 'R5']}\n  series={[\n    { label: 'For', points: [2, 4, 6, 8, 9] },\n    { label: 'Against', points: [5, 4, 3, 2, 1] },\n  ]}\n/>`,
+  markup: `<figure class="sl-chart">\n  <div class="sl-line">\n    <svg viewBox="0 0 100 40" role="img">\n      <g style="--c:var(--sl-green)">\n        <polygon class="sl-area__band" points="…upper …lower"></polygon>\n        <polyline class="sl-area__edge" points="…upper"></polyline>\n      </g>\n    </svg>\n  </div>\n</figure>`,
+  python: `from sonaloop_icons.charts import stacked_area_chart\n\nstacked_area_chart([\n    {"label": "For", "points": [2, 4, 6, 8, 9]},\n    {"label": "Against", "points": [5, 4, 3, 2, 1]},\n], labels=["R1", "R2", "R3", "R4", "R5"])`,
+  notes: chartFigureNote('<code>{kind:"chart", of:"stacked_area", series:[{label, points}], labels:[…]}</code>'),
+});
+
 const cChartColumn = () => componentPage({
   id: 'chart-column', title: 'Column Chart',
   desc: 'Thin rounded <b>vertical bars</b> over hairline gridlines — the Linear Insights panel. Distributions over an ordered category axis (scores 1–5, counts per status), optionally <b>segment-stacked</b> with a shared legend, and an optional <b>breakdown table</b> that restates the numbers: chart for the shape, table for the values.',
@@ -2079,6 +2178,8 @@ const NAV = [
     { id: 'chart-dot-plot', title: 'Dot · Range', ico: 'wave', render: cChartDotPlot },
     { id: 'chart-line', title: 'Line · Trend', ico: 'analytics', render: cChartLine },
     { id: 'chart-sparkline', title: 'Sparkline', ico: 'wave', render: cChartSparkline },
+    { id: 'chart-burnup', title: 'Burn-up · Progress', ico: 'continuousDiscovery', render: cChartBurnup },
+    { id: 'chart-stacked-area', title: 'Stacked Area · Flow', ico: 'wave', render: cChartStackedArea },
     { id: 'chart-column', title: 'Column', ico: 'analytics', render: cChartColumn },
     { id: 'chart-strip', title: 'Strip · Distribution', ico: 'wave', render: cChartStrip },
     { id: 'chart-stats', title: 'Stats · KPI Row', ico: 'analytics', render: cChartStats },

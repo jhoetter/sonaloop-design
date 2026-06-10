@@ -445,6 +445,18 @@
 .sl-line__dot { fill: var(--c, var(--sl-accent)); }
 .sl-line__labels { display: flex; justify-content: space-between; font-size: .75em; color: var(--sl-muted); margin-top: .3em; }
 
+/* Burn-up / progress-over-time — the line SVG plus soft band fills under each series, a dotted
+   ideal/target reference line, and a "now" marker with a hatched future region (the Linear
+   cycle chart). Stacked area / cumulative flow shares the band classes. */
+.sl-line__area { fill: var(--c, var(--sl-accent)); opacity: .10; stroke: none; }
+.sl-line__ref { stroke: var(--sl-muted); stroke-width: 1; stroke-dasharray: 3 3; vector-effect: non-scaling-stroke; }
+.sl-line__now { stroke: var(--sl-ink); opacity: .4; stroke-width: 1; vector-effect: non-scaling-stroke; }
+.sl-burnup__future { fill: var(--sl-ink); opacity: .035; }
+.sl-burnup__hatch { stroke: var(--sl-line); stroke-width: 1; vector-effect: non-scaling-stroke; opacity: .7; }
+.sl-area__band { fill: var(--c, var(--sl-accent)); opacity: .45; stroke: none; }
+.sl-area__edge { fill: none; stroke: var(--c, var(--sl-accent)); stroke-width: 1.25;
+  vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+
 /* Pie / donut — proportions (distribution, sentiment). `--slices` is set inline (conic-gradient). */
 .sl-pie-wrap { display: flex; align-items: center; gap: 1.3em; flex-wrap: wrap; }
 .sl-pie { width: 9.5em; height: 9.5em; flex: none; border-radius: 50%; background: var(--slices, var(--sl-surface-2)); }
