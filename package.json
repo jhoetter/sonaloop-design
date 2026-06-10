@@ -14,6 +14,8 @@
     "./tokens.css": "./styles/tokens.css",
     "./fonts.css": "./styles/fonts.css",
     "./data": "./icons.data.mjs",
+    "./films": "./src/films.ts",
+    "./films/*": "./films/*",
     "./images": "./src/images.ts",
     "./images/*": "./images/*",
     "./style.css": "./styles/hifi-anim.css"
@@ -23,7 +25,8 @@
     "icons.data.mjs",
     "styles",
     "fonts",
-    "images"
+    "images",
+    "films"
   ],
   "scripts": {
     "gen": "node scripts/gen.mjs && node scripts/gen-tokens.mjs && node scripts/gen-website-previews.mjs && node scripts/gen-website-usage.mjs && node scripts/gen-website-css.mjs",

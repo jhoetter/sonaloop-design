@@ -688,6 +688,64 @@ function pageImages() {
   `;
 }
 
+// Brand films: themed pairs served live from /films/<family>/<file> — the exact
+// files products import via `sonaloop-design/films` (src/films.ts). Rendered by
+// the cinematic pipeline (cinematic-product-videos); masters checked in here.
+const FILM_PAIRS = [
+  { name: 'heroOpenCore', light: 'hero/open-core-light.mp4', dark: 'hero/open-core-dark.mp4',
+    label: 'Open Core hero', note: '"the council answers" — 16s, token-exact backdrop' },
+];
+
+function pageFilms() {
+  const cur = theme();
+  const film = (src, vis) => `
+    <div class="ds-film ${vis}">
+      <video src="${src}" loop muted playsinline preload="metadata"></video>
+      <div class="ds-vidbar">
+        <button type="button" class="vb-play" aria-label="Play / pause">${svgReg('play')}${svgReg('pause')}</button>
+        <span class="vb-time vb-cur">0:00</span>
+        <div class="vb-track" role="slider" aria-label="Seek"><i style="width:0%"></i></div>
+        <span class="vb-time vb-dur">–:––</span>
+        <button type="button" class="vb-full" aria-label="Fullscreen">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M16 3h3a2 2 0 0 1 2 2v3"/><path d="M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+        </button>
+      </div>
+    </div>`;
+  const tile = (pr) => `
+    <figure class="ds-image-tile" data-img-pair data-shown="${cur}">
+      <div class="ds-image-frame">
+        ${film(`/films/${pr.light}`, 'img-light')}
+        ${film(`/films/${pr.dark}`, 'img-dark')}
+      </div>
+      <figcaption>
+        <span class="nm">${esc(pr.label)} <span class="lbl">${esc(pr.note)}</span></span>
+        <span class="ds-img-toggle" role="group" aria-label="Preview theme for ${esc(pr.label)}">
+          <button type="button" data-img-theme="light" aria-label="Light" class="${cur === 'light' ? 'is-active' : ''}">${svgReg('sun')}</button>
+          <button type="button" data-img-theme="dark" aria-label="Dark" class="${cur === 'dark' ? 'is-active' : ''}">${svgReg('moon')}</button>
+        </span>
+      </figcaption>
+    </figure>`;
+
+  return `
+    <p class="ds-eyebrow">Foundations</p>
+    <h1 class="ds-h1">Films</h1>
+    <p class="ds-lead">Cinematic <strong>product films</strong> — the moving counterpart to the reference images. Each film is a matched <strong>light / dark pair</strong> whose backdrop equals the theme's <code>--paper</code> token <em>exactly</em> (embed mode), so it melts into any page surface — the website hero embeds these full-bleed behind its headline. Authored in the cinematic pipeline, checked in here as the canonical masters.</p>
+
+    ${h2('films-hero', 'Hero films')}
+    ${p('Three-act causal stories of the product doing real work — a question asked, a dissent typed out live, the council landing on the project board. Use the player to scrub; toggle a tile (or the site theme) to compare variants.')}
+    <div class="ds-image-grid" style="grid-template-columns:1fr">
+      ${FILM_PAIRS.map(tile).join('')}
+    </div>
+
+    ${h2('films-usage', 'Usage')}
+    ${p('Each export is the bundler-resolved URL, drop-in for <code>&lt;video src&gt;</code>. Hero embeds run <code>autoPlay muted loop playsInline</code> with no controls; pair text on top with the <code>shield</code> overlay (a Gaussian alpha falloff — CSS gradients band on film texture).')}
+    ${code('tsx', `import { heroOpenCore, shield } from 'sonaloop-design/films';\n\n<video src={heroOpenCore.light} autoPlay muted loop playsInline className="dark:hidden" />\n<video src={heroOpenCore.dark}  autoPlay muted loop playsInline className="hidden dark:block" />\n\n{/* behind hero copy that sits on the film: */}\n<img src={shield.light} alt="" className="dark:hidden" />`)}
+
+    ${h2('films-add', 'Adding & rendering')}
+    ${p('Films are rendered in <code>cinematic-product-videos</code> (<code>buildPageFilm.ts</code> — director\'s plans, shot grammar, staged story captures, the token-exact embed contract). Render a run, copy the masters into <code>films/hero/</code> with stable names, and register the pair in <code>src/films.ts</code>.')}
+  `;
+}
+
 /* ── BRANDS ────────────────────────────────────────────────────────────────────── */
 function pageBrand() {
   return `
@@ -1758,6 +1816,7 @@ const NAV = [
     { id: 'layout', title: 'Layout', ico: 'squareGrid', render: pageLayout },
     { id: 'icons', title: 'Icons', ico: 'star', render: pageIcons },
     { id: 'images', title: 'Images', ico: 'panel', render: pageImages },
+    { id: 'films', title: 'Films', ico: 'play', render: pageFilms },
   ] },
   { label: 'Brands', items: [
     { id: 'brand', title: 'Sonaloop', ico: 'sonaloop', render: pageBrand },
@@ -1981,6 +2040,55 @@ async function copyText(text, btn) {
     if (label && btn._copyPrev != null) { label.textContent = btn._copyPrev; btn._copyPrev = null; }
   }, 1600);
 }
+
+/* ── Film player (Geist-style floating pill controls) ───────────────────────── */
+const vbFmt = (t) => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`;
+document.addEventListener('click', (e) => {
+  const playBtn = e.target.closest('.vb-play');
+  if (playBtn) {
+    const v = playBtn.closest('.ds-film').querySelector('video');
+    if (v.paused) v.play(); else v.pause();
+    return;
+  }
+  const fullBtn = e.target.closest('.vb-full');
+  if (fullBtn) {
+    const f = fullBtn.closest('.ds-film');
+    if (document.fullscreenElement) document.exitFullscreen();
+    else f.requestFullscreen?.();
+  }
+});
+// Scrubbing: click OR drag anywhere on the track (pointer capture until release).
+document.addEventListener('pointerdown', (e) => {
+  const track = e.target.closest('.vb-track');
+  if (!track) return;
+  e.preventDefault();
+  const v = track.closest('.ds-film').querySelector('video');
+  const seek = (ev) => {
+    const r = track.getBoundingClientRect();
+    if (v.duration) v.currentTime = Math.max(0, Math.min(1, (ev.clientX - r.left) / r.width)) * v.duration;
+  };
+  seek(e);
+  const move = (ev) => seek(ev);
+  const up = () => { document.removeEventListener('pointermove', move); document.removeEventListener('pointerup', up); };
+  document.addEventListener('pointermove', move);
+  document.addEventListener('pointerup', up);
+});
+['play', 'pause'].forEach((ev) =>
+  document.addEventListener(ev, (e) => {
+    const f = e.target.closest?.('.ds-film');
+    if (f) f.classList.toggle('is-playing', ev === 'play');
+  }, true));
+document.addEventListener('timeupdate', (e) => {
+  const f = e.target.closest?.('.ds-film');
+  if (!f) return;
+  const v = e.target;
+  f.querySelector('.vb-cur').textContent = vbFmt(v.currentTime);
+  if (v.duration) f.querySelector('.vb-track i').style.width = `${(v.currentTime / v.duration) * 100}%`;
+}, true);
+document.addEventListener('loadedmetadata', (e) => {
+  const f = e.target.closest?.('.ds-film');
+  if (f && e.target.duration) f.querySelector('.vb-dur').textContent = vbFmt(e.target.duration);
+}, true);
 
 document.addEventListener('click', (e) => {
   const navToggle = e.target.closest('[data-nav-toggle]');

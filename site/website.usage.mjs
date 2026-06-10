@@ -21,6 +21,14 @@ export const usage = {
       "to": "/changelog/:slug"
     },
     {
+      "name": "Framework Template",
+      "to": ""
+    },
+    {
+      "name": "Frameworks",
+      "to": "/frameworks"
+    },
+    {
       "name": "Home",
       "to": "/"
     },
@@ -83,6 +91,14 @@ export const usage = {
   "mega-menu": [],
   "cards": {
     "content": [
+      {
+        "name": "Framework Template",
+        "to": ""
+      },
+      {
+        "name": "Frameworks",
+        "to": "/frameworks"
+      },
       {
         "name": "Home",
         "to": "/"
@@ -155,6 +171,14 @@ export const usage = {
       "to": "/changelog"
     },
     {
+      "name": "Framework Template",
+      "to": ""
+    },
+    {
+      "name": "Frameworks",
+      "to": "/frameworks"
+    },
+    {
       "name": "Install",
       "to": "/install"
     },
@@ -224,6 +248,14 @@ export const usage = {
     {
       "name": "Changelog Entry",
       "to": "/changelog/:slug"
+    },
+    {
+      "name": "Framework Template",
+      "to": ""
+    },
+    {
+      "name": "Frameworks",
+      "to": "/frameworks"
     },
     {
       "name": "Home",
@@ -333,6 +365,14 @@ export const usage = {
       "to": "/changelog/:slug"
     },
     {
+      "name": "Framework Template",
+      "to": ""
+    },
+    {
+      "name": "Frameworks",
+      "to": "/frameworks"
+    },
+    {
       "name": "Home",
       "to": "/"
     },
@@ -410,6 +450,10 @@ export const usage = {
       }
     ],
     "steps": [
+      {
+        "name": "Framework Template",
+        "to": ""
+      },
       {
         "name": "Install",
         "to": "/install"
