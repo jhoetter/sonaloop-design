@@ -80,6 +80,42 @@ long-form content. Charts add `Sparkline` (`sonaloop-design/charts`).
 **Page-level compositions** (Footer, Hero, …) stay in each app and are built FROM these
 primitives + tokens — the design system shares primitives, not whole pages.
 
+## Figures
+
+**Figures** are the system's high-fidelity illustrative plates — large (480×400),
+technical, fine-line **isometric drawings** in the style of Linear's marketing
+"FIG 0.x" plates, used to anchor feature sections on marketing pages and docs.
+They sit above icons in fidelity but work exactly like them under the hood:
+authored once in [`figures.data.mjs`](figures.data.mjs), generated into both
+consumers by `npm run gen`, drawn entirely on `currentColor` (one asset serves
+light and dark), with an opt-in pure-CSS ambient hover gesture in
+`styles/hifi-anim.css` (reduced-motion safe).
+
+Three launch figures, mapping the brand's three claims:
+
+| key | plate | motif |
+| --- | --- | --- |
+| `loop`    | FIG 0.1 · Built for the long run | exploded layer stack, the loop mark engraved on the floating lid |
+| `council` | FIG 0.2 · Deliberation, not consensus | a cluster of independent volumes + one faint echo block |
+| `signal`  | FIG 0.3 · Signal over noise | a damped waveform of upright panels settling flat |
+
+```tsx
+import { LoopFigure } from 'sonaloop-design';      // CouncilFigure, SignalFigure
+<LoopFigure width={480} animate />                  // React
+```
+
+```python
+from sonaloop_icons import figure
+figure("loop", 480)                                 # Python-SSR
+```
+
+Figures are wireframes by default; set `--sl-fig-surface` to the plate's
+background colour and the volumes occlude each other (the reference look).
+Geometry is **computed, not hand-plotted**: `figures.data.mjs` projects 3-D plan
+coordinates through a 30° isometric camera and emits rounded paths with a fixed
+stroke vocabulary — edit dimensions and layout, never raw path data. The docs
+site renders them live under **Foundations → Figures**.
+
 ## Reference images
 
 A small, curated set of on-brand **reference images** lives here too, so every product

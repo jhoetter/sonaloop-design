@@ -9,6 +9,7 @@
  */
 import { inspector, scales, fonts } from '/tokens.data.mjs';
 import { regular, hifi } from '/icons.data.mjs';
+import { figures } from '/figures.data.mjs';
 import { blocks as websiteBlocks } from '/site/website.previews.mjs';
 import { usage as websiteUsage, source as websiteSource } from '/site/website.usage.mjs';
 
@@ -29,6 +30,11 @@ const svgHifi = (name, cls = '') => {
   const spec = hifi[name];
   if (!spec) return '';
   return `<svg class="pi-hifi pi-hifi-${name} ${cls}" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${spec.body}</svg>`;
+};
+const svgFig = (name, cls = '') => {
+  const spec = figures[name];
+  if (!spec) return '';
+  return `<svg class="pi-fig pi-fig-${name} ${cls}" viewBox="0 0 480 400" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${spec.body}</svg>`;
 };
 
 let uid = 0;
@@ -634,6 +640,39 @@ function pageIcons() {
     ${h2('icons-usage', 'Usage')}
     ${code('tsx', `import { CouncilsIcon } from 'sonaloop-design';\n\n<CouncilsIcon className="h-5 w-5" animate />`)}
     ${code('python', `from sonaloop_icons import icon\n\nicon("councils", animate=True)  # → inline <svg class="pi pi-councils …">`)}
+  `;
+}
+
+function pageFigures() {
+  const plate = (name) => {
+    const f = figures[name];
+    return `
+    <figure class="ds-fig-plate pi-hover">
+      <figcaption class="ds-fig-id">FIG ${esc(f.fig)}</figcaption>
+      ${svgFig(name, 'pi-animate')}
+      <div class="ds-fig-title">${esc(f.title)}</div>
+      <p class="ds-fig-note">${esc(f.note)}</p>
+    </figure>`;
+  };
+
+  return `
+    <p class="ds-eyebrow">Foundations</p>
+    <h1 class="ds-h1">Figures</h1>
+    <p class="ds-lead">The system's high-fidelity illustrative plates — large, technical, fine-line isometric drawings that anchor feature sections on marketing pages and docs. They sit above icons in fidelity but work exactly like them under the hood: authored once in <code>figures.data.mjs</code>, generated into both stacks, drawn entirely on <code>currentColor</code> so one asset serves light and dark. Hover a plate for its ambient gesture.</p>
+
+    ${h2('figures-plates', 'The plates')}
+    ${p('Each figure ships with its canonical plate caption — a mono <code>FIG 0.x</code> id, a title and a one-line note — the composition marketing sections reproduce. The motifs are the brand’s three claims: the layered longitudinal <strong>memory</strong>, the deliberating <strong>council</strong>, and the <strong>signal</strong> settling out of noise.')}
+    <div class="ds-fig-grid">${Object.keys(figures).map(plate).join('')}</div>
+
+    ${h2('figures-usage', 'Usage')}
+    ${p('Import from the main barrel like any icon. Figures are wireframes by default; set <code>--sl-fig-surface</code> to the plate’s background colour and the volumes occlude each other (the reference look). <code>animate</code> opts into the slow hover gesture (needs <code>sonaloop-design/style.css</code>; respects reduced motion).')}
+    ${codeTabs([
+      { label: 'React', lang: 'tsx', src: `import { LoopFigure } from 'sonaloop-design';\nimport 'sonaloop-design/style.css';   // ambient hover gestures (optional)\n\n<figure className="pi-hover" style={{ '--sl-fig-surface': 'var(--paper)' }}>\n  <LoopFigure width={480} animate />\n  <figcaption>FIG 0.1 — Built for the long run</figcaption>\n</figure>` },
+      { label: 'Python-SSR', lang: 'python', src: `from sonaloop_icons import figure\n\nfigure("loop", 480)               # → inline <svg class="pi-fig pi-fig-loop" …>\nfigure("council", animate=True)   # ambient hover gesture (opt-in)` },
+    ])}
+
+    ${h2('figures-add', 'Adding a figure')}
+    ${p('Figures are <strong>computed, not hand-plotted</strong>: <code>figures.data.mjs</code> projects 3-D plan coordinates through a 30° isometric camera and emits rounded paths with a fixed stroke vocabulary (silhouettes ·5, edges ·3, hairlines ·18, surface fills ·04). Compose a new figure from the toolkit (<code>isoBox</code>, <code>planeEllipse</code>, <code>vents</code> …), register it in the <code>figures</code> map, then run <code>npm run gen</code>. Tag animatable groups with <code>data-part</code> and add the gesture to <code>styles/hifi-anim.css</code>.')}
   `;
 }
 
@@ -1815,6 +1854,7 @@ const NAV = [
     { id: 'materials', title: 'Materials', ico: 'panel', render: pageMaterials },
     { id: 'layout', title: 'Layout', ico: 'squareGrid', render: pageLayout },
     { id: 'icons', title: 'Icons', ico: 'star', render: pageIcons },
+    { id: 'figures', title: 'Figures', ico: 'syntheses', render: pageFigures },
     { id: 'images', title: 'Images', ico: 'panel', render: pageImages },
     { id: 'films', title: 'Films', ico: 'play', render: pageFilms },
   ] },

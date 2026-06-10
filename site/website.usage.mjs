@@ -21,6 +21,14 @@ export const usage = {
       "to": "/changelog/:slug"
     },
     {
+      "name": "Format Template",
+      "to": ""
+    },
+    {
+      "name": "Formats",
+      "to": "/formats"
+    },
+    {
       "name": "Framework Template",
       "to": ""
     },
@@ -33,6 +41,10 @@ export const usage = {
       "to": "/"
     },
     {
+      "name": "How It Works",
+      "to": "/how-it-works"
+    },
+    {
       "name": "Icons",
       "to": "/icons"
     },
@@ -41,13 +53,8 @@ export const usage = {
       "to": "/install"
     },
     {
-      "name": "Method pages",
-      "to": "/methods/:slug",
-      "live": "/methods/jtbd"
-    },
-    {
-      "name": "Methods",
-      "to": "/methods"
+      "name": "Job Template",
+      "to": ""
     },
     {
       "name": "Personas",
@@ -75,11 +82,6 @@ export const usage = {
       "to": "/sample-report"
     },
     {
-      "name": "Solution pages",
-      "to": "/solutions/:slug",
-      "live": "/solutions/focus-groups"
-    },
-    {
       "name": "Solutions",
       "to": "/solutions"
     },
@@ -91,6 +93,19 @@ export const usage = {
   "mega-menu": [],
   "cards": {
     "content": [
+      {
+        "name": "Blog Post",
+        "to": "/blog/:slug",
+        "live": "/blog/the-pollyanna-problem"
+      },
+      {
+        "name": "Format Template",
+        "to": ""
+      },
+      {
+        "name": "Formats",
+        "to": "/formats"
+      },
       {
         "name": "Framework Template",
         "to": ""
@@ -104,13 +119,12 @@ export const usage = {
         "to": "/"
       },
       {
-        "name": "Method pages",
-        "to": "/methods/:slug",
-        "live": "/methods/jtbd"
+        "name": "How It Works",
+        "to": "/how-it-works"
       },
       {
-        "name": "Methods",
-        "to": "/methods"
+        "name": "Job Template",
+        "to": ""
       },
       {
         "name": "Product pages",
@@ -120,11 +134,6 @@ export const usage = {
       {
         "name": "Resources",
         "to": "/resources"
-      },
-      {
-        "name": "Solution pages",
-        "to": "/solutions/:slug",
-        "live": "/solutions/focus-groups"
       },
       {
         "name": "Solutions",
@@ -145,13 +154,12 @@ export const usage = {
     ],
     "verdict": [
       {
-        "name": "Sample Report",
-        "to": "/sample-report"
+        "name": "Format Template",
+        "to": ""
       },
       {
-        "name": "Solution pages",
-        "to": "/solutions/:slug",
-        "live": "/solutions/focus-groups"
+        "name": "Sample Report",
+        "to": "/sample-report"
       }
     ],
     "snippet": [
@@ -163,12 +171,16 @@ export const usage = {
   },
   "hero": [
     {
-      "name": "Blog",
-      "to": "/blog"
-    },
-    {
       "name": "Changelog",
       "to": "/changelog"
+    },
+    {
+      "name": "Format Template",
+      "to": ""
+    },
+    {
+      "name": "Formats",
+      "to": "/formats"
     },
     {
       "name": "Framework Template",
@@ -179,17 +191,16 @@ export const usage = {
       "to": "/frameworks"
     },
     {
+      "name": "How It Works",
+      "to": "/how-it-works"
+    },
+    {
       "name": "Install",
       "to": "/install"
     },
     {
-      "name": "Method pages",
-      "to": "/methods/:slug",
-      "live": "/methods/jtbd"
-    },
-    {
-      "name": "Methods",
-      "to": "/methods"
+      "name": "Job Template",
+      "to": ""
     },
     {
       "name": "Personas",
@@ -215,11 +226,6 @@ export const usage = {
     {
       "name": "Sample Report",
       "to": "/sample-report"
-    },
-    {
-      "name": "Solution pages",
-      "to": "/solutions/:slug",
-      "live": "/solutions/focus-groups"
     },
     {
       "name": "Solutions",
@@ -250,6 +256,14 @@ export const usage = {
       "to": "/changelog/:slug"
     },
     {
+      "name": "Format Template",
+      "to": ""
+    },
+    {
+      "name": "Formats",
+      "to": "/formats"
+    },
+    {
       "name": "Framework Template",
       "to": ""
     },
@@ -262,6 +276,10 @@ export const usage = {
       "to": "/"
     },
     {
+      "name": "How It Works",
+      "to": "/how-it-works"
+    },
+    {
       "name": "Icons",
       "to": "/icons"
     },
@@ -270,13 +288,8 @@ export const usage = {
       "to": "/install"
     },
     {
-      "name": "Method pages",
-      "to": "/methods/:slug",
-      "live": "/methods/jtbd"
-    },
-    {
-      "name": "Methods",
-      "to": "/methods"
+      "name": "Job Template",
+      "to": ""
     },
     {
       "name": "Personas",
@@ -304,11 +317,6 @@ export const usage = {
       "to": "/sample-report"
     },
     {
-      "name": "Solution pages",
-      "to": "/solutions/:slug",
-      "live": "/solutions/focus-groups"
-    },
-    {
       "name": "Solutions",
       "to": "/solutions"
     },
@@ -319,6 +327,10 @@ export const usage = {
   ],
   "product-showcase": [
     {
+      "name": "Format Template",
+      "to": ""
+    },
+    {
       "name": "Product pages",
       "to": "/products/:slug",
       "live": "/products/open-core"
@@ -326,11 +338,6 @@ export const usage = {
     {
       "name": "Sample Report",
       "to": "/sample-report"
-    },
-    {
-      "name": "Solution pages",
-      "to": "/solutions/:slug",
-      "live": "/solutions/focus-groups"
     }
   ],
   "canvas-showcase": [
@@ -365,6 +372,14 @@ export const usage = {
       "to": "/changelog/:slug"
     },
     {
+      "name": "Format Template",
+      "to": ""
+    },
+    {
+      "name": "Formats",
+      "to": "/formats"
+    },
+    {
       "name": "Framework Template",
       "to": ""
     },
@@ -377,17 +392,16 @@ export const usage = {
       "to": "/"
     },
     {
+      "name": "How It Works",
+      "to": "/how-it-works"
+    },
+    {
       "name": "Install",
       "to": "/install"
     },
     {
-      "name": "Method pages",
-      "to": "/methods/:slug",
-      "live": "/methods/jtbd"
-    },
-    {
-      "name": "Methods",
-      "to": "/methods"
+      "name": "Job Template",
+      "to": ""
     },
     {
       "name": "Personas",
@@ -415,11 +429,6 @@ export const usage = {
       "to": "/sample-report"
     },
     {
-      "name": "Solution pages",
-      "to": "/solutions/:slug",
-      "live": "/solutions/focus-groups"
-    },
-    {
       "name": "Solutions",
       "to": "/solutions"
     },
@@ -430,6 +439,14 @@ export const usage = {
   ],
   "content-atoms": {
     "checklist": [
+      {
+        "name": "Format Template",
+        "to": ""
+      },
+      {
+        "name": "How It Works",
+        "to": "/how-it-works"
+      },
       {
         "name": "Install",
         "to": "/install"
@@ -442,11 +459,6 @@ export const usage = {
       {
         "name": "Sample Report",
         "to": "/sample-report"
-      },
-      {
-        "name": "Solution pages",
-        "to": "/solutions/:slug",
-        "live": "/solutions/focus-groups"
       }
     ],
     "steps": [
@@ -459,9 +471,8 @@ export const usage = {
         "to": "/install"
       },
       {
-        "name": "Method pages",
-        "to": "/methods/:slug",
-        "live": "/methods/jtbd"
+        "name": "Job Template",
+        "to": ""
       }
     ],
     "fields": []

@@ -298,6 +298,23 @@ a.ds-usechip:hover code { color: var(--sl-accent); border-color: color-mix(in sr
 .ds-icon-cell.hifi svg { width: 38px; height: 38px; }
 .ds-icon-cell span { font-family: var(--sl-mono); font-size: 10px; color: var(--sl-faint); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
+/* ── Figures — the FIG 0.x illustrative plates (figures.data.mjs) ─────────────── */
+/* A hairline-framed band of three plates, after the reference composition:
+   mono FIG id on top, the drawing, then title + note. Hovering a plate drives
+   its figure's ambient gesture (.pi-hover). --sl-fig-surface turns the
+   wireframes into occluded solids against the page background. */
+.ds-fig-grid { display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 18px; border-block: 1px solid var(--sl-line); }
+.ds-fig-plate { margin: 0; padding: 28px 28px 32px; --sl-fig-surface: var(--sl-bg); }
+.ds-fig-plate + .ds-fig-plate { border-left: 1px solid var(--sl-line); }
+.ds-fig-plate svg { display: block; width: 100%; height: auto; color: var(--sl-ink); }
+.ds-fig-id { font-family: var(--sl-mono); font-size: 11px; text-transform: uppercase; letter-spacing: .14em; color: var(--sl-faint); margin-bottom: 14px; }
+.ds-fig-title { font-size: 15px; font-weight: 600; color: var(--sl-ink); margin-top: 16px; }
+.ds-fig-note { font-size: 13.5px; line-height: 1.55; color: var(--sl-muted); margin: 6px 0 0; max-width: 40ch; }
+@media (max-width: 900px) {
+  .ds-fig-grid { grid-template-columns: 1fr; }
+  .ds-fig-plate + .ds-fig-plate { border-left: 0; border-top: 1px solid var(--sl-line); }
+}
+
 /* ── Materials / surfaces ─────────────────────────────────────────────────────── */
 .ds-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-top: 18px; }
 .ds-tile { border-radius: 12px; border: 1px solid var(--sl-line); padding: 22px 18px; }
