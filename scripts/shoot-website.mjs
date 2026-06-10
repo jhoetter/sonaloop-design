@@ -14,6 +14,7 @@
  */
 import { chromium } from 'playwright-core';
 import { mkdirSync } from 'node:fs';
+const BASE = process.env.SHOOT_BASE ?? 'http://127.0.0.1:3000';
 
 const [mode = 'page', routesArg = '/', a3, a4, a5, a6] = process.argv.slice(2);
 const OUT = '/tmp/sonaloop-shots';
@@ -30,7 +31,7 @@ async function newPage(browser, theme) {
 }
 
 async function load(page, route, theme) {
-  await page.goto(`http://127.0.0.1:3000${route}`, { waitUntil: 'networkidle' });
+  await page.goto(`${BASE}${route}`, { waitUntil: 'networkidle' });
   await page.evaluate((t) => localStorage.setItem('persona-theme', t), theme);
   await page.reload({ waitUntil: 'networkidle' });
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
