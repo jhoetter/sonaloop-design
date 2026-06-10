@@ -60,6 +60,26 @@ export const tones = {
   risk:           { color: 'amber',  label: 'Risk' },
 };
 
+// ── Brand assets baked into the deck ──────────────────────────────────────────────
+// PPTX can't take SVG, so gen-deck.mjs rasterizes these at DESIGN time (sharp) into
+// py/sonaloop_icons/deck_assets.py (base64 PNG/JPG, vendored as sonaloop/_deck_assets.py).
+// The docs previews keep painting the live SVG/JPGs — same names, two consumers.
+//
+// deckIcons — the CURATED hi-fi set a deck may reference (pillars `icon:` field). Unknown
+// names degrade to no icon; widen the set here when a deck needs more vocabulary.
+export const deckIcons = [
+  'personas', 'councils', 'syntheses', 'projects', 'plan', 'memory', 'analytics',
+  'target', 'bulb', 'search', 'check', 'compass', 'rocket', 'trend', 'sentiment',
+  'quote', 'calendar', 'network',
+];
+export const deckIconTints = ['accent', 'ink'];     // palette roles rasterized per icon
+export const deckLogos = ['sonaloop', 'sonaloop-cloud', 'sonaloop-research'];
+// Light-theme canvases only (decks are light); name → file under images/canvas/.
+export const deckCanvases = {
+  dawn: 'dawn.jpg', abstract: 'abstract-light.jpg', mist: 'mist-light.jpg',
+  meadow: 'meadow-light.jpg', sky: 'sky-light.jpg',
+};
+
 // ── The placeholder study every sample slide draws from ──
 // Fictitious but coherent: one read of the whole master deck tells one story —
 // the German eating panel asked "how do busy people eat healthier without effort?".
@@ -75,10 +95,12 @@ export const layouts = [
   {
     key: 'cover',
     title: 'Cover',
-    desc: 'The brand moment — study title, scope line and date. Every customer deck opens here.',
-    usage: 'Always the first slide. The eyebrow names the artifact kind (Research Report, Meta-Report); meta carries panel · personas · formats.',
+    desc: 'The brand moment — logo, study title, scope line and date, with an optional painterly canvas band on the right. Every customer deck opens here.',
+    usage: 'Always the first slide. `logo: true` paints the Sonaloop mark + wordmark top-left; `canvas` names one of the brand canvases (dawn · abstract · mist · meadow · sky) for the right-side band. The eyebrow names the artifact kind (Research Report, Meta-Report); meta carries panel · personas · formats.',
     sample: {
       kind: 'cover',
+      logo: true,
+      canvas: 'dawn',
       eyebrow: 'Research Report',
       title: STUDY,
       subtitle: 'What keeps busy people from eating well — and what would actually change it',
@@ -114,6 +136,19 @@ export const layouts = [
       num: '02',
       title: 'Decision fatigue, not knowledge',
       subtitle: 'Why the 6 pm question defeats every meal plan the panel has tried',
+    },
+  },
+  {
+    key: 'canvas-section',
+    title: 'Canvas section',
+    desc: 'The cinematic divider: a full-bleed brand canvas with the chapter card floating bottom-left — section art instead of whitespace.',
+    usage: 'Alternate with the plain divider on longer decks, or open the deck’s emotional chapters (voices, vision) with one. Pick the canvas per chapter mood: dawn · abstract · mist · meadow · sky.',
+    sample: {
+      kind: 'canvas-section',
+      canvas: 'meadow',
+      num: '04',
+      title: 'Three product directions',
+      subtitle: 'What the panel would actually adopt — ranked by leverage',
     },
   },
   {
@@ -244,6 +279,26 @@ export const layouts = [
     },
   },
   {
+    key: 'pillars',
+    title: 'Pillars',
+    desc: 'Three or four capability columns, each led by a hi-fi icon chip — the “how this study worked” slide, and the natural home of the icon library in a deck.',
+    usage: 'Methodology up front, or a capability/feature trio anywhere. Icons come from the curated deck set (see deckIcons in deck.data.mjs); unknown names degrade to a chip without a glyph.',
+    sample: {
+      kind: 'pillars',
+      heading: 'How this study worked',
+      items: [
+        { icon: 'personas', title: 'Grounded personas',
+          text: 'Four panel members with durable identities, memories and provenance — not improvised characters.' },
+        { icon: 'calendar', title: 'Simulated days',
+          text: '124 lived evenings: commutes, fridge stares, takeaway temptations — friction observed, not asked about.' },
+        { icon: 'councils', title: 'Structured councils',
+          text: 'Six moderated debates with votes on the record, including two red-team rounds against our own thesis.' },
+        { icon: 'syntheses', title: 'Inspectable evidence',
+          text: 'Every claim in this deck links back to a session you can open and read end-to-end.' },
+      ],
+    },
+  },
+  {
     key: 'chart',
     title: 'Chart',
     desc: 'A full-width native chart led by its takeaway as the headline — the chart is evidence, the headline is the point.',
@@ -315,9 +370,10 @@ export const layouts = [
     key: 'closing',
     title: 'Closing',
     desc: 'Methodology footnote, where the full evidence lives, and the contact line — the deck’s quiet sign-off.',
-    usage: 'Always the last slide. Point to the workspace: the deck summarises, the sessions underneath it are the deliverable.',
+    usage: 'Always the last slide. `logo: true` signs off with the Sonaloop mark. Point to the workspace: the deck summarises, the sessions underneath it are the deliverable.',
     sample: {
       kind: 'closing',
+      logo: true,
       title: 'Thank you',
       text: 'Built with the Sonaloop research engine: grounded personas, simulated days, structured councils — every statement in this deck traces back to an inspectable session.',
       meta: 'Full report, persona sessions and evidence: Sonaloop workspace · ' + STUDY,

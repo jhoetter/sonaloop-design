@@ -7,8 +7,9 @@
  * 1in = 7.5cqw, so a slide paints correctly at any width (gallery thumbs and full pages).
  * Decks are light-theme only — colours come from the palette hexes, NOT the site theme vars.
  */
-import { palette as P, frame as F, type as T, tones as TONES } from '/deck.data.mjs';
+import { palette as P, frame as F, type as T, tones as TONES, deckCanvases } from '/deck.data.mjs';
 import { fonts } from '/tokens.data.mjs';
+import { hifi } from '/icons.data.mjs';
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 // single-quote the family names — these stacks land inside style="…" attributes
@@ -50,6 +51,22 @@ const bullet = (text, color = P.accent, size = 13, gap = 0.09) =>
   `<div style="display:flex;gap:${IN(0.14)};margin-bottom:${IN(gap)};">
      <span style="${ts('body', { size, color, bold: true })}">•</span>
      <span style="${ts('body', { size })}">${esc(text)}</span></div>`;
+
+// hi-fi icon as inline SVG (the docs paint live SVG; the PPTX side embeds the same icons
+// rasterized at design time into _deck_assets — see gen-deck.mjs). Size in inches.
+const hifiSvg = (name, hex, sizeIn) => {
+  const spec = hifi[name];
+  if (!spec) return '';
+  return `<svg viewBox="0 0 48 48" style="width:${IN(sizeIn)};height:${IN(sizeIn)};color:${hex};" fill="none" stroke="${hex}" stroke-linecap="round" stroke-linejoin="round">${spec.body}</svg>`;
+};
+const canvasUrl = (name) => (deckCanvases[name] ? `/images/canvas/${deckCanvases[name]}` : '');
+
+// the brand moment: mark + wordmark ("sona" ink · "loop" muted), top-left of cover/closing
+const logoRow = (x, y, markIn = 0.42) =>
+  `<div style="${box(x, y, 4.0, markIn + 0.08)}display:flex;align-items:center;gap:${IN(0.14)};">
+     ${hifiSvg('sonaloop', P.ink, markIn)}
+     <span style="${ts('attribution', { size: 16 })}">sona<span style="color:${P.muted};">loop</span></span>
+   </div>`;
 
 const initials = (name) => name.split(/\s+/).map((w) => w[0]).join('').slice(0, 2).toUpperCase();
 const chip = (name, d = 0.34, color = P.accent) =>
@@ -114,16 +131,44 @@ function chartSlot(ch, x, y, w, h) {
 /* ── slide painters — geometry mirrors sonaloop/_pptx.py painter-for-painter ────── */
 const PAINTERS = {
   cover(s) {
-    return rule(0.92, 2.0, 1.0)
-      + `<div style="${box(0.9, 2.15, W - 1.8, 3.4)}">
+    const bandW = 4.2, hasCanvas = !!canvasUrl(s.canvas);
+    const textW = hasCanvas ? W - bandW - 1.3 : W - 1.8;
+    return (hasCanvas
+        ? `<div style="${box(W - bandW, 0, bandW, H)}background:url('${canvasUrl(s.canvas)}') center/cover;"></div>`
+        : '')
+      + (s.logo ? logoRow(0.9, 0.55) : '')
+      + rule(0.92, 2.0, 1.0)
+      + `<div style="${box(0.9, 2.15, textW, 3.4)}">
           <div style="${ts('eyebrow')}letter-spacing:.08em;">${esc((s.eyebrow || '').toUpperCase())}</div>
           <div style="${ts('display', { lh: 1.12 })}margin-top:${IN(0.12)};">${esc(s.title || '')}</div>
           ${s.subtitle ? `<div style="${ts('subtitle', { size: 16 })}margin-top:${IN(0.18)};">${esc(s.subtitle)}</div>` : ''}
         </div>`
-      + `<div style="${box(0.9, H - 1.0, W - 1.8, 0.4)}display:flex;justify-content:space-between;align-items:flex-end;">
+      + `<div style="${box(0.9, H - 1.0, textW, 0.4)}display:flex;justify-content:space-between;align-items:flex-end;">
           <span style="${ts('caption', { size: 11 })}font-family:${MONO};">${esc(s.meta || '')}</span>
           <span style="${ts('caption', { size: 11, color: P.muted })}">${esc(s.date || '')}</span>
         </div>`;
+  },
+
+  'canvas-section'(s, title) {
+    return `<div style="position:absolute;inset:0;background:url('${canvasUrl(s.canvas)}') center/cover;"></div>`
+      + `<div style="${box(0.9, H - 2.65, 6.4, 1.75)}background:${P.panel};border-radius:${IN(0.16)};box-shadow:0 ${IN(0.08)} ${IN(0.3)} rgba(26,24,21,.18);padding:${IN(0.28)} ${IN(0.34)};box-sizing:border-box;">
+          ${s.num ? `<div style="${ts('num', { size: 13, color: P.accent })}letter-spacing:.06em;">${esc(s.num)}</div>` : ''}
+          <div style="${ts('title', { lh: 1.15 })}margin-top:${IN(0.06)};">${esc(s.title || '')}</div>
+          ${s.subtitle ? `<div style="${ts('subtitle', { size: 12 })}margin-top:${IN(0.08)};">${esc(s.subtitle)}</div>` : ''}
+        </div>`;
+  },
+
+  pillars(s, title) {
+    const items = s.items || [], n = Math.max(items.length, 1);
+    const gap = 0.3, cw = (W - 2 * M - gap * (n - 1)) / n, cy = 2.0;
+    const cols = items.map((it, i) => `
+      <div style="${box(M + i * (cw + gap), cy, cw, H - cy - 0.9)}">
+        <div style="width:${IN(0.72)};height:${IN(0.72)};border-radius:${IN(0.14)};background:${P.accentWeak};display:flex;align-items:center;justify-content:center;">
+          ${hifiSvg(it.icon, P.accent, 0.46)}</div>
+        <div style="${ts('body', { size: 14, bold: true })}margin-top:${IN(0.18)};">${esc(it.title || '')}</div>
+        <div style="${ts('body', { size: 11.5, color: P.muted })}margin-top:${IN(0.08)};">${esc(it.text || '')}</div>
+      </div>`).join('');
+    return header('', s.heading || '') + cols + footer(title);
   },
 
   agenda(s, title) {
@@ -251,7 +296,8 @@ const PAINTERS = {
   },
 
   closing(s, title) {
-    return rule(0.92, 2.0, 1.0)
+    return (s.logo ? logoRow(0.9, 1.15) : '')
+      + rule(0.92, 2.0, 1.0)
       + `<div style="${box(0.9, 2.2, W - 1.8, 3.6)}">
           <div style="${ts('display', { size: 32 })}">${esc(s.title || '')}</div>
           ${s.text ? `<div style="${ts('subtitle', { size: 14, color: P.ink })}margin-top:${IN(0.22)};max-width:${IN(8.6)};">${esc(s.text)}</div>` : ''}
