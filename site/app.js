@@ -226,6 +226,25 @@ function chartEffort(items, { title = '', xLabel = 'Effort', yLabel = 'Value', q
     + `<div class="sl-quad-xlab">${esc(xLabel)}</div></div><div class="sl-legend" style="margin-top:.9em">${legend}</div></figure>`;
 }
 
+function chartStats(items, { title = '' } = {}) {
+  const tiles = items.map((it) => {
+    const sw = it.color ? `<span class="sl-kpi__sw" style="--c:${it.color}"></span>` : '';
+    const sub = it.sub ? `<span class="sl-kpi__sub">${chMd(it.sub)}</span>` : '';
+    return `<div class="sl-kpi"><span class="sl-kpi__label">${sw}${chMd(it.label)}</span><span class="sl-kpi__val">${esc(String(it.value))}</span>${sub}</div>`;
+  }).join('');
+  return `<figure class="sl-chart">${chTitle(title)}<div class="sl-kpis">${tiles}</div></figure>`;
+}
+
+function chartPStrip(items, { title = '' } = {}) {
+  const total = items.reduce((s, it) => s + it.value, 0) || 1;
+  const segs = items.map((it, i) => `<span class="sl-pstrip__seg" title="${esc(it.label)}: ${it.value}" style="flex-grow:${it.value};--c:${it.color || CHART_SERIES[i % CHART_SERIES.length]}"></span>`).join('');
+  const legend = items.map((it, i) => `<span class="sl-legend__item"><span class="sl-legend__sw" style="--c:${it.color || CHART_SERIES[i % CHART_SERIES.length]}"></span><span class="sl-legend__label">${chMd(it.label)}</span><span class="sl-legend__val">${it.value} · ${Math.round((it.value / total) * 100)}%</span></span>`).join('');
+  return `<figure class="sl-chart">${chTitle(title)}<div class="sl-pstrip">${segs}</div><div class="sl-legend sl-legend--row" style="margin-top:.7em">${legend}</div></figure>`;
+}
+
+const microPie = (value, max, color = 'var(--sl-accent)') =>
+  `<span class="sl-mpie" role="img" style="--p:${Math.max(0, Math.min(100, (value / max) * 100)).toFixed(1)};--c:${color}"></span>`;
+
 /* "Used on the website" — the consumer pages auto-detected from the sibling marketing site by
    scripts/gen-website-usage.mjs. Blocks rendered inside another block (no direct page import) get
    a short note instead of a list. */
@@ -1374,6 +1393,70 @@ const cChartLine = () => componentPage({
   notes: chartFigureNote('<code>{kind:"chart", of:"line", labels:[…], series:[{label, points}]}</code>'),
 });
 
+const cChartStats = () => componentPage({
+  id: 'chart-stats', title: 'Stats · KPI Row',
+  desc: 'A row of <b>big-number tiles</b> — small label, big value, optional sub-line/delta. The Linear-style stat header above a progress chart (<i>Scope · Started · Completed</i>) and the standalone headline-metrics row for a report section. A colour swatch renders only when an item sets <code>color</code>.',
+  demo: `<div style="display:grid;gap:34px;width:100%">
+      ${chartStats([
+        { label: 'Personas', value: 16 }, { label: 'Agreement', value: '72%', sub: '+9 vs round 1' },
+        { label: 'Confidence', value: 4.1, sub: 'of 5' }, { label: 'Open questions', value: 3 },
+      ], { title: 'Study at a glance' })}
+      ${chartStats([
+        { label: 'Scope', value: 16, color: 'var(--c1)' }, { label: 'Started', value: 2, sub: '13%', color: 'var(--sl-amber)' },
+        { label: 'Completed', value: 11, sub: '69%', color: 'var(--sl-violet)' },
+      ], { title: 'Progress (colour-keyed header)' })}
+    </div>`,
+  variants: { cols: ['Prop', 'Type', 'Effect'], rows: [
+    ['items', '{label, value, sub?, color?}[]', 'The tiles. <code>value</code> may be a number or a pre-formatted string (“72%”).'],
+    ['sub', 'string', 'Small secondary line under the value — a delta or “11 of 16”.'],
+    ['color', 'string', 'Adds the swatch before the label (colour-key it to a paired chart).'],
+  ] },
+  react: `import { StatsChart } from 'sonaloop-design/charts';\n\n<StatsChart title="Study at a glance"\n  items={[{ label: 'Personas', value: 16 }, { label: 'Agreement', value: '72%', sub: '+9 vs R1' }]}\n/>`,
+  markup: `<figure class="sl-chart">\n  <div class="sl-kpis">\n    <div class="sl-kpi">\n      <span class="sl-kpi__label"><span class="sl-kpi__sw" style="--c:var(--c1)"></span>Scope</span>\n      <span class="sl-kpi__val">16</span>\n      <span class="sl-kpi__sub">69%</span>\n    </div>\n  </div>\n</figure>`,
+  python: `from sonaloop_icons.charts import stats_chart\n\nstats_chart([{"label": "Personas", "value": 16},\n             {"label": "Agreement", "value": "72%", "sub": "+9 vs R1"}])`,
+  notes: chartFigureNote('<code>{kind:"chart", of:"stats", series:[{label, value, sub}]}</code>'),
+});
+
+const cChartPStrip = () => componentPage({
+  id: 'chart-progress-strip', title: 'Progress Strip',
+  desc: 'ONE full-width <b>segmented status bar</b> + a count/% legend — composition at a glance (finding status, sentiment split, segment mix). The Linear roadmap-scope / Plane project-overview pattern: denser and calmer than a pie when the figure sits inline in a report section.',
+  demo: `<div style="display:grid;gap:34px;width:100%;max-width:560px">
+      ${chartPStrip([
+        { label: 'Validated', value: 9, color: 'var(--sl-green)' }, { label: 'Open', value: 4, color: 'var(--sl-amber)' },
+        { label: 'Rejected', value: 2, color: 'var(--sl-red)' },
+      ], { title: 'Finding status' })}
+      ${chartPStrip([
+        { label: 'For', value: 11 }, { label: 'Conditional', value: 5 }, { label: 'Against', value: 4 },
+      ], { title: 'Council stance' })}
+    </div>`,
+  variants: { cols: ['Prop', 'Type', 'Effect'], rows: [
+    ['items', '{label, value, color?}[]', 'The segments; widths are proportional, the legend computes %.'],
+    ['title', 'string', 'Optional mono section title.'],
+    ['showValues', 'boolean = true', 'Count · % per legend entry.'],
+  ] },
+  react: `import { ProgressStripChart } from 'sonaloop-design/charts';\n\n<ProgressStripChart title="Finding status"\n  items={[{ label: 'Validated', value: 9 }, { label: 'Open', value: 4 }, { label: 'Rejected', value: 2 }]}\n/>`,
+  markup: `<figure class="sl-chart">\n  <div class="sl-pstrip">\n    <span class="sl-pstrip__seg" style="flex-grow:9;--c:var(--sl-green)"></span>\n    <span class="sl-pstrip__seg" style="flex-grow:4;--c:var(--sl-amber)"></span>\n  </div>\n  <div class="sl-legend sl-legend--row">…count · % entries…</div>\n</figure>`,
+  python: `from sonaloop_icons.charts import progress_strip\n\nprogress_strip([{"label": "Validated", "value": 9}, {"label": "Open", "value": 4}])`,
+  notes: chartFigureNote('<code>{kind:"chart", of:"progress_strip", series:[{label, value}]}</code>'),
+});
+
+const cChartProgressPie = () => componentPage({
+  id: 'chart-progress-pie', title: 'Progress Pie · Micro',
+  desc: 'A <b>tiny inline pie</b> that fills <code>value / max</code> — the Linear milestone-list pattern. Drop it in list rows and table cells next to text like “69% of 16”; pair with the <a href="#/chart-sparkline">Sparkline</a> for per-row trends. Not a report figure-kind — an inline building block for tables and lists.',
+  demo: `<div style="display:flex;flex-direction:column;gap:14px;font-size:.9rem">
+      <span style="display:flex;align-items:center;gap:9px">${microPie(77, 100, 'var(--sl-amber)')} Discovery &amp; alignment <span style="color:var(--sl-muted)">77% of 15</span></span>
+      <span style="display:flex;align-items:center;gap:9px">${microPie(4, 12, 'var(--sl-accent)')} Metrics &amp; data definition <span style="color:var(--sl-muted)">33% of 12</span></span>
+      <span style="display:flex;align-items:center;gap:9px">${microPie(12, 12, 'var(--sl-green)')} UX exploration <span style="color:var(--sl-muted)">done</span></span>
+    </div>`,
+  variants: { cols: ['Prop', 'Type', 'Effect'], rows: [
+    ['value / max', 'number', 'The fill fraction (max defaults to 100).'],
+    ['color', 'string', 'Pie colour (default accent); the empty rest renders at low alpha.'],
+  ] },
+  react: `import { ProgressPie } from 'sonaloop-design/charts';\n\n<ProgressPie value={11} max={16} color=\"var(--sl-amber)\" /> 69% of 16`,
+  markup: `<span class="sl-mpie" role="img" style="--p:68.8;--c:var(--sl-amber)"></span> 69% of 16`,
+  python: `from sonaloop_icons.charts import progress_pie\n\nprogress_pie(11, 16)  # pairs with "69% of 16" text`,
+});
+
 const cTextarea = () => componentPage({
   id: 'textarea', title: 'Textarea', desc: 'A multi-line text field — the brief, a prompt, a persona note. Same hairline + focus ring as Input; vertically resizable.',
   demo: `<textarea class="sl-textarea" rows="3" placeholder="Describe the decision the council should weigh in on…" style="max-width:420px">We're considering a weekly meal-prep subscription for busy parents.</textarea>`,
@@ -1908,6 +1991,9 @@ const NAV = [
     { id: 'chart-dot-plot', title: 'Dot · Range', ico: 'wave', render: cChartDotPlot },
     { id: 'chart-line', title: 'Line · Trend', ico: 'analytics', render: cChartLine },
     { id: 'chart-sparkline', title: 'Sparkline', ico: 'wave', render: cChartSparkline },
+    { id: 'chart-stats', title: 'Stats · KPI Row', ico: 'analytics', render: cChartStats },
+    { id: 'chart-progress-strip', title: 'Progress Strip', ico: 'squareRows', render: cChartPStrip },
+    { id: 'chart-progress-pie', title: 'Progress Pie · Micro', ico: 'half', render: cChartProgressPie },
   ] },
   { label: 'Composites', items: [
     { id: 'app-shell', title: 'App Shell', ico: 'panel', render: cAppShell },

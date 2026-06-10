@@ -15,7 +15,10 @@
  *   <DotPlotChart items={[{ label: 'Trust the AI', values: [2, 3, 3, 4, 5] }]} />
  *   <LineChart series={[{ label: 'Confidence', points: [2, 3, 5, 4, 6] }]} labels={['R1', 'R2', 'R3', 'R4', 'R5']} />
  *   <EffortImpactChart items={[{ label: 'Auto shopping list', x: 2, y: 5 }]} />
+ *   <StatsChart items={[{ label: 'Personas', value: 16 }, { label: 'Agreement', value: '72%', sub: '+9 vs R1' }]} />
+ *   <ProgressStripChart items={[{ label: 'Validated', value: 9 }, { label: 'Open', value: 4 }]} />
  *   <Sparkline values={[3, 5, 4, 6, 5, 8]} />
+ *   <ProgressPie value={11} max={16} />
  */
 import { Fragment } from 'react';
 import type { CSSProperties, HTMLAttributes, ReactNode } from 'react';
@@ -350,6 +353,59 @@ export function EffortImpactChart({ items, title, xLabel = 'Effort', yLabel = 'V
   );
 }
 
+/* ── Stats — KPI number row (small label · big value · optional sub/delta) ─────── */
+export interface StatItem { label: string; value: number | string; sub?: string; color?: string }
+export function StatsChart({ items, title }: { items: StatItem[]; title?: string }) {
+  const rows = items.filter((it) => it.label?.trim() || (it.value !== undefined && it.value !== null && it.value !== ''));
+  if (!rows.length) return null;
+  return (
+    <figure className="sl-chart">
+      <Title title={title} />
+      <div className="sl-kpis">
+        {rows.map((it, i) => (
+          <div className="sl-kpi" key={i}>
+            <span className="sl-kpi__label">
+              {it.color && <span className="sl-kpi__sw" style={{ '--c': it.color } as Sv} />}
+              <MD t={it.label} />
+            </span>
+            <span className="sl-kpi__val">{typeof it.value === 'number' ? fmt(it.value) : it.value}</span>
+            {it.sub && <MD t={it.sub} className="sl-kpi__sub" />}
+          </div>
+        ))}
+      </div>
+    </figure>
+  );
+}
+
+/* ── Progress strip — ONE segmented status bar + a count/% legend ───────────────── */
+export interface ProgressStripItem { label: string; value: number; color?: string }
+export function ProgressStripChart({ items, title, showValues = true }:
+  { items: ProgressStripItem[]; title?: string; showValues?: boolean }) {
+  const rows = items.filter((it) => it.value > 0);
+  const total = rows.reduce((s, it) => s + it.value, 0);
+  if (!rows.length || total <= 0) return null;
+  return (
+    <figure className="sl-chart">
+      <Title title={title} />
+      <div className="sl-pstrip">
+        {rows.map((it, i) => (
+          <span className="sl-pstrip__seg" key={i} title={`${it.label}: ${fmt(it.value)}`}
+            style={{ flexGrow: it.value, '--c': seriesColor(i, it.color) } as Sv} />
+        ))}
+      </div>
+      <div className="sl-legend sl-legend--row" style={{ marginTop: '.7em' }}>
+        {rows.map((it, i) => (
+          <span className="sl-legend__item" key={i}>
+            <span className="sl-legend__sw" style={{ '--c': seriesColor(i, it.color) } as Sv} />
+            <MD t={it.label} className="sl-legend__label" />
+            {showValues && <span className="sl-legend__val">{fmt(it.value)} · {Math.round((it.value / total) * 100)}%</span>}
+          </span>
+        ))}
+      </div>
+    </figure>
+  );
+}
+
 /* ── Sparkline — a compact, label-less trend (filled area) for inline/cell use ──── */
 export interface SparklineProps extends HTMLAttributes<HTMLSpanElement> {
   values: number[];
@@ -375,4 +431,12 @@ export function Sparkline({ values, color = 'var(--sl-accent)', fill = true, wid
       </svg>
     </span>
   );
+}
+
+/* ── ProgressPie — a micro inline pie (value/max) for list rows and table cells ── */
+export function ProgressPie({ value, max = 100, color = 'var(--sl-accent)', className, ...rest }:
+  { value: number; max?: number; color?: string } & HTMLAttributes<HTMLSpanElement>) {
+  const pct = max ? Math.max(0, Math.min(100, (value / max) * 100)) : 0;
+  return <span className={`sl-mpie${className ? ` ${className}` : ''}`} role="img" title={`${Math.round(pct)}%`}
+    style={{ '--p': pct.toFixed(1), '--c': color } as Sv} {...rest} />;
 }

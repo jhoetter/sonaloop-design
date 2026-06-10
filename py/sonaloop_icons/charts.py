@@ -15,6 +15,10 @@ identically in the Python-SSR app, on the website, and in headless-Chromium PDF/
     dot_plot_chart([{"label": "Trust the AI", "values": [2, 3, 3, 4, 5]}])  # spread of voices on 1..5
     line_chart([{"label": "Confidence", "points": [2, 3, 5, 4, 6]}], labels=["R1", "R2", "R3", "R4", "R5"])
     effort_impact([{"label": "Auto shopping list", "x": 2, "y": 5}])  # x=effort, y=value (1..5)
+    stats_chart([{"label": "Personas", "value": 16}, {"label": "Agreement", "value": "72%", "sub": "+9 vs R1"}])
+    progress_strip([{"label": "Validated", "value": 9}, {"label": "Open", "value": 4}])  # one 100% bar + legend
+    sparkline([3, 5, 4, 6, 5, 8])                       # tiny inline trend (for list rows / table cells)
+    progress_pie(11, 16)                                 # tiny inline pie — pairs with "69% of 16"
 
 All text is rendered as-is (already-resolved/translated by the caller — this layer is i18n-agnostic).
 Series colours come from position unless an item sets `color`.
@@ -340,6 +344,81 @@ def effort_impact(items: Sequence[dict], *, title: str = "", x_label: str = "Eff
             f'{"".join(dots)}</div><div class="sl-quad-xlab">{_esc(x_label)}</div></div>')
     return (f'<figure class="sl-chart">{_title(title)}{quad}'
             f'<div class="sl-legend" style="margin-top:.9em">{"".join(legend)}</div></figure>')
+
+
+def stats_chart(items: Sequence[dict], *, title: str = "") -> str:
+    """KPI number row — small label · big value · optional sub-line. items: [{label, value, sub?, color?}].
+    The Linear-style stat header (Scope · Started · Completed) and the standalone headline-metrics row.
+    `value` may be a number or an already-formatted string ("72%", "8 of 12"); a swatch renders only
+    when an item sets `color` (stat headers are colour-keyed to their chart; plain KPIs stay quiet).
+    "" when empty."""
+    rows = [it for it in items
+            if str(it.get("label", "")).strip() or it.get("value") not in (None, "")]
+    if not rows:
+        return ""
+    tiles = []
+    for it in rows:
+        v = it.get("value")
+        n = _num(v)
+        val = _fmt(n) if (n is not None and not isinstance(v, str)) else _esc(v)
+        sw = f'<span class="sl-kpi__sw" style="--c:{_esc(it["color"])}"></span>' if it.get("color") else ""
+        sub = f'<span class="sl-kpi__sub">{_md(it["sub"])}</span>' if it.get("sub") else ""
+        tiles.append(
+            f'<div class="sl-kpi">'
+            f'<span class="sl-kpi__label">{sw}{_md(it.get("label"))}</span>'
+            f'<span class="sl-kpi__val">{val}</span>{sub}</div>')
+    return f'<figure class="sl-chart">{_title(title)}<div class="sl-kpis">{"".join(tiles)}</div></figure>'
+
+
+def progress_strip(items: Sequence[dict], *, title: str = "", show_values: bool = True) -> str:
+    """ONE full-width segmented status bar + a count/% legend. items: [{label, value, color?}].
+    Composition at a glance (finding status, sentiment split) — denser and calmer than a pie
+    when the figure sits inline in a report section. "" when empty/zero."""
+    rows = [it for it in items if (_num(it.get("value")) or 0) > 0]
+    total = sum(_num(it["value"]) or 0 for it in rows)
+    if not rows or total <= 0:
+        return ""
+    segs, legend = [], []
+    for i, it in enumerate(rows):
+        v = _num(it["value"]) or 0
+        c = _color(it, i)
+        segs.append(f'<span class="sl-pstrip__seg" title="{_esc(it.get("label"))}: {_fmt(v)}" '
+                    f'style="flex-grow:{v:g};--c:{c}"></span>')
+        val = f'<span class="sl-legend__val">{_fmt(v)} · {v / total * 100:.0f}%</span>' if show_values else ""
+        legend.append(
+            f'<span class="sl-legend__item"><span class="sl-legend__sw" style="--c:{c}"></span>'
+            f'<span class="sl-legend__label">{_md(it.get("label"))}</span>{val}</span>')
+    return (f'<figure class="sl-chart">{_title(title)}<div class="sl-pstrip">{"".join(segs)}</div>'
+            f'<div class="sl-legend sl-legend--row" style="margin-top:.7em">{"".join(legend)}</div></figure>')
+
+
+def sparkline(points: Sequence[Any], *, color: str = "var(--sl-accent)", fill: bool = True,
+              width: str = "6em", height: str = "1.6em") -> str:
+    """Tiny axis-free inline trend for list rows and table cells — the Python twin of the React
+    <Sparkline> (same .sl-spark classes). Not a report figure-kind; embed it inside other markup.
+    "" with fewer than 2 finite points."""
+    pts = [p for p in (_num(x) for x in points) if p is not None]
+    if len(pts) < 2:
+        return ""
+    mn, mx = min(pts), max(pts)
+    span = (mx - mn) or 1
+    w, h, pad = 100, 32, 2
+    coords = [((i / (len(pts) - 1)) * w, h - pad - (v - mn) / span * (h - pad * 2))
+              for i, v in enumerate(pts)]
+    line = " ".join(f"{x:.2f},{y:.2f}" for x, y in coords)
+    poly = f'<polygon class="sl-spark__fill" points="0,{h} {line} {w},{h}"></polygon>' if fill else ""
+    return (f'<span class="sl-spark" style="width:{_esc(width)};height:{_esc(height)}">'
+            f'<svg viewBox="0 0 {w} {h}" preserveAspectRatio="none" role="img" style="--c:{_esc(color)}">'
+            f'{poly}<polyline class="sl-spark__line" points="{line}"></polyline></svg></span>')
+
+
+def progress_pie(value: Any, max_value: Any = 100, *, color: str = "var(--sl-accent)") -> str:
+    """Micro progress-pie — a tiny inline pie that fills value/max, for milestone/percent list rows.
+    Pairs with text like "69% of 16". Not a report figure-kind; embed it inside other markup."""
+    m = _num(max_value) or 1
+    v = _num(value) or 0
+    pct = max(0.0, min(100.0, v / m * 100)) if m else 0.0
+    return f'<span class="sl-mpie" role="img" title="{round(pct)}%" style="--p:{pct:.1f};--c:{_esc(color)}"></span>'
 
 
 def _num(v: Any) -> float | None:
