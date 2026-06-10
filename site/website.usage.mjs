@@ -57,6 +57,10 @@ export const usage = {
       "to": ""
     },
     {
+      "name": "Persona Detail",
+      "to": "/resources/personas/:slug"
+    },
+    {
       "name": "Personas",
       "to": "/resources/personas"
     },
@@ -292,6 +296,10 @@ export const usage = {
       "to": ""
     },
     {
+      "name": "Persona Detail",
+      "to": "/resources/personas/:slug"
+    },
+    {
       "name": "Personas",
       "to": "/resources/personas"
     },
@@ -404,6 +412,10 @@ export const usage = {
       "to": ""
     },
     {
+      "name": "Persona Detail",
+      "to": "/resources/personas/:slug"
+    },
+    {
       "name": "Personas",
       "to": "/resources/personas"
     },
@@ -450,6 +462,10 @@ export const usage = {
       {
         "name": "Install",
         "to": "/install"
+      },
+      {
+        "name": "Persona Detail",
+        "to": "/resources/personas/:slug"
       },
       {
         "name": "Product pages",

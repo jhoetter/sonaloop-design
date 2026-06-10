@@ -12,6 +12,8 @@ import { regular, hifi } from '/icons.data.mjs';
 import { figures } from '/figures.data.mjs';
 import { blocks as websiteBlocks } from '/site/website.previews.mjs';
 import { usage as websiteUsage, source as websiteSource } from '/site/website.usage.mjs';
+import { layouts as deckLayouts, deckTitle } from '/deck.data.mjs';
+import { renderDeckSlide } from '/site/deck.preview.mjs';
 
 // Where the local marketing site runs (its `npm run dev`), so the "Used on" chips open the real page.
 const WEBSITE_ORIGIN = 'http://localhost:3000';
@@ -2132,6 +2134,56 @@ const cListPage = () => componentPage({
   python: `# _list_page() in web/_components.py emits the same .sl-list* contract.`,
 });
 
+/* ── Deck (PPTX master template) — painted live from deck.data.mjs ─────────────── */
+// slide dict → Python literal (the sample IS the renderer's input, so the code example
+// is generated from the same data the preview paints — they cannot disagree).
+const pyLit = (v) => JSON.stringify(v, null, 2)
+  .replace(/\btrue\b/g, 'True').replace(/\bfalse\b/g, 'False').replace(/\bnull\b/g, 'None');
+
+function pageDeckOverview() {
+  const gallery = deckLayouts.map((l, i) => `
+    <a class="deck-card" href="#/deck-${l.key}">
+      <div class="deck-stage">${renderDeckSlide(l.sample, deckTitle)}</div>
+      <div class="deck-card__cap">
+        <span class="deck-card__num">${String(i + 1).padStart(2, '0')}</span>
+        <span class="deck-card__title">${esc(l.title)}</span>
+        <span class="deck-card__kind">kind: ${esc(l.key)}</span>
+      </div>
+    </a>`).join('');
+  return `
+    <p class="ds-eyebrow">Deck</p>
+    <h1 class="ds-h1">Master Template</h1>
+    <p class="ds-lead">The customer deck as a design-system citizen: one master template for the native PowerPoint export — every layout authored once in <span class="mono">deck.data.mjs</span>, previewed here with placeholder content, and rendered by the core as real, editable PPTX shapes.</p>
+    ${p(`Authored here → generated to <span class="mono">py/sonaloop_icons/deck.py</span> (<span class="mono">npm run gen:deck</span>) → vendored into the core as <span class="mono">sonaloop/_deck.py</span> (<span class="mono">make icons</span>) → painted by <span class="mono">sonaloop/_pptx.py</span>. The placeholder study below (“${esc(deckTitle)}”, the German eating panel) is the same content the core renders with <span class="mono">sonaloop template-deck</span> — open the result in PowerPoint and it matches these previews slide for slide.`)}
+    ${h2('slides', 'The deck, slide by slide')}
+    ${p('Deck order as a customer reads it: cover → agenda → executive summary → chapters (divider · insights · evidence) → recommendations and risks → voices → next steps → closing. Click any slide for its layout spec and slide model.')}
+    <div class="deck-grid">${gallery}</div>
+    ${h2('render', 'Rendering the demo deck')}
+    ${code('bash', `# in ~/repos/sonaloop — renders every layout below with this placeholder content
+sonaloop template-deck                # → data/export/master-template.pptx
+make template-deck                    # same, via the Makefile`)}
+  `;
+}
+
+function deckLayoutPage(l, i) {
+  return `
+    <p class="ds-eyebrow">Deck</p>
+    <h1 class="ds-h1">${esc(l.title)}</h1>
+    <p class="ds-lead">${esc(l.desc)}</p>
+    <div class="deck-stage deck-full">${renderDeckSlide(l.sample, deckTitle)}</div>
+    ${h2('usage', 'Usage')}
+    ${p(esc(l.usage))}
+    ${h2('model', 'Slide model')}
+    ${p(`The dict <span class="mono">sonaloop/_pptx.render()</span> accepts for this layout — exactly the placeholder content previewed above (generated from <span class="mono">deck.data.mjs</span>).`)}
+    ${code('python', `from sonaloop import _pptx\n\nslide = ${pyLit(l.sample)}\n\ndeck_bytes = _pptx.render([slide], title=${JSON.stringify(deckTitle)})`)}
+  `;
+}
+
+const DECK_ICO = { cover: 'star', agenda: 'squareRows', section: 'squareSplit', summary: 'bulb',
+  insight: 'target', recommendation: 'check', risk: 'diamond', quote: 'contact', voices: 'projects',
+  stats: 'analytics', chart: 'wave', comparison: 'squareCols', timeline: 'clock', closing: 'sonaloop',
+  content: 'report', image: 'panel' };
+
 const NAV = [
   { label: 'Foundations', items: [
     { id: 'introduction', title: 'Introduction', ico: 'overview', render: pageIntroduction },
@@ -2201,6 +2253,13 @@ const NAV = [
     { id: 'chart-stats', title: 'Stats · KPI Row', ico: 'analytics', render: cChartStats },
     { id: 'chart-progress-strip', title: 'Progress Strip', ico: 'squareRows', render: cChartPStrip },
     { id: 'chart-progress-pie', title: 'Progress Pie · Micro', ico: 'half', render: cChartProgressPie },
+  ] },
+  { label: 'Deck', items: [
+    { id: 'deck', title: 'Master Template', ico: 'report', render: pageDeckOverview },
+    ...deckLayouts.map((l, i) => ({
+      id: `deck-${l.key}`, title: l.title, ico: DECK_ICO[l.key] || 'rectangle',
+      render: () => deckLayoutPage(l, i),
+    })),
   ] },
   { label: 'Composites', items: [
     { id: 'app-shell', title: 'App Shell', ico: 'panel', render: cAppShell },
