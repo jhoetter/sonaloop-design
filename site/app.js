@@ -226,6 +226,47 @@ function chartEffort(items, { title = '', xLabel = 'Effort', yLabel = 'Value', q
     + `<div class="sl-quad-xlab">${esc(xLabel)}</div></div><div class="sl-legend" style="margin-top:.9em">${legend}</div></figure>`;
 }
 
+function chartColumn(items, { title = '', table = false } = {}) {
+  const keys = [];
+  for (const it of items) for (const s of it.segments || []) if (!keys.includes(s.label)) keys.push(s.label);
+  const segColor = (s) => s.color || CHART_SERIES[Math.max(0, keys.indexOf(s.label)) % CHART_SERIES.length];
+  const totalOf = (it) => it.segments ? it.segments.reduce((n, s) => n + Math.max(0, s.value || 0), 0) : it.value;
+  const mx = Math.max(...items.map(totalOf)) || 1;
+  const cols = items.map((it) => {
+    const total = totalOf(it);
+    const pct = Math.max(0, Math.min(100, (total / mx) * 100)).toFixed(1);
+    const bar = it.segments
+      ? `<span class="sl-col__bar sl-col__bar--stack" style="--v:${pct}%">${it.segments.filter((s) => s.value > 0).map((s) => `<span class="sl-col__seg" title="${esc(s.label)}: ${s.value}" style="flex-grow:${s.value};--c:${segColor(s)}"></span>`).join('')}</span>`
+      : `<span class="sl-col__bar" title="${esc(it.label)}: ${total}" style="--v:${pct}%;--c:${it.color || 'var(--c1)'}"></span>`;
+    return `<div class="sl-col"><span class="sl-col__val">${total}</span>${bar}</div>`;
+  }).join('');
+  const labels = items.map((it) => `<span title="${esc(it.label)}">${chMd(it.label)}</span>`).join('');
+  const legend = keys.length ? `<div class="sl-legend sl-legend--row" style="margin-top:.7em">${keys.map((k) => `<span class="sl-legend__item"><span class="sl-legend__sw" style="--c:${segColor(items.flatMap((it) => it.segments || []).find((s) => s.label === k))}"></span><span class="sl-legend__label">${chMd(k)}</span></span>`).join('')}</div>` : '';
+  let tbl = '';
+  if (table) {
+    const head = keys.length ? `<tr><th></th>${keys.map((k) => `<th>${chMd(k)}</th>`).join('')}<th>Total</th></tr>` : '<tr><th></th><th>Value</th></tr>';
+    const body = items.map((it) => keys.length
+      ? `<tr><td>${chMd(it.label)}</td>${keys.map((k) => `<td>${(it.segments || []).find((s) => s.label === k)?.value ?? 0}</td>`).join('')}<td>${totalOf(it)}</td></tr>`
+      : `<tr><td>${chMd(it.label)}</td><td>${totalOf(it)}</td></tr>`).join('');
+    tbl = `<table class="sl-table sl-chart__table"><thead>${head}</thead><tbody>${body}</tbody></table>`;
+  }
+  return `<figure class="sl-chart">${chTitle(title)}<div class="sl-cols-wrap"><div class="sl-cols-axis"><span>${mx}</span><span>${mx / 2}</span><span>0</span></div><div class="sl-cols">${cols}</div><div class="sl-cols-labels">${labels}</div></div>${legend}${tbl}</figure>`;
+}
+
+function chartStrip(items, { title = '', unit = '' } = {}) {
+  const all = items.flatMap((it) => it.values);
+  const mn = Math.min(...all), mx = Math.max(...all), span = (mx - mn) || 1;
+  const xOf = (v) => `${Math.max(0, Math.min(100, ((v - mn) / span) * 100)).toFixed(1)}%`;
+  const rows = items.map((it, i) => {
+    const c = it.color || CHART_SERIES[i % CHART_SERIES.length];
+    const mean = Math.round((it.values.reduce((s, v) => s + v, 0) / it.values.length) * 10) / 10;
+    const dots = it.values.map((v) => `<span class="sl-dot-pt" style="left:${xOf(v)};--c:${c}"></span>`).join('');
+    return `<div class="sl-dot-row"><span class="sl-dot-label" title="${esc(it.label)}">${chMd(it.label)}</span><span class="sl-dot-track">${dots}<span class="sl-dot-mean" style="left:${xOf(mean)};--c:${c}" title="mean ${mean}${esc(unit)}"></span></span><span class="sl-dot-val">${mean}${esc(unit)}</span></div>`;
+  }).join('');
+  const scale = `<div class="sl-dot-scale"><span></span><span class="sl-dot-scale__axis"><span>${mn}${esc(unit)}</span><span>${mn + (mx - mn) / 2}${esc(unit)}</span><span>${mx}${esc(unit)}</span></span><span></span></div>`;
+  return `<figure class="sl-chart">${chTitle(title)}<div class="sl-dots">${rows}</div>${scale}</figure>`;
+}
+
 function chartStats(items, { title = '' } = {}) {
   const tiles = items.map((it) => {
     const sw = it.color ? `<span class="sl-kpi__sw" style="--c:${it.color}"></span>` : '';
@@ -1393,6 +1434,53 @@ const cChartLine = () => componentPage({
   notes: chartFigureNote('<code>{kind:"chart", of:"line", labels:[…], series:[{label, points}]}</code>'),
 });
 
+const cChartColumn = () => componentPage({
+  id: 'chart-column', title: 'Column Chart',
+  desc: 'Thin rounded <b>vertical bars</b> over hairline gridlines — the Linear Insights panel. Distributions over an ordered category axis (scores 1–5, counts per status), optionally <b>segment-stacked</b> with a shared legend, and an optional <b>breakdown table</b> that restates the numbers: chart for the shape, table for the values.',
+  demo: `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:34px;width:100%;align-items:start">
+      ${chartColumn([
+        { label: '1', value: 1 }, { label: '2', value: 3 }, { label: '3', value: 6 }, { label: '4', value: 9 }, { label: '5', value: 4 },
+      ], { title: 'Score distribution (1–5)' })}
+      ${chartColumn([
+        { label: 'Todo', segments: [{ label: 'High', value: 7 }, { label: 'Medium', value: 4 }, { label: 'Low', value: 4 }] },
+        { label: 'Doing', segments: [{ label: 'High', value: 3 }, { label: 'Medium', value: 2 }, { label: 'Low', value: 1 }] },
+        { label: 'Done', segments: [{ label: 'High', value: 5 }, { label: 'Medium', value: 6 }, { label: 'Low', value: 2 }] },
+      ], { title: 'Issues by status · priority', table: true })}
+    </div>`,
+  variants: { cols: ['Prop', 'Type', 'Effect'], rows: [
+    ['items', '{label, value | segments, color?}[]', 'One column each; <code>segments</code> stacks composition (colour keyed by segment label).'],
+    ['table', 'boolean = false', 'Append the breakdown table beneath the plot.'],
+    ['maxValue', 'number', 'Fix the y scale (else the largest column).'],
+    ['showValues', 'boolean = true', 'Per-column value label above each bar.'],
+  ] },
+  react: `import { ColumnChart } from 'sonaloop-design/charts';\n\n<ColumnChart title="Score distribution"\n  items={[{ label: '1', value: 1 }, { label: '2', value: 3 }, { label: '3', value: 6 }]}\n  table\n/>`,
+  markup: `<figure class="sl-chart">\n  <div class="sl-cols-wrap">\n    <div class="sl-cols-axis"><span>9</span><span>4.5</span><span>0</span></div>\n    <div class="sl-cols">\n      <div class="sl-col">\n        <span class="sl-col__val">6</span>\n        <span class="sl-col__bar" style="--v:66.7%;--c:var(--c1)"></span>\n      </div>\n    </div>\n    <div class="sl-cols-labels"><span>3</span></div>\n  </div>\n</figure>`,
+  python: `from sonaloop_icons.charts import column_chart\n\ncolumn_chart([{"label": "1", "value": 1}, {"label": "2", "value": 3}], table=True)`,
+  notes: chartFigureNote('<code>{kind:"chart", of:"column", series:[{label, value | segments}], table:true}</code>'),
+});
+
+const cChartStrip = () => componentPage({
+  id: 'chart-strip', title: 'Strip · Distribution',
+  desc: 'A <b>continuous-axis dot strip</b> per category — the Linear issue-age pattern. Each value is a dot on a real scale (price points, latencies), one lane per row, so outliers and spread read at a glance. The continuous sibling of the 1–5 <a href="#/chart-dot-plot">Dot · Range</a>: the scale auto-ranges from the data (or fix <code>min</code>/<code>max</code>) with an optional unit suffix.',
+  demo: `<div style="width:100%;max-width:520px">
+      ${chartStrip([
+        { label: 'Families', values: [9, 12, 12, 15, 19] },
+        { label: 'Singles', values: [5, 7, 9, 9, 11] },
+        { label: 'Pro users', values: [15, 19, 25, 29, 49] },
+      ], { title: 'Willingness to pay / month', unit: '€' })}
+    </div>`,
+  variants: { cols: ['Prop', 'Type', 'Effect'], rows: [
+    ['items', '{label, values: number[], color?}[]', 'One lane per row; each value is a dot, the taller marker the mean.'],
+    ['minValue / maxValue', 'number', 'Fix the scale (else auto-ranged from the data).'],
+    ['unit', 'string', 'Suffix on means and axis ticks (“€”, “d”, “s”).'],
+    ['showMean', 'boolean = true', 'Draw the mean marker.'],
+  ] },
+  react: `import { StripChart } from 'sonaloop-design/charts';\n\n<StripChart title="Willingness to pay / month" unit="€"\n  items={[{ label: 'Families', values: [9, 12, 12, 15, 19] }, { label: 'Pro users', values: [15, 29, 49] }]}\n/>`,
+  markup: `<figure class="sl-chart">\n  <div class="sl-dots">\n    <div class="sl-dot-row">\n      <span class="sl-dot-label">Families</span>\n      <span class="sl-dot-track">\n        <span class="sl-dot-pt" style="left:18%;--c:var(--c1)"></span>\n        <span class="sl-dot-mean" style="left:30%;--c:var(--c1)"></span>\n      </span>\n      <span class="sl-dot-val">13.4€</span>\n    </div>\n  </div>\n  <div class="sl-dot-scale">…5€ · 27€ · 49€…</div>\n</figure>`,
+  python: `from sonaloop_icons.charts import strip_chart\n\nstrip_chart([{"label": "Families", "values": [9, 12, 12, 15, 19]}], unit="€")`,
+  notes: chartFigureNote('<code>{kind:"chart", of:"strip", series:[{label, values}], unit:"€"}</code>'),
+});
+
 const cChartStats = () => componentPage({
   id: 'chart-stats', title: 'Stats · KPI Row',
   desc: 'A row of <b>big-number tiles</b> — small label, big value, optional sub-line/delta. The Linear-style stat header above a progress chart (<i>Scope · Started · Completed</i>) and the standalone headline-metrics row for a report section. A colour swatch renders only when an item sets <code>color</code>.',
@@ -1991,6 +2079,8 @@ const NAV = [
     { id: 'chart-dot-plot', title: 'Dot · Range', ico: 'wave', render: cChartDotPlot },
     { id: 'chart-line', title: 'Line · Trend', ico: 'analytics', render: cChartLine },
     { id: 'chart-sparkline', title: 'Sparkline', ico: 'wave', render: cChartSparkline },
+    { id: 'chart-column', title: 'Column', ico: 'analytics', render: cChartColumn },
+    { id: 'chart-strip', title: 'Strip · Distribution', ico: 'wave', render: cChartStrip },
     { id: 'chart-stats', title: 'Stats · KPI Row', ico: 'analytics', render: cChartStats },
     { id: 'chart-progress-strip', title: 'Progress Strip', ico: 'squareRows', render: cChartPStrip },
     { id: 'chart-progress-pie', title: 'Progress Pie · Micro', ico: 'half', render: cChartProgressPie },

@@ -15,6 +15,8 @@
  *   <DotPlotChart items={[{ label: 'Trust the AI', values: [2, 3, 3, 4, 5] }]} />
  *   <LineChart series={[{ label: 'Confidence', points: [2, 3, 5, 4, 6] }]} labels={['R1', 'R2', 'R3', 'R4', 'R5']} />
  *   <EffortImpactChart items={[{ label: 'Auto shopping list', x: 2, y: 5 }]} />
+ *   <ColumnChart items={[{ label: '1', value: 2 }, { label: '2', value: 5 }]} table />
+ *   <StripChart items={[{ label: 'WTP', values: [9, 12, 15, 29] }]} unit="€" />
  *   <StatsChart items={[{ label: 'Personas', value: 16 }, { label: 'Agreement', value: '72%', sub: '+9 vs R1' }]} />
  *   <ProgressStripChart items={[{ label: 'Validated', value: 9 }, { label: 'Open', value: 4 }]} />
  *   <Sparkline values={[3, 5, 4, 6, 5, 8]} />
@@ -349,6 +351,121 @@ export function EffortImpactChart({ items, title, xLabel = 'Effort', yLabel = 'V
           );
         })}
       </div>
+    </figure>
+  );
+}
+
+/* ── Column — thin vertical bars over hairline gridlines (Linear Insights panel) ── */
+export interface ColumnItem { label: string; value?: number; segments?: StackSegment[]; color?: string }
+export function ColumnChart({ items, title, maxValue, showValues = true, table = false }:
+  { items: ColumnItem[]; title?: string; maxValue?: number; showValues?: boolean; table?: boolean }) {
+  const totalOf = (it: ColumnItem) => it.segments?.length
+    ? it.segments.reduce((n, s) => n + Math.max(0, s.value || 0), 0)
+    : (Number.isFinite(it.value) ? it.value! : null);
+  const rows = items.map((it) => [it, totalOf(it)] as const).filter((r): r is [ColumnItem, number] => r[1] !== null);
+  if (!rows.length) return null;
+  const keys: string[] = [];
+  for (const [it] of rows) for (const s of it.segments ?? []) if (!keys.includes(s.label)) keys.push(s.label);
+  const segColor = (s: StackSegment) => s.color ?? SERIES[Math.max(0, keys.indexOf(s.label)) % SERIES.length];
+  const mx = maxValue || Math.max(...rows.map(([, t]) => t)) || 1;
+  return (
+    <figure className="sl-chart">
+      <Title title={title} />
+      <div className="sl-cols-wrap">
+        <div className="sl-cols-axis"><span>{fmt(mx)}</span><span>{fmt(mx / 2)}</span><span>0</span></div>
+        <div className="sl-cols">
+          {rows.map(([it, total], i) => {
+            const pct = Math.max(0, Math.min(100, (total / mx) * 100));
+            return (
+              <div className="sl-col" key={i}>
+                {showValues && <span className="sl-col__val">{fmt(total)}</span>}
+                {it.segments?.length ? (
+                  <span className="sl-col__bar sl-col__bar--stack" style={{ '--v': `${pct.toFixed(1)}%` } as Sv}>
+                    {[...it.segments].filter((s) => s.value > 0).map((s, j) => (
+                      <span className="sl-col__seg" key={j} title={`${s.label}: ${fmt(s.value)}`}
+                        style={{ flexGrow: s.value, '--c': segColor(s) } as Sv} />
+                    ))}
+                  </span>
+                ) : (
+                  <span className="sl-col__bar" title={`${it.label}: ${fmt(total)}`}
+                    style={{ '--v': `${pct.toFixed(1)}%`, '--c': it.color ?? 'var(--c1)' } as Sv} />
+                )}
+              </div>
+            );
+          })}
+        </div>
+        <div className="sl-cols-labels">{rows.map(([it], i) => <MD t={it.label} title={it.label} key={i} />)}</div>
+      </div>
+      {keys.length > 0 && (
+        <div className="sl-legend sl-legend--row" style={{ marginTop: '.7em' }}>
+          {keys.map((k, i) => {
+            const first = rows.flatMap(([it]) => it.segments ?? []).find((s) => s.label === k)!;
+            return (
+              <span className="sl-legend__item" key={i}>
+                <span className="sl-legend__sw" style={{ '--c': segColor(first) } as Sv} />
+                <MD t={k} className="sl-legend__label" />
+              </span>
+            );
+          })}
+        </div>
+      )}
+      {table && (
+        <table className="sl-table sl-chart__table">
+          <thead>
+            {keys.length
+              ? <tr><th />{keys.map((k, i) => <th key={i}>{k}</th>)}<th>Total</th></tr>
+              : <tr><th /><th>Value</th></tr>}
+          </thead>
+          <tbody>
+            {rows.map(([it, total], i) => (
+              <tr key={i}>
+                <td>{it.label}</td>
+                {keys.length
+                  ? <>{keys.map((k, j) => <td key={j}>{fmt(it.segments?.find((s) => s.label === k)?.value ?? 0)}</td>)}<td>{fmt(total)}</td></>
+                  : <td>{fmt(total)}</td>}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </figure>
+  );
+}
+
+/* ── Strip — continuous-axis dot strip per category (Linear issue-age pattern) ──── */
+export interface StripItem { label: string; values: number[]; color?: string }
+export function StripChart({ items, title, minValue, maxValue, unit = '', showMean = true }:
+  { items: StripItem[]; title?: string; minValue?: number; maxValue?: number; unit?: string; showMean?: boolean }) {
+  const rows = items.filter((it) => Array.isArray(it.values) && it.values.some((v) => Number.isFinite(v)));
+  if (!rows.length) return null;
+  const all = rows.flatMap((it) => it.values).filter((v) => Number.isFinite(v));
+  const mn = minValue ?? Math.min(...all);
+  const mx = maxValue ?? Math.max(...all);
+  const span = (mx - mn) || 1;
+  const xOf = (v: number) => `${Math.max(0, Math.min(100, ((v - mn) / span) * 100))}%`;
+  return (
+    <figure className="sl-chart">
+      <Title title={title} />
+      <div className="sl-dots">
+        {rows.map((it, i) => {
+          const vals = it.values.filter((v) => Number.isFinite(v));
+          const mean = Math.round((vals.reduce((s, v) => s + v, 0) / vals.length) * 10) / 10;
+          const c = it.color ?? SERIES[i % SERIES.length];
+          return (
+            <div className="sl-dot-row" key={i}>
+              <MD t={it.label} className="sl-dot-label" title={it.label} />
+              <span className="sl-dot-track">
+                {vals.map((v, j) => <span className="sl-dot-pt" key={j} style={{ left: xOf(v), '--c': c } as Sv} />)}
+                {showMean && <span className="sl-dot-mean" style={{ left: xOf(mean), '--c': c } as Sv} title={`mean ${fmt(mean)}${unit}`} />}
+              </span>
+              <span className="sl-dot-val">{fmt(mean)}{unit}</span>
+            </div>
+          );
+        })}
+      </div>
+      <div className="sl-dot-scale"><span /><span className="sl-dot-scale__axis">
+        <span>{fmt(mn)}{unit}</span><span>{fmt(mn + (mx - mn) / 2)}{unit}</span><span>{fmt(mx)}{unit}</span>
+      </span><span /></div>
     </figure>
   );
 }

@@ -479,6 +479,30 @@
   font-size: .8em; font-weight: 700; color: var(--c, var(--sl-accent)); background: var(--sl-bg);
   border: 1.8px solid var(--c, var(--sl-accent)); box-shadow: 0 0 0 3px var(--sl-bg); }
 
+/* Column chart — thin rounded VERTICAL bars over hairline gridlines (the Linear Insights panel),
+   optionally segment-stacked, with an optional breakdown table beneath (.sl-chart__table).
+   Fills are scaled to 86% of the plot so per-column value labels always fit; y ticks read
+   max / half / 0. Gridlines are quiet color-mixed hairlines, the baseline a solid rule. */
+.sl-cols-wrap { display: grid; grid-template-columns: auto 1fr; gap: .2em .55em; }
+.sl-cols-axis { display: flex; flex-direction: column; justify-content: space-between; text-align: right;
+  font-size: .72em; color: var(--sl-faint); font-variant-numeric: tabular-nums; transform: translateY(.35em); }
+.sl-cols { display: flex; align-items: flex-end; gap: .55em; height: 9.5em;
+  border-bottom: 1px solid var(--sl-line);
+  background-image: linear-gradient(color-mix(in srgb, var(--sl-line) 55%, transparent) 1px, transparent 1px);
+  background-size: 100% 25%; }
+.sl-col { flex: 1; min-width: 0; height: 100%; display: flex; flex-direction: column;
+  justify-content: flex-end; align-items: center; gap: .3em; }
+.sl-col__val { font-size: .72em; color: var(--sl-muted); font-variant-numeric: tabular-nums; line-height: 1; }
+.sl-col__bar { width: min(100%, 2.1em); height: calc(var(--v, 0%) * .86); min-height: 2px;
+  border-radius: 3px 3px 0 0; background: var(--c, var(--c1)); }
+.sl-col__bar--stack { display: flex; flex-direction: column-reverse; background: none; overflow: hidden; }
+.sl-col__seg { flex-basis: 0; background: var(--c, var(--sl-accent)); }
+.sl-cols-labels { grid-column: 2; display: flex; gap: .55em; margin-top: .3em; }
+.sl-cols-labels span { flex: 1; min-width: 0; text-align: center; font-size: .75em; color: var(--sl-muted);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sl-chart__table { margin-top: .9em; font-size: .85em; }
+.sl-chart__table td { font-variant-numeric: tabular-nums; }
+
 /* KPI stat row — big-number tiles (small label · big value · optional sub/delta): the Linear-style
    stat header above a progress chart, or a standalone headline-metrics row. Swatch only when an
    item sets a colour (a stat header is colour-keyed to its chart; plain KPIs stay quiet). */

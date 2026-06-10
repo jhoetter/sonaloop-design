@@ -15,6 +15,8 @@ identically in the Python-SSR app, on the website, and in headless-Chromium PDF/
     dot_plot_chart([{"label": "Trust the AI", "values": [2, 3, 3, 4, 5]}])  # spread of voices on 1..5
     line_chart([{"label": "Confidence", "points": [2, 3, 5, 4, 6]}], labels=["R1", "R2", "R3", "R4", "R5"])
     effort_impact([{"label": "Auto shopping list", "x": 2, "y": 5}])  # x=effort, y=value (1..5)
+    column_chart([{"label": "1", "value": 2}, {"label": "2", "value": 5}], table=True)  # vertical bars
+    strip_chart([{"label": "WTP", "values": [9, 12, 15, 29]}], unit="€")  # continuous dot strip
     stats_chart([{"label": "Personas", "value": 16}, {"label": "Agreement", "value": "72%", "sub": "+9 vs R1"}])
     progress_strip([{"label": "Validated", "value": 9}, {"label": "Open", "value": 4}])  # one 100% bar + legend
     sparkline([3, 5, 4, 6, 5, 8])                       # tiny inline trend (for list rows / table cells)
@@ -344,6 +346,113 @@ def effort_impact(items: Sequence[dict], *, title: str = "", x_label: str = "Eff
             f'{"".join(dots)}</div><div class="sl-quad-xlab">{_esc(x_label)}</div></div>')
     return (f'<figure class="sl-chart">{_title(title)}{quad}'
             f'<div class="sl-legend" style="margin-top:.9em">{"".join(legend)}</div></figure>')
+
+
+def column_chart(items: Sequence[dict], *, title: str = "", max_value: float | None = None,
+                 show_values: bool = True, table: bool = False) -> str:
+    """Thin VERTICAL bars over hairline gridlines (the Linear Insights panel) — distributions over
+    an ordered category axis (scores 1..5, counts per status). items: [{label, value, color?}] or
+    [{label, segments: [{label, value, color?}]}] for stacked composition; series colour is keyed
+    by segment label like stacked_bar_chart. `table=True` appends a breakdown table that restates
+    the numbers — chart for the shape, table for the values. "" when nothing is scored."""
+    def _total(it: dict) -> float | None:
+        if it.get("segments"):
+            vals = [_num(s.get("value")) for s in it["segments"]]
+            return sum(max(0.0, v) for v in vals if v is not None) if any(v is not None for v in vals) else None
+        return _num(it.get("value"))
+
+    rows = [(it, _total(it)) for it in items]
+    rows = [(it, t) for it, t in rows if t is not None]
+    if not rows:
+        return ""
+    keys: list[str] = []
+    for it, _t in rows:
+        for s in (it.get("segments") or []):
+            if s.get("label") not in keys:
+                keys.append(s.get("label"))
+
+    def seg_color(s: dict) -> str:
+        return str(s.get("color") or _SERIES[max(0, keys.index(s.get("label"))) % len(_SERIES)])
+
+    mx = max_value if max_value else max(t for _it, t in rows) or 1
+    cols = []
+    for it, total in rows:
+        pct = max(0.0, min(100.0, total / mx * 100)) if mx else 0
+        if it.get("segments"):
+            segs = "".join(
+                f'<span class="sl-col__seg" title="{_esc(s.get("label"))}: {_fmt(_num(s.get("value")) or 0)}" '
+                f'style="flex-grow:{_num(s.get("value")) or 0:g};--c:{seg_color(s)}"></span>'
+                for s in it["segments"] if (_num(s.get("value")) or 0) > 0)
+            bar = f'<span class="sl-col__bar sl-col__bar--stack" style="--v:{pct:.1f}%">{segs}</span>'
+        else:
+            c = str(it.get("color") or "var(--c1)")
+            bar = f'<span class="sl-col__bar" title="{_esc(it.get("label"))}: {_fmt(total)}" style="--v:{pct:.1f}%;--c:{c}"></span>'
+        val = f'<span class="sl-col__val">{_fmt(total)}</span>' if show_values else ""
+        cols.append(f'<div class="sl-col">{val}{bar}</div>')
+    labels = "".join(f'<span title="{_esc(it.get("label"))}">{_md(it.get("label"))}</span>' for it, _t in rows)
+    axis = (f'<div class="sl-cols-axis"><span>{_fmt(mx)}</span><span>{_fmt(mx / 2)}</span><span>0</span></div>')
+    legend = ""
+    if keys:
+        first = {s.get("label"): s for it, _t in reversed(rows) for s in (it.get("segments") or [])}
+        legend = ('<div class="sl-legend sl-legend--row" style="margin-top:.7em">' + "".join(
+            f'<span class="sl-legend__item"><span class="sl-legend__sw" style="--c:{seg_color(first[k])}"></span>'
+            f'<span class="sl-legend__label">{_md(k)}</span></span>' for k in keys) + "</div>")
+    tbl = ""
+    if table:
+        if keys:
+            head = "<tr><th></th>" + "".join(f"<th>{_md(k)}</th>" for k in keys) + "<th>Total</th></tr>"
+            body = []
+            for it, total in rows:
+                by = {s.get("label"): _num(s.get("value")) or 0 for s in (it.get("segments") or [])}
+                cells = "".join(f"<td>{_fmt(by.get(k, 0))}</td>" for k in keys)
+                body.append(f"<tr><td>{_md(it.get('label'))}</td>{cells}<td>{_fmt(total)}</td></tr>")
+        else:
+            head = "<tr><th></th><th>Value</th></tr>"
+            body = [f"<tr><td>{_md(it.get('label'))}</td><td>{_fmt(total)}</td></tr>" for it, total in rows]
+        tbl = (f'<table class="sl-table sl-chart__table"><thead>{head}</thead>'
+               f'<tbody>{"".join(body)}</tbody></table>')
+    return (f'<figure class="sl-chart">{_title(title)}<div class="sl-cols-wrap">{axis}'
+            f'<div class="sl-cols">{"".join(cols)}</div>'
+            f'<div class="sl-cols-labels">{labels}</div></div>{legend}{tbl}</figure>')
+
+
+def strip_chart(items: Sequence[dict], *, title: str = "", min_value: float | None = None,
+                max_value: float | None = None, unit: str = "", show_mean: bool = True) -> str:
+    """Continuous-axis dot strip per category (the Linear issue-age pattern) — each value is a dot
+    on a real scale, one lane per row, outliers visible at a glance. The continuous sibling of
+    dot_plot_chart (auto-ranged min/max, a mid tick, optional unit suffix).
+    items: [{label, values: [num], color?}]. "" when nothing is scored."""
+    rows = [it for it in items if isinstance(it.get("values"), (list, tuple))
+            and any(_num(v) is not None for v in it["values"])]
+    if not rows:
+        return ""
+    allv = [v for it in rows for v in (_num(x) for x in it["values"]) if v is not None]
+    mn = min_value if min_value is not None else min(allv)
+    mx = max_value if max_value is not None else max(allv)
+    span = (mx - mn) or 1
+    u = _esc(unit)
+
+    def x_of(v: float) -> float:
+        return max(0.0, min(100.0, (v - mn) / span * 100))
+
+    out = []
+    for i, it in enumerate(rows):
+        vals = [_num(v) for v in it["values"] if _num(v) is not None]
+        mean = round(sum(vals) / len(vals) * 10) / 10
+        c = it.get("color") or _SERIES[i % len(_SERIES)]
+        dots = "".join(f'<span class="sl-dot-pt" style="left:{x_of(v):.1f}%;--c:{c}"></span>' for v in vals)
+        meanm = (f'<span class="sl-dot-mean" style="left:{x_of(mean):.1f}%;--c:{c}" title="mean {_fmt(mean)}{u}"></span>'
+                 if show_mean else "")
+        out.append(
+            f'<div class="sl-dot-row">'
+            f'<span class="sl-dot-label" title="{_esc(it.get("label"))}">{_md(it.get("label"))}</span>'
+            f'<span class="sl-dot-track">{dots}{meanm}</span>'
+            f'<span class="sl-dot-val">{_fmt(mean)}{u}</span></div>')
+    mid = mn + (mx - mn) / 2
+    scale = ('<div class="sl-dot-scale"><span></span>'
+             f'<span class="sl-dot-scale__axis"><span>{_fmt(mn)}{u}</span><span>{_fmt(mid)}{u}</span>'
+             f'<span>{_fmt(mx)}{u}</span></span><span></span></div>')
+    return f'<figure class="sl-chart">{_title(title)}<div class="sl-dots">{"".join(out)}</div>{scale}</figure>'
 
 
 def stats_chart(items: Sequence[dict], *, title: str = "") -> str:
