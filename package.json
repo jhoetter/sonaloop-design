@@ -23,6 +23,7 @@
   "files": [
     "src",
     "icons.data.mjs",
+    "figures.data.mjs",
     "styles",
     "fonts",
     "images",

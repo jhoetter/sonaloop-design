@@ -1,7 +1,7 @@
 /*
- * sonaloop-icons — hover micro-interactions (regular + hi-fi).
+ * sonaloop-icons — hover micro-interactions (regular + hi-fi + figures).
  *
- * SOURCE OF TRUTH for icon animation. `scripts/gen.mjs` copies this verbatim
+ * SOURCE OF TRUTH for icon & figure animation. `scripts/gen.mjs` copies this verbatim
  * into the Python package (as HIFI_ANIM_CSS) so sonaloop and
  * persona-website share one animation layer. Authored by hand — safe to edit.
  *
@@ -603,7 +603,46 @@
   .pi-rocket.pi-animate:is(:hover, :focus-visible) [data-part="rocket"], .pi-hover:hover .pi-rocket.pi-animate [data-part="rocket"] { transform: translateY(-2px); }
   .pi-rocket.pi-animate:is(:hover, :focus-visible) [data-part="flame"], .pi-hover:hover .pi-rocket.pi-animate [data-part="flame"] { animation: pi-beat .6s ease; }
 
+  /* ════════════════════════════════════════════════════════════════════════
+     FIGURES 480×400 (pi-fig) — the illustrative plates (figures.data.mjs).
+     Slower and even quieter than the icons: one slow ambient gesture per
+     hover, hairline-scale amplitudes. Same gates: opt-in via `.pi-animate`,
+     triggered by the svg's own :hover/:focus-visible or a `.pi-hover` ancestor.
+     ════════════════════════════════════════════════════════════════════════ */
+  .pi-fig [data-part] { transform-box: fill-box; transition: transform .8s cubic-bezier(.4, 0, .2, 1), opacity .8s ease; }
+
+  /* loop — the lid lifts away and the strata breathe apart; lift lines firm up */
+  .pi-fig-loop.pi-animate:is(:hover, :focus-visible) :is([data-part="lid"], [data-part="mark"]), .pi-hover:hover .pi-fig-loop.pi-animate :is([data-part="lid"], [data-part="mark"]) { transform: translateY(-7px); }
+  .pi-fig-loop.pi-animate:is(:hover, :focus-visible) [data-part="slab-5"], .pi-hover:hover .pi-fig-loop.pi-animate [data-part="slab-5"] { transform: translateY(-3.5px); }
+  .pi-fig-loop.pi-animate:is(:hover, :focus-visible) [data-part="slab-4"], .pi-hover:hover .pi-fig-loop.pi-animate [data-part="slab-4"] { transform: translateY(-2px); }
+  .pi-fig-loop.pi-animate:is(:hover, :focus-visible) [data-part="slab-3"], .pi-hover:hover .pi-fig-loop.pi-animate [data-part="slab-3"] { transform: translateY(-1px); }
+  .pi-fig-loop.pi-animate:is(:hover, :focus-visible) [data-part="links"], .pi-hover:hover .pi-fig-loop.pi-animate [data-part="links"] { stroke-opacity: .8; }
+
+  /* council — the voices rise to the table, one after another; the absent one firms up */
+  .pi-fig-council.pi-animate:is(:hover, :focus-visible) [data-part="blk-a"], .pi-hover:hover .pi-fig-council.pi-animate [data-part="blk-a"] { transform: translateY(-4px); }
+  .pi-fig-council.pi-animate:is(:hover, :focus-visible) [data-part="blk-b"], .pi-hover:hover .pi-fig-council.pi-animate [data-part="blk-b"] { transform: translateY(-3px); transition-delay: .07s; }
+  .pi-fig-council.pi-animate:is(:hover, :focus-visible) [data-part="blk-c"], .pi-hover:hover .pi-fig-council.pi-animate [data-part="blk-c"] { transform: translateY(-2px); transition-delay: .04s; }
+  .pi-fig-council.pi-animate:is(:hover, :focus-visible) [data-part="blk-d"], .pi-hover:hover .pi-fig-council.pi-animate [data-part="blk-d"] { transform: translateY(-2.5px); transition-delay: .11s; }
+  .pi-fig-council.pi-animate:is(:hover, :focus-visible) [data-part="ghost"], .pi-hover:hover .pi-fig-council.pi-animate [data-part="ghost"] { opacity: .55; transition-delay: .15s; }
+
+  /* signal — one quiet pulse runs down the waveform */
+  .pi-fig-signal.pi-animate:is(:hover, :focus-visible) [data-part], .pi-hover:hover .pi-fig-signal.pi-animate [data-part] { animation: pi-fig-ripple 1.2s cubic-bezier(.4, 0, .2, 1) both; }
+  .pi-fig-signal.pi-animate:is(:hover, :focus-visible) [data-part="slat-2"], .pi-hover:hover .pi-fig-signal.pi-animate [data-part="slat-2"] { animation-delay: .05s; }
+  .pi-fig-signal.pi-animate:is(:hover, :focus-visible) [data-part="slat-3"], .pi-hover:hover .pi-fig-signal.pi-animate [data-part="slat-3"] { animation-delay: .1s; }
+  .pi-fig-signal.pi-animate:is(:hover, :focus-visible) [data-part="slat-4"], .pi-hover:hover .pi-fig-signal.pi-animate [data-part="slat-4"] { animation-delay: .15s; }
+  .pi-fig-signal.pi-animate:is(:hover, :focus-visible) [data-part="slat-5"], .pi-hover:hover .pi-fig-signal.pi-animate [data-part="slat-5"] { animation-delay: .2s; }
+  .pi-fig-signal.pi-animate:is(:hover, :focus-visible) [data-part="slat-6"], .pi-hover:hover .pi-fig-signal.pi-animate [data-part="slat-6"] { animation-delay: .25s; }
+  .pi-fig-signal.pi-animate:is(:hover, :focus-visible) [data-part="slat-7"], .pi-hover:hover .pi-fig-signal.pi-animate [data-part="slat-7"] { animation-delay: .3s; }
+  .pi-fig-signal.pi-animate:is(:hover, :focus-visible) [data-part="slat-8"], .pi-hover:hover .pi-fig-signal.pi-animate [data-part="slat-8"] { animation-delay: .35s; }
+  .pi-fig-signal.pi-animate:is(:hover, :focus-visible) [data-part="slat-9"], .pi-hover:hover .pi-fig-signal.pi-animate [data-part="slat-9"] { animation-delay: .4s; }
+  .pi-fig-signal.pi-animate:is(:hover, :focus-visible) [data-part="slat-10"], .pi-hover:hover .pi-fig-signal.pi-animate [data-part="slat-10"] { animation-delay: .45s; }
+  .pi-fig-signal.pi-animate:is(:hover, :focus-visible) [data-part="slat-11"], .pi-hover:hover .pi-fig-signal.pi-animate [data-part="slat-11"] { animation-delay: .5s; }
+  .pi-fig-signal.pi-animate:is(:hover, :focus-visible) [data-part="slat-12"], .pi-hover:hover .pi-fig-signal.pi-animate [data-part="slat-12"] { animation-delay: .55s; }
+  .pi-fig-signal.pi-animate:is(:hover, :focus-visible) [data-part="slat-13"], .pi-hover:hover .pi-fig-signal.pi-animate [data-part="slat-13"] { animation-delay: .6s; }
+  .pi-fig-signal.pi-animate:is(:hover, :focus-visible) [data-part="slat-14"], .pi-hover:hover .pi-fig-signal.pi-animate [data-part="slat-14"] { animation-delay: .65s; }
+
   /* ── keyframes ────────────────────────────────────────────────────────── */
+  @keyframes pi-fig-ripple { 0%, 100% { transform: translateY(0); } 30% { transform: translateY(-4px); } }
   @keyframes pi-spin      { to { transform: rotate(360deg); } }
   @keyframes pi-draw      { from { stroke-dashoffset: var(--pi-len, 60); } to { stroke-dashoffset: 0; } }
   @keyframes pi-appear    { from { opacity: 0; transform: scale(.85); } to { opacity: 1; transform: scale(1); } }
