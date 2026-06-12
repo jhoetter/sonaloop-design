@@ -17,8 +17,10 @@
  * the semantic gaps --sl-gap-tight/item/group/section/region, the row heights
  * --sl-row-dense (32) / --sl-row (40) / --sl-row-h (48, chrome) and --sl-ctl-sm (28).
  * Allowed literals: 1–3px optical hairlines/micro-nudges, chart + calendar-grid geometry
- * (data fidelity, not rhythm), and layout column widths. The em/rem-sized rules (buttons,
- * inputs, cards, ⌘K) are the density-adaptive layer and stay off the px grid on purpose.
+ * (data fidelity, not rhythm), and layout column widths. Em/rem sizing is for TYPOGRAPHY
+ * (font-size/line-height) and small inline controls (buttons, inputs, chips, ⌘K); page
+ * STRUCTURE — cards, entity rows, tabs, list paddings — sits on the px token grid, so the
+ * rendered rhythm is measurable (sonaloop scripts/ux_spacing.py holds it to ±0.5px).
  */
 
 /* ── Buttons ─────────────────────────────────────────────────────────────────── */
@@ -46,7 +48,7 @@
 /* ── Card ────────────────────────────────────────────────────────────────────── */
 .sl-card {
   background: var(--sl-surface); border: 1px solid var(--sl-line);
-  border-radius: var(--sl-radius); padding: 1.05em;
+  border-radius: var(--sl-radius); padding: var(--sl-s-4); /* token px — structure stays on the grid */
   box-shadow: 0 1px 2px color-mix(in srgb, var(--sl-ink) 4%, transparent);
 }
 .sl-card__title { margin: 0 0 .4em; font-weight: 600; color: var(--sl-ink); }
@@ -428,8 +430,9 @@
 
 /* ── Entity (a list row: leading visual · title/desc · trailing) ──────────────────
    The shared primitive for council/persona/project/synthesis rows. Use .sl-entity-list to
-   stack rows under one hairline frame; --button makes a row interactive. */
-.sl-entity { display: flex; align-items: center; gap: .85em; padding: .7em .9em;
+   stack rows under one hairline frame; --button makes a row interactive.
+   Structure sits on the px grid (token paddings/gap — em stays for TYPOGRAPHY only). */
+.sl-entity { display: flex; align-items: center; gap: var(--sl-gap-group); padding: var(--sl-s-2) var(--sl-s-3);
   border: 1px solid var(--sl-line); border-radius: var(--sl-radius); background: var(--sl-surface); }
 .sl-entity--button { cursor: pointer; transition: background .12s, border-color .12s; }
 .sl-entity--button:hover { background: var(--sl-hover); }
@@ -940,7 +943,7 @@ button.sl-navhead:hover { color: var(--sl-muted); }
    is the compact segmented look for small option sets (calendar ranges). For a settings
    theme/density toggle, prefer .sl-segmented. */
 .sl-tabs { display: flex; gap: var(--sl-gap-tight); flex-wrap: wrap; border-bottom: 1px solid var(--sl-line); }
-.sl-tab { display: inline-flex; align-items: center; gap: var(--sl-gap-item); padding: .6em .8em; font-size: .92em; font-weight: 500;
+.sl-tab { display: inline-flex; align-items: center; gap: var(--sl-gap-item); padding: var(--sl-s-2); font-size: .92em; font-weight: 500;
   color: var(--sl-muted); background: none; border: 0; border-bottom: 2px solid transparent; margin-bottom: -1px;
   cursor: pointer; text-decoration: none; transition: color .11s, border-color .11s; }
 .sl-tab:hover { color: var(--sl-ink); }
@@ -948,7 +951,7 @@ button.sl-navhead:hover { color: var(--sl-muted); }
 .sl-tab svg { width: 15px; height: 15px; }
 .sl-tabs--pill { display: inline-flex; gap: 2px; flex-wrap: nowrap; padding: 2px; border: 1px solid var(--sl-line);
   border-radius: var(--sl-radius); background: var(--sl-surface-2); }
-.sl-tabs--pill .sl-tab { border: 0; margin: 0; padding: .35em .8em; border-radius: var(--sl-radius-sm); }
+.sl-tabs--pill .sl-tab { border: 0; margin: 0; padding: var(--sl-s-1) var(--sl-s-2); border-radius: var(--sl-radius-sm); }
 .sl-tabs--pill .sl-tab.is-active { background: var(--sl-surface); color: var(--sl-ink); box-shadow: 0 1px 2px rgba(0, 0, 0, .06); }
 
 /* ── Property list (Linear-style key/value rows) ──────────────────────────────────

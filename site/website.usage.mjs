@@ -69,6 +69,10 @@ export const usage = {
       "to": "/pricing"
     },
     {
+      "name": "Privacy",
+      "to": "/privacy"
+    },
+    {
       "name": "Product pages",
       "to": "/products/:slug",
       "live": "/products/open-core"
@@ -308,6 +312,10 @@ export const usage = {
       "to": "/pricing"
     },
     {
+      "name": "Privacy",
+      "to": "/privacy"
+    },
+    {
       "name": "Product pages",
       "to": "/products/:slug",
       "live": "/products/open-core"
@@ -422,6 +430,10 @@ export const usage = {
     {
       "name": "Pricing",
       "to": "/pricing"
+    },
+    {
+      "name": "Privacy",
+      "to": "/privacy"
     },
     {
       "name": "Product pages",
