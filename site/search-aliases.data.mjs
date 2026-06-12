@@ -41,5 +41,6 @@ export const searchAliases = {
   icons: ['iconography', 'glyphs', 'arrow', 'arrows', 'symbols'],
   colors: ['palette', 'colour', 'theme colors'],
   typography: ['fonts', 'typeface', 'type'],
-  layout: ['spacing', 'grid', 'radius'],
+  layout: ['grid', 'radius'],
+  spacing: ['density', 'row height', 'rhythm', 'gaps', 'padding', 'margins', 'whitespace'],
 };

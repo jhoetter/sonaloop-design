@@ -42,10 +42,18 @@ const SL_MAP = {
   // shared .sl-app-shell layer works in both the website/Tailwind and the Python app.
   sidebar: 'sidebar', overlay: 'overlay', 'shadow-lg': 'shadow-lg',
 };
+// Spacing & density scale keys mirrored as --sl-* so the shared components.css can use
+// them on every surface (the inspector :root additionally gets the bare --s-1… names).
+const SL_SCALE_KEYS = [
+  's-1', 's-2', 's-3', 's-4', 's-5', 's-6', 's-8',
+  'gap-tight', 'gap-item', 'gap-group', 'gap-section', 'gap-region',
+  'row-dense', 'row', 'row-h', 'ctl-sm',
+];
 const slDecls = (set) =>
   Object.entries(SL_MAP).map(([sl, k]) => `--sl-${sl}:${set[k]}`).join(';') +
   `;--sl-radius-sm:${scales['radius-sm']};--sl-radius:${scales.radius};--sl-radius-lg:${scales['radius-lg']};--sl-radius-full:${scales['radius-full']}` +
-  `;--sl-row-h:${scales['row-h']};--sl-ease:${scales.ease}` +
+  SL_SCALE_KEYS.map((k) => `;--sl-${k}:${scales[k]}`).join('') +
+  `;--sl-ease:${scales.ease}` +
   `;--sl-sans:${scales.sans};--sl-mono:${scales.mono};--sl-pixel:${scales.pixel}`;
 
 // ── website: styles/tokens.css (R G B triplets; [data-theme] driven, default light) ──

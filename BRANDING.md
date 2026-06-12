@@ -125,6 +125,22 @@ To resemble Sonaloop, nudge it **warmer and a touch more humanist** without losi
 - **Avoid:** anything cold/techy-generic, ultra-geometric, or a warm-display personality that
   fights the cool painterly canvases. Sona should feel like a *quiet, premium instrument*.
 
+## Spacing & density
+
+Row heights and the distance between elements are **one tokenized rhythm** — authored in
+`tokens.data.mjs` (`scales`), emitted as `--sl-*` into both stacks, documented with live
+examples on the docs site's **Foundations → Spacing & density** page.
+
+- **4px grid** `--sl-s-1…s-8` (4…32) with five semantic gaps: `gap-tight` 4 (icon↔label,
+  title↔subtitle) · `gap-item` 8 (siblings in a group, heading→content) · `gap-group` 12
+  (cards in a grid) · `gap-section` 24 (between page sections) · `gap-region` 32 (content↔aside).
+- **Row densities**, measured from the shipped app and snapped to the grid: `row-dense` 32
+  (outline/nav/menu rows) · `row` 40 (list rows) · `row-h` 48 (chrome: topbar, brand, drawer
+  head) · `ctl-sm` 28 (icon buttons). Rows in a list never use gaps — gap 0 + a 1px hairline.
+- Buttons/inputs stay **em-based** (the density-adaptive layer: dense at the app's 13px base,
+  airy at the website's 16px); 1–3px literals are optical, charts/calendar grids keep their
+  structural px. `styles/components.css` states the full contract in its header.
+
 ## Surfaces, radius, elevation
 
 - Rounded: cards `rounded-xl`/`rounded-2xl`, buttons `rounded-lg`, chips `rounded-md`.

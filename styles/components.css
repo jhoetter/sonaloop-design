@@ -11,6 +11,14 @@
  * never drift. Sizing is **em-based**, so the SAME class adapts to each surface's base
  * font-size — dense in the 13px Python-SSR app, airy on the 16px website. Hand-authored.
  * Class prefix `sl-` avoids clashing with either app.
+ *
+ * SPACING CONTRACT (docs: "Spacing & density" Foundations page; tokens.data.mjs `scales`):
+ * px spacing in this file sits on the 4px grid via tokens — --sl-s-1…--sl-s-8 (raw steps),
+ * the semantic gaps --sl-gap-tight/item/group/section/region, the row heights
+ * --sl-row-dense (32) / --sl-row (40) / --sl-row-h (48, chrome) and --sl-ctl-sm (28).
+ * Allowed literals: 1–3px optical hairlines/micro-nudges, chart + calendar-grid geometry
+ * (data fidelity, not rhythm), and layout column widths. The em/rem-sized rules (buttons,
+ * inputs, cards, ⌘K) are the density-adaptive layer and stay off the px grid on purpose.
  */
 
 /* ── Buttons ─────────────────────────────────────────────────────────────────── */
@@ -662,36 +670,36 @@
   border-right: 1px solid var(--sl-line); display: flex; flex-direction: column; flex-shrink: 0; overflow: hidden;
   transition: width 200ms var(--sl-ease), min-width 200ms var(--sl-ease), border-right-width 200ms; }
 .sl-app-shell.is-collapsed .sl-sidebar { width: 0; min-width: 0; border-right-width: 0; }
-.sl-brand { height: var(--sl-row-h); flex-shrink: 0; display: flex; align-items: center; padding: 0 14px;
+.sl-brand { height: var(--sl-row-h); flex-shrink: 0; display: flex; align-items: center; padding: 0 var(--sl-s-4);
   font-size: .8125rem; border-bottom: 1px solid var(--sl-line); }
-.sl-sb-scroll { overflow: auto; padding: 10px 8px; flex: 1; min-height: 0; }
+.sl-sb-scroll { overflow: auto; padding: var(--sl-s-2); flex: 1; min-height: 0; }
 /* Search slot — pinned under the brand (below its border), above the nav. The trigger fills the width. */
-.sl-sb-search { flex-shrink: 0; padding: 10px 8px 2px; }
+.sl-sb-search { flex-shrink: 0; padding: var(--sl-s-2) var(--sl-s-2) 2px; }
 .sl-sb-search .sl-cmdk-trigger { width: 100%; }
 .sl-nav { display: flex; flex-direction: column; gap: 1px; }
 /* Items render as <a> in the SSR app and <button> in React consumers — both styled here. */
-.sl-nav a, .sl-nav button { display: flex; align-items: center; gap: 9px; width: 100%; padding: 5px 8px;
+.sl-nav a, .sl-nav button { display: flex; align-items: center; gap: var(--sl-gap-item); width: 100%; padding: var(--sl-s-1) var(--sl-s-2);
   border: 0; background: transparent; border-radius: var(--sl-radius-sm); color: var(--sl-ink); font: inherit;
-  font-weight: 500; font-size: .8125rem; text-align: left; position: relative; min-height: 30px; text-decoration: none; cursor: pointer; }
+  font-weight: 500; font-size: .8125rem; text-align: left; position: relative; min-height: var(--sl-row-dense); text-decoration: none; cursor: pointer; }
 .sl-nav a svg, .sl-nav button svg { width: 16px; height: 16px; flex: none; color: var(--sl-faint); }
 .sl-nav a:hover, .sl-nav button:hover { background: var(--sl-hover); }
 .sl-nav a.is-active, .sl-nav button.is-active { background: var(--sl-sel); color: var(--sl-ink); font-weight: 600; }
-.sl-nav a.is-active::before, .sl-nav button.is-active::before { content: ''; position: absolute; left: -8px; top: 7px; bottom: 7px;
+.sl-nav a.is-active::before, .sl-nav button.is-active::before { content: ''; position: absolute; left: -8px; top: 8px; bottom: 8px;
   width: 2.5px; border-radius: 0 3px 3px 0; background: var(--sl-accent); }
 .sl-nav a.is-active svg, .sl-nav button.is-active svg { color: var(--sl-accent); }
 .sl-nav-meta { margin-left: auto; font-size: .7rem; color: var(--sl-faint); font-variant-numeric: tabular-nums; }
 .sl-navhead { font-size: .6875rem; letter-spacing: .05em; text-transform: uppercase; color: var(--sl-faint);
-  margin: 18px 9px 6px; font-weight: 650; }
+  margin: var(--sl-s-4) var(--sl-s-2) var(--sl-s-1); font-weight: 650; }
 /* Collapsible section variant — the head is a caret toggle; .is-collapsed hides the items. */
 .sl-nav-group { display: flex; flex-direction: column; }
-button.sl-navhead { display: flex; align-items: center; gap: 6px; width: 100%; padding: 0; background: none; border: 0;
+button.sl-navhead { display: flex; align-items: center; gap: var(--sl-gap-tight); width: 100%; padding: 0; background: none; border: 0;
   cursor: pointer; text-align: left; font-family: inherit; }
 button.sl-navhead:hover { color: var(--sl-muted); }
 .sl-navhead__caret { margin-left: auto; display: inline-flex; color: var(--sl-faint); transition: transform .15s var(--sl-ease); }
 .sl-nav-group.is-collapsed .sl-navhead__caret { transform: rotate(-90deg); }
 .sl-nav-group.is-collapsed .sl-nav { display: none; }
-.sl-usermenu { position: relative; flex-shrink: 0; border-top: 1px solid var(--sl-line); padding: 8px; }
-.sl-um-trigger { width: 100%; display: flex; align-items: center; gap: 9px; padding: 6px 8px; border: 1px solid transparent;
+.sl-usermenu { position: relative; flex-shrink: 0; border-top: 1px solid var(--sl-line); padding: var(--sl-s-2); }
+.sl-um-trigger { width: 100%; display: flex; align-items: center; gap: var(--sl-gap-item); padding: var(--sl-s-1) var(--sl-s-2); border: 1px solid transparent;
   border-radius: var(--sl-radius); background: transparent; cursor: pointer; color: var(--sl-ink); font: inherit; font-size: .8125rem; font-weight: 500; }
 .sl-um-trigger:hover { background: var(--sl-hover); }
 .sl-usermenu.is-open .sl-um-trigger { background: var(--sl-hover); }
@@ -701,22 +709,22 @@ button.sl-navhead:hover { color: var(--sl-muted); }
 .sl-um-caret { color: var(--sl-muted); display: inline-flex; transition: transform .15s var(--sl-ease); }
 .sl-um-caret svg { width: 16px; height: 16px; }
 .sl-usermenu.is-open .sl-um-caret { transform: rotate(180deg); }
-.sl-um-pop { position: absolute; left: 8px; right: 8px; bottom: calc(100% + 4px); background: var(--sl-overlay);
-  border: 1px solid var(--sl-line); border-radius: var(--sl-radius-lg); box-shadow: 0 16px 44px rgba(0, 0, 0, .22); padding: 10px; z-index: 60; }
+.sl-um-pop { position: absolute; left: 8px; right: 8px; bottom: calc(100% + var(--sl-s-1)); background: var(--sl-overlay);
+  border: 1px solid var(--sl-line); border-radius: var(--sl-radius-lg); box-shadow: 0 16px 44px rgba(0, 0, 0, .22); padding: var(--sl-s-2); z-index: 60; }
 .sl-um-pop[hidden] { display: none; }
-.sl-um-sec { margin-bottom: 10px; }
+.sl-um-sec { margin-bottom: var(--sl-gap-item); }
 .sl-um-sec:last-child { margin-bottom: 0; }
-.sl-um-lbl { font-size: .6875rem; letter-spacing: .02em; color: var(--sl-faint); font-weight: 600; margin: 0 2px 6px; }
+.sl-um-lbl { font-size: .6875rem; letter-spacing: .02em; color: var(--sl-faint); font-weight: 600; margin: 0 2px var(--sl-s-1); }
 .sl-resize { width: 8px; margin: 0 -4px; flex-shrink: 0; cursor: col-resize; position: relative; z-index: 10; }
 .sl-app-shell.is-collapsed .sl-resize { display: none; }
 .sl-resize::after { content: ''; position: absolute; inset: 0 50%; width: 2px; transform: translateX(-50%);
   background: var(--sl-accent); opacity: 0; transition: opacity 150ms; }
 .sl-resize:hover::after { opacity: .4; }
 .sl-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
-.sl-topbar { height: var(--sl-row-h); flex-shrink: 0; display: flex; align-items: center; gap: 10px; padding: 0 12px;
+.sl-topbar { height: var(--sl-row-h); flex-shrink: 0; display: flex; align-items: center; gap: var(--sl-gap-group); padding: 0 var(--sl-s-3);
   border-bottom: 1px solid var(--sl-line); background: var(--sl-surface); }
 .sl-iconbtn { border: 1px solid var(--sl-line); background: var(--sl-surface); border-radius: var(--sl-radius-sm);
-  width: 28px; height: 28px; cursor: pointer; color: var(--sl-muted); flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; }
+  width: var(--sl-ctl-sm); height: var(--sl-ctl-sm); cursor: pointer; color: var(--sl-muted); flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; }
 .sl-iconbtn:hover { background: var(--sl-hover); color: var(--sl-ink); }
 .sl-iconbtn svg { width: 16px; height: 16px; }
 /* Ghost: a borderless quiet icon button for inline row actions (edit · delete · close). */
@@ -724,7 +732,7 @@ button.sl-navhead:hover { color: var(--sl-muted); }
 .sl-iconbtn--ghost:hover { background: var(--sl-hover); }
 .sl-iconbtn--danger:hover { color: var(--sl-red); }
 .sl-spacer { flex: 1; }
-.sl-tb-actions { display: flex; align-items: center; gap: 8px; }
+.sl-tb-actions { display: flex; align-items: center; gap: var(--sl-gap-item); }
 .sl-shell-body { flex: 1; min-height: 0; overflow: auto; }
 @media (max-width: 760px) {
   .sl-sidebar { position: fixed; top: 0; left: 0; height: 100vh; z-index: 100; width: 280px !important; min-width: 280px !important;
@@ -738,7 +746,7 @@ button.sl-navhead:hover { color: var(--sl-muted); }
    .sl-cmdk); an SSR app may keep a persistent root and toggle the `hidden` attribute
    instead (the enter animation replays on un-hide). All sit above the shell, z-index 120 / 60. */
 .sl-overlay-close { border: 0; background: none; cursor: pointer; color: var(--sl-muted);
-  border-radius: var(--sl-radius-sm); padding: 5px; line-height: 0; display: inline-flex; flex-shrink: 0; }
+  border-radius: var(--sl-radius-sm); padding: var(--sl-s-1); line-height: 0; display: inline-flex; flex-shrink: 0; }
 .sl-overlay-close:hover { background: var(--sl-hover); color: var(--sl-ink); }
 .sl-overlay-close svg { width: 18px; height: 18px; }
 .sl-drawer[hidden], .sl-modal[hidden] { display: none; }
@@ -762,15 +770,15 @@ button.sl-navhead:hover { color: var(--sl-muted); }
    (not an essence preview) — generous reading width, still leaving the page behind visible. */
 .sl-drawer--wide .sl-drawer__panel { width: min(720px, 94vw); }
 .sl-drawer.is-open .sl-drawer__panel { transform: none; }
-.sl-drawer__head { height: var(--sl-row-h); flex-shrink: 0; display: flex; align-items: center; gap: 8px;
-  padding: 0 8px 0 16px; border-bottom: 1px solid var(--sl-line); }
+.sl-drawer__head { height: var(--sl-row-h); flex-shrink: 0; display: flex; align-items: center; gap: var(--sl-gap-item);
+  padding: 0 var(--sl-s-2) 0 var(--sl-s-4); border-bottom: 1px solid var(--sl-line); }
 .sl-drawer__title { font-weight: 600; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.sl-drawer__body { flex: 1; min-height: 0; overflow-y: auto; padding: 18px 22px; }
-.sl-drawer__foot { flex-shrink: 0; border-top: 1px solid var(--sl-line); padding: 12px 16px;
-  display: flex; justify-content: flex-end; gap: 8px; }
+.sl-drawer__body { flex: 1; min-height: 0; overflow-y: auto; padding: var(--sl-s-5) var(--sl-gap-section); }
+.sl-drawer__foot { flex-shrink: 0; border-top: 1px solid var(--sl-line); padding: var(--sl-s-3) var(--sl-s-4);
+  display: flex; justify-content: flex-end; gap: var(--sl-gap-item); }
 
 /* Modal (centered dialog) */
-.sl-modal { position: fixed; inset: 0; z-index: 120; display: flex; align-items: center; justify-content: center; padding: 24px; }
+.sl-modal { position: fixed; inset: 0; z-index: 120; display: flex; align-items: center; justify-content: center; padding: var(--sl-s-6); }
 .sl-modal__scrim { position: absolute; inset: 0; background: color-mix(in srgb, #0a0c10 38%, transparent);
   animation: sl-fade-in .2s var(--sl-ease); }
 .sl-modal__panel { position: relative; width: min(520px, 100%); max-height: calc(100vh - 48px); display: flex;
@@ -779,37 +787,37 @@ button.sl-navhead:hover { color: var(--sl-muted); }
 .sl-modal--sm .sl-modal__panel { width: min(400px, 100%); }
 .sl-modal--lg .sl-modal__panel { width: min(720px, 100%); }
 @keyframes sl-modal-in { from { opacity: 0; transform: translateY(8px) scale(.98); } }
-.sl-modal__head { display: flex; align-items: flex-start; gap: 8px; padding: 16px 16px 0; }
+.sl-modal__head { display: flex; align-items: flex-start; gap: var(--sl-gap-item); padding: var(--sl-s-4) var(--sl-s-4) 0; }
 .sl-modal__title { font-weight: 600; font-size: 1.05em; flex: 1; min-width: 0; }
-.sl-modal__body { padding: 10px 16px 16px; overflow-y: auto; color: var(--sl-muted); }
-.sl-modal__foot { flex-shrink: 0; padding: 12px 16px; border-top: 1px solid var(--sl-line);
-  display: flex; justify-content: flex-end; gap: 8px; }
+.sl-modal__body { padding: var(--sl-s-2) var(--sl-s-4) var(--sl-s-4); overflow-y: auto; color: var(--sl-muted); }
+.sl-modal__foot { flex-shrink: 0; padding: var(--sl-s-3) var(--sl-s-4); border-top: 1px solid var(--sl-line);
+  display: flex; justify-content: flex-end; gap: var(--sl-gap-item); }
 
 /* Image lightbox — a full-bleed zoom view (distinct from Modal's chrome'd dialog). */
 .sl-lightbox { position: fixed; inset: 0; z-index: 130; display: flex; align-items: center; justify-content: center;
-  padding: 24px; background: color-mix(in srgb, #0a0c10 80%, transparent); backdrop-filter: blur(4px);
+  padding: var(--sl-s-6); background: color-mix(in srgb, #0a0c10 80%, transparent); backdrop-filter: blur(4px);
   animation: sl-fade-in .2s var(--sl-ease); }
-.sl-lightbox__fig { display: flex; flex-direction: column; align-items: center; gap: 12px; max-height: 100%; margin: 0; }
+.sl-lightbox__fig { display: flex; flex-direction: column; align-items: center; gap: var(--sl-gap-group); max-height: 100%; margin: 0; }
 .sl-lightbox__img { max-width: 86vw; max-height: 82vh; object-fit: contain;
   border-radius: var(--sl-radius-lg); box-shadow: var(--sl-shadow-lg); }
 .sl-lightbox__cap { font-family: var(--sl-mono); font-size: .8em; color: rgba(255, 255, 255, .72); }
-.sl-lightbox__x { position: absolute; top: 18px; right: 18px; padding: .25em .6em; font-family: var(--sl-mono);
+.sl-lightbox__x { position: absolute; top: var(--sl-s-4); right: var(--sl-s-4); padding: .25em .6em; font-family: var(--sl-mono);
   font-size: .8em; color: rgba(255, 255, 255, .8); background: none; border: 1px solid rgba(255, 255, 255, .2);
   border-radius: var(--sl-radius-sm); cursor: pointer; }
 .sl-lightbox__x:hover { background: rgba(255, 255, 255, .1); }
 
 /* Popover (anchored) + the menu rows it usually holds */
 .sl-popover-wrap { position: relative; display: inline-flex; }
-.sl-popover { position: absolute; z-index: 60; min-width: 180px; padding: 6px; background: var(--sl-overlay);
+.sl-popover { position: absolute; z-index: 60; min-width: 180px; padding: var(--sl-s-1); background: var(--sl-overlay);
   border: 1px solid var(--sl-line); border-radius: var(--sl-radius-lg); box-shadow: var(--sl-shadow-lg);
   animation: sl-pop-in .12s var(--sl-ease); }
 .sl-popover[hidden] { display: none; }
 @keyframes sl-pop-in { from { opacity: 0; transform: translateY(-4px); } }
-.sl-popover--bottom-start { top: calc(100% + 6px); left: 0; }
-.sl-popover--bottom-end { top: calc(100% + 6px); right: 0; }
-.sl-popover--top-start { bottom: calc(100% + 6px); left: 0; }
-.sl-popover--top-end { bottom: calc(100% + 6px); right: 0; }
-.sl-menu-item { display: flex; align-items: center; gap: 9px; width: 100%; padding: 7px 10px; border: 0;
+.sl-popover--bottom-start { top: calc(100% + var(--sl-s-2)); left: 0; }
+.sl-popover--bottom-end { top: calc(100% + var(--sl-s-2)); right: 0; }
+.sl-popover--top-start { bottom: calc(100% + var(--sl-s-2)); left: 0; }
+.sl-popover--top-end { bottom: calc(100% + var(--sl-s-2)); right: 0; }
+.sl-menu-item { display: flex; align-items: center; gap: var(--sl-gap-item); width: 100%; padding: var(--sl-s-2) var(--sl-s-3); border: 0;
   background: none; border-radius: var(--sl-radius-sm); font: inherit; color: var(--sl-ink); cursor: pointer;
   text-align: left; text-decoration: none; }
 .sl-menu-item:hover { background: var(--sl-hover); }
@@ -817,12 +825,12 @@ button.sl-navhead:hover { color: var(--sl-muted); }
 /* Selectable rows (option/filter menus): a leading check column + the label + a trailing count. */
 .sl-menu-item__check { width: 1.05em; flex-shrink: 0; display: inline-flex; justify-content: center; }
 .sl-menu-item__check svg { width: 13px; height: 13px; color: var(--sl-accent); }
-.sl-menu-item__label { flex: 1; min-width: 0; display: inline-flex; align-items: center; gap: 8px; }
+.sl-menu-item__label { flex: 1; min-width: 0; display: inline-flex; align-items: center; gap: var(--sl-gap-item); }
 .sl-menu-item__count { flex-shrink: 0; font-family: var(--sl-mono); font-size: .82em; color: var(--sl-faint); }
-.sl-menu-sep { height: 1px; background: var(--sl-line); margin: 5px 0; }
-.sl-menu-label { font-size: .6875em; letter-spacing: .02em; color: var(--sl-faint); font-weight: 600; padding: 4px 10px 2px; }
+.sl-menu-sep { height: 1px; background: var(--sl-line); margin: var(--sl-s-1) 0; }
+.sl-menu-label { font-size: .6875em; letter-spacing: .02em; color: var(--sl-faint); font-weight: 600; padding: var(--sl-s-1) var(--sl-s-3) 2px; }
 /* A labelled control row inside a menu (a Select, a toggle) — Display / settings menus. */
-.sl-menu-field { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 5px 8px; }
+.sl-menu-field { display: flex; align-items: center; justify-content: space-between; gap: var(--sl-gap-group); padding: var(--sl-s-1) var(--sl-s-2); }
 .sl-menu-field__label { font-size: .9em; color: var(--sl-muted); }
 
 /* Toolbar button — a quiet bordered pill that triggers a menu (Filter · Display · Views) or
@@ -838,16 +846,16 @@ button.sl-navhead:hover { color: var(--sl-muted); }
    A "+ Filter" toolbar button opens a two-level facet menu (pick a facet, then its values
    as selectable .sl-menu-item rows); each non-empty facet becomes a removable chip that
    reopens its value menu. The chrome is here; the menu rows reuse .sl-menu-item. */
-.sl-filter-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-.sl-filter-back { display: flex; width: 100%; align-items: center; gap: 6px; margin-bottom: 2px;
-  padding: 4px 10px 5px; border: 0; background: none; cursor: pointer; font: inherit; font-size: .72em;
+.sl-filter-bar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sl-gap-item); }
+.sl-filter-back { display: flex; width: 100%; align-items: center; gap: var(--sl-gap-tight); margin-bottom: 2px;
+  padding: var(--sl-s-1) var(--sl-s-3); border: 0; background: none; cursor: pointer; font: inherit; font-size: .72em;
   text-transform: uppercase; letter-spacing: .04em; color: var(--sl-faint); text-align: left;
   border-radius: var(--sl-radius-sm); }
 .sl-filter-back:hover { background: var(--sl-hover); color: var(--sl-muted); }
-.sl-filter-empty { padding: 8px 10px; font-size: .85em; color: var(--sl-faint); }
+.sl-filter-empty { padding: var(--sl-s-2) var(--sl-s-3); font-size: .85em; color: var(--sl-faint); }
 .sl-filter-chip { display: inline-flex; align-items: center; overflow: hidden;
   border: 1px solid var(--sl-line); border-radius: var(--sl-radius-sm); font-size: .85em; }
-.sl-filter-chip__body { display: inline-flex; align-items: center; gap: 6px; padding: .25em .45em .25em .65em;
+.sl-filter-chip__body { display: inline-flex; align-items: center; gap: var(--sl-gap-tight); padding: .25em .45em .25em .65em;
   border: 0; background: none; font: inherit; font-size: 1em; color: var(--sl-ink); cursor: pointer; }
 .sl-filter-chip__body:hover { background: var(--sl-hover); }
 .sl-filter-chip__key { color: var(--sl-muted); }
@@ -869,13 +877,13 @@ button.sl-navhead:hover { color: var(--sl-muted); }
    the quiet text actions .sl-facet-more ("+N more" / "less" on overflowing groups) and
    .sl-facet-clear ("Clear filters", only while something is selected). On narrow
    viewports each group stacks its label above the chips. */
-.sl-facet-bar { display: flex; flex-direction: column; gap: 7px; }
-.sl-facet-group { display: flex; gap: 10px; align-items: baseline; }
+.sl-facet-bar { display: flex; flex-direction: column; gap: var(--sl-gap-item); }
+.sl-facet-group { display: flex; gap: var(--sl-s-3); align-items: baseline; }
 .sl-facet-group__label { flex: none; width: 110px; font-size: .72em; text-transform: uppercase;
   letter-spacing: .05em; color: var(--sl-muted); font-weight: 600; }
-.sl-facet-group__chips { display: flex; flex-wrap: wrap; gap: 4px; min-width: 0; }
+.sl-facet-group__chips { display: flex; flex-wrap: wrap; gap: var(--sl-gap-tight); min-width: 0; }
 .sl-facet-chip {
-  display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px;
+  display: inline-flex; align-items: center; gap: var(--sl-gap-tight); padding: 2px var(--sl-s-2);
   border: 1px solid var(--sl-line); border-radius: var(--sl-radius-full);
   background: var(--sl-surface); color: var(--sl-ink); font: inherit; font-size: .85em;
   cursor: pointer;
@@ -889,7 +897,7 @@ button.sl-navhead:hover { color: var(--sl-muted); }
   color: var(--sl-accent); cursor: pointer;
 }
 .sl-facet-more:hover, .sl-facet-clear:hover { text-decoration: underline; }
-.sl-facet-clear { align-self: flex-start; margin-left: 120px; }
+.sl-facet-clear { align-self: flex-start; margin-left: calc(110px + var(--sl-s-3)); }   /* label col + group gap */
 @media (max-width: 760px) {
   .sl-facet-group { flex-direction: column; gap: 3px; }
   .sl-facet-clear { margin-left: 0; }
@@ -899,8 +907,8 @@ button.sl-navhead:hover { color: var(--sl-muted); }
    Underline tabs for in-page section switching (docs, detail bodies); the pill variant
    is the compact segmented look for small option sets (calendar ranges). For a settings
    theme/density toggle, prefer .sl-segmented. */
-.sl-tabs { display: flex; gap: 4px; flex-wrap: wrap; border-bottom: 1px solid var(--sl-line); }
-.sl-tab { display: inline-flex; align-items: center; gap: 7px; padding: .6em .8em; font-size: .92em; font-weight: 500;
+.sl-tabs { display: flex; gap: var(--sl-gap-tight); flex-wrap: wrap; border-bottom: 1px solid var(--sl-line); }
+.sl-tab { display: inline-flex; align-items: center; gap: var(--sl-gap-item); padding: .6em .8em; font-size: .92em; font-weight: 500;
   color: var(--sl-muted); background: none; border: 0; border-bottom: 2px solid transparent; margin-bottom: -1px;
   cursor: pointer; text-decoration: none; transition: color .11s, border-color .11s; }
 .sl-tab:hover { color: var(--sl-ink); }
@@ -914,9 +922,9 @@ button.sl-navhead:hover { color: var(--sl-muted); }
 /* ── Property list (Linear-style key/value rows) ──────────────────────────────────
    icon · label · value per row; the detail-page Properties/metadata panel. */
 .sl-props { display: flex; flex-direction: column; }
-.sl-props--card { padding: 4px; background: var(--sl-surface); border: 1px solid var(--sl-line); border-radius: var(--sl-radius); }
-.sl-prop { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 7px 10px; font-size: .92em; }
-.sl-prop__k { display: inline-flex; align-items: center; gap: 8px; color: var(--sl-muted); flex-shrink: 0; }
+.sl-props--card { padding: var(--sl-s-1); background: var(--sl-surface); border: 1px solid var(--sl-line); border-radius: var(--sl-radius); }
+.sl-prop { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sl-gap-group); padding: var(--sl-s-2) var(--sl-s-3); font-size: .92em; }
+.sl-prop__k { display: inline-flex; align-items: center; gap: var(--sl-gap-item); color: var(--sl-muted); flex-shrink: 0; }
 .sl-prop__k svg { width: 14px; height: 14px; color: var(--sl-faint); }
 .sl-prop__v { color: var(--sl-ink); font-weight: 500; text-align: right; min-width: 0; overflow-wrap: anywhere; }
 /* Left-aligned variant — a fixed label column with the value beside it (Linear's issue rail). */
@@ -928,41 +936,41 @@ button.sl-navhead:hover { color: var(--sl-muted); }
    The shell every index page shares (projects, personas, councils, …): a header with a
    title + a muted count + an optional lead and trailing actions (a search box), then a
    list of dense, hairline-separated rows. The rows are flatter than the bordered .sl-entity. */
-.sl-list-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
-.sl-list-title { margin: 0 0 4px; font-size: 1.85em; font-weight: 650; letter-spacing: -.02em; line-height: 1.2; }
+.sl-list-head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--sl-s-4); }
+.sl-list-title { margin: 0 0 var(--sl-gap-tight); font-size: 1.85em; font-weight: 650; letter-spacing: -.02em; line-height: 1.2; }
 .sl-list-count { margin-left: .35em; font-size: .55em; font-weight: 500; color: var(--sl-faint); vertical-align: middle; }
-.sl-list-lead { margin: 0 0 16px; max-width: 74ch; color: var(--sl-muted); line-height: 1.5; }
-.sl-list { margin-top: 8px; border-top: 1px solid var(--sl-line); }
-.sl-list-row { display: flex; align-items: center; gap: 11px; width: 100%; min-height: 40px; padding: 9px 10px;
+.sl-list-lead { margin: 0 0 var(--sl-s-4); max-width: 74ch; color: var(--sl-muted); line-height: 1.5; }
+.sl-list { margin-top: var(--sl-gap-item); border-top: 1px solid var(--sl-line); }
+.sl-list-row { display: flex; align-items: center; gap: var(--sl-gap-group); width: 100%; min-height: var(--sl-row); padding: var(--sl-s-2) var(--sl-s-3);
   border: 0; border-bottom: 1px solid var(--sl-line); border-radius: var(--sl-radius-sm); background: none;
   font: inherit; color: var(--sl-ink); text-align: left; cursor: pointer; transition: background .11s; }
 .sl-list-row:last-child { border-bottom: 0; }
 .sl-list-row:hover { background: var(--sl-hover); }
 .sl-list-row__title { flex: 1; min-width: 0; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.sl-list-row__trailing { flex-shrink: 0; display: flex; align-items: center; gap: 11px; color: var(--sl-faint); font-size: .85em; }
+.sl-list-row__trailing { flex-shrink: 0; display: flex; align-items: center; gap: var(--sl-gap-group); color: var(--sl-faint); font-size: .85em; }
 
 /* ── Page header (the detail-page hero: top slot · icon · title · sub · actions) ─── */
-.sl-page-header { display: flex; align-items: flex-start; gap: 16px; }
-.sl-page-header__main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
-.sl-page-header__top { display: flex; align-items: center; gap: 8px; }
-.sl-page-header__title { display: flex; align-items: center; gap: 10px; margin: 0; font-size: 1.55em; font-weight: 650;
+.sl-page-header { display: flex; align-items: flex-start; gap: var(--sl-s-4); }
+.sl-page-header__main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--sl-gap-item); }
+.sl-page-header__top { display: flex; align-items: center; gap: var(--sl-gap-item); }
+.sl-page-header__title { display: flex; align-items: center; gap: var(--sl-gap-group); margin: 0; font-size: 1.55em; font-weight: 650;
   line-height: 1.2; }
 .sl-page-header__title svg { width: 1.05em; height: 1.05em; flex-shrink: 0; color: var(--sl-muted); }
 .sl-page-header__sub { margin: 0; color: var(--sl-muted); max-width: 65ch; }
-.sl-page-header__actions { flex-shrink: 0; display: flex; align-items: center; gap: 8px; }
+.sl-page-header__actions { flex-shrink: 0; display: flex; align-items: center; gap: var(--sl-gap-item); }
 
 /* ── Detail layout (content column + sticky aside) and the scrollspy page rail ───── */
-.sl-detail { display: grid; grid-template-columns: minmax(0, 1fr) 248px; gap: 32px; align-items: start; }
-.sl-detail__main { min-width: 0; display: flex; flex-direction: column; gap: 22px; }
-.sl-detail__aside { display: flex; flex-direction: column; gap: 20px; position: sticky; top: 16px; }
+.sl-detail { display: grid; grid-template-columns: minmax(0, 1fr) 248px; gap: var(--sl-gap-region); align-items: start; }
+.sl-detail__main { min-width: 0; display: flex; flex-direction: column; gap: var(--sl-gap-section); }
+.sl-detail__aside { display: flex; flex-direction: column; gap: var(--sl-s-5); position: sticky; top: var(--sl-s-4); }
 @media (max-width: 900px) {
   .sl-detail { grid-template-columns: 1fr; }
   .sl-detail__aside { position: static; }
 }
 .sl-rail { display: flex; flex-direction: column; gap: 2px; font-size: .85em; }
 .sl-rail__head { font-size: .8em; letter-spacing: .02em; text-transform: uppercase; color: var(--sl-faint);
-  font-weight: 600; margin-bottom: 4px; }
-.sl-rail__item { color: var(--sl-muted); text-decoration: none; padding: 3px 0 3px 12px;
+  font-weight: 600; margin-bottom: var(--sl-gap-tight); }
+.sl-rail__item { color: var(--sl-muted); text-decoration: none; padding: 3px 0 3px var(--sl-s-3);
   border-left: 2px solid var(--sl-line); transition: color .12s, border-color .12s; }
 .sl-rail__item:hover { color: var(--sl-ink); }
 .sl-rail__item.is-active { color: var(--sl-ink); border-left-color: var(--sl-accent); }
@@ -987,7 +995,7 @@ button.sl-navhead:hover { color: var(--sl-muted); }
    flexed, never internally scrolled; anchor arrivals clear sticky headers via
    scroll-margin. The h2 stays at body size (a section is part of the page, not a
    new page); `__h` is the uppercase small group label inside a section. */
-.sl-section { flex: 0 0 auto; width: 100%; max-width: 900px; margin: 0 auto; padding: 0 24px; scroll-margin-top: 10px; }
+.sl-section { flex: 0 0 auto; width: 100%; max-width: 900px; margin: 0 auto; padding: 0 var(--sl-s-6); scroll-margin-top: var(--sl-s-2); }
 .sl-section h2 { font-size: 1em; margin: 0 0 .45em; }
 .sl-section__h { font-size: .92em; font-weight: 600; color: var(--sl-muted); text-transform: uppercase; letter-spacing: .04em; }
 
@@ -1052,14 +1060,14 @@ button.sl-navhead:hover { color: var(--sl-muted); }
 :root { --sl-cal-h0: #edeef2; --sl-cal-h1: #d8dcf7; --sl-cal-h2: #b2bbef; --sl-cal-h3: #838ee0; --sl-cal-h4: #5b67d1; }
 [data-theme="dark"] { --sl-cal-h0: #1c1d21; --sl-cal-h1: #23284a; --sl-cal-h2: #343c80; --sl-cal-h3: #4a54b8; --sl-cal-h4: #5e6ad2; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --sl-cal-h0: #1c1d21; --sl-cal-h1: #23284a; --sl-cal-h2: #343c80; --sl-cal-h3: #4a54b8; --sl-cal-h4: #5e6ad2; } }
-.sl-cal-nav { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 14px 0; }
-.sl-cal-nav-l { display: flex; align-items: center; gap: 7px; }
-.sl-cal-arrow { width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center;
+.sl-cal-nav { display: flex; align-items: center; justify-content: space-between; gap: var(--sl-gap-group); flex-wrap: wrap; margin: var(--sl-s-3) 0; }
+.sl-cal-nav-l { display: flex; align-items: center; gap: var(--sl-gap-item); }
+.sl-cal-arrow { width: var(--sl-ctl-sm); height: var(--sl-ctl-sm); display: inline-flex; align-items: center; justify-content: center;
   border: 1px solid var(--sl-line); border-radius: var(--sl-radius-sm); color: var(--sl-muted); font-size: 17px; line-height: 1; background: var(--sl-surface); }
 .sl-cal-arrow:hover { background: var(--sl-hover); color: var(--sl-ink); }
-.sl-cal-today { border: 1px solid var(--sl-line); border-radius: var(--sl-radius-sm); padding: 5px 12px; font-size: .92em; color: var(--sl-ink); background: var(--sl-surface); }
+.sl-cal-today { border: 1px solid var(--sl-line); border-radius: var(--sl-radius-sm); padding: var(--sl-s-1) var(--sl-s-3); font-size: .92em; color: var(--sl-ink); background: var(--sl-surface); }
 .sl-cal-today:hover { background: var(--sl-hover); }
-.sl-cal-title { font-size: 1.15em; font-weight: 600; color: var(--sl-ink); margin-left: 8px; }
+.sl-cal-title { font-size: 1.15em; font-weight: 600; color: var(--sl-ink); margin-left: var(--sl-s-2); }
 /* event chip (week + month) — soft fill, leading type-coloured rule */
 .sl-cev { display: flex; align-items: baseline; gap: 6px; border-left: 2.5px solid var(--sl-accent); background: var(--sl-surface-2);
   border-radius: var(--sl-radius-sm); padding: 2px 7px; font-size: .82em; color: var(--sl-ink); line-height: 1.45; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -1076,7 +1084,7 @@ button.sl-navhead:hover { color: var(--sl-muted); }
 .sl-cw-h.today .sl-cw-d { background: var(--sl-accent); color: #fff; width: 24px; height: 24px; line-height: 24px; border-radius: 50%; margin: 3px auto 0; }
 .sl-cw-mood { position: absolute; top: 9px; right: 9px; width: 7px; height: 7px; border-radius: 50%; background: var(--sl-muted); }
 .sl-cw-mood.pos { background: var(--sl-green); } .sl-cw-mood.neg { background: var(--sl-amber); } .sl-cw-mood.neu { background: var(--sl-line-2); }
-.sl-cw-body { padding: 8px; display: flex; flex-direction: column; gap: 5px; }
+.sl-cw-body { padding: var(--sl-s-2); display: flex; flex-direction: column; gap: var(--sl-gap-tight); }
 .sl-cw-empty { color: var(--sl-faint); font-size: .92em; text-align: center; padding-top: 10px; }
 /* MONTH: weekday grid */
 .sl-cal-month { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 1px; background: var(--sl-line); border: 1px solid var(--sl-line); border-radius: var(--sl-radius); overflow: hidden; }

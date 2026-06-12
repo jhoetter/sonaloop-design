@@ -44,12 +44,30 @@ export const scales = {
   // Radius scale — the SINGLE lever for corner roundness across the website + inspector.
   // Change these and every surface re-skins (go sharp by dropping them toward 0).
   'radius-sm': '6px', radius: '8px', 'radius-lg': '12px', 'radius-full': '9999px',
-  'row-h': '48px', ease: 'cubic-bezier(.4,0,.2,1)',
+  // Density — row heights, measured from what the app actually ships and snapped to the
+  // 4px grid (see the "Spacing & density" docs page + BRANDING.md):
+  //   row-dense  32  the data row (project outline rows, sidebar nav, menu rows)
+  //   row        40  the default list row (index/library rows, entity rows)
+  //   row-h      48  the chrome row (topbar, sidebar brand, drawer head) — touch-safe
+  //   ctl-sm     28  the small square control (icon buttons, calendar arrows)
+  // Buttons/inputs stay em-based on purpose (≈30px in the 13px app, ≈36px on the 16px
+  // site) — density tokens are for px-sized rows and chrome, not for the em layer.
+  'row-dense': '32px', row: '40px', 'row-h': '48px', 'ctl-sm': '28px',
+  ease: 'cubic-bezier(.4,0,.2,1)',
   sans: fonts.sans.join(','),
   mono: fonts.mono.join(','),
   pixel: fonts.pixel.join(','),
   't-xs': '11px', 't-sm': '12px', 't-body': '13px', 't-md': '15px', 't-prose': '16px', 't-lg': '18px', 't-xl': '24px',
   's-1': '4px', 's-2': '8px', 's-3': '12px', 's-4': '16px', 's-5': '20px', 's-6': '24px', 's-8': '32px',
+  // Vertical rhythm — semantic gap aliases over the s-scale. The ruleset (docs page):
+  //   rows in a list      gap 0 + a 1px hairline separator (never gaps between rows)
+  //   gap-tight     4px   icon↔label, title↔subtitle, chips in a cluster
+  //   gap-item      8px   siblings inside a group (fields in a form, actions in a bar)
+  //   gap-group    12px   cards in a grid, groups inside a panel, heading→content
+  //   gap-section  24px   between sections of a page / drawer body padding
+  //   gap-region   32px   page regions (content column ↔ aside rail)
+  // 1–3px stay literal in CSS (optical hairlines/micro-nudges, not rhythm).
+  'gap-tight': '4px', 'gap-item': '8px', 'gap-group': '12px', 'gap-section': '24px', 'gap-region': '32px',
 };
 
 // ── Website (Tailwind, R G B triplets). NOTE: --line is a BASE colour used at low

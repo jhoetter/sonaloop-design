@@ -726,11 +726,124 @@ function pageLayout() {
     <div class="ds-preview"><div class="ds-preview-stage is-center"><div class="ds-canvas-grid" style="width:340px;height:160px"></div></div></div>
 
     ${h2('layout-space', 'Spacing scale')}
-    ${p('A 4px-based scale. Author with the tokens, never magic numbers, so rhythm stays consistent across both stacks.')}
+    ${p('A 4px-based scale. Author with the tokens, never magic numbers, so rhythm stays consistent across both stacks. The full rhythm system — row heights, semantic gaps and the rules that bind them — lives on <a href="#/spacing">Spacing &amp; density</a>.')}
     <div class="ds-space-row">${bars}</div>
 
     ${h2('layout-row', 'Row height')}
-    ${p(`The inspector's list rows share one rhythm — <code>--row-h: ${scales['row-h']}</code> — so timelines, council lists and memory tables align to the same baseline.`)}
+    ${p(`Rows come in three densities — <code>--row-dense: ${scales['row-dense']}</code> (data rows), <code>--row: ${scales.row}</code> (list rows) and <code>--row-h: ${scales['row-h']}</code> (chrome) — so timelines, council lists and memory tables align to the same baseline. See <a href="#/spacing">Spacing &amp; density</a> for the measured system.`)}
+  `;
+}
+
+function pageSpacing() {
+  const sKeys = ['s-1', 's-2', 's-3', 's-4', 's-5', 's-6', 's-8'];
+  const max = parseInt(scales['s-8']);
+  const bars = sKeys.map((k) => {
+    const px = parseInt(scales[k]);
+    return `<div><div class="bar" style="height:${20 + (px / max) * 90}px"></div><small>${k}<br>${px}px</small></div>`;
+  }).join('');
+
+  const tokenRows = [
+    ['--sl-gap-tight', scales['gap-tight'], 'Icon ↔ label, title ↔ subtitle stacks, chips in a cluster'],
+    ['--sl-gap-item', scales['gap-item'], 'Siblings inside a group — form fields, actions in a bar, heading → content'],
+    ['--sl-gap-group', scales['gap-group'], 'Cards in a grid, groups inside a panel, topbar segments'],
+    ['--sl-gap-section', scales['gap-section'], 'Between sections of a page; drawer-body padding; page gutters'],
+    ['--sl-gap-region', scales['gap-region'], 'Page regions — content column ↔ aside rail'],
+  ];
+  const rowTokens = [
+    ['--sl-row-dense', scales['row-dense'], 'The data row: project-outline rows, sidebar nav, menu rows'],
+    ['--sl-row', scales.row, 'The default list row: index/library rows, entity rows'],
+    ['--sl-row-h', scales['row-h'], 'The chrome row: topbar, sidebar brand, drawer head — touch-safe'],
+    ['--sl-ctl-sm', scales['ctl-sm'], 'The small square control: icon buttons, calendar arrows'],
+  ];
+  const ruleRows = [
+    ['Rows in a list', 'Height from a row token · <b>gap 0</b> · a 1px hairline separator between rows — never gaps.'],
+    ['Row leading visual → text', '<code>gap-item</code> (8) dense rows · <code>gap-group</code> (12) default list rows.'],
+    ['Title ↔ subtitle, chip cluster', '<code>gap-tight</code> (4).'],
+    ['Controls in a bar', '<code>gap-item</code> (8) — toolbar actions, modal/drawer footers, page-header actions.'],
+    ['Cards in a grid', '<code>gap-group</code> (12).'],
+    ['Section heading → content', '<code>gap-item</code> (8).'],
+    ['Between page sections', '<code>gap-section</code> (24) — also the drawer body\'s horizontal padding.'],
+    ['Page regions', '<code>gap-region</code> (32) — the detail layout\'s content ↔ aside gutter.'],
+    ['Page gutters', '<code>s-6</code> (24) — the centered 900px measure\'s side padding.'],
+    ['1–3px values', 'Stay literal — optical hairlines and micro-nudges, not rhythm.'],
+    ['Charts · calendar grid', 'Exempt — structural data geometry (the 11px year-heatmap pitch), not rhythm.'],
+  ];
+
+  // Live examples — real .sl-* markup, sized by the real tokens.
+  const navDemo = `
+    <div style="width:min(240px,100%)">
+      <nav class="sl-nav">
+        <button class="is-active">${svgReg('overview')}Overview<span class="sl-nav-meta">12</span></button>
+        <button>${svgReg('councils')}Councils<span class="sl-nav-meta">4</span></button>
+        <button>${svgReg('personas')}Personas</button>
+      </nav>
+    </div>`;
+  const listDemo = `
+    <div class="sl-list" style="width:min(460px,100%)">
+      <button class="sl-list-row"><span class="sl-dot sl-dot--positive"></span><span class="sl-list-row__title">Pricing-page council</span><span class="sl-list-row__trailing">4 voices · 2d</span></button>
+      <button class="sl-list-row"><span class="sl-dot sl-dot--warning"></span><span class="sl-list-row__title">Onboarding red-team</span><span class="sl-list-row__trailing">6 voices · 5d</span></button>
+      <button class="sl-list-row"><span class="sl-dot sl-dot--accent"></span><span class="sl-list-row__title">Q3 positioning study</span><span class="sl-list-row__trailing">3 voices · 1w</span></button>
+    </div>`;
+  const chromeDemo = `
+    <div style="width:min(460px,100%);border:1px solid var(--sl-line);border-radius:var(--sl-radius);overflow:hidden">
+      <div class="sl-topbar"><button class="sl-iconbtn">${svgReg('panel')}</button><span style="font-size:.9em">Councils</span><span class="sl-spacer"></span><div class="sl-tb-actions"><button class="sl-iconbtn">${svgReg('search')}</button><button class="sl-iconbtn">${svgReg('settings')}</button></div></div>
+      <div style="padding:var(--sl-s-3) var(--sl-s-4);color:var(--sl-muted);font-size:.85em">body…</div>
+    </div>`;
+  const rowExample = (token, note, demo) => `
+    <div style="display:flex;flex-direction:column;gap:var(--sl-gap-item)">
+      <span class="sl-eyebrow">${esc(token)} · ${esc(note)}</span>${demo}
+    </div>`;
+  const rowsDemo = `<div style="display:flex;flex-direction:column;gap:var(--sl-gap-section);align-items:flex-start">
+    ${rowExample(`--sl-row-dense ${scales['row-dense']}`, 'nav / data rows', navDemo)}
+    ${rowExample(`--sl-row ${scales.row}`, 'list rows, gap 0 + hairline', listDemo)}
+    ${rowExample(`--sl-row-h ${scales['row-h']}`, 'chrome row + --sl-ctl-sm controls', chromeDemo)}
+  </div>`;
+
+  const card = (t, b) => `<div class="sl-card"><h4 class="sl-card__title" style="font-size:.95em">${esc(t)}</h4><p class="sl-card__body" style="font-size:.85em">${esc(b)}</p></div>`;
+  const gridDemo = `
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--sl-gap-group);width:100%">
+      ${card('Councils', 'Deliberating panels.')}${card('Memory', 'Longitudinal recall.')}${card('Syntheses', 'The written verdicts.')}
+    </div>`;
+  const sectionStackDemo = `
+    <div style="display:flex;flex-direction:column;gap:var(--sl-gap-section);width:min(460px,100%)">
+      ${['Findings', 'Open questions'].map((t) => `
+        <section style="display:flex;flex-direction:column;gap:var(--sl-gap-item)">
+          <h3 class="sl-section__h" style="margin:0">${esc(t)}</h3>
+          <p style="margin:0;color:var(--sl-muted);font-size:.9em;line-height:1.5">Heading to content is gap-item (8); this section sits gap-section (24) above the next.</p>
+        </section>`).join('')}
+    </div>`;
+
+  return `
+    <p class="ds-eyebrow">Foundations</p>
+    <h1 class="ds-h1">Spacing &amp; density</h1>
+    <p class="ds-lead">Row heights and the distance between elements, as one tokenized rhythm. The values are <b>measured from the shipped app</b> (outline rows ≈32, library rows 40, chrome 48) and snapped to the 4px grid — so components and consumers follow a system instead of re-inventing 7/9/13px one-offs.</p>
+    <div class="ds-callout"><span class="ico">${svgReg('bulb')}</span><p>Authored once in <code>tokens.data.mjs</code> (<code>scales</code>), emitted by <code>npm run gen</code> as <code>--sl-*</code> into <code>styles/tokens.css</code> (website) and <code>py/sonaloop_icons/tokens.py</code> (inspector). <code>styles/components.css</code> states the contract in its header.</p></div>
+
+    ${h2('space-scale', 'The grid')}
+    ${p('A 4px base scale — <code>--sl-s-1…--sl-s-8</code> (name = steps of 4). Everything px-sized in the component layer sits on it; 1–3px stay literal (optical, not rhythm). The em-sized rules (buttons, inputs, cards) are the density-adaptive layer — dense at the app\'s 13px base, airy at the website\'s 16px — and deliberately stay off the px grid.')}
+    <div class="ds-space-row">${bars}</div>
+
+    ${h2('space-gaps', 'Semantic gaps')}
+    ${p('Five named distances answer "how far apart?" so the choice is semantic, not numeric:')}
+    ${table(['token', 'px', 'use'], tokenRows.map(([k, v, u]) => [k, v, u]))}
+
+    ${h2('space-rows', 'Row heights & control sizes')}
+    ${p('Three row densities plus one small control size. Buttons and inputs stay em-based on purpose (≈30px in the 13px app, ≈36px on the 16px site) — these tokens are for px-sized rows and chrome.')}
+    ${table(['token', 'px', 'use'], rowTokens.map(([k, v, u]) => [k, v, u]))}
+    ${preview(rowsDemo)}
+
+    ${h2('space-rules', 'The rules')}
+    ${p('The rhythm ruleset every surface follows — codified from the best of the current screens, not invented:')}
+    ${table(['context', 'rule'], ruleRows)}
+
+    ${h2('space-examples', 'Rhythm in practice')}
+    ${p('Cards in a grid: <code>gap-group</code> (12).')}
+    ${preview(gridDemo)}
+    ${p('A section stack: <code>gap-section</code> (24) between sections, <code>gap-item</code> (8) heading → content.')}
+    ${preview(sectionStackDemo)}
+
+    ${h2('space-before', 'Before / after')}
+    ${p('Before normalization, <code>components.css</code> spread its px spacing over <b>20 distinct values</b> across 150 declarations — including the off-grid one-offs 5·6·7·9·10·11·14·18·22px (62 occurrences). After: every rhythm value is a token — a <b>7-step grid + 5 semantic gaps + 4 height tokens</b> — with each rule moved ≤2px (snap-to-grid, not a redesign). Remaining literals are 1–3px optical hairlines and chart/calendar geometry.')}
   `;
 }
 
@@ -2289,6 +2402,7 @@ const NAV = [
     { id: 'typography', title: 'Typography', ico: 'pencil', render: pageTypography },
     { id: 'materials', title: 'Materials', ico: 'panel', render: pageMaterials },
     { id: 'layout', title: 'Layout', ico: 'squareGrid', render: pageLayout },
+    { id: 'spacing', title: 'Spacing & density', ico: 'squareRows', render: pageSpacing },
     { id: 'icons', title: 'Icons', ico: 'star', render: pageIcons },
     { id: 'figures', title: 'Figures', ico: 'syntheses', render: pageFigures },
     { id: 'images', title: 'Images', ico: 'panel', render: pageImages },
