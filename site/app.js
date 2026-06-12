@@ -501,19 +501,42 @@ function pageIntroduction() {
       <div class="wb-body"><div class="wb-h" style="width:80%"></div><div class="wb-h" style="width:54%"></div>
         <div class="wb-actions"><span class="sl-btn sl-btn--primary">Get started</span><span class="sl-btn">Docs</span></div></div>
     </div></div>`;
+  const patternsCanvas = `<div class="ds-canvas-app">
+      <div class="ab">
+        <div class="ab-side"><i class="is-active"></i><i></i><i></i><i></i></div>
+        <div class="ab-main">
+          <div class="ab-top"><i></i></div>
+          <div class="ab-body"><i style="width:78%"></i><i style="width:60%"></i><i style="width:68%"></i></div>
+        </div>
+      </div>
+      <div class="ab-pal"><span class="ab-pal-k">⌘K</span><i style="width:82%"></i><i style="width:64%"></i></div>
+    </div>`;
+  const deckCanvas = `<div class="ds-canvas-deck">
+      <div class="dk dk--back"></div>
+      <div class="dk">
+        <i class="dk-kicker"></i>
+        <div class="dk-title"><i style="width:86%"></i><i style="width:58%"></i></div>
+        <div class="dk-foot">
+          <div class="dk-bars"><i style="height:10px"></i><i style="height:18px"></i><i style="height:14px"></i><i style="height:24px"></i></div>
+          <span class="dk-num">1 / ${deckLayouts.length}</span>
+        </div>
+      </div>
+    </div>`;
 
   return `
     <h1 class="ds-h1">Sonaloop Design System</h1>
     <p class="ds-lead">The single source of truth for building consistent Sonaloop experiences — the React marketing site and the Python-SSR inspector, skinned from one set of tokens, icons and components.</p>
     <div class="ds-hero-grid">
-      ${cell('#/brand', `<span class="sl-logo" style="font-size:34px"><span class="sl-logo__mark">${svgReg('sonaloop')}</span><span class="sl-logo__word">sona<span class="sl-logo__loop">loop</span></span></span>`, 'Brand Assets', 'How to work with the Sonaloop mark and wordmark.')}
+      ${cell('#/brand', `<span class="sl-logo" style="font-size:34px"><span class="sl-logo__mark">${svgReg('sonaloop')}</span><span class="sl-logo__word">sona<span class="sl-logo__loop">loop</span></span></span>`, 'Brand', 'How to work with the Sonaloop mark and wordmark.')}
       ${cell('#/icons', iconsCanvas, 'Icons', 'A stroke icon set tailored for research &amp; council tools.')}
       ${cell('#/button', compCanvas, 'Components', 'Building blocks shared across React and Python SSR.')}
       ${cell('#/colors', `<div class="ds-canvas-colors">${colorBars}</div>`, 'Colors', 'A near-white warm light + cool dark, accessible system.')}
       ${cell('#/layout', `<div class="ds-canvas-grid"></div>`, 'Layout', 'Spacing, radii and the grid that hold every surface together.')}
-      ${cell('#/typography', `<div class="ds-canvas-type"><span>Sona</span><span class="mono">Sona Mono</span></div>`, 'Typeface', 'Sona, Sona Mono &amp; Sona Pixel — Sonaloop&#39;s own type.')}
+      ${cell('#/typography', `<div class="ds-canvas-type"><span>Sona</span><span class="mono">Sona Mono</span></div>`, 'Typography', 'Sona, Sona Mono &amp; Sona Pixel — Sonaloop&#39;s own type.')}
       ${cell('#/chart-bar', chartsCanvas, 'Charts', 'Bar, pie/donut &amp; effort·impact — print &amp; PDF-safe.')}
       ${cell('#/web-navbar', webCanvas, 'Website', 'Marketing blocks — navbar, mega-menu, cards, hero &amp; footer.')}
+      ${cell('#/app-shell', patternsCanvas, 'Patterns', 'Assemblies of the components — app shell, ⌘K palette, overlays &amp; list pages.')}
+      ${cell('#/deck', deckCanvas, 'Deck', 'The master slide template — every canonical layout from cover to closing.')}
     </div>
     <div class="ds-callout" style="margin-top:32px">
       <span class="ico">${svgReg('bulb')}</span>
@@ -1030,7 +1053,7 @@ function pageFilms() {
 /* ── BRANDS ────────────────────────────────────────────────────────────────────── */
 function pageBrand() {
   return `
-    <p class="ds-eyebrow">Brands</p>
+    <p class="ds-eyebrow">Brand</p>
     <h1 class="ds-h1">Sonaloop</h1>
     <p class="ds-lead">The Sonaloop mark is a single continuous loop with three nodes — the feedback loop between personas, councils and synthesis. Pair it with the wordmark set in Geist Mono, uppercase. The lockup ships as the <a href="#/components/logo">Logo</a> component (<code>.sl-logo</code>) — every surface renders that one source.</p>
 
@@ -1051,6 +1074,7 @@ function pageBrand() {
       <div class="ds-brand-panel" style="flex-direction:column;gap:14px">${svgHifi('sonaloop-cloud')}<span class="mono" style="font-family:var(--sl-mono);font-size:12px;color:var(--sl-faint)">Sonaloop Cloud</span></div>
       <div class="ds-brand-panel" style="flex-direction:column;gap:14px">${svgHifi('sonaloop-research')}<span class="mono" style="font-family:var(--sl-mono);font-size:12px;color:var(--sl-faint)">Sonaloop Research</span></div>
     </div>
+    ${code('tsx', `import { SonaloopCloudIcon, SonaloopResearchIcon } from 'sonaloop-design';`)}
 
     ${h2('brand-dont', 'Clear space & misuse')}
     <ul class="ds-ul">
@@ -1058,17 +1082,6 @@ function pageBrand() {
       <li class="ds-li">Don't recolour the mark, add gradients, or set it on the indigo accent.</li>
       <li class="ds-li">Don't stretch, rotate or outline the wordmark — Geist Mono, uppercase, tracking <code>0.14em</code>.</li>
     </ul>
-  `;
-}
-
-function pageProduct(name, iconName, blurb) {
-  return `
-    <p class="ds-eyebrow">Brands</p>
-    <h1 class="ds-h1">${esc(name)}</h1>
-    <p class="ds-lead">${blurb}</p>
-    <div class="ds-brand-hero">${svgHifi(iconName)}<span class="wm" style="font-size:34px">${esc(name)}</span></div>
-    ${h2('pf-usage', 'Usage')}
-    ${code('tsx', `import { ${iconName === 'sonaloop-cloud' ? 'SonaloopCloudIcon' : 'SonaloopResearchIcon'} } from 'sonaloop-design';`)}
   `;
 }
 
@@ -1289,7 +1302,7 @@ const cAvatar = () => componentPage({
 });
 
 const cSegmented = () => componentPage({
-  id: 'segmented', title: 'Segmented · Tabs', desc: 'A compact control for switching between mutually-exclusive options — install clients on the site, theme & view switchers in the inspector. Horizontal by default; <code>--fill</code> stretches, <code>--stacked</code> puts the icon over the label.',
+  id: 'segmented', title: 'Segmented', desc: 'A compact control for switching between mutually-exclusive options — install clients on the site, theme & view switchers in the inspector. Horizontal by default; <code>--fill</code> stretches, <code>--stacked</code> puts the icon over the label.',
   demo: `<div style="display:flex;flex-direction:column;gap:18px;align-items:flex-start">
       <div class="sl-segmented" role="group" aria-label="Client">
         <button class="sl-segmented__item is-active">npm</button>
@@ -1411,14 +1424,6 @@ const cEmptyState = () => componentPage({
   markup: `<div class="sl-empty sl-empty--no-results sl-empty--sm">\n  <div class="sl-empty__icon">…</div>\n  <h2 class="sl-empty__title">No matches</h2>\n  <p class="sl-empty__body">…</p>\n  <div class="sl-empty__actions"><button class="sl-btn sl-btn--sm">Clear search</button></div>\n</div>`,
   python: `# same classes on the inspector's own markup\n_empty_state("No councils yet", "Run your first council…", icon="councils")\nh("div", {"class_": "sl-empty sl-empty--error"},\n  h("div", {"class_": "sl-empty__icon"}, raw(_icon_hifi("warning"))),\n  h("h2", {"class_": "sl-empty__title"}, t("run_failed")),\n  h("div", {"class_": "sl-empty__actions"}, h("button", {"class_": "sl-btn sl-btn--sm"}, t("retry"))))`,
 });
-
-// Composites keeps a pointer — the page itself now lives under Components.
-const cEmptyStatePointer = () => `
-    <p class="ds-eyebrow">Composites</p>
-    <h1 class="ds-h1">Empty State</h1>
-    <p class="ds-lead">Empty State moved to <b>Components</b> — it grew first-use / no-results / error variants plus sm/md sizes, and it is an atomic primitive rather than a composition.</p>
-    ${p(`<a href="#/empty-state">Open Empty State under Components →</a>`)}
-  `;
 
 const cBreadcrumb = () => componentPage({
   id: 'breadcrumb', title: 'Breadcrumb', desc: 'The compact ancestry trail in the inspector top bar — project → council → view. Truncates gracefully when space is tight.',
@@ -2010,7 +2015,7 @@ const cEntity = () => componentPage({
 });
 
 /* ── nav model ─────────────────────────────────────────────────────────────────── */
-// ── Composites: components built FROM other components (not atomic primitives). ─────
+// ── Patterns: assemblies built FROM other components (not atomic primitives). ───────
 const _navIco = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/></svg>`;
 const cAppShell = () => componentPage({
   id: 'app-shell', title: 'App Shell',
@@ -2168,16 +2173,61 @@ const cTabs = () => componentPage({
 
 const cPropertyList = () => componentPage({
   id: 'property-list', title: 'Property List',
-  desc: 'A Linear-style key/value panel — an icon + label + value per row. The metadata block on every detail page. Compose <code>&lt;Property&gt;</code> rows inside a <code>&lt;PropertyList&gt;</code>; pass <code>card</code> for a bordered surface, or <code>align="start"</code> (<code>.sl-props--start</code>) for a left-aligned label column instead of the right-aligned value. Empty rows are the caller’s to skip.',
-  demo: `<div class="sl-props sl-props--card" style="width:100%;max-width:340px">
-    <div class="sl-prop"><span class="sl-prop__k">${svgReg('projects')}Project</span><span class="sl-prop__v">Sonaloop Cloud</span></div>
-    <div class="sl-prop"><span class="sl-prop__k">${svgReg('personas')}Personas</span><span class="sl-prop__v">4 voices</span></div>
-    <div class="sl-prop"><span class="sl-prop__k">${svgReg('clock')}Updated</span><span class="sl-prop__v">2h ago</span></div>
-    <div class="sl-prop"><span class="sl-prop__k">${svgReg('check')}Status</span><span class="sl-prop__v"><span class="sl-badge sl-badge--positive">Synthesised</span></span></div>
+  desc: 'A Linear-style key/value panel — an icon + label + value per row. The metadata block on every detail page. Compose <code>&lt;Property&gt;</code> rows inside a <code>&lt;PropertyList&gt;</code>; pass <code>card</code> for a bordered surface, <code>align="start"</code> (<code>.sl-props--start</code>) for a left-aligned label column instead of the right-aligned value, or <code>quiet</code> (<code>.sl-props--quiet</code>) for the <b>frameless Notion-style</b> variant on detail pages and slide-overs — no card chrome, a plain muted label column, regular-weight values (links accent) and generous row rhythm from the gap tokens. Empty rows are the caller’s to skip.',
+  demo: `<div style="display:flex;gap:48px;flex-wrap:wrap;align-items:flex-start;width:100%;max-width:760px">
+    <div class="sl-props sl-props--card" style="flex:1;min-width:280px;max-width:340px">
+      <div class="sl-prop"><span class="sl-prop__k">${svgReg('projects')}Project</span><span class="sl-prop__v">Sonaloop Cloud</span></div>
+      <div class="sl-prop"><span class="sl-prop__k">${svgReg('personas')}Personas</span><span class="sl-prop__v">4 voices</span></div>
+      <div class="sl-prop"><span class="sl-prop__k">${svgReg('clock')}Updated</span><span class="sl-prop__v">2h ago</span></div>
+      <div class="sl-prop"><span class="sl-prop__k">${svgReg('check')}Status</span><span class="sl-prop__v"><span class="sl-badge sl-badge--positive">Synthesised</span></span></div>
+    </div>
+    <div class="sl-props sl-props--quiet" style="flex:1;min-width:280px;max-width:340px">
+      <div class="sl-prop"><span class="sl-prop__k">${svgReg('projects')}Project</span><span class="sl-prop__v"><a href="#/property-list">Sonaloop Cloud</a></span></div>
+      <div class="sl-prop"><span class="sl-prop__k">${svgReg('personas')}Personas</span><span class="sl-prop__v">4 voices</span></div>
+      <div class="sl-prop"><span class="sl-prop__k">${svgReg('clock')}Updated</span><span class="sl-prop__v">2h ago</span></div>
+      <div class="sl-prop"><span class="sl-prop__k">${svgReg('check')}Status</span><span class="sl-prop__v"><span class="sl-badge sl-badge--positive">Synthesised</span></span></div>
+    </div>
   </div>`,
-  react: `import { PropertyList, Property } from 'sonaloop-design/components';\n\n<PropertyList card>\n  <Property icon={<ProjectsIcon size={14} />} label=\"Project\">Sonaloop Cloud</Property>\n  <Property icon={<PersonasIcon size={14} />} label=\"Personas\">4 voices</Property>\n  <Property icon={<ClockIcon size={14} />} label=\"Updated\">2h ago</Property>\n</PropertyList>`,
-  markup: `<div class="sl-props sl-props--card">\n  <div class="sl-prop"><span class="sl-prop__k">…Project</span><span class="sl-prop__v">Sonaloop Cloud</span></div>\n</div>`,
-  python: `h("div", {"class_": "sl-prop"},\n  h("span", {"class_": "sl-prop__k"}, icon, "Project"),\n  h("span", {"class_": "sl-prop__v"}, "Sonaloop Cloud"))`,
+  variants: { cols: ['Class', 'Variant', 'Use'], rows: [
+    ['.sl-props', 'Default', 'Space-between rows — label left, value right.'],
+    ['.sl-props--card', 'Card', 'Bordered surface — a rail metadata panel.'],
+    ['.sl-props--start', 'Start', 'Fixed label column, left value (Linear’s issue rail).'],
+    ['.sl-props--quiet', 'Quiet', 'Frameless Notion-style — detail pages & slide-overs.'],
+  ] },
+  react: `import { PropertyList, Property } from 'sonaloop-design/components';\n\n<PropertyList card>\n  <Property icon={<ProjectsIcon size={14} />} label=\"Project\">Sonaloop Cloud</Property>\n  <Property icon={<PersonasIcon size={14} />} label=\"Personas\">4 voices</Property>\n  <Property icon={<ClockIcon size={14} />} label=\"Updated\">2h ago</Property>\n</PropertyList>\n\n// frameless, Notion-style — detail pages & slide-overs:\n<PropertyList quiet>\n  <Property icon={<ProjectsIcon size={14} />} label=\"Project\"><a href={url}>Sonaloop Cloud</a></Property>\n  <Property icon={<ClockIcon size={14} />} label=\"Updated\">2h ago</Property>\n</PropertyList>`,
+  markup: `<div class="sl-props sl-props--card">\n  <div class="sl-prop"><span class="sl-prop__k">…Project</span><span class="sl-prop__v">Sonaloop Cloud</span></div>\n</div>\n\n<!-- frameless (Notion-style) -->\n<div class="sl-props sl-props--quiet">\n  <div class="sl-prop"><span class="sl-prop__k">…Project</span><span class="sl-prop__v"><a href="…">Sonaloop Cloud</a></span></div>\n</div>`,
+  python: `h("div", {"class_": "sl-props sl-props--quiet"},\n  h("div", {"class_": "sl-prop"},\n    h("span", {"class_": "sl-prop__k"}, icon, "Project"),\n    h("span", {"class_": "sl-prop__v"}, link)))`,
+});
+
+const cFileCard = () => componentPage({
+  id: 'file-card', title: 'File Card',
+  desc: 'An asset rendered as a <b>file</b>, not a generic row: a prominent type identity on a quiet stage — an uppercase extension badge derived from the media type (<code>PPTX</code> · <code>PDF</code> · <code>CSV</code> · <code>PNG</code> …) or an image thumbnail — the filename <b>with its extension</b> as the title, a faint size · date meta line, and exactly <b>one</b> action slot (a download <a href="#/icon-button">IconButton</a> — never duplicated affordances). <code>&lt;FileGrid&gt;</code> (<code>.sl-file-grid</code>) lays cards out responsively; <code>row</code> (<code>.sl-file--row</code>) is the compact list variant for dense lenses. Badge tones follow the type family; unknown types stay neutral.',
+  demo: (() => { const dl = '<button class="sl-iconbtn sl-iconbtn--ghost" aria-label="Download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 11l5 5 5-5M5 20h14"/></svg></button>';
+    const card = (stage, name, meta) => `<div class="sl-file">
+      <span class="sl-file__stage">${stage}</span>
+      <span class="sl-file__body"><span class="sl-file__info"><span class="sl-file__name">${name}</span><span class="sl-file__meta">${meta}</span></span><span class="sl-file__action">${dl}</span></span>
+    </div>`;
+    return `<div style="display:flex;flex-direction:column;gap:20px;width:100%;max-width:620px">
+    <div class="sl-file-grid">
+      ${card('<span class="sl-file__ext sl-file__ext--amber">pptx</span>', 'exec-summary.pptx', '4.1 MB · 4 Jun')}
+      ${card('<span class="sl-file__ext sl-file__ext--red">pdf</span>', 'council-report.pdf', '1.2 MB · 2 Jun')}
+      ${card('<span class="sl-file__ext sl-file__ext--green">csv</span>', 'survey-responses.csv', '86 KB · 28 May')}
+      ${card('<img class="sl-file__thumb" src="/images/canvas/dawn.jpg" alt="">', 'persona-maya.png', '640 KB · 21 May')}
+    </div>
+    <div class="sl-file sl-file--row">
+      <span class="sl-file__stage"><span class="sl-file__ext sl-file__ext--blue">docx</span></span>
+      <span class="sl-file__body"><span class="sl-file__info"><span class="sl-file__name">interview-guide.docx</span><span class="sl-file__meta">312 KB · 18 May</span></span><span class="sl-file__action">${dl}</span></span>
+    </div>
+  </div>`; })(),
+  variants: { cols: ['Class', 'Variant', 'Use'], rows: [
+    ['.sl-file', 'Card', 'Stage (badge/thumbnail) over name · meta · one action.'],
+    ['.sl-file-grid', 'Grid', 'Responsive auto-fill layout for a files lens.'],
+    ['.sl-file--row', 'Row', 'Compact list variant — identity square · name · meta.'],
+    ['.sl-file__ext--red…violet', 'Tone', 'Type family colour (pdf · decks · sheets · text · images).'],
+  ] },
+  react: `import { FileCard, FileGrid, IconButton } from 'sonaloop-design/components';\n\n<FileGrid>\n  <FileCard name=\"exec-summary.pptx\" meta=\"4.1 MB · 4 Jun\" href={url}\n    action={<IconButton ghost aria-label=\"Download\"><DownloadIcon size={16} /></IconButton>} />\n  <FileCard name=\"persona-maya.png\" meta=\"640 KB · 21 May\" thumb=\"/assets/maya-thumb.png\" />\n</FileGrid>\n\n// compact list variant:\n<FileCard row name=\"interview-guide.docx\" meta=\"312 KB · 18 May\" />`,
+  markup: `<div class="sl-file-grid">\n  <a class="sl-file" href="…">\n    <span class="sl-file__stage"><span class="sl-file__ext sl-file__ext--amber">pptx</span></span>\n    <span class="sl-file__body">\n      <span class="sl-file__info">\n        <span class="sl-file__name">exec-summary.pptx</span>\n        <span class="sl-file__meta">4.1 MB · 4 Jun</span>\n      </span>\n      <span class="sl-file__action"><button class="sl-iconbtn sl-iconbtn--ghost">…</button></span>\n    </span>\n  </a>\n</div>`,
+  python: `# Same .sl-file / .sl-file-grid contract from the SSR app; the badge tone\n# class comes from the extension's type family (pdf→red, pptx→amber, …).`,
 });
 
 const cPageHeader = () => componentPage({
@@ -2228,6 +2278,25 @@ const cChartSparkline = () => componentPage({
   python: `# charts.py renders the same .sl-spark SVG.`,
 });
 
+const cLikelihood = () => componentPage({
+  id: 'likelihood', title: 'Likelihood',
+  desc: 'The presentation contract for <b>predicted behaviour</b>: a tabular percentage label beside a fixed <b>40px mini-bar</b> (“85 %” + bar). The tone shifts at thresholds — <code>--high</code> (≥ 70) green, <code>--mid</code> (≥ 40) amber, <code>--low</code> red; unmodified stays accent. Pure markup (the fill width is <code>--p</code>, 0–100, set inline), so the Python-SSR app emits the identical classes. Inline-sized: drop it into a table cell, an entity row or a property value.',
+  demo: `<div style="display:flex;flex-direction:column;gap:14px;align-items:flex-start">
+    <span class="sl-likelihood sl-likelihood--high" style="--p:85"><span class="sl-likelihood__val">85&thinsp;%</span><span class="sl-likelihood__bar"><span class="sl-likelihood__fill"></span></span></span>
+    <span class="sl-likelihood sl-likelihood--mid" style="--p:55"><span class="sl-likelihood__val">55&thinsp;%</span><span class="sl-likelihood__bar"><span class="sl-likelihood__fill"></span></span></span>
+    <span class="sl-likelihood sl-likelihood--low" style="--p:20"><span class="sl-likelihood__val">20&thinsp;%</span><span class="sl-likelihood__bar"><span class="sl-likelihood__fill"></span></span></span>
+  </div>`,
+  variants: { cols: ['Class', 'Tone', 'Use'], rows: [
+    ['.sl-likelihood', 'Accent', 'No threshold semantics — a neutral probability.'],
+    ['.sl-likelihood--high', 'Green', '≥ 70 — the behaviour is likely.'],
+    ['.sl-likelihood--mid', 'Amber', '≥ 40 — uncertain.'],
+    ['.sl-likelihood--low', 'Red', 'below 40 — unlikely.'],
+  ] },
+  react: `import { Likelihood } from 'sonaloop-design/components';\n\n<Likelihood value={85} />\n// custom thresholds [mid, high]:\n<Likelihood value={55} thresholds={[50, 80]} />`,
+  markup: `<span class="sl-likelihood sl-likelihood--high" style="--p:85">\n  <span class="sl-likelihood__val">85&thinsp;%</span>\n  <span class="sl-likelihood__bar"><span class="sl-likelihood__fill"></span></span>\n</span>`,
+  python: `tone = "high" if p >= 70 else "mid" if p >= 40 else "low"\nh("span", {"class_": f"sl-likelihood sl-likelihood--{tone}", "style": f"--p:{p}"},\n  h("span", {"class_": "sl-likelihood__val"}, f"{p}\\u2009%"),\n  h("span", {"class_": "sl-likelihood__bar"}, h("span", {"class_": "sl-likelihood__fill"})))`,
+});
+
 const cProse = () => componentPage({
   id: 'prose', title: 'Prose',
   desc: 'The one reading surface for rendered Markdown / long-form content — council findings, syntheses, SOUL docs, report bodies. Apply <code>.sl-prose</code> to the wrapper around the rendered HTML; headings, lists, links, inline <code>code</code>, fenced blocks, blockquotes and tables (via the shared <a href="#/table">Table</a>) are all token-driven, so the same content reads identically across the Python-SSR app and the React surfaces. Em-based — set the container’s <code>font-size</code> to scale the whole block; <code>.sl-prose--sm</code> is the denser inline/aside variant.',
@@ -2249,9 +2318,13 @@ const cProse = () => componentPage({
 
 const cFilterBar = () => componentPage({
   id: 'filter-bar', title: 'Filter Bar',
-  desc: 'A Linear-style faceted filter for a list. A quiet “+ Filter” <a href="#/popover">ToolbarButton</a> opens a two-level menu — pick a facet, then toggle its values (selectable <code>.sl-menu-item</code> rows with per-value counts) — and each non-empty facet becomes a removable chip (<code>.sl-filter-chip</code>) that reopens its value menu. <b>Domain-agnostic</b>: the host passes <code>facets</code> (options · counts · current selection) and gets <code>onToggle</code> / <code>onClearFacet</code> / <code>onClearAll</code> back, so the same bar drives tickets, councils or any other list.',
-  demo: (() => { const chk = '<span class="sl-menu-item__check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>'; return `<div style="width:100%;max-width:560px;margin-bottom:140px">
+  desc: 'A Linear-style faceted filter for a list — <b>the complete list-control row, search included</b> (“filter + search, always”). A quiet leading search input (<code>.sl-filter-search</code>, borderless until focus) fuses with the “+ Filter” <a href="#/popover">ToolbarButton</a> and the active-facet chips into ONE bar row; the bar lives in the scaffold bar inside the content measure. The button opens a two-level menu — pick a facet, then toggle its values (selectable <code>.sl-menu-item</code> rows with per-value counts) — and each non-empty facet becomes a removable chip (<code>.sl-filter-chip</code>) that reopens its value menu. Chips <b>wrap</b>, never clip. <b>Domain-agnostic</b>: the host passes <code>facets</code> (options · counts · current selection) plus an optional <code>search</code> slot, and gets <code>onToggle</code> / <code>onClearFacet</code> / <code>onClearAll</code> / <code>search.onChange</code> back, so the same bar drives tickets, councils or any other list.',
+  demo: (() => { const chk = '<span class="sl-menu-item__check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg></span>'; return `<div style="width:100%;max-width:620px;margin-bottom:140px">
     <div class="sl-filter-bar">
+      <span class="sl-filter-search">
+        ${svgReg('search')}
+        <input type="search" class="sl-filter-search__input" placeholder="Search sessions…" aria-label="Search sessions">
+      </span>
       <div class="sl-popover-wrap">
         <button class="sl-toolbtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16l-6 7.5V19l-4 2v-8.5z"/></svg>Filter</button>
         <div class="sl-popover sl-popover--bottom-start" style="animation:none;min-width:13rem">
@@ -2268,9 +2341,15 @@ const cFilterBar = () => componentPage({
       <button class="sl-filter-clear">Clear</button>
     </div>
   </div>`; })(),
-  react: `import { FilterBar, type FilterFacet } from 'sonaloop-design/components';\n\nconst facets: FilterFacet[] = [{\n  key: 'statuses', label: 'Status', icon: <StatusGlyph status=\"todo\" />,\n  selected: filter.statuses,\n  summary: filter.statuses.map((s) => STATUS_LABEL[s]).join(', '),\n  options: STATUSES.map((s) => ({ value: s, count: countOf(s), label: <><StatusGlyph status={s} /> {STATUS_LABEL[s]}</> })),\n}];\n\n<FilterBar facets={facets}\n  onToggle={(key, v) => toggle(key, v)}\n  onClearFacet={(key) => clearFacet(key)}\n  onClearAll={() => setFilter(EMPTY)} />`,
-  markup: `<div class="sl-filter-bar">\n  <button class="sl-toolbtn">Filter</button>\n  <span class="sl-filter-chip">\n    <button class="sl-filter-chip__body">Status is In progress</button>\n    <button class="sl-filter-chip__x">✕</button>\n  </span>\n</div>`,
-  python: `# Same .sl-filter-bar / .sl-filter-chip + .sl-menu-item contract from the SSR app.`,
+  variants: { cols: ['Class', 'Part', 'Use'], rows: [
+    ['.sl-filter-bar', 'The bar row', 'Search + button + chips as ONE wrapping row in the scaffold bar.'],
+    ['.sl-filter-search', 'Search slot', 'Leading quiet input — borderless until focus, hairline-separated.'],
+    ['.sl-filter-chip', 'Facet chip', 'A non-empty facet; reopens its value menu, ✕ clears it.'],
+    ['.sl-filter-clear', 'Clear all', 'Quiet text action, shown only while something is selected.'],
+  ] },
+  react: `import { FilterBar, type FilterFacet } from 'sonaloop-design/components';\n\nconst facets: FilterFacet[] = [{\n  key: 'statuses', label: 'Status', icon: <StatusGlyph status=\"todo\" />,\n  selected: filter.statuses,\n  summary: filter.statuses.map((s) => STATUS_LABEL[s]).join(', '),\n  options: STATUSES.map((s) => ({ value: s, count: countOf(s), label: <><StatusGlyph status={s} /> {STATUS_LABEL[s]}</> })),\n}];\n\n<FilterBar facets={facets}\n  search={{ value: filter.q, placeholder: 'Search sessions…', onChange: (q) => setQ(q) }}\n  onToggle={(key, v) => toggle(key, v)}\n  onClearFacet={(key) => clearFacet(key)}\n  onClearAll={() => setFilter(EMPTY)} />`,
+  markup: `<div class="sl-filter-bar">\n  <span class="sl-filter-search">\n    <svg>…</svg><input type="search" class="sl-filter-search__input" placeholder="Search…">\n  </span>\n  <button class="sl-toolbtn">Filter</button>\n  <span class="sl-filter-chip">\n    <button class="sl-filter-chip__body">Status is In progress</button>\n    <button class="sl-filter-chip__x">✕</button>\n  </span>\n</div>`,
+  python: `# Same .sl-filter-bar / .sl-filter-search / .sl-filter-chip + .sl-menu-item contract\n# from the SSR app; ?q= composes with the facet params server-side.`,
 });
 
 const cIconButton = () => componentPage({
@@ -2396,22 +2475,21 @@ const DECK_ICO = { cover: 'star', agenda: 'squareRows', section: 'squareSplit', 
   content: 'report', image: 'panel' };
 
 const NAV = [
-  { label: 'Foundations', items: [
+  // One section per Introduction tile, in tile order (Brand → Deck) — the overview grid
+  // IS the sitemap. Pages without a tile live in their family's section (Figures → Icons,
+  // Images/Films → Brand, Materials → Colors, Spacing → Layout). Introduction itself
+  // stays a bare top-level link.
+  { flat: true, items: [
     { id: 'introduction', title: 'Introduction', ico: 'overview', render: pageIntroduction },
-    { id: 'colors', title: 'Colors', ico: 'half', render: pageColors },
-    { id: 'typography', title: 'Typography', ico: 'pencil', render: pageTypography },
-    { id: 'materials', title: 'Materials', ico: 'panel', render: pageMaterials },
-    { id: 'layout', title: 'Layout', ico: 'squareGrid', render: pageLayout },
-    { id: 'spacing', title: 'Spacing & density', ico: 'squareRows', render: pageSpacing },
-    { id: 'icons', title: 'Icons', ico: 'star', render: pageIcons },
-    { id: 'figures', title: 'Figures', ico: 'syntheses', render: pageFigures },
+  ] },
+  { label: 'Brand', items: [
+    { id: 'brand', title: 'Sonaloop', ico: 'sonaloop', render: pageBrand },
     { id: 'images', title: 'Images', ico: 'panel', render: pageImages },
     { id: 'films', title: 'Films', ico: 'play', render: pageFilms },
   ] },
-  { label: 'Brands', items: [
-    { id: 'brand', title: 'Sonaloop', ico: 'sonaloop', render: pageBrand },
-    { id: 'cloud', title: 'Sonaloop Cloud', ico: 'sonaloop-cloud', render: () => pageProduct('Sonaloop Cloud', 'sonaloop-cloud', 'The hosted Sonaloop — councils, syntheses and memory, running for your team.') },
-    { id: 'research', title: 'Sonaloop Research', ico: 'sonaloop-research', render: () => pageProduct('Sonaloop Research', 'sonaloop-research', 'The deep design-research surface — continuous discovery, frontier tracking and meta-reports.') },
+  { label: 'Icons', items: [
+    { id: 'icons', title: 'Icons', ico: 'star', render: pageIcons },
+    { id: 'figures', title: 'Figures', ico: 'syntheses', render: pageFigures },
   ] },
   { label: 'Components', items: [
     { id: 'button', title: 'Button', ico: 'caretRight', render: cButton },
@@ -2423,12 +2501,13 @@ const NAV = [
     { id: 'avatar', title: 'Avatar', ico: 'contact', render: cAvatar },
     { id: 'logo', title: 'Logo', ico: 'sonaloop', render: cLogo },
     { id: 'card', title: 'Card', ico: 'rectangle', render: cCard },
+    { id: 'file-card', title: 'File Card', ico: 'report', render: cFileCard },
     { id: 'note', title: 'Note', ico: 'bulb', render: cNote },
     { id: 'stat', title: 'Stat', ico: 'analytics', render: cStat },
     { id: 'progress', title: 'Progress', ico: 'wave', render: cProgress },
     { id: 'stepper', title: 'Stepper', ico: 'plan', render: cStepper },
     { id: 'empty-state', title: 'Empty State', ico: 'square', render: cEmptyState },
-    { id: 'segmented', title: 'Segmented · Tabs', ico: 'squareCols', render: cSegmented },
+    { id: 'segmented', title: 'Segmented', ico: 'squareCols', render: cSegmented },
     { id: 'tabs', title: 'Tabs', ico: 'squareCols', render: cTabs },
     { id: 'theme-toggle', title: 'Theme Toggle', ico: 'monitor', render: cThemeToggle },
     { id: 'table', title: 'Table', ico: 'squareRows', render: cTable },
@@ -2439,6 +2518,7 @@ const NAV = [
     { id: 'input', title: 'Input', ico: 'search', render: cInput },
     { id: 'textarea', title: 'Textarea', ico: 'pencil', render: cTextarea },
     { id: 'select', title: 'Select', ico: 'chevron', render: cSelect },
+    { id: 'field', title: 'Field · Fieldset', ico: 'settings', render: cField },
     { id: 'checkbox', title: 'Checkbox', ico: 'check', render: cCheckbox },
     { id: 'radio', title: 'Radio', ico: 'circle', render: cRadio },
     { id: 'switch', title: 'Switch', ico: 'exchange', render: cSwitch },
@@ -2448,6 +2528,17 @@ const NAV = [
     { id: 'arrow-link', title: 'Arrow Link', ico: 'arrowRight', render: cArrowLink },
     { id: 'property-list', title: 'Property List', ico: 'squareRows', render: cPropertyList },
     { id: 'page-header', title: 'Page Header', ico: 'panel', render: cPageHeader },
+  ] },
+  { label: 'Colors', items: [
+    { id: 'colors', title: 'Colors', ico: 'half', render: pageColors },
+    { id: 'materials', title: 'Materials', ico: 'panel', render: pageMaterials },
+  ] },
+  { label: 'Layout', items: [
+    { id: 'layout', title: 'Layout', ico: 'squareGrid', render: pageLayout },
+    { id: 'spacing', title: 'Spacing & density', ico: 'squareRows', render: pageSpacing },
+  ] },
+  { label: 'Typography', items: [
+    { id: 'typography', title: 'Typography', ico: 'pencil', render: pageTypography },
   ] },
   { label: 'Charts', items: [
     { id: 'chart-bar', title: 'Bar', ico: 'analytics', render: cChartBar },
@@ -2467,29 +2558,7 @@ const NAV = [
     { id: 'chart-stats', title: 'Stats · KPI Row', ico: 'analytics', render: cChartStats },
     { id: 'chart-progress-strip', title: 'Progress Strip', ico: 'squareRows', render: cChartPStrip },
     { id: 'chart-progress-pie', title: 'Progress Pie · Micro', ico: 'half', render: cChartProgressPie },
-  ] },
-  { label: 'Deck', items: [
-    { id: 'deck', title: 'Master Template', ico: 'report', render: pageDeckOverview },
-    ...deckLayouts.map((l, i) => ({
-      id: `deck-${l.key}`, title: l.title, ico: DECK_ICO[l.key] || 'rectangle',
-      render: () => deckLayoutPage(l, i),
-    })),
-  ] },
-  { label: 'Composites', items: [
-    { id: 'app-shell', title: 'App Shell', ico: 'panel', render: cAppShell },
-    { id: 'command-palette', title: 'Command Palette ⌘K', ico: 'search', render: cCommandPalette },
-    { id: 'drawer', title: 'Drawer · Slide-over', ico: 'panel', render: cDrawer },
-    { id: 'modal', title: 'Modal · Dialog', ico: 'square', render: cModal },
-    { id: 'image-lightbox', title: 'Image Lightbox', ico: 'panel', render: cImageLightbox },
-    { id: 'popover', title: 'Popover · Menu', ico: 'squareSplit', render: cPopover },
-    { id: 'detail-layout', title: 'Detail Layout', ico: 'squareRows', render: cDetailLayout },
-    { id: 'list-page', title: 'List Page', ico: 'squareRows', render: cListPage },
-    { id: 'calendar', title: 'Calendar', ico: 'clock', render: cCalendar },
-    { id: 'filter-bar', title: 'Filter Bar', ico: 'half', render: cFilterBar },
-    { id: 'entity', title: 'Entity', ico: 'projects', render: cEntity },
-    { id: 'field', title: 'Field · Fieldset', ico: 'settings', render: cField },
-    // pointer only — the Empty State page itself moved to Components (kept out of ⌘K).
-    { id: 'empty-state-moved', title: 'Empty State ↗', ico: 'square', pointer: true, render: cEmptyStatePointer },
+    { id: 'likelihood', title: 'Likelihood', ico: 'target', render: cLikelihood },
   ] },
   { label: 'Website', items: [
     { id: 'web-navbar', title: 'Navbar', ico: 'panel', render: () => websitePage({
@@ -2537,30 +2606,52 @@ const NAV = [
       desc: 'A divide-y question/answer stack — the same FAQ pattern that repeats across Pricing, Install and Home, now one component.',
       usage: `import { FaqList } from 'sonaloop-design/website';\n\n<FaqList items={[\n  { q: 'Why is local free?', a: 'Your own AI writes the text — we sell methodology, not tokens.' },\n  { q: 'Do I need an API key?', a: 'No, not for the core.' },\n]} />` }) },
   ] },
+  { label: 'Patterns', items: [
+    { id: 'app-shell', title: 'App Shell', ico: 'panel', render: cAppShell },
+    { id: 'command-palette', title: 'Command Palette ⌘K', ico: 'search', render: cCommandPalette },
+    { id: 'drawer', title: 'Drawer · Slide-over', ico: 'panel', render: cDrawer },
+    { id: 'modal', title: 'Modal · Dialog', ico: 'square', render: cModal },
+    { id: 'image-lightbox', title: 'Image Lightbox', ico: 'panel', render: cImageLightbox },
+    { id: 'popover', title: 'Popover · Menu', ico: 'squareSplit', render: cPopover },
+    { id: 'detail-layout', title: 'Detail Layout', ico: 'squareRows', render: cDetailLayout },
+    { id: 'list-page', title: 'List Page', ico: 'squareRows', render: cListPage },
+    { id: 'calendar', title: 'Calendar', ico: 'clock', render: cCalendar },
+    { id: 'filter-bar', title: 'Filter Bar', ico: 'half', render: cFilterBar },
+    { id: 'entity', title: 'Entity', ico: 'projects', render: cEntity },
+  ] },
+  { label: 'Deck', items: [
+    { id: 'deck', title: 'Master Template', ico: 'report', render: pageDeckOverview },
+    ...deckLayouts.map((l, i) => ({
+      id: `deck-${l.key}`, title: l.title, ico: DECK_ICO[l.key] || 'rectangle',
+      render: () => deckLayoutPage(l, i),
+    })),
+  ] },
 ];
 
 const FLAT = NAV.flatMap((g) => g.items);
 const byId = (id) => FLAT.find((i) => i.id === id);
 
 /* ── sidebar ──────────────────────────────────────────────────────────────────── */
-// Accordion nav: only the section you're currently in is open. Every group renders
+// The flat group renders its pages as plain top-level links; every other group is an
+// accordion section — only the one you're currently in is open. Every group renders
 // collapsed; renderPage opens the active one (and collapses the rest) on each navigation.
-// Components, Charts and Website list alphabetically in the nav; Foundations & Brands keep their curated order.
-const NAV_ALPHA = new Set(['Components', 'Charts', 'Website']);
+// Components, Patterns, Charts and Website list alphabetically in the nav; the small
+// tile sections and Deck (slide order) keep their curated order.
+const NAV_ALPHA = new Set(['Components', 'Patterns', 'Charts', 'Website']);
 function renderSidebar() {
   $('#sidebar').innerHTML = NAV.map((g) => {
     const items = NAV_ALPHA.has(g.label)
       ? [...g.items].sort((a, b) => a.title.localeCompare(b.title))
       : g.items;
+    const links = items.map((it) => `<a href="#/${it.id}" data-nav="${it.id}">${esc(it.title)}</a>`).join('');
+    if (g.flat) return `<nav class="sl-nav sl-nav--top" aria-label="Pages">${links}</nav>`;
     return `
     <div class="sl-nav-group is-collapsed" data-group="${esc(g.label)}">
       <button type="button" class="sl-navhead" data-nav-toggle="${esc(g.label)}" aria-expanded="false">
         <span>${esc(g.label)}</span>
         <span class="sl-navhead__caret">${svgReg('chevron')}</span>
       </button>
-      <nav class="sl-nav">
-        ${items.map((it) => `<a href="#/${it.id}" data-nav="${it.id}">${esc(it.title)}</a>`).join('')}
-      </nav>
+      <nav class="sl-nav">${links}</nav>
     </div>`;
   }).join('');
 }
@@ -2608,8 +2699,11 @@ function renderPage() {
     a.classList.toggle('is-active', a.dataset.nav === id));
   const crumb = $('#crumb');
   if (crumb) {
-    const sec = NAV.find((g) => g.items.some((it) => it.id === id))?.label || '';
-    crumb.innerHTML = `<span class="sl-breadcrumb__link">${esc(sec)}</span><span class="sl-breadcrumb__sep" aria-hidden="true"></span><span class="sl-breadcrumb__current">${esc(item.title)}</span>`;
+    // no section crumb for top-level pages, or when it would just repeat the title
+    const sec = NAV.find((g) => g.items.some((it) => it.id === id))?.label;
+    crumb.innerHTML = (sec && sec !== item.title
+      ? `<span class="sl-breadcrumb__link">${esc(sec)}</span><span class="sl-breadcrumb__sep" aria-hidden="true"></span>`
+      : '') + `<span class="sl-breadcrumb__current">${esc(item.title)}</span>`;
   }
   document.title = `Design | sonaloop · ${item.title}`;
   main.scrollTo?.(0, 0);
@@ -2832,7 +2926,7 @@ function setTheme(pref) {
 // Pages carry their curated synonyms (site/search-aliases.data.mjs) so "wizard" finds
 // Stepper and "blank state" finds Empty State. Pointer-only nav entries stay out of ⌘K.
 const PALETTE_ITEMS = [
-  ...FLAT.filter((i) => !i.pointer).map((i) => ({ kind: 'Page', title: i.title, sub: '', href: `#/${i.id}`, ico: i.ico, aliases: searchAliases[i.id] || [] })),
+  ...FLAT.map((i) => ({ kind: 'Page', title: i.title, sub: '', href: `#/${i.id}`, ico: i.ico, aliases: searchAliases[i.id] || [] })),
   ...Object.keys(regular).map((n) => ({ kind: 'Icon', title: n, sub: '', href: `#/icons`, iconName: n, aliases: [] })),
 ];
 

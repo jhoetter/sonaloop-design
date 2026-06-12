@@ -45,6 +45,8 @@ a { color: inherit; }
 .sl-sb-search .sl-cmdk-trigger { font-size: 13px; }
 /* the docs nav has many sections — use the shared collapsible .sl-nav-group, denser rows */
 .sl-sb-scroll .sl-nav a { font-size: 13.5px; }
+/* the Introduction renders as a plain top-level link above the sections */
+.sl-sb-scroll .sl-nav--top { margin-bottom: var(--sl-s-2); }
 /* settings popover: full-width theme segmented + the source link */
 .sl-um-pop .sl-segmented { width: 100%; }
 .sl-um-pop .sl-segmented__item svg { width: 16px; height: 16px; }
@@ -111,6 +113,36 @@ a { color: inherit; }
 .ds-canvas-web .wb-h { height: 9px; border-radius: 4px; background: var(--sl-ink); opacity: .82; margin-bottom: 8px; }
 .ds-canvas-web .wb-actions { display: flex; gap: 7px; margin-top: 12px; }
 .ds-canvas-web .wb-actions .sl-btn { font-size: 10px; padding: .28em .7em; }
+
+/* Patterns tile — a mini app shell (sidebar · topbar · rows) with a floating ⌘K palette */
+.ds-canvas-app { position: relative; }
+.ds-canvas-app .ab { display: flex; width: 244px; height: 122px; border: 1px solid var(--sl-line); border-radius: 11px; overflow: hidden; background: var(--sl-surface); }
+.ds-canvas-app .ab-side { width: 62px; background: var(--sl-bg); border-right: 1px solid var(--sl-line); padding: 11px 9px; display: flex; flex-direction: column; gap: 8px; }
+.ds-canvas-app .ab-side i { height: 6px; border-radius: 3px; background: var(--sl-line); display: block; }
+.ds-canvas-app .ab-side i.is-active { background: var(--sl-accent); }
+.ds-canvas-app .ab-main { flex: 1; display: flex; flex-direction: column; }
+.ds-canvas-app .ab-top { display: flex; align-items: center; padding: 9px 12px; border-bottom: 1px solid var(--sl-line); }
+.ds-canvas-app .ab-top i { width: 56px; height: 5px; border-radius: 3px; background: var(--sl-line); display: block; }
+.ds-canvas-app .ab-body { padding: 12px; display: flex; flex-direction: column; gap: 9px; }
+.ds-canvas-app .ab-body i { height: 7px; border-radius: 3px; background: var(--sl-line); display: block; }
+.ds-canvas-app .ab-pal { position: absolute; left: 50%; top: 50%; transform: translate(-34%, -44%); width: 118px;
+  border: 1px solid var(--sl-line); border-radius: 9px; background: var(--sl-surface);
+  box-shadow: 0 10px 26px rgba(20, 16, 8, .14); padding: 9px 10px; display: flex; flex-direction: column; gap: 7px; }
+.ds-canvas-app .ab-pal i { height: 5px; border-radius: 3px; background: var(--sl-line); display: block; }
+.ds-canvas-app .ab-pal-k { font-family: var(--sl-mono); font-size: 9px; color: var(--sl-faint); }
+
+/* Deck tile — a 16:10 slide (kicker · title · bar chart · page number) over a stacked twin */
+.ds-canvas-deck { position: relative; }
+.ds-canvas-deck .dk { width: 196px; aspect-ratio: 16 / 10; border: 1px solid var(--sl-line); border-radius: 8px;
+  background: var(--sl-surface); padding: 14px 16px; display: flex; flex-direction: column; position: relative; }
+.ds-canvas-deck .dk--back { position: absolute; inset: 0; transform: translate(10px, -9px) rotate(1.6deg); opacity: .45; }
+.ds-canvas-deck .dk-kicker { width: 44px; height: 4px; border-radius: 2px; background: var(--sl-accent); display: block; }
+.ds-canvas-deck .dk-title { margin-top: 11px; display: flex; flex-direction: column; gap: 6px; }
+.ds-canvas-deck .dk-title i { height: 9px; border-radius: 4px; background: var(--sl-ink); opacity: .82; display: block; }
+.ds-canvas-deck .dk-foot { margin-top: auto; display: flex; align-items: flex-end; justify-content: space-between; }
+.ds-canvas-deck .dk-bars { display: flex; gap: 5px; align-items: flex-end; }
+.ds-canvas-deck .dk-bars i { width: 9px; border-radius: 2px 2px 0 0; background: var(--sl-accent); opacity: .75; display: block; }
+.ds-canvas-deck .dk-num { font-family: var(--sl-mono); font-size: 9px; color: var(--sl-faint); }
 
 /* ── Preview frames ───────────────────────────────────────────────────────────── */
 .ds-preview {

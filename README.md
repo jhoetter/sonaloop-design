@@ -185,15 +185,16 @@ make check          # drift guard: fail if any generated artifact is stale
 `make dev` serves a full design-system documentation site (`site/`), organised the way the
 [Geist](https://vercel.com/geist/introduction) (Vercel) site is:
 
-- **Foundations** — Introduction, Colors, Typography, Materials, Layout, Icons.
-- **Brands** — the Sonaloop mark/wordmark, plus Sonaloop Cloud & Research.
+- **One section per Introduction tile, in tile order** — the overview grid is the sitemap:
+  Brand (mark/wordmark, Images, Films), Icons (+ Figures), Components, Colors (+ Materials),
+  Layout (+ Spacing & density), Typography, Charts, Website, Patterns, Deck.
 - **Components** — a live reference for every `.sl-*` primitive (Button, Badge, Tag, Pill,
-  Chip, Card, Eyebrow, Input, Kbd, Divider, Arrow Link, Tabs, Property List, Page Header …),
-  each with an **App-dense / Web-airy** preview toggle and copy-ready React / class-contract /
-  Python-SSR snippets.
-- **Composites** — the assembled patterns built from those primitives: App Shell, Command
-  Palette ⌘K, the overlays (Drawer · Modal · Popover) and Detail Layout, plus Entity, Field
-  and Empty State.
+  Chip, Card, Eyebrow, Input, Field, Kbd, Divider, Arrow Link, Tabs, Property List,
+  Page Header …), each with an **App-dense / Web-airy** preview toggle and copy-ready
+  React / class-contract / Python-SSR snippets.
+- **Patterns** — the assemblies built from those primitives: App Shell, Command
+  Palette ⌘K, the overlays (Drawer · Modal · Popover · Lightbox), Detail Layout, List Page,
+  Calendar, Filter Bar and Entity.
 - **Website** — the marketing-site blocks (Navbar + Mega Menu, Cards, Hero, CTA Band, Footer,
   Product · Canvas · Integration showcases, Related Rail) as **real, prop-driven React
   components**, shadcn-style: own-the-source, composed across the whole site many times, exported

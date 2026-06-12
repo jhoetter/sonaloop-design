@@ -28,12 +28,15 @@ export const searchAliases = {
   kbd: ['keyboard shortcut', 'hotkey', 'shortcut key'],
   'icon-button': ['ghost button'],
   'arrow-link': ['more link', 'read more'],
-  // composites
+  'file-card': ['file', 'attachment', 'asset', 'document', 'download', 'thumbnail', 'extension badge', 'files lens'],
+  'property-list': ['properties', 'metadata', 'key value', 'detail rail', 'frameless properties', 'notion properties', 'quiet props'],
+  likelihood: ['probability', 'percentage', 'percent', 'confidence', 'prediction', 'predicted behavior', 'mini bar'],
+  // patterns
   'command-palette': ['cmdk', 'cmd+k', 'search palette', 'spotlight', 'quick switcher', 'omnibox'],
   modal: ['dialog', 'confirm'],
   drawer: ['slide-over', 'side panel', 'sheet', 'peek'],
   popover: ['menu', 'dropdown menu', 'context menu'],
-  'filter-bar': ['filters', 'facets', 'faceted search'],
+  'filter-bar': ['filters', 'facets', 'faceted search', 'search', 'text search', 'list search', 'search input'],
   'app-shell': ['sidebar', 'navigation shell', 'layout shell'],
   'list-page': ['index page', 'list view'],
   'image-lightbox': ['image zoom', 'image preview'],

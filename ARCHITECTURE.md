@@ -118,7 +118,7 @@ flowchart TD
     end
 
     GUARD["pre-commit hook + npm run check<br/>regenerate, fail on stale artifacts"]
-    DOCS["site/ docs site<br/>make dev → :6006<br/>Foundations · Brands · Components ·<br/>Composites · Website"]
+    DOCS["site/ docs site<br/>make dev → :6006<br/>one section per intro tile<br/>Brand → Website · Patterns · Deck"]
 
     DS -->|"sonaloop-design/components<br/>tokens.css · components.css · tailwind-preset"| WEBSITE
     DS --> TRACKER
