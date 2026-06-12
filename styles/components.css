@@ -850,6 +850,10 @@ button.sl-navhead:hover { color: var(--sl-muted); }
    scaffold bar INSIDE the content measure and never compose the pieces themselves.
    Chips wrap onto further lines; nothing ever clips. The menu rows reuse .sl-menu-item. */
 .sl-filter-bar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sl-gap-item); }
+/* --grow: the search slot STRETCHES so search · divider · Filter · chips span the full
+   content measure — the bar becomes the list's complete control row (inspector outline +
+   Library). Default bars keep the compact 220px slot. */
+.sl-filter-bar--grow .sl-filter-search { flex: 1 1 220px; }
 /* The leading search slot — borderless until focus so it fuses with the button + chips
    into one quiet row; a trailing hairline separates it from the facet controls. */
 .sl-filter-search { position: relative; display: inline-flex; align-items: center; flex: 0 1 220px; min-width: 130px; }
