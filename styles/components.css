@@ -842,11 +842,26 @@ button.sl-navhead:hover { color: var(--sl-muted); }
 .sl-toolbtn.is-active { color: var(--sl-ink); background: var(--sl-sel); }
 .sl-toolbtn svg { width: 15px; height: 15px; }
 
-/* ── Filter bar (faceted list filtering) ──────────────────────────────────────────
-   A "+ Filter" toolbar button opens a two-level facet menu (pick a facet, then its values
-   as selectable .sl-menu-item rows); each non-empty facet becomes a removable chip that
-   reopens its value menu. The chrome is here; the menu rows reuse .sl-menu-item. */
+/* ── Filter bar (faceted list filtering + search) ─────────────────────────────────
+   The COMPLETE list-control row: a leading quiet search slot, a "+ Filter" toolbar button
+   that opens a two-level facet menu (pick a facet, then its values as selectable
+   .sl-menu-item rows), and a removable chip per non-empty facet that reopens its value
+   menu. Filter + search always travel together — consumers place the whole bar in the
+   scaffold bar INSIDE the content measure and never compose the pieces themselves.
+   Chips wrap onto further lines; nothing ever clips. The menu rows reuse .sl-menu-item. */
 .sl-filter-bar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sl-gap-item); }
+/* The leading search slot — borderless until focus so it fuses with the button + chips
+   into one quiet row; a trailing hairline separates it from the facet controls. */
+.sl-filter-search { position: relative; display: inline-flex; align-items: center; flex: 0 1 220px; min-width: 130px; }
+.sl-filter-search > svg { position: absolute; left: .55em; width: 14px; height: 14px; color: var(--sl-faint); pointer-events: none; }
+.sl-filter-search__input { width: 100%; padding: .28em .5em .28em 2em; border: 1px solid transparent; border-radius: var(--sl-radius-sm);
+  background: none; font: inherit; font-size: .92em; color: var(--sl-ink); transition: background .12s, border-color .12s; }
+.sl-filter-search__input::placeholder { color: var(--sl-faint); }
+.sl-filter-search__input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
+.sl-filter-search__input:hover { background: var(--sl-hover); }
+.sl-filter-search__input:focus, .sl-filter-search__input:focus-visible { outline: none; border-color: var(--sl-accent);
+  background: var(--sl-bg); box-shadow: 0 0 0 2px color-mix(in srgb, var(--sl-accent) 22%, transparent); }
+.sl-filter-search::after { content: ""; flex: none; width: 1px; height: 1.1em; margin-left: var(--sl-gap-item); background: var(--sl-line); }
 .sl-filter-back { display: flex; width: 100%; align-items: center; gap: var(--sl-gap-tight); margin-bottom: 2px;
   padding: var(--sl-s-1) var(--sl-s-3); border: 0; background: none; cursor: pointer; font: inherit; font-size: .72em;
   text-transform: uppercase; letter-spacing: .04em; color: var(--sl-faint); text-align: left;
@@ -931,6 +946,16 @@ button.sl-navhead:hover { color: var(--sl-muted); }
 .sl-props--start .sl-prop { justify-content: flex-start; align-items: center; }
 .sl-props--start .sl-prop__k { width: 5.5rem; }
 .sl-props--start .sl-prop__v { text-align: left; font-weight: 400; }
+/* Frameless quiet variant (Notion-style) — detail pages & slide-overs. No card chrome at
+   all: a plain muted label column, regular-weight values (links in accent), and a generous
+   row rhythm from the gap tokens instead of row padding. Quiet owns its layout — don't
+   combine with --card/--start. */
+.sl-props--quiet { gap: var(--sl-gap-group); }
+.sl-props--quiet .sl-prop { justify-content: flex-start; align-items: center; padding: 0; gap: var(--sl-gap-group); }
+.sl-props--quiet .sl-prop__k { width: 8.5rem; color: var(--sl-muted); font-weight: 400; }
+.sl-props--quiet .sl-prop__v { text-align: left; font-weight: 400; }
+.sl-props--quiet .sl-prop__v a { color: var(--sl-accent); text-decoration: none; }
+.sl-props--quiet .sl-prop__v a:hover { text-decoration: underline; }
 
 /* ── List page (index scaffold: title · count · lead · dense hairline rows) ───────
    The shell every index page shares (projects, personas, councils, …): a header with a
@@ -1114,3 +1139,56 @@ a.sl-cy-cell:hover { outline: 1.5px solid var(--sl-accent); outline-offset: 1px;
 .sl-cy-legend { display: flex; justify-content: flex-end; align-items: center; gap: 5px; margin: 12px 2px 0; font-size: .82em; color: var(--sl-muted); }
 .sl-cy-swatch { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
 .sl-cy-swatch.l0 { background: var(--sl-cal-h0); } .sl-cy-swatch.l1 { background: var(--sl-cal-h1); } .sl-cy-swatch.l2 { background: var(--sl-cal-h2); } .sl-cy-swatch.l3 { background: var(--sl-cal-h3); } .sl-cy-swatch.l4 { background: var(--sl-cal-h4); }
+
+/* ── File card (file-first asset presentation) ─────────────────────────────────────
+   An asset rendered as a FILE, not a generic row: a prominent type identity on a quiet
+   stage (an uppercase extension badge derived from the media type — PPTX · PNG · PDF ·
+   CSV — or an image thumbnail), the filename WITH its extension as the title, a faint
+   size · date meta line, and exactly ONE trailing action slot (a download IconButton —
+   never duplicated affordances). .sl-file-grid lays cards out responsively;
+   .sl-file--row is the compact list variant for dense lenses. The badge tone follows the
+   type family (--red docs that print, --amber decks, --green sheets/data, --blue text,
+   --violet images); unknown types stay neutral. */
+.sl-file { display: flex; flex-direction: column; min-width: 0; background: var(--sl-surface);
+  border: 1px solid var(--sl-line); border-radius: var(--sl-radius); overflow: hidden;
+  color: inherit; text-decoration: none; transition: background .12s, border-color .12s; }
+a.sl-file:hover, button.sl-file:hover { background: var(--sl-hover); border-color: color-mix(in srgb, var(--sl-ink) 14%, var(--sl-line)); }
+.sl-file__stage { display: flex; align-items: center; justify-content: center; height: 84px;
+  background: var(--sl-surface-2); border-bottom: 1px solid var(--sl-line-2); overflow: hidden; }
+.sl-file__thumb { width: 100%; height: 100%; object-fit: cover; }
+.sl-file__ext { font-family: var(--sl-mono); font-size: .72em; font-weight: 650; letter-spacing: .08em; line-height: 1;
+  text-transform: uppercase; padding: .5em .75em; border-radius: var(--sl-radius-sm);
+  color: var(--sl-muted); background: var(--sl-surface); border: 1px solid var(--sl-line);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--sl-ink) 5%, transparent); }
+.sl-file__ext--red    { color: var(--sl-red);    background: color-mix(in srgb, var(--sl-red) 8%, var(--sl-surface));    border-color: color-mix(in srgb, var(--sl-red) 30%, transparent); }
+.sl-file__ext--amber  { color: var(--sl-amber);  background: color-mix(in srgb, var(--sl-amber) 8%, var(--sl-surface));  border-color: color-mix(in srgb, var(--sl-amber) 30%, transparent); }
+.sl-file__ext--green  { color: var(--sl-green);  background: color-mix(in srgb, var(--sl-green) 8%, var(--sl-surface));  border-color: color-mix(in srgb, var(--sl-green) 30%, transparent); }
+.sl-file__ext--blue   { color: var(--sl-blue);   background: color-mix(in srgb, var(--sl-blue) 8%, var(--sl-surface));   border-color: color-mix(in srgb, var(--sl-blue) 30%, transparent); }
+.sl-file__ext--violet { color: var(--sl-violet); background: color-mix(in srgb, var(--sl-violet) 8%, var(--sl-surface)); border-color: color-mix(in srgb, var(--sl-violet) 30%, transparent); }
+.sl-file__body { display: flex; align-items: center; gap: var(--sl-gap-item); min-height: var(--sl-row); padding: var(--sl-s-2) var(--sl-s-3); }
+.sl-file__info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.sl-file__name { font-size: .92em; font-weight: 500; color: var(--sl-ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sl-file__meta { font-size: .8em; color: var(--sl-faint); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sl-file__action { flex: none; display: inline-flex; align-items: center; }
+.sl-file-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: var(--sl-gap-group); }
+/* Compact row — the dense list/lens variant: a small identity square, then name + meta. */
+.sl-file--row { flex-direction: row; align-items: stretch; }
+.sl-file--row .sl-file__stage { flex: none; width: 56px; height: auto; border-bottom: 0; border-right: 1px solid var(--sl-line-2); }
+.sl-file--row .sl-file__ext { font-size: .62em; padding: .45em .55em; letter-spacing: .06em; }
+.sl-file--row .sl-file__body { min-height: var(--sl-row-h); }
+
+/* ── Likelihood (labelled probability: percentage + 40px mini-bar) ─────────────────
+   The presentation contract for predicted behaviour ("85 %" beside a fixed mini-bar).
+   Pure markup — SSR-friendly; the fill width comes from --p (0–100) set inline. Tone
+   shifts at thresholds via the modifier the host applies: --high (≥ 70) green,
+   --mid (≥ 40) amber, --low red; unmodified stays accent. */
+.sl-likelihood { display: inline-flex; align-items: center; gap: var(--sl-gap-item);
+  font-variant-numeric: tabular-nums; --tone: var(--sl-accent); }
+.sl-likelihood__val { font-size: .92em; font-weight: 600; color: var(--sl-ink); white-space: nowrap; }
+.sl-likelihood__bar { flex: none; width: 40px; height: 4px; border-radius: var(--sl-radius-full);
+  background: var(--sl-surface-2); overflow: hidden; }
+.sl-likelihood__fill { display: block; height: 100%; width: calc(var(--p, 0) * 1%);
+  border-radius: var(--sl-radius-full); background: var(--tone); }
+.sl-likelihood--high { --tone: var(--sl-green); }
+.sl-likelihood--mid  { --tone: var(--sl-amber); }
+.sl-likelihood--low  { --tone: var(--sl-red); }

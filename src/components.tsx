@@ -1108,13 +1108,22 @@ export function IconButton({ ghost, danger, className, ...rest }: IconButtonProp
   return <button type="button" className={cx('sl-iconbtn', ghost && 'sl-iconbtn--ghost', danger && 'sl-iconbtn--danger', className)} {...rest} />;
 }
 
-/* ── Filter bar (faceted list filtering) ──────────────────────────────────────────
+/* ── Filter bar (faceted list filtering + search) ─────────────────────────────────
    Domain-agnostic: the host passes `facets` (each with its options, per-value counts and
-   current selection); the bar renders the add-filter menu, the active chips and the clear
-   actions, and reports toggles/clears back. Built from ToolbarButton · Popover · MenuItem. */
+   current selection); the bar renders the quiet leading search slot, the add-filter menu,
+   the active chips and the clear actions, and reports input/toggles/clears back. Filter +
+   search always travel together — the contract ships the COMPLETE bar row, so consumers
+   drop it into the scaffold bar (inside the content measure) and never compose the pieces
+   themselves. Built from Popover · ToolbarButton · MenuItem. */
 const FilterGlyph = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <path d="M4 5h16l-6 7.5V19l-4 2v-8.5z" />
+  </svg>
+);
+const SearchGlyph = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <circle cx="11" cy="11" r="7" />
+    <path d="M21 21l-4.3-4.3" />
   </svg>
 );
 export interface FilterOption {
@@ -1137,6 +1146,12 @@ export interface FilterFacet {
   /** Shown when the facet has no options. */
   emptyText?: string;
 }
+export interface FilterSearch {
+  value: string;
+  /** Placeholder (doubles as the accessible label). Default "Search…". */
+  placeholder?: string;
+  onChange: (value: string) => void;
+}
 export interface FilterBarProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onToggle'> {
   facets: FilterFacet[];
   onToggle: (facetKey: string, value: string) => void;
@@ -1144,6 +1159,10 @@ export interface FilterBarProps extends Omit<HTMLAttributes<HTMLDivElement>, 'on
   onClearAll: () => void;
   /** Add-filter button label. Default "Filter". */
   addLabel?: string;
+  /** The leading text-search slot (`.sl-filter-search`) — quiet, borderless until focus.
+   *  Search is part of the filter contract: pass it wherever the list is searchable, so
+   *  filter + search always render as ONE bar row. */
+  search?: FilterSearch;
 }
 function FacetOptions({ facet, onToggle }: { facet: FilterFacet; onToggle: (k: string, v: string) => void }) {
   if (!facet.options.length) return <div className="sl-filter-empty">{facet.emptyText ?? 'No options'}</div>;
@@ -1176,11 +1195,26 @@ function AddFilterMenu({ facets, onToggle }: { facets: FilterFacet[]; onToggle: 
     </>
   );
 }
-/** A Linear-style faceted filter bar. Domain-agnostic — pass `facets` with options + selection. */
-export function FilterBar({ facets, onToggle, onClearFacet, onClearAll, addLabel = 'Filter', className, ...rest }: FilterBarProps) {
+/** A Linear-style faceted filter bar — the complete list-control row (search + facets).
+ *  Domain-agnostic: pass `facets` with options + selection, and `search` when the list
+ *  is text-searchable. */
+export function FilterBar({ facets, onToggle, onClearFacet, onClearAll, addLabel = 'Filter', search, className, ...rest }: FilterBarProps) {
   const active = facets.filter((f) => f.selected.length > 0);
   return (
     <div className={cx('sl-filter-bar', className)} {...rest}>
+      {search ? (
+        <span className="sl-filter-search">
+          <SearchGlyph />
+          <input
+            type="search"
+            className="sl-filter-search__input"
+            value={search.value}
+            placeholder={search.placeholder ?? 'Search…'}
+            aria-label={search.placeholder ?? 'Search'}
+            onChange={(e) => search.onChange(e.currentTarget.value)}
+          />
+        </span>
+      ) : null}
       <Popover trigger={({ toggle }) => <ToolbarButton icon={<FilterGlyph />} onClick={toggle}>{addLabel}</ToolbarButton>}>
         {() => <AddFilterMenu facets={facets} onToggle={onToggle} />}
       </Popover>
@@ -1259,9 +1293,15 @@ export interface PropertyListProps extends HTMLAttributes<HTMLDivElement> {
   /** Row layout: `between` (value right-aligned, default) or `start` (a fixed label column with
    *  the value beside it — Linear's issue rail). */
   align?: 'between' | 'start';
+  /** Frameless Notion-style variant (`.sl-props--quiet`) — detail pages & slide-overs. No card
+   *  chrome: a plain muted label column, regular-weight values (links accent), generous row
+   *  rhythm from the gap tokens. Quiet owns its layout — it overrides `card`/`align`. */
+  quiet?: boolean;
 }
-export function PropertyList({ card, align = 'between', className, ...rest }: PropertyListProps) {
-  return <div className={cx('sl-props', card && 'sl-props--card', align === 'start' && 'sl-props--start', className)} {...rest} />;
+export function PropertyList({ card, align = 'between', quiet, className, ...rest }: PropertyListProps) {
+  return quiet
+    ? <div className={cx('sl-props', 'sl-props--quiet', className)} {...rest} />
+    : <div className={cx('sl-props', card && 'sl-props--card', align === 'start' && 'sl-props--start', className)} {...rest} />;
 }
 export interface PropertyProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
   icon?: ReactNode;
@@ -1460,6 +1500,93 @@ export function Clamp({ lines = 5, moreLabel = 'more', lessLabel = 'less', class
         {open ? lessLabel : moreLabel}
       </button>
     </div>
+  );
+}
+
+/* ── File card (file-first asset presentation) ─────────────────────────────────────
+   An asset rendered as a FILE: a prominent type identity (an extension badge derived from
+   the filename/media type, or an image thumbnail), the filename WITH its extension as the
+   title, a faint size · date meta line and exactly ONE action slot. FileGrid lays cards
+   out responsively; `row` is the compact list variant. */
+const EXT_TONE: Record<string, string> = {
+  pdf: 'red',
+  ppt: 'amber', pptx: 'amber', key: 'amber',
+  csv: 'green', tsv: 'green', xls: 'green', xlsx: 'green', numbers: 'green',
+  doc: 'blue', docx: 'blue', txt: 'blue', md: 'blue', rtf: 'blue',
+  png: 'violet', jpg: 'violet', jpeg: 'violet', gif: 'violet', svg: 'violet', webp: 'violet',
+};
+/** The extension of a filename ("findings.pptx" → "pptx"; no dot → ""). */
+export const fileExt = (name: string): string => {
+  const i = name.lastIndexOf('.');
+  return i > 0 ? name.slice(i + 1).toLowerCase() : '';
+};
+export interface FileCardProps extends Omit<HTMLAttributes<HTMLElement>, 'title'> {
+  /** Filename WITH its extension — the title ("findings.pptx"). */
+  name: string;
+  /** Type identity for the badge. Defaults to the extension parsed from `name`. */
+  ext?: string;
+  /** The quiet meta line — size · date ("1.2 MB · 4 Jun"). */
+  meta?: ReactNode;
+  /** Image thumbnail URL — replaces the extension badge on the stage. */
+  thumb?: string;
+  /** Exactly ONE trailing action (a download IconButton) — never duplicated affordances. */
+  action?: ReactNode;
+  /** Render the whole card as a link (the file's detail/peek). */
+  href?: string;
+  /** The compact list variant (`.sl-file--row`) for dense lenses. */
+  row?: boolean;
+}
+export function FileCard({ name, ext, meta, thumb, action, href, row, className, ...rest }: FileCardProps) {
+  const e = (ext ?? fileExt(name)) || 'file';
+  const tone = EXT_TONE[e.toLowerCase()];
+  const inner = (
+    <>
+      <span className="sl-file__stage">
+        {thumb
+          ? <img className="sl-file__thumb" src={thumb} alt="" loading="lazy" />
+          : <span className={cx('sl-file__ext', tone && `sl-file__ext--${tone}`)}>{e}</span>}
+      </span>
+      <span className="sl-file__body">
+        <span className="sl-file__info">
+          <span className="sl-file__name">{name}</span>
+          {meta ? <span className="sl-file__meta">{meta}</span> : null}
+        </span>
+        {action ? <span className="sl-file__action">{action}</span> : null}
+      </span>
+    </>
+  );
+  const cls = cx('sl-file', row && 'sl-file--row', className);
+  return href
+    ? <a href={href} className={cls} {...(rest as HTMLAttributes<HTMLAnchorElement>)}>{inner}</a>
+    : <div className={cls} {...rest}>{inner}</div>;
+}
+/** The responsive card grid (`.sl-file-grid`) — auto-fill columns, token gaps. */
+export function FileGrid({ className, ...rest }: HTMLAttributes<HTMLDivElement>) {
+  return <div className={cx('sl-file-grid', className)} {...rest} />;
+}
+
+/* ── Likelihood (labelled probability: percentage + 40px mini-bar) ─────────────────
+   The presentation contract for predicted behaviour — "85 %" beside a fixed mini-bar
+   whose tone shifts at thresholds. Pure markup (the SSR app emits the same classes). */
+export interface LikelihoodProps extends HTMLAttributes<HTMLSpanElement> {
+  /** Probability in percent (0–100). */
+  value: number;
+  /** Tone thresholds `[mid, high]`: ≥ high → green, ≥ mid → amber, below → red.
+   *  Default `[40, 70]`. */
+  thresholds?: [number, number];
+}
+export function Likelihood({ value, thresholds = [40, 70], className, style, ...rest }: LikelihoodProps) {
+  const v = Math.round(Math.max(0, Math.min(100, value)));
+  const tone = v >= thresholds[1] ? 'high' : v >= thresholds[0] ? 'mid' : 'low';
+  return (
+    <span
+      className={cx('sl-likelihood', `sl-likelihood--${tone}`, className)}
+      style={{ '--p': v, ...style } as CSSProperties}
+      {...rest}
+    >
+      <span className="sl-likelihood__val">{v}&thinsp;%</span>
+      <span className="sl-likelihood__bar"><span className="sl-likelihood__fill" /></span>
+    </span>
   );
 }
 
