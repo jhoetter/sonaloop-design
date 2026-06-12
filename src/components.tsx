@@ -841,6 +841,50 @@ export function AppShell({
   );
 }
 
+/* ── User menu: account variant ──────────────────────────────────────────────────
+   The signed-in identity for AppShell's userMenu (multi-user apps). Compose it as:
+     userMenu={{ label: name, icon: <UserMenuInitials name={name} />, children: (
+       <>
+         <UserMenuAccount label="Signed in as" name={name} email={email}
+                          logoutHref="/cloud/auth/logout" logoutLabel="Log out" />
+         ...theme/language sections...
+       </> ) }}
+   Anonymous/local mode keeps the plain settings trigger — same popover, no account
+   section. Hosts pass the localized labels; the component renders structure only. */
+export function userInitials(name?: string): string {
+  const parts = (name || '').trim().split(/\s+/).filter(Boolean);
+  return (parts.slice(0, 2).map((p) => p[0]).join('') || '?').toUpperCase();
+}
+export function UserMenuInitials({ name, className, ...rest }: { name?: string } & HTMLAttributes<HTMLSpanElement>) {
+  return <span className={cx('sl-um-ava--initials', className)} {...rest}>{userInitials(name)}</span>;
+}
+export interface UserMenuAccountProps {
+  /** Section label, e.g. "Signed in as" / "Angemeldet als". */
+  label?: ReactNode;
+  name?: string;
+  email?: string;
+  logoutHref?: string;
+  logoutLabel?: ReactNode;
+  /** Extra rows between the identity and the sign-out (e.g. a workspace link). */
+  children?: ReactNode;
+}
+export function UserMenuAccount({ label, name, email, logoutHref, logoutLabel, children }: UserMenuAccountProps) {
+  const who = name || email;
+  return (
+    <div className="sl-um-sec">
+      {label != null && <div className="sl-um-lbl">{label}</div>}
+      {who && (
+        <div className="sl-um-who">
+          <strong>{who}</strong>
+          {name && email ? <span>{email}</span> : null}
+        </div>
+      )}
+      {children}
+      {logoutHref && <a className="sl-btn" href={logoutHref}>{logoutLabel ?? 'Log out'}</a>}
+    </div>
+  );
+}
+
 /* ── Overlays: Drawer · Modal · Popover ──────────────────────────────────────────
    The React wrappers mount on `open` (no exit animation, like CommandPalette). The
    styling is the shared `.sl-*` overlay layer; the Python-SSR app ships its own opener
