@@ -758,6 +758,9 @@ button.sl-navhead:hover { color: var(--sl-muted); }
   overflow: hidden; background: var(--sl-surface); border-left: 1px solid var(--sl-line);
   box-shadow: var(--sl-shadow-lg); transform: translateX(100%); transition: transform .24s var(--sl-ease); }
 .sl-drawer--left .sl-drawer__panel { border-left: 0; border-right: 1px solid var(--sl-line); transform: translateX(-100%); }
+/* --wide: the Notion-style slide-over that renders a FULL detail page in sidebar layout
+   (not an essence preview) — generous reading width, still leaving the page behind visible. */
+.sl-drawer--wide .sl-drawer__panel { width: min(720px, 94vw); }
 .sl-drawer.is-open .sl-drawer__panel { transform: none; }
 .sl-drawer__head { height: var(--sl-row-h); flex-shrink: 0; display: flex; align-items: center; gap: 8px;
   padding: 0 8px 0 16px; border-bottom: 1px solid var(--sl-line); }

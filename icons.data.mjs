@@ -222,6 +222,11 @@ export const regular = {
     label: 'ExternalIcon',
     body: '<path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 13v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5"/>',
   },
+  // expand — the slide-over's "open as full page" control (Notion-style diagonal arrows).
+  expand: {
+    label: 'ExpandIcon',
+    body: '<path d="M14 4h6v6"/><path d="M20 4l-6.5 6.5"/><path d="M10 20H4v-6"/><path d="M4 20l6.5-6.5"/>',
+  },
 
   // ── Reaction / notation markers ──────────────────────────────────────────────
   // Replace inline Unicode UI markers (👍 ⚠ ● ◇ ◆ ▸) with real icons.
