@@ -54,7 +54,9 @@
 
 /* ── Eyebrow (mono label) ────────────────────────────────────────────────────── */
 .sl-eyebrow {
-  font-family: var(--sl-mono); font-size: .72em; font-weight: 500;
+  /* never below the 11px type-scale floor — at the app's dense bases .72em alone lands
+     off-scale (ux-contract §11 T1); the site's 16px base keeps the airy .72em ≈ 11.5px */
+  font-family: var(--sl-mono); font-size: max(.72em, 11px); font-weight: 500;
   text-transform: uppercase; letter-spacing: .14em; color: var(--sl-muted);
 }
 
@@ -102,7 +104,7 @@
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--sl-accent) 25%, transparent); }
 
 /* ── kbd + divider ───────────────────────────────────────────────────────────── */
-.sl-kbd { font-family: var(--sl-mono); font-size: .8em; padding: .05em .45em;
+.sl-kbd { font-family: var(--sl-mono); font-size: max(.8em, 11px); padding: .05em .45em; /* 11px floor: type-scale (T1) */
   border: 1px solid var(--sl-line); border-radius: var(--sl-radius-sm); background: var(--sl-surface-2); color: var(--sl-ink); }
 .sl-divider { height: 1px; border: 0; background: var(--sl-line); margin: 1.1em 0; }
 
@@ -1066,19 +1068,19 @@ button.sl-navhead:hover { color: var(--sl-muted); }
 .sl-prose { line-height: 1.62; color: var(--sl-ink); overflow-wrap: break-word; }
 .sl-prose > :first-child { margin-top: 0; }
 .sl-prose > :last-child { margin-bottom: 0; }
-.sl-prose p { margin: 0 0 .9em; max-width: 70ch; }
-.sl-prose strong { font-weight: 680; }
+.sl-prose p { margin: 0 0 .9em; max-width: var(--sl-measure-prose, 70ch); }
+.sl-prose strong { font-weight: 700; }
 .sl-prose em { font-style: italic; }
 .sl-prose del { color: var(--sl-muted); }
 .sl-prose a { color: var(--sl-accent); text-decoration: none; }
 .sl-prose a:hover { text-decoration: underline; }
-.sl-prose h2 { font-size: 1.18em; font-weight: 680; line-height: 1.3; margin: 1.5em 0 .55em; }
-.sl-prose h3 { font-size: 1.05em; font-weight: 680; margin: 1.4em 0 .45em; }
-.sl-prose h4 { font-size: 1em; font-weight: 680; margin: 1.25em 0 .4em; }
-.sl-prose ul, .sl-prose ol { margin: 0 0 .9em; padding-left: 1.5em; max-width: 70ch; }
+.sl-prose h2 { font-size: 1.18em; font-weight: 650; line-height: 1.35; margin: 1.5em 0 .55em; }
+.sl-prose h3 { font-size: 1.05em; font-weight: 650; margin: 1.4em 0 .45em; }
+.sl-prose h4 { font-size: 1em; font-weight: 650; margin: 1.25em 0 .4em; }
+.sl-prose ul, .sl-prose ol { margin: 0 0 .9em; padding-left: 1.5em; max-width: var(--sl-measure-prose, 70ch); }
 .sl-prose li { margin: 0 0 .4em; }
 .sl-prose li > ul, .sl-prose li > ol { margin: .4em 0 0; }
-.sl-prose blockquote { margin: 0 0 .9em; padding: .55em 1em; max-width: 70ch;
+.sl-prose blockquote { margin: 0 0 .9em; padding: .55em 1em; max-width: var(--sl-measure-prose, 70ch);
   border-left: 3px solid var(--sl-accent); background: var(--sl-accent-weak);
   border-radius: 0 var(--sl-radius-sm) var(--sl-radius-sm) 0; }
 .sl-prose blockquote > :last-child { margin-bottom: 0; }
@@ -1091,7 +1093,7 @@ button.sl-navhead:hover { color: var(--sl-muted); }
 .sl-prose hr { height: 1px; border: 0; background: var(--sl-line); margin: 1.5em 0; }
 .sl-prose .sl-table { display: block; overflow-x: auto; margin: 1.1em 0; }
 /* --sm: a denser variant for inline/aside prose (a card body, a drawer). */
-.sl-prose--sm { font-size: .92em; line-height: 1.55; }
+.sl-prose--sm { font-size: .92em; line-height: 1.6; }
 
 /* ── Calendar (persona-activity views: week agenda · month grid · year heatmap) ───
    The dense calendar shared by the Python-SSR app and the React data UI. The week/month/year

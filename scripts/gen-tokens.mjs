@@ -48,6 +48,7 @@ const SL_SCALE_KEYS = [
   's-1', 's-2', 's-3', 's-4', 's-5', 's-6', 's-8',
   'gap-tight', 'gap-item', 'gap-group', 'gap-section', 'gap-region',
   'row-dense', 'row', 'row-h', 'ctl-sm',
+  'measure-prose',
 ];
 const slDecls = (set) =>
   Object.entries(SL_MAP).map(([sl, k]) => `--sl-${sl}:${set[k]}`).join(';') +

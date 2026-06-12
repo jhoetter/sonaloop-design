@@ -57,7 +57,15 @@ export const scales = {
   sans: fonts.sans.join(','),
   mono: fonts.mono.join(','),
   pixel: fonts.pixel.join(','),
-  't-xs': '11px', 't-sm': '12px', 't-body': '13px', 't-md': '15px', 't-prose': '16px', 't-lg': '18px', 't-xl': '24px',
+  // Type scale (the t-* steps; ux-contract §11 T1 gates every rendered size against it):
+  //   t-xs 11 eyebrows/micro-meta · t-sm 12 quiet meta/chips · t-body 13 the app UI voice ·
+  //   t-md 15 dense reading (turn cards, report base) · t-prose 16 document prose ·
+  //   t-lg 18 leads (verdict/question) · t-xl 24 page titles · t-2xl 32 report covers
+  't-xs': '11px', 't-sm': '12px', 't-body': '13px', 't-md': '15px', 't-prose': '16px', 't-lg': '18px', 't-xl': '24px', 't-2xl': '32px',
+  // Reading measure — the max line length for RUNNING prose (council turns, exec summaries,
+  // report sections, verdict/note bodies). Structural elements (rows, charts, rails, headers)
+  // keep their container measure; prose stays left-aligned inside it (§11 T2).
+  'measure-prose': '70ch',
   's-1': '4px', 's-2': '8px', 's-3': '12px', 's-4': '16px', 's-5': '20px', 's-6': '24px', 's-8': '32px',
   // Vertical rhythm — semantic gap aliases over the s-scale. The ruleset (docs page):
   //   rows in a list      gap 0 + a 1px hairline separator (never gaps between rows)
