@@ -59,6 +59,7 @@ export const DiamondIcon = personaIcon("DiamondIcon", "<path d=\"M12 3l9 9-9 9-9
 export const DiamondFilledIcon = personaIcon("DiamondFilledIcon", "<path d=\"M12 3l9 9-9 9-9-9z\" fill=\"currentColor\"/>", "diamondFilled");
 export const CaretRightIcon = personaIcon("CaretRightIcon", "<path d=\"M9 5l7 7-7 7z\" fill=\"currentColor\" stroke=\"none\"/>", "caretRight");
 export const ArrowRightIcon = personaIcon("ArrowRightIcon", "<path d=\"M4 12h14M13 6l6 6-6 6\"/>", "arrowRight");
+export const ArrowLeftIcon = personaIcon("ArrowLeftIcon", "<path d=\"M20 12H6M11 6l-6 6 6 6\"/>", "arrowLeft");
 export const SquareIcon = personaIcon("SquareIcon", "<rect x=\"4\" y=\"4\" width=\"16\" height=\"16\" rx=\"2.5\"/>", "square");
 export const SquareSplitIcon = personaIcon("SquareSplitIcon", "<rect x=\"4\" y=\"4\" width=\"16\" height=\"16\" rx=\"2.5\"/><rect x=\"8.5\" y=\"8.5\" width=\"7\" height=\"7\" rx=\"1\" fill=\"currentColor\"/>", "squareSplit");
 export const SquareRowsIcon = personaIcon("SquareRowsIcon", "<rect x=\"4\" y=\"4\" width=\"16\" height=\"16\" rx=\"2.5\"/><path d=\"M4 9.3h16M4 14.6h16\"/>", "squareRows");
@@ -169,6 +170,7 @@ export const DiamondHifi = personaIconHifi("DiamondHifi", "<path d=\"M24 6l18 18
 export const DiamondFilledHifi = personaIconHifi("DiamondFilledHifi", "<path d=\"M24 6l18 18-18 18L6 24z\" fill=\"currentColor\" fill-opacity=\"0.85\" stroke=\"currentColor\" stroke-width=\"2\"/>", "diamondFilled");
 export const CaretRightHifi = personaIconHifi("CaretRightHifi", "<circle cx=\"24\" cy=\"24\" r=\"20\" fill=\"currentColor\" fill-opacity=\"0.06\" stroke=\"none\"/><path d=\"M20 13l13 11-13 11z\" fill=\"currentColor\" stroke=\"none\"/>", "caretRight");
 export const ArrowRightHifi = personaIconHifi("ArrowRightHifi", "<circle cx=\"24\" cy=\"24\" r=\"20\" fill=\"currentColor\" fill-opacity=\"0.06\" stroke=\"none\"/><path d=\"M11 24h24M26 14l10 10-10 10\" stroke-width=\"2.5\"/>", "arrowRight");
+export const ArrowLeftHifi = personaIconHifi("ArrowLeftHifi", "<circle cx=\"24\" cy=\"24\" r=\"20\" fill=\"currentColor\" fill-opacity=\"0.06\" stroke=\"none\"/><path d=\"M37 24H13M22 14L12 24l10 10\" stroke-width=\"2.5\"/>", "arrowLeft");
 export const SquareHifi = personaIconHifi("SquareHifi", "<rect x=\"8\" y=\"8\" width=\"32\" height=\"32\" rx=\"6\" fill=\"currentColor\" fill-opacity=\"0.08\" stroke-width=\"2\"/>", "square");
 export const SquareSplitHifi = personaIconHifi("SquareSplitHifi", "<rect x=\"8\" y=\"8\" width=\"32\" height=\"32\" rx=\"6\" fill=\"currentColor\" fill-opacity=\"0.06\" stroke-width=\"2\"/><rect x=\"17\" y=\"17\" width=\"14\" height=\"14\" rx=\"2.5\" fill=\"currentColor\" fill-opacity=\"0.85\" stroke=\"none\"/>", "squareSplit");
 export const SquareRowsHifi = personaIconHifi("SquareRowsHifi", "<rect x=\"8\" y=\"8\" width=\"32\" height=\"32\" rx=\"6\" fill=\"currentColor\" fill-opacity=\"0.06\" stroke-width=\"2\"/><path d=\"M8 18.7h32M8 29.3h32\" stroke-width=\"1.75\"/>", "squareRows");

@@ -22,6 +22,7 @@ import type {
 } from 'react';
 import { ChevronIcon, MonitorIcon, MoonIcon, PanelIcon, SunIcon, SonaloopIcon } from './index';
 import type { PersonaIcon } from './icon';
+import type { ThemePreference } from './theme';
 
 const cx = (...c: Array<string | false | null | undefined>) => c.filter(Boolean).join(' ');
 
@@ -159,6 +160,13 @@ export function Avatar({ name, src, tone = 'accent', size = 'md', color, classNa
 export function AvatarGroup({ className, ...rest }: HTMLAttributes<HTMLSpanElement>) {
   return <span className={cx('sl-avatar-group', className)} {...rest} />;
 }
+const AVATAR_COLORS = ['#3d7b5f', '#2f6f9f', '#a66b1f', '#7a5ea6', '#b3493f', '#4a7d7d', '#5a6b8a'];
+/** The ecosystem-wide per-entity hashed initials colour: a stable 7-colour palette keyed by a
+ *  char-code sum of the seed (a persona id, a user slug, …) — pass to `<Avatar color={…}>`. */
+export function avatarColor(seed: string): string {
+  const sum = [...seed].reduce((a, c) => a + c.charCodeAt(0), 0);
+  return AVATAR_COLORS[sum % AVATAR_COLORS.length];
+}
 
 /* ── Segmented control / Tabs (controlled) ───────────────────────────────────── */
 export interface SegmentedOption {
@@ -201,9 +209,12 @@ export function Segmented({ options, value, onChange, fill, stacked, className, 
 /* ── Theme toggle (controlled) ───────────────────────────────────────────────── */
 // The ONE canonical color-scheme switch, shared by every product so the glyphs never
 // diverge: ☀ light · ▢ system (follow the OS) · ☾ dark. It's presentational only —
-// each app owns its own theme state (React context, vanilla JS, Python-SSR) and passes
-// the current `value` + an `onChange`. Built on Segmented, so it inherits its styling.
-export type ThemePreference = 'light' | 'system' | 'dark';
+// the host owns the theme state (the shared useTheme() hook below, or vanilla JS /
+// Python-SSR) and passes the current `value` + an `onChange`. Built on Segmented, so it
+// inherits its styling. State lives in ./theme: useTheme()'s `preference`/`setPreference`
+// plug straight into `value`/`onChange` here.
+export { useTheme } from './theme';
+export type { Theme, ThemePreference } from './theme';
 
 const THEME_TOGGLE_OPTIONS: { value: ThemePreference; Icon: PersonaIcon; label: string }[] = [
   { value: 'light', Icon: SunIcon, label: 'Light' },
@@ -310,16 +321,31 @@ export function Note({ tone = 'accent', icon, className, children, ...rest }: No
 }
 
 /* ── Empty state ─────────────────────────────────────────────────────────────── */
+export type EmptyStateVariant = 'first-use' | 'no-results' | 'error';
+export type EmptyStateSize = 'sm' | 'md';
 export interface EmptyStateProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
   icon?: ReactNode;
   title: ReactNode;
+  /** `first-use` (default — the inviting "nothing here yet" card), `no-results` (a quieter
+   *  dashed frame for a search/filter that matched nothing) or `error` (something failed —
+   *  pair with a Retry `action`). */
+  variant?: EmptyStateVariant;
+  /** `md` (default) or the compact `sm` for panels, drawers and table bodies. */
+  size?: EmptyStateSize;
+  /** CTA slot under the body — a primary Button on first-use, "Clear search" on no-results,
+   *  Retry on error. */
+  action?: ReactNode;
 }
-export function EmptyState({ icon, title, className, children, ...rest }: EmptyStateProps) {
+export function EmptyState({ icon, title, variant = 'first-use', size = 'md', action, className, children, ...rest }: EmptyStateProps) {
   return (
-    <div className={cx('sl-empty', className)} {...rest}>
+    <div
+      className={cx('sl-empty', variant !== 'first-use' && `sl-empty--${variant}`, size !== 'md' && `sl-empty--${size}`, className)}
+      {...rest}
+    >
       {icon && <div className="sl-empty__icon">{icon}</div>}
       <h2 className="sl-empty__title">{title}</h2>
       {children && <p className="sl-empty__body">{children}</p>}
+      {action && <div className="sl-empty__actions">{action}</div>}
     </div>
   );
 }
@@ -368,6 +394,55 @@ export function Progress({ value = 0, className, ...rest }: ProgressProps) {
     <div className={cx('sl-progress', className)} role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} {...rest}>
       <div className="sl-progress__bar" style={{ width: `${pct}%` }} />
     </div>
+  );
+}
+
+/* ── Stepper (numbered / checked progress steps) ─────────────────────────────── */
+export interface StepperStep {
+  /** Step label beside the marker — omit (or pass plain strings) for marker-only steps. */
+  label?: ReactNode;
+  /** A quiet second line under the label. */
+  desc?: ReactNode;
+}
+export type StepperOrientation = 'horizontal' | 'vertical';
+export interface StepperProps extends HTMLAttributes<HTMLOListElement> {
+  /** The steps in order — `{ label?, desc? }` objects or bare label strings. */
+  steps: Array<StepperStep | string>;
+  /** 0-based index of the active step. Earlier steps render done (✓), later ones upcoming. */
+  current?: number;
+  /** `horizontal` (default) — markers joined by connectors; `vertical` — the compact stack. */
+  orientation?: StepperOrientation;
+}
+const StepCheck = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M5 13l4 4L19 7" />
+  </svg>
+);
+/** Progress steps for a multi-stage flow (onboarding, council setup, a wizard): numbered
+ *  markers that tick off as they complete. Purely presentational — states derive from
+ *  `current`; the host owns the navigation between steps. */
+export function Stepper({ steps, current = 0, orientation = 'horizontal', className, ...rest }: StepperProps) {
+  return (
+    <ol className={cx('sl-stepper', orientation === 'vertical' && 'sl-stepper--vertical', className)} {...rest}>
+      {steps.map((s, i) => {
+        const step = typeof s === 'string' ? { label: s } : s;
+        return (
+          <li
+            key={i}
+            className={cx('sl-stepper__step', i < current && 'is-done', i === current && 'is-current')}
+            aria-current={i === current ? 'step' : undefined}
+          >
+            <span className="sl-stepper__marker" aria-hidden="true">{i < current ? <StepCheck /> : i + 1}</span>
+            {(step.label != null || step.desc != null) && (
+              <span className="sl-stepper__text">
+                {step.label != null && <span className="sl-stepper__label">{step.label}</span>}
+                {step.desc != null && <span className="sl-stepper__desc">{step.desc}</span>}
+              </span>
+            )}
+          </li>
+        );
+      })}
+    </ol>
   );
 }
 
@@ -1133,6 +1208,17 @@ export function FilterBar({ facets, onToggle, onClearFacet, onClearAll, addLabel
   );
 }
 
+/* ── Facet bar (always-visible faceted filtering) ─────────────────────────────────
+   FilterBar's open sibling — every facet's chips stay on the page with live counts
+   instead of hiding behind a "+ Filter" menu. Lives in ./facets; re-exported here so
+   consumers reach it via sonaloop-design/components. */
+export {
+  FacetBar,
+  type FacetOption,
+  type FacetGroup,
+  type FacetBarProps,
+} from './facets';
+
 /* ── Tabs (underline · pill) ──────────────────────────────────────────────────────
    In-page section switching. Buttons by default (controlled value/onChange); pass a
    per-item `href` for navigation tabs (renders anchors). For a settings theme/density
@@ -1312,6 +1398,68 @@ export function PageRail({ items, heading, className, ...rest }: PageRailProps) 
         </a>
       ))}
     </nav>
+  );
+}
+
+/* ── Page scaffold (ONE scroll context per page) ──────────────────────────────────
+   head/bar are fixed slots; children render inside the single scrolling body. */
+export interface ScaffoldProps extends HTMLAttributes<HTMLDivElement> {
+  /** Fixed page-header slot (breadcrumb / title / actions / chips). */
+  head?: ReactNode;
+  /** Fixed toolbar slot under the head (filters, tabs). */
+  bar?: ReactNode;
+  /** Optional right rail beside the body content (rendered via the `.sl-detail` grid,
+   *  INSIDE the one scroll context — sticky within it, never a second scroller). */
+  rail?: ReactNode;
+}
+/** The page layout contract: a column with fixed head/bar and ONE scrolling body.
+ *  Children must never bring their own scroll container (two nested scroll traps = bug). */
+export function Scaffold({ head, bar, rail, className, children, ...rest }: ScaffoldProps) {
+  return (
+    <div className={cx('sl-scaffold', className)} {...rest}>
+      {head ? <div className="sl-scaffold__head">{head}</div> : null}
+      {bar ? <div className="sl-scaffold__bar">{bar}</div> : null}
+      <div className="sl-scaffold__body">{rail ? <DetailLayout aside={rail}>{children}</DetailLayout> : children}</div>
+    </div>
+  );
+}
+
+/* ── Section (quiet content group below the main canvas) ─────────────────────────── */
+export interface SectionProps extends Omit<HTMLAttributes<HTMLElement>, 'title'> {
+  /** Quiet body-sized heading; omit for an unlabelled group. */
+  title?: ReactNode;
+}
+/** A content-sized block in the page's centered 900px measure — never flexed, never
+ *  internally scrolled. Use `.sl-section__h` for uppercase group labels inside it. */
+export function Section({ title, className, children, ...rest }: SectionProps) {
+  return (
+    <section className={cx('sl-section', className)} {...rest}>
+      {title != null ? <h2>{title}</h2> : null}
+      {children}
+    </section>
+  );
+}
+
+/* ── Clamp (dosed long-form text) ─────────────────────────────────────────────────── */
+export interface ClampProps extends HTMLAttributes<HTMLDivElement> {
+  /** Clamp height in lines (default 5 — the contract for rows/peeks). */
+  lines?: number;
+  /** Toggle labels (pass localized strings). */
+  moreLabel?: ReactNode;
+  lessLabel?: ReactNode;
+}
+/** Line-clamped prose with an expand/collapse text-button. Long authored text stays
+ *  scannable in list/peek contexts; the full dump belongs on detail pages (C6). */
+export function Clamp({ lines = 5, moreLabel = 'more', lessLabel = 'less', className, style, children, ...rest }: ClampProps) {
+  const [open, setOpen] = useState(false);
+  const clampStyle: CSSProperties | undefined = lines !== 5 ? { WebkitLineClamp: lines, ...style } : style;
+  return (
+    <div {...rest}>
+      <div className={cx('sl-clamp', open && 'open', className)} style={clampStyle}>{children}</div>
+      <button type="button" className="sl-clamp-toggle" onClick={() => setOpen((o) => !o)}>
+        {open ? lessLabel : moreLabel}
+      </button>
+    </div>
   );
 }
 

@@ -253,6 +253,11 @@ export const regular = {
     label: 'ArrowRightIcon',
     body: '<path d="M4 12h14M13 6l6 6-6 6"/>',
   },
+  // arrowRight's exact mirror — a full back/previous arrow (`back` stays the bare chevron).
+  arrowLeft: {
+    label: 'ArrowLeftIcon',
+    body: '<path d="M20 12H6M11 6l-6 6 6 6"/>',
+  },
 
   // ── Research-graph notation (maps the suggestions/*.json glyph set) ───────────
   // ◇◆ diverge/converge use diamond/diamondFilled above; these cover the rest.
@@ -879,6 +884,12 @@ export const hifi = {
     body:
       '<circle cx="24" cy="24" r="20" fill="currentColor" fill-opacity="0.06" stroke="none"/>' +
       '<path d="M11 24h24M26 14l10 10-10 10" stroke-width="2.5"/>',
+  },
+  arrowLeft: {
+    label: 'ArrowLeftHifi',
+    body:
+      '<circle cx="24" cy="24" r="20" fill="currentColor" fill-opacity="0.06" stroke="none"/>' +
+      '<path d="M37 24H13M22 14L12 24l10 10" stroke-width="2.5"/>',
   },
   square: {
     label: 'SquareHifi',

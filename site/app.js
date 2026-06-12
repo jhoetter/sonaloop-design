@@ -12,6 +12,7 @@ import { regular, hifi } from '/icons.data.mjs';
 import { figures } from '/figures.data.mjs';
 import { blocks as websiteBlocks } from '/site/website.previews.mjs';
 import { usage as websiteUsage, source as websiteSource } from '/site/website.usage.mjs';
+import { searchAliases } from '/site/search-aliases.data.mjs';
 import { layouts as deckLayouts, deckTitle } from '/deck.data.mjs';
 import { renderDeckSlide } from '/site/deck.preview.mjs';
 
@@ -1245,18 +1246,66 @@ const cNote = () => componentPage({
   python: `h("div", {"class_": "sl-note"}, h("span", {"class_": "sl-note__icon"}, icon), h("p", {"class_": "sl-note__body"}, text))`,
 });
 
+// A small mono caption above a demo item (matches the Progress page's labels).
+const demoLabel = (t) => `<div style="font-size:.75em;color:var(--sl-muted);margin-bottom:8px;font-family:var(--sl-mono)">${esc(t)}</div>`;
+
 const cEmptyState = () => componentPage({
-  id: 'empty-state', title: 'Empty State', desc: 'A calm, centred card for “nothing here yet” and not-found views — a hi-fi product glyph, a title, a line of guidance and an optional action.',
-  demo: `<div class="sl-empty">
-      <div class="sl-empty__icon">${svgHifi('councils')}</div>
-      <h2 class="sl-empty__title">No councils yet</h2>
-      <p class="sl-empty__body">Run your first memory-grounded council to see verdicts and sentiment here.</p>
-      <button class="sl-btn sl-btn--primary">Run a council</button>
+  id: 'empty-state', title: 'Empty State',
+  desc: 'A calm, centred card for the three empty moments of a product: <b>first-use</b> (nothing here yet — inviting, with a primary CTA), <b>no-results</b> (a search or filter matched nothing — quieter, with a “clear” action) and <b>error</b> (something failed — a retry affordance). Sizes <code>md</code> (default) and the compact <code>sm</code> for panels and drawers.',
+  demo: `<div style="display:flex;flex-direction:column;gap:26px;width:100%">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;align-items:start">
+        <div>${demoLabel('first-use · default')}
+          <div class="sl-empty">
+            <div class="sl-empty__icon">${svgHifi('councils')}</div>
+            <h2 class="sl-empty__title">No councils yet</h2>
+            <p class="sl-empty__body">Run your first memory-grounded council to see verdicts and sentiment here.</p>
+            <div class="sl-empty__actions"><button class="sl-btn sl-btn--primary">Run a council</button></div>
+          </div>
+        </div>
+        <div>${demoLabel('no-results · search context')}
+          <div class="sl-empty sl-empty--no-results">
+            <div class="sl-empty__icon">${svgHifi('search')}</div>
+            <h2 class="sl-empty__title">No matches for “wizzard”</h2>
+            <p class="sl-empty__body">Try a different term, or clear the search to see everything again.</p>
+            <div class="sl-empty__actions"><button class="sl-btn sl-btn--sm">Clear search</button></div>
+          </div>
+        </div>
+        <div>${demoLabel('error · retry affordance')}
+          <div class="sl-empty sl-empty--error">
+            <div class="sl-empty__icon">${svgHifi('warning')}</div>
+            <h2 class="sl-empty__title">Council failed to load</h2>
+            <p class="sl-empty__body">The run could not be fetched — your data is safe. Try again in a moment.</p>
+            <div class="sl-empty__actions"><button class="sl-btn sl-btn--sm">Retry</button></div>
+          </div>
+        </div>
+      </div>
+      <div>${demoLabel('sm · compact (panels, drawers, table bodies)')}
+        <div class="sl-empty sl-empty--no-results sl-empty--sm">
+          <div class="sl-empty__icon">${svgHifi('search')}</div>
+          <h2 class="sl-empty__title">No matching personas</h2>
+          <p class="sl-empty__body">Loosen a filter to widen the panel.</p>
+        </div>
+      </div>
     </div>`,
-  react: `import { EmptyState } from 'sonaloop-design/components';\nimport { CouncilsHifi } from 'sonaloop-design';\n\n<EmptyState icon={<CouncilsHifi />} title="No councils yet">\n  Run your first council to see verdicts here.\n</EmptyState>`,
-  markup: `<div class="sl-empty">\n  <div class="sl-empty__icon">…</div>\n  <h2 class="sl-empty__title">No councils yet</h2>\n  <p class="sl-empty__body">…</p>\n</div>`,
-  python: `_empty_state("No councils yet", "Run your first council…", icon="councils")`,
+  variants: { cols: ['Class', 'Meaning'], rows: [
+    ['.sl-empty', 'First-use (default): the inviting “nothing here yet” card; put the primary CTA in <code>__actions</code>.'],
+    ['.sl-empty--no-results', 'A search/filter matched nothing — quieter dashed frame on the page background; pair with “Clear search”.'],
+    ['.sl-empty--error', 'Something failed — glyph + frame tint negative; pair with a Retry action.'],
+    ['.sl-empty--sm', 'Compact density for panels, drawers and table bodies.'],
+    ['.sl-empty__actions', 'The CTA slot under the body (a Button, a quiet text action).'],
+  ] },
+  react: `import { Button, EmptyState } from 'sonaloop-design/components';\nimport { CouncilsHifi, SearchHifi, WarningHifi } from 'sonaloop-design';\n\n// first-use (default)\n<EmptyState icon={<CouncilsHifi />} title="No councils yet"\n  action={<Button variant="primary">Run a council</Button>}>\n  Run your first council to see verdicts here.\n</EmptyState>\n\n// a search matched nothing — compact, with a clear affordance\n<EmptyState variant="no-results" size="sm" icon={<SearchHifi />}\n  title={\`No matches for “\${q}”\`}\n  action={<Button size="sm" onClick={clearSearch}>Clear search</Button>} />\n\n// something failed — retry\n<EmptyState variant="error" icon={<WarningHifi />} title="Council failed to load"\n  action={<Button size="sm" onClick={retry}>Retry</Button>}>\n  The run could not be fetched — your data is safe.\n</EmptyState>`,
+  markup: `<div class="sl-empty sl-empty--no-results sl-empty--sm">\n  <div class="sl-empty__icon">…</div>\n  <h2 class="sl-empty__title">No matches</h2>\n  <p class="sl-empty__body">…</p>\n  <div class="sl-empty__actions"><button class="sl-btn sl-btn--sm">Clear search</button></div>\n</div>`,
+  python: `# same classes on the inspector's own markup\n_empty_state("No councils yet", "Run your first council…", icon="councils")\nh("div", {"class_": "sl-empty sl-empty--error"},\n  h("div", {"class_": "sl-empty__icon"}, raw(_icon_hifi("warning"))),\n  h("h2", {"class_": "sl-empty__title"}, t("run_failed")),\n  h("div", {"class_": "sl-empty__actions"}, h("button", {"class_": "sl-btn sl-btn--sm"}, t("retry"))))`,
 });
+
+// Composites keeps a pointer — the page itself now lives under Components.
+const cEmptyStatePointer = () => `
+    <p class="ds-eyebrow">Composites</p>
+    <h1 class="ds-h1">Empty State</h1>
+    <p class="ds-lead">Empty State moved to <b>Components</b> — it grew first-use / no-results / error variants plus sm/md sizes, and it is an atomic primitive rather than a composition.</p>
+    ${p(`<a href="#/empty-state">Open Empty State under Components →</a>`)}
+  `;
 
 const cBreadcrumb = () => componentPage({
   id: 'breadcrumb', title: 'Breadcrumb', desc: 'The compact ancestry trail in the inspector top bar — project → council → view. Truncates gracefully when space is tight.',
@@ -1301,6 +1350,55 @@ const cProgress = () => componentPage({
   react: `import { Progress } from 'sonaloop-design/components';\n\n<Progress value={72} />`,
   markup: `<div class="sl-progress"><div class="sl-progress__bar" style="width:72%"></div></div>`,
   python: `h("div", {"class_": "sl-progress"}, h("div", {"class_": "sl-progress__bar", "style": f"width:{pct}%"}))`,
+});
+
+// Stepper demo bits — the same check glyph the React <Stepper> renders into done markers.
+const stepCheck = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg>`;
+const stepLi = (n, state, label, desc) => `<li class="sl-stepper__step${state ? ` is-${state}` : ''}"${state === 'current' ? ' aria-current="step"' : ''}>
+      <span class="sl-stepper__marker">${state === 'done' ? stepCheck : n}</span>
+      ${label ? `<span class="sl-stepper__text"><span class="sl-stepper__label">${esc(label)}</span>${desc ? `<span class="sl-stepper__desc">${esc(desc)}</span>` : ''}</span>` : ''}
+    </li>`;
+
+const cStepper = () => componentPage({
+  id: 'stepper', title: 'Stepper',
+  desc: 'The progress-<b>steps</b> indicator for any multi-stage flow — onboarding, council setup, a wizard. Numbered circular markers joined by hairline connectors tick off with a check as steps complete; states (<b>done · current · upcoming</b>) derive from the host’s current index. Horizontal by default, with a compact <b>vertical</b> variant for sidebars and drawers; labels (and quiet descriptions) are optional, so a bare marker rail works too.',
+  demo: `<div style="display:flex;flex-direction:column;gap:30px;width:100%;max-width:640px">
+      <div>${demoLabel('horizontal · current = 1')}
+        <ol class="sl-stepper">
+          ${stepLi(1, 'done', 'Persona')}
+          ${stepLi(2, 'current', 'Council')}
+          ${stepLi(3, '', 'Synthesis')}
+          ${stepLi(4, '', 'Report')}
+        </ol>
+      </div>
+      <div>${demoLabel('vertical · compact, with descriptions')}
+        <ol class="sl-stepper sl-stepper--vertical" style="max-width:300px">
+          ${stepLi(1, 'done', 'Pick personas', 'Who deliberates')}
+          ${stepLi(2, 'done', 'Frame the question', 'What the council decides')}
+          ${stepLi(3, 'current', 'Run the council', 'Voices argue on the record')}
+          ${stepLi(4, '', 'Read the synthesis', 'Verdicts, grounded in quotes')}
+        </ol>
+      </div>
+      <div>${demoLabel('marker-only · no labels')}
+        <ol class="sl-stepper" style="max-width:260px">
+          ${stepLi(1, 'done')}
+          ${stepLi(2, 'done')}
+          ${stepLi(3, 'current')}
+          ${stepLi(4, '')}
+          ${stepLi(5, '')}
+        </ol>
+      </div>
+    </div>`,
+  variants: { cols: ['Class', 'Meaning'], rows: [
+    ['.sl-stepper', 'The horizontal rail (an <code>&lt;ol&gt;</code> of steps).'],
+    ['.sl-stepper--vertical', 'The compact stacked variant — the connector drops below each marker.'],
+    ['.sl-stepper__step', 'One step; add <code>.is-done</code> (✓, accent fill) or <code>.is-current</code> (accent ring). Unmarked = upcoming.'],
+    ['.sl-stepper__marker', 'The circle — the step number, or a check SVG when done.'],
+    ['.sl-stepper__text', 'Optional label column: <code>__label</code> over a quiet <code>__desc</code>.'],
+  ] },
+  react: `import { Stepper } from 'sonaloop-design/components';\n\n// horizontal (default) — strings are labels; earlier steps render done\n<Stepper current={1} steps={['Persona', 'Council', 'Synthesis', 'Report']} />\n\n// compact vertical with descriptions\n<Stepper orientation="vertical" current={2} steps={[\n  { label: 'Pick personas', desc: 'Who deliberates' },\n  { label: 'Frame the question', desc: 'What the council decides' },\n  { label: 'Run the council', desc: 'Voices argue on the record' },\n  { label: 'Read the synthesis', desc: 'Verdicts, grounded in quotes' },\n]} />\n\n// marker-only rail\n<Stepper current={2} steps={Array(5).fill({})} />`,
+  markup: `<ol class="sl-stepper">\n  <li class="sl-stepper__step is-done">\n    <span class="sl-stepper__marker"><!-- check svg --></span>\n    <span class="sl-stepper__text"><span class="sl-stepper__label">Persona</span></span>\n  </li>\n  <li class="sl-stepper__step is-current" aria-current="step">\n    <span class="sl-stepper__marker">2</span>\n    <span class="sl-stepper__text"><span class="sl-stepper__label">Council</span></span>\n  </li>\n  <li class="sl-stepper__step">\n    <span class="sl-stepper__marker">3</span>\n    <span class="sl-stepper__text"><span class="sl-stepper__label">Synthesis</span></span>\n  </li>\n</ol>`,
+  python: `def _step(n, label, state=""):\n    marker = raw(_check_svg()) if state == "is-done" else str(n)\n    return h("li", {"class_": f"sl-stepper__step {state}".strip()},\n             h("span", {"class_": "sl-stepper__marker"}, marker),\n             h("span", {"class_": "sl-stepper__text"}, h("span", {"class_": "sl-stepper__label"}, label)))\n\nh("ol", {"class_": "sl-stepper"},\n  _step(1, t("persona"), "is-done"), _step(2, t("council"), "is-current"), _step(3, t("synthesis")))`,
 });
 
 const cStat = () => componentPage({
@@ -2214,6 +2312,8 @@ const NAV = [
     { id: 'note', title: 'Note', ico: 'bulb', render: cNote },
     { id: 'stat', title: 'Stat', ico: 'analytics', render: cStat },
     { id: 'progress', title: 'Progress', ico: 'wave', render: cProgress },
+    { id: 'stepper', title: 'Stepper', ico: 'plan', render: cStepper },
+    { id: 'empty-state', title: 'Empty State', ico: 'square', render: cEmptyState },
     { id: 'segmented', title: 'Segmented · Tabs', ico: 'squareCols', render: cSegmented },
     { id: 'tabs', title: 'Tabs', ico: 'squareCols', render: cTabs },
     { id: 'theme-toggle', title: 'Theme Toggle', ico: 'monitor', render: cThemeToggle },
@@ -2274,7 +2374,8 @@ const NAV = [
     { id: 'filter-bar', title: 'Filter Bar', ico: 'half', render: cFilterBar },
     { id: 'entity', title: 'Entity', ico: 'projects', render: cEntity },
     { id: 'field', title: 'Field · Fieldset', ico: 'settings', render: cField },
-    { id: 'empty-state', title: 'Empty State', ico: 'square', render: cEmptyState },
+    // pointer only — the Empty State page itself moved to Components (kept out of ⌘K).
+    { id: 'empty-state-moved', title: 'Empty State ↗', ico: 'square', pointer: true, render: cEmptyStatePointer },
   ] },
   { label: 'Website', items: [
     { id: 'web-navbar', title: 'Navbar', ico: 'panel', render: () => websitePage({
@@ -2614,9 +2715,11 @@ function setTheme(pref) {
 }
 
 /* ── search palette ───────────────────────────────────────────────────────────── */
+// Pages carry their curated synonyms (site/search-aliases.data.mjs) so "wizard" finds
+// Stepper and "blank state" finds Empty State. Pointer-only nav entries stay out of ⌘K.
 const PALETTE_ITEMS = [
-  ...FLAT.map((i) => ({ kind: 'Page', title: i.title, sub: '', href: `#/${i.id}`, ico: i.ico })),
-  ...Object.keys(regular).map((n) => ({ kind: 'Icon', title: n, sub: '', href: `#/icons`, iconName: n })),
+  ...FLAT.filter((i) => !i.pointer).map((i) => ({ kind: 'Page', title: i.title, sub: '', href: `#/${i.id}`, ico: i.ico, aliases: searchAliases[i.id] || [] })),
+  ...Object.keys(regular).map((n) => ({ kind: 'Icon', title: n, sub: '', href: `#/icons`, iconName: n, aliases: [] })),
 ];
 
 function openPalette() {
@@ -2632,24 +2735,75 @@ function closePalette() { $('#palette').hidden = true; }
 // Results grouped under muted section headers (Pages · Icons), Linear/Raycast-style.
 const PALETTE_GROUPS = [{ kind: 'Page', label: 'Pages' }, { kind: 'Icon', label: 'Icons' }];
 let paletteActive = 0;
+
+// Alias-aware matching: a query hits an item by title, by kind, or by any curated synonym —
+// alias hits surface the matched word as a quiet "≈ alias" subtitle so the redirect is legible.
+function paletteMatches(q) {
+  if (!q) return PALETTE_ITEMS.filter((i) => i.kind === 'Page');
+  return PALETTE_ITEMS.flatMap((i) => {
+    if (i.title.toLowerCase().includes(q) || i.kind.toLowerCase().includes(q)) return [i];
+    const alias = i.aliases.find((a) => a.includes(q));
+    return alias ? [{ ...i, sub: `≈ ${alias}` }] : [];
+  });
+}
+
+// Tiny Levenshtein — queries are short, so this stays cheap.
+function lev(a, b) {
+  if (!a.length || !b.length) return a.length || b.length;
+  let prev = Array.from({ length: b.length + 1 }, (_, j) => j);
+  for (let i = 1; i <= a.length; i++) {
+    const cur = [i];
+    for (let j = 1; j <= b.length; j++) {
+      cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    }
+    prev = cur;
+  }
+  return prev[b.length];
+}
+
+// Nearest-hit suggestions for an otherwise-dead "No matches": rank pages by normalized edit
+// distance over the title, its words and the curated aliases; keep only plausible neighbours.
+function nearestPages(q, n = 5) {
+  const score = (i) => {
+    const t = i.title.toLowerCase();
+    const cands = [t, ...t.split(/[\s·/]+/), ...i.aliases];
+    return Math.min(...cands.map((c) => lev(q, c) / Math.max(q.length, c.length)));
+  };
+  return PALETTE_ITEMS.filter((i) => i.kind === 'Page')
+    .map((i) => ({ i, s: score(i) }))
+    .filter(({ s }) => s <= 0.5)
+    .sort((a, b) => a.s - b.s)
+    .slice(0, n)
+    .map(({ i }) => i);
+}
+
+const paletteItemHtml = (m, i) => {
+  const ico = m.iconName ? svgReg(m.iconName) : (m.ico ? svgReg(m.ico) : '');
+  return `<div class="sl-cmdk-item${i === 0 ? ' is-active' : ''}" data-href="${m.href}" data-i="${i}">
+        <span class="sl-cmdk-ico">${ico}</span>
+        <span class="sl-cmdk-title">${esc(m.title)}</span>
+        ${m.sub ? `<span class="sl-cmdk-sub">${esc(m.sub)}</span>` : ''}
+      </div>`;
+};
+
 function renderPaletteList(q) {
   q = q.trim().toLowerCase();
-  const matches = (q ? PALETTE_ITEMS.filter((i) => i.title.toLowerCase().includes(q) || i.kind.toLowerCase().includes(q)) : PALETTE_ITEMS.filter((i) => i.kind === 'Page')).slice(0, 40);
+  const matches = paletteMatches(q).slice(0, 40);
   paletteActive = 0;
   const list = $('#palette-list');
-  if (!matches.length) { list.innerHTML = `<div class="sl-cmdk-empty">No matches for “${esc(q)}”.</div>`; return; }
+  if (!matches.length) {
+    // Instead of dead-ending, suggest the nearest pages (typo-tolerant, alias-aware).
+    const near = nearestPages(q);
+    list.innerHTML = `<div class="sl-cmdk-empty">No matches for “${esc(q)}”.${near.length ? '' : ' Try a component name or a synonym (“wizard”, “blank state”).'}</div>`
+      + (near.length ? `<div class="sl-cmdk-sec">Closest matches</div>${near.map(paletteItemHtml).join('')}` : '');
+    return;
+  }
   let i = 0, html = '';
   for (const { kind, label } of PALETTE_GROUPS) {
     const g = matches.filter((m) => m.kind === kind);
     if (!g.length) continue;
     html += `<div class="sl-cmdk-sec">${esc(label)}</div>`;
-    html += g.map((m) => {
-      const ico = m.iconName ? svgReg(m.iconName) : (m.ico ? svgReg(m.ico) : '');
-      return `<div class="sl-cmdk-item${i === 0 ? ' is-active' : ''}" data-href="${m.href}" data-i="${i++}">
-        <span class="sl-cmdk-ico">${ico}</span>
-        <span class="sl-cmdk-title">${esc(m.title)}</span>
-      </div>`;
-    }).join('');
+    html += g.map((m) => paletteItemHtml(m, i++)).join('');
   }
   list.innerHTML = html;
 }

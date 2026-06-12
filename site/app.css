@@ -135,6 +135,9 @@ a { color: inherit; }
    else icon-only items (e.g. the Theme Toggle) collapse to nothing. */
 .ds-preview-stage .sl-segmented__item svg { width: 1.05em; height: 1.05em; flex: none; }
 .ds-preview-stage .sl-segmented--stacked .sl-segmented__item svg { width: 1.25em; height: 1.25em; }
+/* Same deal for the Empty State hi-fi glyphs (React consumers size them via the icon's
+   `size` prop; --sm has its own scale in the shared CSS, so leave it alone here). */
+.ds-preview-stage .sl-empty:not(.sl-empty--sm) .sl-empty__icon svg { width: 44px; height: 44px; }
 
 /* ── Website-section previews ──────────────────────────────────────────────────────
    Marketing/app blocks need to render edge-to-edge on the page surface (the navbar and
