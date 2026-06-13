@@ -594,7 +594,7 @@ export function Navbar({
   brand = { to: '/', label: 'Sonaloop' },
   pricing = { to: '/pricing', label: 'Pricing' },
   secondaryLink = { to: '/sample-report', label: 'Sample report' },
-  primaryCta = { to: '/install', label: 'Install MCP' },
+  primaryCta = { to: '/mcp', label: 'Install MCP' },
   initialOpenKey = null,
 }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false);
@@ -919,7 +919,7 @@ export const DEFAULT_CTA: CtaBandProps = {
   title: 'Run a council that pushes back.',
   body:
     'One config block, no API key. Spin up a synthetic focus group on your own Claude Code, Cursor or Codex — and watch it disagree with you, on the record.',
-  primary: { label: 'Install MCP — free', to: '/install' },
+  primary: { label: 'Install MCP — free', to: '/mcp' },
   secondary: { label: 'See a sample report', to: '/sample-report' },
 };
 
