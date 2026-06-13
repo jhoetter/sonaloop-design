@@ -81,10 +81,12 @@ async function iconPng(spec, hex) {
   return (await sharp(Buffer.from(svg)).png()).toBuffer();
 }
 
+// The deck embeds the ENTIRE hi-fi icon set (single source: icons.data.mjs `hifi`), so any icon
+// the design system gains is immediately available to decks. `deckIcons` stays as the curated,
+// recommended shortlist (surfaced first in pickers); the embed below is the full set.
 const ICONS = {};
-for (const name of deckIcons) {
+for (const name of Object.keys(hifi)) {
   const spec = hifi[name];
-  // hard fail: the deck set is curated — a vanished icon must break the build, not the deck
   if (!spec) throw new Error(`deck icon missing from hifi set: ${name}`);
   ICONS[name] = {};
   for (const tint of deckIconTints) {
