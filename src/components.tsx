@@ -8,7 +8,7 @@
  *
  * Page-level compositions (Footer, Hero, …) stay in each app and are built FROM these.
  */
-import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
+import { createContext, Fragment, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import type {
   ButtonHTMLAttributes,
   CSSProperties,
@@ -933,6 +933,45 @@ function useEnterExit(open: boolean, durationMs: number) {
   return { render, active };
 }
 
+// ── Drawer expand (a wider "Notion-style" reading layout, opt-in per Drawer) ───────
+const ExpandGlyph = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M9 4H5a1 1 0 0 0-1 1v4M15 4h4a1 1 0 0 1 1 1v4M9 20H5a1 1 0 0 1-1-1v-4M15 20h4a1 1 0 0 0 1-1v-4" />
+  </svg>
+);
+
+export interface DrawerExpandApi {
+  expandable: boolean;
+  expanded: boolean;
+  toggle: () => void;
+}
+const DrawerExpandContext = createContext<DrawerExpandApi>({ expandable: false, expanded: false, toggle: () => {} });
+
+/** Read the enclosing Drawer's expand state — for `bare` drawers that own their header. */
+export function useDrawerExpand(): DrawerExpandApi {
+  return useContext(DrawerExpandContext);
+}
+
+/** The Drawer Expand/Collapse toggle. Renders nothing unless the enclosing Drawer is `expandable`.
+ *  A non-bare Drawer places it in the built-in header automatically; in a `bare` Drawer, drop this
+ *  into your own header to expose the same control. */
+export function DrawerExpandToggle({ className }: { className?: string }) {
+  const { expandable, expanded, toggle } = useContext(DrawerExpandContext);
+  if (!expandable) return null;
+  return (
+    <button
+      type="button"
+      className={cx('sl-overlay-expand', className)}
+      onClick={toggle}
+      aria-label={expanded ? 'Collapse' : 'Expand'}
+      aria-pressed={expanded}
+      title={expanded ? 'Collapse' : 'Expand'}
+    >
+      <ExpandGlyph />
+    </button>
+  );
+}
+
 export type DrawerSide = 'right' | 'left';
 export interface DrawerProps {
   open: boolean;
@@ -948,33 +987,74 @@ export interface DrawerProps {
    *  with its own header + scroll region). The Drawer still supplies the scrim, slide animation,
    *  ESC/scroll-lock/focus. */
   bare?: boolean;
+  /** Show an Expand/Collapse toggle that widens the panel to `expandedWidth` (animated). In a
+   *  non-bare Drawer the toggle sits in the header automatically; in a `bare` Drawer, render
+   *  <DrawerExpandToggle/> inside your own header. */
+  expandable?: boolean;
+  /** Panel width when expanded. Default `min(72rem, 100vw)`. */
+  expandedWidth?: string;
+  /** Initial expanded state (uncontrolled); resets to this each time the Drawer opens. Default false. */
+  defaultExpanded?: boolean;
+  /** Controlled expanded state — pair with `onExpandedChange`. */
+  expanded?: boolean;
+  onExpandedChange?: (expanded: boolean) => void;
   className?: string;
   children?: ReactNode;
 }
 /** A right/left slide-over peek panel — the detail-without-leaving-the-page pattern. Animates in
- *  and out (kept mounted across the close transition). */
-export function Drawer({ open, onClose, title, side = 'right', width, footer, bare, className, children }: DrawerProps) {
+ *  and out (kept mounted across the close transition). Pass `expandable` for a built-in widen toggle. */
+export function Drawer({
+  open,
+  onClose,
+  title,
+  side = 'right',
+  width,
+  footer,
+  bare,
+  expandable = false,
+  expandedWidth = 'min(72rem, 100vw)',
+  defaultExpanded = false,
+  expanded: expandedProp,
+  onExpandedChange,
+  className,
+  children,
+}: DrawerProps) {
   useOverlayDismiss(open, onClose);
   const { render, active } = useEnterExit(open, 240);
   const panelRef = useRef<HTMLDivElement>(null);
+  const [expandedState, setExpandedState] = useState(defaultExpanded);
+  const isControlled = expandedProp !== undefined;
+  const expanded = isControlled ? !!expandedProp : expandedState;
+  const setExpanded = (v: boolean) => {
+    if (!isControlled) setExpandedState(v);
+    onExpandedChange?.(v);
+  };
+  // Reset an uncontrolled Drawer to its default each time it (re)opens.
+  useEffect(() => { if (open && !isControlled) setExpandedState(defaultExpanded); }, [open]);
   useEffect(() => { if (open) panelRef.current?.focus(); }, [open]);
   if (!render) return null;
+  const isWide = expandable && expanded;
+  const panelWidth = isWide ? expandedWidth : width;
+  const expandApi: DrawerExpandApi = { expandable, expanded, toggle: () => setExpanded(!expanded) };
   return (
-    <div className={cx('sl-drawer', active && 'is-open', side === 'left' && 'sl-drawer--left', className)} aria-hidden={!active}>
-      <div className="sl-drawer__scrim" onClick={onClose} />
-      <aside className="sl-drawer__panel" role="dialog" aria-modal="true" ref={panelRef} tabIndex={-1} style={width ? { width } : undefined}>
-        {bare ? children : (
-          <>
-            <header className="sl-drawer__head">
-              <span className="sl-drawer__title">{title}</span>
-              <button type="button" className="sl-overlay-close" onClick={onClose} aria-label="Close"><CloseGlyph /></button>
-            </header>
-            <div className="sl-drawer__body">{children}</div>
-            {footer ? <footer className="sl-drawer__foot">{footer}</footer> : null}
-          </>
-        )}
-      </aside>
-    </div>
+    <DrawerExpandContext.Provider value={expandApi}>
+      <div className={cx('sl-drawer', active && 'is-open', side === 'left' && 'sl-drawer--left', isWide && 'is-expanded', className)} aria-hidden={!active}>
+        <div className="sl-drawer__scrim" onClick={onClose} />
+        <aside className="sl-drawer__panel" role="dialog" aria-modal="true" ref={panelRef} tabIndex={-1} style={panelWidth ? { width: panelWidth } : undefined}>
+          {bare ? children : (
+            <>
+              <header className="sl-drawer__head">
+                <span className="sl-drawer__title">{title}</span>
+                <DrawerExpandToggle />
+                <button type="button" className="sl-overlay-close" onClick={onClose} aria-label="Close"><CloseGlyph /></button>
+              </header>
+              <div className="sl-drawer__body">{children}</div>
+              {footer ? <footer className="sl-drawer__foot">{footer}</footer> : null}
+            </>
+          )}
+        </aside>
+      </div>
+    </DrawerExpandContext.Provider>
   );
 }
 

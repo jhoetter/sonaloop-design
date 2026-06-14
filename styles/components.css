@@ -765,6 +765,11 @@ button.sl-navhead:hover { color: var(--sl-muted); }
   border-radius: var(--sl-radius-sm); padding: var(--sl-s-1); line-height: 0; display: inline-flex; flex-shrink: 0; }
 .sl-overlay-close:hover { background: var(--sl-hover); color: var(--sl-ink); }
 .sl-overlay-close svg { width: 18px; height: 18px; }
+/* The Drawer Expand/Collapse toggle (DrawerExpandToggle) — same affordance as the close button. */
+.sl-overlay-expand { border: 0; background: none; cursor: pointer; color: var(--sl-muted);
+  border-radius: var(--sl-radius-sm); padding: var(--sl-s-1); line-height: 0; display: inline-flex; flex-shrink: 0; }
+.sl-overlay-expand:hover { background: var(--sl-hover); color: var(--sl-ink); }
+.sl-overlay-expand svg { width: 16px; height: 16px; }
 .sl-drawer[hidden], .sl-modal[hidden] { display: none; }
 @keyframes sl-fade-in { from { opacity: 0; } }
 
@@ -780,7 +785,8 @@ button.sl-navhead:hover { color: var(--sl-muted); }
 .sl-drawer.is-open .sl-drawer__scrim { opacity: 1; }
 .sl-drawer__panel { position: relative; height: 100%; width: min(620px, 94vw); display: flex; flex-direction: column;
   overflow: hidden; background: var(--sl-surface); border-left: 1px solid var(--sl-line);
-  box-shadow: var(--sl-shadow-lg); transform: translateX(100%); transition: transform .24s var(--sl-ease); }
+  box-shadow: var(--sl-shadow-lg); transform: translateX(100%);
+  transition: transform .24s var(--sl-ease), width .24s var(--sl-ease); }
 .sl-drawer--left .sl-drawer__panel { border-left: 0; border-right: 1px solid var(--sl-line); transform: translateX(-100%); }
 /* --wide: the Notion-style slide-over that renders a FULL detail page in sidebar layout
    (not an essence preview) — generous reading width, still leaving the page behind visible. */
