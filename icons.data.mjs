@@ -75,6 +75,11 @@ export const regular = {
     // A folder — distinct from the sonaloop brand mark's three-node loop.
     body: '<path data-part="folder" d="M4 20h16a2 2 0 0 0 2-2V8.5a2 2 0 0 0-2-2h-7.1a2 2 0 0 1-1.6-.8l-.9-1.2a2 2 0 0 0-1.6-.8H4a2 2 0 0 0-2 2V18a2 2 0 0 0 2 2z"/>',
   },
+  folderOpen: {
+    label: 'FolderOpenIcon',
+    // An expanded folder — its front flap tilted open. Used in file trees to mark an open directory.
+    body: '<path data-part="folder" d="M6 14l1.45-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.55 6a2 2 0 0 1-1.94 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"/>',
+  },
   plan: {
     label: 'PlanIcon',
     // A checklist — the project plan / build-order (distinct from the projects folder).
