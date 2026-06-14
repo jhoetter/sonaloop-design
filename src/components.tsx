@@ -20,7 +20,7 @@ import type {
   TableHTMLAttributes,
   TextareaHTMLAttributes,
 } from 'react';
-import { ChevronIcon, MonitorIcon, MoonIcon, PanelIcon, SunIcon, SonaloopIcon } from './index';
+import { AlertIcon, ChevronIcon, MonitorIcon, MoonIcon, PanelIcon, SunIcon, SonaloopIcon } from './index';
 import type { PersonaIcon } from './icon';
 import type { ThemePreference } from './theme';
 
@@ -1010,6 +1010,71 @@ export function Modal({ open, onClose, title, size = 'md', footer, hideClose, cl
         {footer ? <footer className="sl-modal__foot">{footer}</footer> : null}
       </div>
     </div>
+  );
+}
+
+export type AlertDialogTone = 'info' | 'warning' | 'danger';
+export interface AlertDialogProps {
+  open: boolean;
+  onClose: () => void;
+  title?: ReactNode;
+  /** The alert text. Prefer concise, actionable copy. */
+  message?: ReactNode;
+  /** Dialog tone. `warning` is the native alert replacement default. */
+  tone?: AlertDialogTone;
+  /** Primary acknowledgement label. */
+  confirmLabel?: ReactNode;
+  /** Optional secondary action for soft recovery paths. */
+  cancelLabel?: ReactNode;
+  onConfirm?: () => void;
+  onCancel?: () => void;
+  className?: string;
+  children?: ReactNode;
+}
+/** A branded modal replacement for native alert prompts. Use it for acknowledgement-only
+ *  interruptions; use Modal directly when the content is a richer workflow. */
+export function AlertDialog({
+  open,
+  onClose,
+  title = 'Hinweis',
+  message,
+  tone = 'warning',
+  confirmLabel = 'OK',
+  cancelLabel,
+  onConfirm,
+  onCancel,
+  className,
+  children,
+}: AlertDialogProps) {
+  const closeWith = useCallback((kind: 'confirm' | 'cancel') => {
+    if (kind === 'confirm') onConfirm?.();
+    else onCancel?.();
+    onClose();
+  }, [onCancel, onClose, onConfirm]);
+
+  return (
+    <Modal
+      open={open}
+      onClose={() => closeWith('cancel')}
+      title={null}
+      size="sm"
+      className={cx('sl-alert-dialog', `sl-alert-dialog--${tone}`, className)}
+      footer={(
+        <>
+          {cancelLabel ? <Button type="button" variant="ghost" onClick={() => closeWith('cancel')}>{cancelLabel}</Button> : null}
+          <Button type="button" variant="primary" onClick={() => closeWith('confirm')} autoFocus>{confirmLabel}</Button>
+        </>
+      )}
+    >
+      <div className="sl-alert-dialog__content">
+        <span className="sl-alert-dialog__icon" aria-hidden="true"><AlertIcon size={20} /></span>
+        <div className="sl-alert-dialog__copy">
+          <h2 className="sl-alert-dialog__title">{title}</h2>
+          {message ? <div className="sl-alert-dialog__message">{message}</div> : null}
+          {children}
+        </div>
+      </div>
+    </Modal>
   );
 }
 

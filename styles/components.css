@@ -809,6 +809,22 @@ button.sl-navhead:hover { color: var(--sl-muted); }
 .sl-modal__foot { flex-shrink: 0; padding: var(--sl-s-3) var(--sl-s-4); border-top: 1px solid var(--sl-line);
   display: flex; justify-content: flex-end; gap: var(--sl-gap-item); }
 
+/* Alert dialog — branded replacement for native browser alert prompts. */
+.sl-alert-dialog .sl-modal__body { padding-top: var(--sl-s-4); }
+.sl-alert-dialog__content { display: flex; gap: var(--sl-gap-group); align-items: flex-start; }
+.sl-alert-dialog__icon { flex: none; display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; border-radius: var(--sl-radius-full);
+  color: var(--sl-blue); background: color-mix(in srgb, var(--sl-blue) 12%, transparent); }
+.sl-alert-dialog--warning .sl-alert-dialog__icon {
+  color: var(--sl-amber); background: color-mix(in srgb, var(--sl-amber) 14%, transparent); }
+.sl-alert-dialog--danger .sl-alert-dialog__icon {
+  color: var(--sl-red); background: color-mix(in srgb, var(--sl-red) 14%, transparent); }
+.sl-alert-dialog__copy { min-width: 0; display: flex; flex-direction: column; gap: var(--sl-gap-tight); }
+.sl-alert-dialog__title { margin: 0; color: var(--sl-ink); font-size: 1.05em; font-weight: 650; line-height: 1.25; }
+.sl-alert-dialog__message { color: var(--sl-muted); line-height: 1.5; }
+.sl-alert-dialog__message :where(p) { margin: 0; }
+.sl-alert-dialog__message :where(p + p) { margin-top: .6em; }
+
 /* Image lightbox — a full-bleed zoom view (distinct from Modal's chrome'd dialog). */
 .sl-lightbox { position: fixed; inset: 0; z-index: 130; display: flex; align-items: center; justify-content: center;
   padding: var(--sl-s-6); background: color-mix(in srgb, #0a0c10 80%, transparent); backdrop-filter: blur(4px);
