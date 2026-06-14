@@ -991,8 +991,10 @@ export interface DrawerProps {
    *  non-bare Drawer the toggle sits in the header automatically; in a `bare` Drawer, render
    *  <DrawerExpandToggle/> inside your own header. */
   expandable?: boolean;
-  /** Panel width when expanded. Default `min(72rem, 100vw)`. */
+  /** Panel width when expanded in `'widen'` mode. Default `min(72rem, 100vw)`. */
   expandedWidth?: string;
+  /** How `expandable` expands: `'widen'` (to `expandedWidth`, default) or `'page'` (full viewport width). */
+  expandMode?: 'widen' | 'page';
   /** Initial expanded state (uncontrolled); resets to this each time the Drawer opens. Default false. */
   defaultExpanded?: boolean;
   /** Controlled expanded state — pair with `onExpandedChange`. */
@@ -1013,6 +1015,7 @@ export function Drawer({
   bare,
   expandable = false,
   expandedWidth = 'min(72rem, 100vw)',
+  expandMode = 'widen',
   defaultExpanded = false,
   expanded: expandedProp,
   onExpandedChange,
@@ -1034,7 +1037,7 @@ export function Drawer({
   useEffect(() => { if (open) panelRef.current?.focus(); }, [open]);
   if (!render) return null;
   const isWide = expandable && expanded;
-  const panelWidth = isWide ? expandedWidth : width;
+  const panelWidth = isWide ? (expandMode === 'page' ? '100vw' : expandedWidth) : width;
   const expandApi: DrawerExpandApi = { expandable, expanded, toggle: () => setExpanded(!expanded) };
   return (
     <DrawerExpandContext.Provider value={expandApi}>
