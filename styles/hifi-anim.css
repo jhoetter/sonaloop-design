@@ -672,6 +672,7 @@
   @keyframes pi-shimmer   { 0%, 100% { stroke-opacity: .5; } 45% { stroke-opacity: .9; } }
   @keyframes pi-glow      { 0%, 100% { fill-opacity: .1; } 45% { fill-opacity: .24; } }
   @keyframes pi-glow-core { 0%, 100% { transform: scale(1); } 45% { transform: scale(1.06); } }
+  @keyframes pi-radiate   { 0%, 100% { transform: scale(1) rotate(0); } 45% { transform: scale(1.12) rotate(8deg); } }
   @keyframes pi-screen    { 0%, 100% { fill-opacity: .08; } 45% { fill-opacity: .2; } }
   @keyframes pi-moon      { 0%, 100% { fill-opacity: .1; } 45% { fill-opacity: .26; } }
   @keyframes pi-slide-x   { from { transform: translateX(-4px); opacity: .3; } to { transform: translateX(0); opacity: 1; } }
