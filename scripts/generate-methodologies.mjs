@@ -88,6 +88,36 @@ const PAIRS = {
       `over warm cream all settle gently toward that one point of signal. Minimal, focused, lots of open ` +
       `space around the single glow.`,
   },
+  'continuous-discovery': {
+    lightPrompt:
+      `${STYLE_BASE} Composition: soft concentric ripples spreading outward in a calm, repeating cadence over ` +
+      `a still reflective plane — gentle layered rings of dusty indigo and muted lavender over warm cream, an ` +
+      `ongoing rhythm with no clear beginning or end. Quiet, cyclical, contemplative.`,
+  },
+  'design-sprint': {
+    lightPrompt:
+      `${STYLE_BASE} Composition: five soft luminous vertical columns of light stepping left-to-right across the ` +
+      `frame in a brisk, even cadence — dusty indigo and lavender bands over warm cream, calm but carrying a ` +
+      `gentle forward momentum. Rhythmic and purposeful.`,
+  },
+  'customer-discovery': {
+    lightPrompt:
+      `${STYLE_BASE} Composition: a warm, intimate pool of soft light gathered close in the center, attentive and ` +
+      `quiet — the feeling of leaning in to listen closely. A softly glowing warm-cream centre held by gentle ` +
+      `dusty-lavender and faint slate-blue around the edges. Calm, close, human.`,
+  },
+  'jtbd-switch': {
+    lightPrompt:
+      `${STYLE_BASE} Composition: two gentle opposing currents of mist — one drifting in from the left, one drawn ` +
+      `from the right — meeting near the center and resolving into a single soft forward drift. Dusty indigo and ` +
+      `muted lavender over warm cream; calm, balanced directional motion.`,
+  },
+  'reaction-test': {
+    lightPrompt:
+      `${STYLE_BASE} Composition: a single bright, soft bloom of light near the center with ONE quick luminous ring ` +
+      `spreading outward — immediate and light, a momentary reaction. Mostly open warm cream with a gentle ` +
+      `lavender-indigo ripple. Airy, fast, minimal.`,
+  },
 };
 
 const args = process.argv.slice(2);
