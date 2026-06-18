@@ -693,12 +693,13 @@ export function AppShell({
 }: AppShellProps) {
   // Lazy initialisers read persisted state before first paint (no collapse flash).
   const [collapsed, setCollapsed] = useState(() => {
+    if (isShellMobile()) return true;
     try {
       const stored = localStorage.getItem(`${storageKey}:open`);
       if (stored === 'false') return true;
       if (stored === 'true') return false;
     } catch { /* ignore */ }
-    return isShellMobile();
+    return false;
   });
   const [width, setWidth] = useState(() => {
     try { return parseInt(localStorage.getItem(`${storageKey}:width`) || '', 10) || defaultWidth; } catch { return defaultWidth; }
@@ -714,6 +715,7 @@ export function AppShell({
       return next;
     });
   const menuRef = useRef<HTMLDivElement>(null);
+  const shellRef = useRef<HTMLDivElement>(null);
 
   const persistOpen = useCallback((open: boolean) => {
     try { localStorage.setItem(`${storageKey}:open`, String(open)); } catch { /* ignore */ }
@@ -725,6 +727,22 @@ export function AppShell({
     setCollapsed(true);
     persistOpen(false);
   }, [persistOpen]);
+
+  useEffect(() => {
+    const onMobileClose = (e: PointerEvent | TouchEvent) => {
+      if (!(e.target instanceof Element)) return;
+      const closeEl = e.target.closest('.sl-sidebar-close, .sl-sidebar-backdrop');
+      if (!closeEl || closeEl.closest('.sl-app-shell') !== shellRef.current) return;
+      e.preventDefault();
+      closeSidebar();
+    };
+    document.addEventListener('pointerup', onMobileClose);
+    document.addEventListener('touchend', onMobileClose, { passive: false });
+    return () => {
+      document.removeEventListener('pointerup', onMobileClose);
+      document.removeEventListener('touchend', onMobileClose);
+    };
+  }, [closeSidebar]);
 
   // `[` toggles the sidebar (Linear-style), unless the user is typing.
   useEffect(() => {
@@ -806,6 +824,7 @@ export function AppShell({
 
   return (
     <div
+      ref={shellRef}
       className={cx('sl-app-shell', collapsed && 'is-collapsed', className)}
       style={{ ['--sl-sidebar-w' as string]: `${width}px` } as React.CSSProperties}
     >

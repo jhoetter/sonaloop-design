@@ -3036,8 +3036,8 @@ function initShell() {
   };
   try {
     const storedOpen = localStorage.getItem('ds-shell:open');
-    if (storedOpen === 'false') setCollapsed(true, false);
-    else if (storedOpen == null && isMobile()) setCollapsed(true, false);
+    if (isMobile()) setCollapsed(true, false);
+    else if (storedOpen === 'false') setCollapsed(true, false);
     else setCollapsed(false, false);
     const w = localStorage.getItem('ds-shell:width');
     if (w) app.style.setProperty('--sl-sidebar-w', `${w}px`);
@@ -3046,11 +3046,20 @@ function initShell() {
     setCollapsed(!app.classList.contains('is-collapsed'));
   };
   const close = () => setCollapsed(true);
+  const closest = (target, selector) => target?.closest ? target.closest(selector) : null;
+  const closeFromEvent = (e) => {
+    if (!closest(e.target, '[data-sidebar-close]')) return false;
+    e.preventDefault();
+    close();
+    return true;
+  };
   document.addEventListener('click', (e) => {
-    if (e.target.closest && e.target.closest('[data-sidebar-toggle]')) { e.preventDefault(); toggle(); }
-    if (e.target.closest && e.target.closest('[data-sidebar-close]')) { e.preventDefault(); close(); }
-    if (e.target.closest && e.target.closest('.sl-sidebar .sl-nav a') && isMobile()) close();
+    if (closeFromEvent(e)) return;
+    if (closest(e.target, '[data-sidebar-toggle]')) { e.preventDefault(); toggle(); }
+    if (closest(e.target, '.sl-sidebar .sl-nav a') && isMobile()) close();
   });
+  document.addEventListener('pointerup', closeFromEvent);
+  document.addEventListener('touchend', closeFromEvent, { passive: false });
   document.addEventListener('keydown', (e) => {
     const tag = (e.target.tagName || '').toLowerCase();
     if (e.key === '[') {
