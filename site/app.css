@@ -170,6 +170,15 @@ a { color: inherit; }
 /* Same deal for the Empty State hi-fi glyphs (React consumers size them via the icon's
    `size` prop; --sm has its own scale in the shared CSS, so leave it alone here). */
 .ds-preview-stage .sl-empty:not(.sl-empty--sm) .sl-empty__icon svg { width: 44px; height: 44px; }
+/* Keep the AppShell pattern preview sandboxed inside its preview frame. The real shell's
+   mobile sidebar becomes viewport-fixed, but a docs demo must never cover the docs chrome. */
+.ds-shell-demo .sl-sidebar {
+  position: relative; inset: auto; z-index: auto; height: 100%; max-width: none;
+  transform: none !important; box-shadow: none !important;
+  width: var(--sl-sidebar-w) !important; min-width: var(--sl-sidebar-w) !important;
+}
+.ds-shell-demo .sl-sidebar-backdrop, .ds-shell-demo .sl-sidebar-close { display: none !important; }
+.ds-shell-demo .sl-resize { display: block; }
 
 /* ── Website-section previews ──────────────────────────────────────────────────────
    Marketing/app blocks need to render edge-to-edge on the page surface (the navbar and
@@ -455,6 +464,27 @@ a.ds-usechip:hover code { color: var(--sl-accent); border-color: color-mix(in sr
      here we only tighten the content padding and collapse the docs' own content grids. */
   .sl-shell-body { padding: 24px 18px 80px; }
   .ds-grid-2, .ds-grid-3, .ds-brand-clear { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .ds-h1 { font-size: 34px; line-height: 1.08; }
+  .ds-lead { font-size: 16px; line-height: 1.55; }
+  .ds-h2 { margin-top: 40px; font-size: 21px; }
+  .ds-hero-cell { padding: 24px 20px 22px; }
+  .ds-preview-bar { flex-wrap: wrap; align-items: flex-start; }
+  .ds-preview-bar .ds-top-spacer { display: none; }
+  .ds-preview-stage { padding: 26px 16px; overflow-x: auto; }
+  .ds-web-stage { overflow-x: auto; }
+  .ds-table { display: block; max-width: 100%; overflow-x: auto; white-space: nowrap; }
+  .ds-type-row, .ds-glyph-row, .ds-specimen-head, .ds-image-tile figcaption, .ds-footer {
+    flex-direction: column; align-items: flex-start;
+  }
+  .ds-type-row { gap: 6px; }
+  .ds-type-row .ds-type-meta, .ds-glyph-label { width: auto; }
+  .ds-type-row .ds-type-sample { white-space: normal; }
+  .ds-swatches, .ds-pixel-grid, .ds-image-grid { grid-template-columns: 1fr; }
+  .ds-vidbar { width: calc(100% - 24px); gap: 8px; padding: 6px 10px; }
+  .ds-vidbar .vb-time { display: none; }
+  .ds-next { align-items: flex-start; }
 }
 
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }

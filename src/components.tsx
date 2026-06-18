@@ -620,6 +620,11 @@ export {
   type CommandPaletteProps,
 } from './command';
 
+const CloseGlyph = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" aria-hidden="true">
+    <path d="M6 6l12 12M18 6L6 18" />
+  </svg>
+);
 
 /* ── App shell ───────────────────────────────────────────────────────────────────
    The product chrome shared with the Python-SSR app (same .sl-* classes): a collapsible
@@ -670,6 +675,10 @@ export interface AppShellProps {
 const SHELL_MIN = 180;
 const SHELL_MAX = 480;
 const SHELL_HIDE = 32;
+const SHELL_MOBILE = '(max-width: 760px)';
+const isShellMobile = () => typeof window !== 'undefined'
+  && typeof window.matchMedia === 'function'
+  && window.matchMedia(SHELL_MOBILE).matches;
 
 export function AppShell({
   brand,
@@ -684,7 +693,12 @@ export function AppShell({
 }: AppShellProps) {
   // Lazy initialisers read persisted state before first paint (no collapse flash).
   const [collapsed, setCollapsed] = useState(() => {
-    try { return localStorage.getItem(`${storageKey}:open`) === 'false'; } catch { return false; }
+    try {
+      const stored = localStorage.getItem(`${storageKey}:open`);
+      if (stored === 'false') return true;
+      if (stored === 'true') return false;
+    } catch { /* ignore */ }
+    return isShellMobile();
   });
   const [width, setWidth] = useState(() => {
     try { return parseInt(localStorage.getItem(`${storageKey}:width`) || '', 10) || defaultWidth; } catch { return defaultWidth; }
@@ -707,17 +721,29 @@ export function AppShell({
   const toggle = useCallback(() => {
     setCollapsed((c) => { persistOpen(c); return !c; });
   }, [persistOpen]);
+  const closeSidebar = useCallback(() => {
+    setCollapsed(true);
+    persistOpen(false);
+  }, [persistOpen]);
 
   // `[` toggles the sidebar (Linear-style), unless the user is typing.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement | null)?.tagName?.toLowerCase();
-      if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
-      if (e.key === '[') { e.preventDefault(); toggle(); }
+      if (e.key === '[') {
+        if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+        e.preventDefault();
+        toggle();
+        return;
+      }
+      if (e.key === 'Escape' && !collapsed && isShellMobile()) {
+        e.preventDefault();
+        closeSidebar();
+      }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [toggle]);
+  }, [collapsed, closeSidebar, toggle]);
 
   // User-menu popover closes on outside click / Escape.
   useEffect(() => {
@@ -760,6 +786,10 @@ export function AppShell({
 
   const renderItem = (it: AppShellNavItem, key: number) => {
     const cls = cx('pi-hover', it.active && 'is-active');
+    const onSelect = () => {
+      it.onSelect?.();
+      if (isShellMobile()) closeSidebar();
+    };
     const inner = (
       <>
         {it.icon}
@@ -768,9 +798,9 @@ export function AppShell({
       </>
     );
     return it.href ? (
-      <a key={key} href={it.href} className={cls} title={it.title} onClick={it.onSelect}>{inner}</a>
+      <a key={key} href={it.href} className={cls} title={it.title} onClick={onSelect}>{inner}</a>
     ) : (
-      <button key={key} type="button" className={cls} title={it.title} onClick={it.onSelect}>{inner}</button>
+      <button key={key} type="button" className={cls} title={it.title} onClick={onSelect}>{inner}</button>
     );
   };
 
@@ -780,7 +810,12 @@ export function AppShell({
       style={{ ['--sl-sidebar-w' as string]: `${width}px` } as React.CSSProperties}
     >
       <aside className="sl-sidebar">
-        <div className="sl-brand">{brand}</div>
+        <div className="sl-brand">
+          {brand}
+          <button type="button" className="sl-sidebar-close sl-iconbtn sl-iconbtn--ghost" aria-label="Close sidebar" title="Close sidebar" onClick={closeSidebar}>
+            <CloseGlyph />
+          </button>
+        </div>
         {search && <div className="sl-sb-search">{search}</div>}
         <div className="sl-sb-scroll">
           {nav.map((sec, i) => {
@@ -821,6 +856,7 @@ export function AppShell({
           </div>
         )}
       </aside>
+      <button type="button" className="sl-sidebar-backdrop" aria-label="Close sidebar" onClick={closeSidebar} tabIndex={collapsed ? -1 : 0} />
       <div
         className="sl-resize"
         role="separator"
@@ -830,7 +866,7 @@ export function AppShell({
       />
       <div className="sl-main">
         <header className="sl-topbar">
-          <button type="button" className="sl-iconbtn" aria-label="Toggle sidebar" title="Toggle sidebar ([)" onClick={toggle}>
+          <button type="button" className="sl-iconbtn" aria-label="Toggle sidebar" aria-expanded={!collapsed} title="Toggle sidebar ([)" onClick={toggle}>
             <PanelIcon size={16} />
           </button>
           {topbar}
@@ -890,12 +926,6 @@ export function UserMenuAccount({ label, name, email, logoutHref, logoutLabel, c
    styling is the shared `.sl-*` overlay layer; the Python-SSR app ships its own opener
    over the same classes. Drawer + Modal share ESC-close, body scroll-lock and focus
    restore via useOverlayDismiss; Popover is anchored (outside-click + ESC, no lock). */
-const CloseGlyph = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" aria-hidden="true">
-    <path d="M6 6l12 12M18 6L6 18" />
-  </svg>
-);
-
 /** ESC-to-close + body scroll-lock + restore focus to the trigger, while `open`. */
 function useOverlayDismiss(open: boolean, onClose: () => void) {
   const restore = useRef<HTMLElement | null>(null);

@@ -2019,11 +2019,11 @@ const cEntity = () => componentPage({
 const _navIco = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/></svg>`;
 const cAppShell = () => componentPage({
   id: 'app-shell', title: 'App Shell',
-  desc: 'The product chrome as ONE composition — a collapsible + drag-resizable sidebar (brand · nav sections with an accent active-bar + icon hover · a bottom user-menu), a resize handle, and a topbar (sidebar toggle · breadcrumb · actions). The sidebar, collapse state, resize and user-menu are tightly coupled (the handle writes <code>--sl-sidebar-w</code>; collapse is shared), so it ships as a single shell rather than loose Sidebar/Header parts. Same source on both stacks: the React <code>&lt;AppShell&gt;</code> and the Python-SSR <code>_layout</code> emit these <code>.sl-app-shell</code> classes; behaviour is <code>_shell.SHELL_JS</code> (vendored). Pair with the <a href="#/command-menu">Command Menu</a> for ⌘K.',
+  desc: 'The product chrome as ONE composition — a collapsible + drag-resizable sidebar (brand · nav sections with an accent active-bar + icon hover · a bottom user-menu), a resize handle, and a topbar (sidebar toggle · breadcrumb · actions). Below mobile width the sidebar becomes a dismissible overlay with a scrim, close button, Escape close and nav-item auto-close. Same source on both stacks: the React <code>&lt;AppShell&gt;</code> and the Python-SSR <code>_layout</code> emit these <code>.sl-app-shell</code> classes; behaviour is <code>_shell.SHELL_JS</code> (vendored). Pair with the <a href="#/command-menu">Command Menu</a> for ⌘K.',
   demo: `<div style="height:380px;border:1px solid var(--sl-line);border-radius:var(--sl-radius);overflow:hidden;font-size:13px">
-    <div class="sl-app-shell" style="height:100%;--sl-sidebar-w:208px">
+    <div class="sl-app-shell ds-shell-demo" style="height:100%;--sl-sidebar-w:208px">
       <aside class="sl-sidebar">
-        <div class="sl-brand"><span style="font-weight:600">sonaloop</span></div>
+        <div class="sl-brand"><span style="font-weight:600">sonaloop</span><button class="sl-sidebar-close sl-iconbtn sl-iconbtn--ghost" type="button" aria-label="Close sidebar">${XGLYPH}</button></div>
         <div class="sl-sb-scroll">
           <div class="sl-navhead">Workspace</div>
           <nav class="sl-nav">
@@ -2039,6 +2039,7 @@ const cAppShell = () => componentPage({
         </div>
         <div class="sl-usermenu"><button class="sl-um-trigger" type="button"><span class="sl-um-ava">${_navIco}</span><span class="sl-um-name">Settings</span><span class="sl-um-caret"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="m6 9 6 6 6-6"/></svg></span></button></div>
       </aside>
+      <button class="sl-sidebar-backdrop" type="button" aria-label="Close sidebar"></button>
       <div class="sl-resize"></div>
       <div class="sl-main">
         <header class="sl-topbar"><button class="sl-iconbtn" type="button" data-sidebar-toggle><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg></button><nav class="sl-breadcrumb"><span class="sl-breadcrumb__current">Projects</span></nav><span class="sl-spacer"></span></header>
@@ -2047,8 +2048,8 @@ const cAppShell = () => componentPage({
     </div>
   </div>`,
   react: `import { AppShell } from 'sonaloop-design/components';\nimport { ProjectsIcon, PersonasIcon, SettingsIcon } from 'sonaloop-design';\nimport { Logo, ThemeToggle, Breadcrumb } from 'sonaloop-design/components';\n\n<AppShell\n  brand={<Logo size=\"sm\" />}\n  nav={[{ label: 'Workspace', items: [\n    { label: 'Projects', icon: <ProjectsIcon size={16} animate />, active: true, meta: 3, onSelect: goProjects },\n    { label: 'Personas', icon: <PersonasIcon size={16} animate />, onSelect: goPersonas },\n  ] }]}\n  userMenu={{ label: 'Settings', icon: <SettingsIcon size={18} animate />,\n    children: <ThemeToggle value={theme} onChange={setTheme} /> }}\n  topbar={<><Breadcrumb items={[{ label: 'Projects' }]} /><span className=\"sl-spacer\" /></>}\n>\n  {/* main content */}\n</AppShell>`,
-  markup: `<div class="sl-app-shell">\n  <aside class="sl-sidebar">\n    <div class="sl-brand">…logo…</div>\n    <div class="sl-sb-scroll">\n      <div class="sl-navhead">Workspace</div>\n      <nav class="sl-nav"><a class="is-active">…</a><a>…</a></nav>\n    </div>\n    <div class="sl-usermenu">…</div>\n  </aside>\n  <div class="sl-resize"></div>\n  <div class="sl-main">\n    <header class="sl-topbar"><button class="sl-iconbtn" data-sidebar-toggle>…</button>…crumbs…</header>\n    …body…\n  </div>\n</div>`,
-  python: `# web/_components.py:_layout emits the same .sl-app-shell markup;\n# resize / collapse / user-menu behaviour is _shell.SHELL_JS (vendored from sonaloop-design).\nh("div", {"class_": "sl-app-shell"},\n  h("aside", {"class_": "sl-sidebar"}, brand, nav, user_menu),\n  h("div", {"class_": "sl-resize"}),\n  h("div", {"class_": "sl-main"}, topbar, body)) + SHELL_JS`,
+  markup: `<div class="sl-app-shell">\n  <aside class="sl-sidebar">\n    <div class="sl-brand">…logo…<button class="sl-sidebar-close">✕</button></div>\n    <div class="sl-sb-scroll">\n      <div class="sl-navhead">Workspace</div>\n      <nav class="sl-nav"><a class="is-active">…</a><a>…</a></nav>\n    </div>\n    <div class="sl-usermenu">…</div>\n  </aside>\n  <button class="sl-sidebar-backdrop" aria-label="Close sidebar"></button>\n  <div class="sl-resize"></div>\n  <div class="sl-main">\n    <header class="sl-topbar"><button class="sl-iconbtn" data-sidebar-toggle>…</button>…crumbs…</header>\n    …body…\n  </div>\n</div>`,
+  python: `# web/_components.py:_layout emits the same .sl-app-shell markup;\n# resize / collapse / user-menu behaviour is _shell.SHELL_JS (vendored from sonaloop-design).\nh("div", {"class_": "sl-app-shell"},\n  h("aside", {"class_": "sl-sidebar"}, brand_with_close, nav, user_menu),\n  h("button", {"class_": "sl-sidebar-backdrop", "aria-label": "Close sidebar"}),\n  h("div", {"class_": "sl-resize"}),\n  h("div", {"class_": "sl-main"}, topbar, body)) + SHELL_JS`,
 });
 
 const cCommandPalette = () => componentPage({
@@ -3024,22 +3025,44 @@ function paletteGo(el) { if (!el) return; location.hash = el.dataset.href; close
 function initShell() {
   const app = $('#app');
   const rz = $('#rz');
+  const toggleBtn = $('#sbt');
+  const isMobile = () => window.matchMedia?.('(max-width: 760px)').matches ?? false;
+  const setCollapsed = (collapsed, persist = true) => {
+    app.classList.toggle('is-collapsed', collapsed);
+    toggleBtn?.setAttribute('aria-expanded', String(!collapsed));
+    if (persist) {
+      try { localStorage.setItem('ds-shell:open', String(!collapsed)); } catch { /* ignore */ }
+    }
+  };
   try {
-    if (localStorage.getItem('ds-shell:open') === 'false') app.classList.add('is-collapsed');
+    const storedOpen = localStorage.getItem('ds-shell:open');
+    if (storedOpen === 'false') setCollapsed(true, false);
+    else if (storedOpen == null && isMobile()) setCollapsed(true, false);
+    else setCollapsed(false, false);
     const w = localStorage.getItem('ds-shell:width');
     if (w) app.style.setProperty('--sl-sidebar-w', `${w}px`);
   } catch { /* ignore */ }
   const toggle = () => {
-    app.classList.toggle('is-collapsed');
-    try { localStorage.setItem('ds-shell:open', String(!app.classList.contains('is-collapsed'))); } catch { /* ignore */ }
+    setCollapsed(!app.classList.contains('is-collapsed'));
   };
+  const close = () => setCollapsed(true);
   document.addEventListener('click', (e) => {
     if (e.target.closest && e.target.closest('[data-sidebar-toggle]')) { e.preventDefault(); toggle(); }
+    if (e.target.closest && e.target.closest('[data-sidebar-close]')) { e.preventDefault(); close(); }
+    if (e.target.closest && e.target.closest('.sl-sidebar .sl-nav a') && isMobile()) close();
   });
   document.addEventListener('keydown', (e) => {
     const tag = (e.target.tagName || '').toLowerCase();
-    if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
-    if (e.key === '[') { e.preventDefault(); toggle(); }
+    if (e.key === '[') {
+      if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+      e.preventDefault();
+      toggle();
+      return;
+    }
+    if (e.key === 'Escape' && isMobile() && !app.classList.contains('is-collapsed')) {
+      e.preventDefault();
+      close();
+    }
   });
 
   // bottom settings popover
@@ -3067,8 +3090,8 @@ function initShell() {
     rz.addEventListener('pointermove', (e) => {
       if (!resizing) return;
       const next = sw + (e.clientX - sx);
-      if (next <= 32) { app.classList.add('is-collapsed'); }
-      else { last = Math.max(200, Math.min(420, next)); app.style.setProperty('--sl-sidebar-w', `${last}px`); app.classList.remove('is-collapsed'); }
+      if (next <= 32) { setCollapsed(true); }
+      else { last = Math.max(200, Math.min(420, next)); app.style.setProperty('--sl-sidebar-w', `${last}px`); setCollapsed(false); }
     });
     rz.addEventListener('pointerup', () => {
       if (!resizing) return; resizing = false;

@@ -616,6 +616,17 @@ export function Navbar({
     return () => window.removeEventListener('scroll', onScroll);
   }, [transparent]);
 
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      e.preventDefault();
+      setMobileOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [mobileOpen]);
+
   // Hover-intent: a short close delay lets the cursor travel into the panel.
   const open = (key: string) => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
@@ -712,7 +723,16 @@ export function Navbar({
       )}
 
       {/* Mobile menu */}
-      {mobileOpen && <MobileMenu menus={menus} pricing={pricing} secondaryLink={secondaryLink} primaryCta={primaryCta} currentPath={currentPath} />}
+      {mobileOpen && (
+        <MobileMenu
+          menus={menus}
+          pricing={pricing}
+          secondaryLink={secondaryLink}
+          primaryCta={primaryCta}
+          currentPath={currentPath}
+          onNavigate={() => setMobileOpen(false)}
+        />
+      )}
     </nav>
   );
 }
@@ -796,19 +816,21 @@ function MobileMenu({
   secondaryLink,
   primaryCta,
   currentPath,
+  onNavigate,
 }: {
   menus: MegaMenu[];
   pricing: NavLinkSpec;
   secondaryLink: NavLinkSpec;
   primaryCta: NavLinkSpec;
   currentPath: string;
+  onNavigate: () => void;
 }) {
   return (
     <div className="lg:hidden bg-paper border-t border-line/10 max-h-[80vh] overflow-y-auto">
       <div className="measure-frame py-4 flex flex-col gap-5">
         {menus.map((menu) => (
           <div key={menu.key}>
-            <L to={menu.to} className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink/40">
+            <L to={menu.to} onClick={onNavigate} className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink/40">
               {menu.label}
             </L>
             <ul className="mt-2 flex flex-col">
@@ -818,6 +840,7 @@ function MobileMenu({
                   <li key={item.to}>
                     <L
                       to={item.to}
+                      onClick={onNavigate}
                       className={cx('flex items-center gap-2.5 py-2.5 font-sans text-sm border-b border-line/[0.06]', active ? 'text-blueprint font-medium' : 'text-ink/70')}
                     >
                       {item.icon && <Icon name={item.icon} size={18} className="text-blueprint/60" />}
@@ -829,14 +852,14 @@ function MobileMenu({
             </ul>
           </div>
         ))}
-        <L to={pricing.to} className={cx('font-sans text-sm py-2', currentPath === pricing.to ? 'text-blueprint font-medium' : 'text-ink/70')}>
+        <L to={pricing.to} onClick={onNavigate} className={cx('font-sans text-sm py-2', currentPath === pricing.to ? 'text-blueprint font-medium' : 'text-ink/70')}>
           {pricing.label}
         </L>
         <div className="flex flex-col gap-2 pt-1">
-          <L to={secondaryLink.to} className="sl-btn text-sm w-full justify-center">
+          <L to={secondaryLink.to} onClick={onNavigate} className="sl-btn text-sm w-full justify-center">
             {secondaryLink.label}
           </L>
-          <L to={primaryCta.to} className="sl-btn sl-btn--primary text-sm w-full justify-center">
+          <L to={primaryCta.to} onClick={onNavigate} className="sl-btn sl-btn--primary text-sm w-full justify-center">
             {primaryCta.label}
           </L>
         </div>

@@ -288,6 +288,9 @@
 .sl-table--bordered thead th { background: var(--sl-surface-2); }
 .sl-table--zebra tbody tr:nth-child(even) td { background: var(--sl-surface-2); }
 .sl-table--zebra tbody tr:hover td { background: var(--sl-hover); }
+@media (max-width: 760px) {
+  .sl-table { display: block; overflow-x: auto; max-width: 100%; }
+}
 
 /* ── Progress bar ────────────────────────────────────────────────────────────────── */
 .sl-progress { height: .5em; border-radius: var(--sl-radius-full); background: var(--sl-surface-2); overflow: hidden; }
@@ -340,6 +343,11 @@
 .sl-stepper--vertical .sl-stepper__step.is-done:not(:last-child)::before {
   background: color-mix(in srgb, var(--sl-accent) 55%, var(--sl-line)); }
 .sl-stepper--vertical .sl-stepper__text { padding-top: .12em; }
+@media (max-width: 560px) {
+  .sl-stepper { flex-direction: column; gap: .8em; }
+  .sl-stepper__step:not(:last-child) { flex: none; }
+  .sl-stepper__step:not(:last-child)::after { content: none; }
+}
 
 /* ── Stat (metric chip + strip) ──────────────────────────────────────────────────── */
 .sl-stats { display: flex; flex-wrap: wrap; gap: .55em; }
@@ -449,6 +457,10 @@
   border: 1px solid var(--sl-line); border-radius: var(--sl-radius); background: var(--sl-surface); }
 .sl-entity-list .sl-entity { border: 0; border-radius: 0; border-bottom: 1px solid var(--sl-line); }
 .sl-entity-list .sl-entity:last-child { border-bottom: 0; }
+@media (max-width: 560px) {
+  .sl-entity { align-items: flex-start; }
+  .sl-entity__trailing { flex-wrap: wrap; justify-content: flex-start; }
+}
 
 /* ── Charts (bar · pie/donut · effort·impact quadrant) ────────────────────────────────
    Static, token-driven, print-safe (no hover-only data) so they render identically in the
@@ -670,23 +682,28 @@
    Shared markup — the React <AppShell> (tsx consumers) and the Python-SSR app render these
    same classes from one source, so the inspector and the tracker can never drift.
    Sidebar width is a scoped custom property the resize JS writes; collapse via .is-collapsed. */
-.sl-app-shell { display: flex; height: 100vh; overflow: hidden; --sl-sidebar-w: 248px; }
+.sl-app-shell { position: relative; display: flex; height: 100vh; overflow: hidden; --sl-sidebar-w: 248px; }
+.sl-sidebar-backdrop { display: none; }
 .sl-sidebar { width: var(--sl-sidebar-w); min-width: var(--sl-sidebar-w); background: var(--sl-sidebar);
   border-right: 1px solid var(--sl-line); display: flex; flex-direction: column; flex-shrink: 0; overflow: hidden;
   transition: width 200ms var(--sl-ease), min-width 200ms var(--sl-ease), border-right-width 200ms; }
 .sl-app-shell.is-collapsed .sl-sidebar { width: 0; min-width: 0; border-right-width: 0; }
 .sl-brand { height: var(--sl-row-h); flex-shrink: 0; display: flex; align-items: center; padding: 0 var(--sl-s-4);
-  font-size: .8125rem; border-bottom: 1px solid var(--sl-line); }
+  gap: var(--sl-gap-item); font-size: .8125rem; border-bottom: 1px solid var(--sl-line); }
+.sl-brand > :first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.sl-sidebar-close { display: none; margin-left: auto; }
 .sl-sb-scroll { overflow: auto; padding: var(--sl-s-2); flex: 1; min-height: 0; }
 /* Search slot — pinned under the brand (below its border), above the nav. The trigger fills the width. */
 .sl-sb-search { flex-shrink: 0; padding: var(--sl-s-2) var(--sl-s-2) 2px; }
 .sl-sb-search .sl-cmdk-trigger { width: 100%; }
 .sl-nav { display: flex; flex-direction: column; gap: 1px; }
 /* Items render as <a> in the SSR app and <button> in React consumers — both styled here. */
-.sl-nav a, .sl-nav button { display: flex; align-items: center; gap: var(--sl-gap-item); width: 100%; padding: var(--sl-s-1) var(--sl-s-2);
+.sl-nav a, .sl-nav button { display: flex; align-items: center; gap: var(--sl-gap-item); width: 100%; min-width: 0; padding: var(--sl-s-1) var(--sl-s-2);
   border: 0; background: transparent; border-radius: var(--sl-radius-sm); color: var(--sl-ink); font: inherit;
   font-weight: 500; font-size: .8125rem; text-align: left; position: relative; min-height: var(--sl-row-dense); text-decoration: none; cursor: pointer; }
 .sl-nav a svg, .sl-nav button svg { width: 16px; height: 16px; flex: none; color: var(--sl-faint); }
+.sl-nav button > span:not(.sl-nav-meta) { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sl-nav a { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .sl-nav a:hover, .sl-nav button:hover { background: var(--sl-hover); }
 .sl-nav a.is-active, .sl-nav button.is-active { background: var(--sl-sel); color: var(--sl-ink); font-weight: 600; }
 .sl-nav a.is-active::before, .sl-nav button.is-active::before { content: ''; position: absolute; left: -8px; top: 8px; bottom: 8px;
@@ -751,10 +768,21 @@ button.sl-navhead:hover { color: var(--sl-muted); }
 .sl-tb-actions { display: flex; align-items: center; gap: var(--sl-gap-item); }
 .sl-shell-body { flex: 1; min-height: 0; overflow: auto; }
 @media (max-width: 760px) {
-  .sl-sidebar { position: fixed; top: 0; left: 0; height: 100vh; z-index: 100; width: 280px !important; min-width: 280px !important;
+  .sl-sidebar-backdrop {
+    display: block; position: fixed; inset: 0; z-index: 90; margin: 0; padding: 0; border: 0;
+    background: color-mix(in srgb, #0a0c10 38%, transparent);
+    opacity: 1; transition: opacity 220ms var(--sl-ease); cursor: default;
+  }
+  .sl-app-shell.is-collapsed .sl-sidebar-backdrop { opacity: 0; pointer-events: none; }
+  .sl-sidebar { position: fixed; top: 0; left: 0; height: 100vh; z-index: 100;
+    width: min(280px, calc(100vw - 48px)) !important; min-width: min(280px, calc(100vw - 48px)) !important;
+    max-width: calc(100vw - 48px);
     transform: translateX(-100%); transition: transform 220ms var(--sl-ease); }
   .sl-app-shell:not(.is-collapsed) .sl-sidebar { transform: translateX(0); box-shadow: var(--sl-shadow-lg); }
+  .sl-sidebar-close { display: inline-flex; }
   .sl-resize { display: none; }
+  .sl-topbar { gap: var(--sl-gap-item); padding: 0 var(--sl-s-2); }
+  .sl-tb-actions { min-width: 0; overflow-x: auto; }
 }
 
 /* ── Overlays: Drawer · Modal · Popover ───────────────────────────────────────────
@@ -798,6 +826,12 @@ button.sl-navhead:hover { color: var(--sl-muted); }
 .sl-drawer__body { flex: 1; min-height: 0; overflow-y: auto; padding: var(--sl-s-5) var(--sl-gap-section); }
 .sl-drawer__foot { flex-shrink: 0; border-top: 1px solid var(--sl-line); padding: var(--sl-s-3) var(--sl-s-4);
   display: flex; justify-content: flex-end; gap: var(--sl-gap-item); }
+@media (max-width: 560px) {
+  .sl-drawer__panel, .sl-drawer--wide .sl-drawer__panel { width: 100vw; }
+  .sl-drawer__body { padding: var(--sl-s-4); }
+  .sl-drawer__foot { flex-wrap: wrap; justify-content: stretch; }
+  .sl-drawer__foot .sl-btn { flex: 1 1 auto; }
+}
 
 /* Modal (centered dialog) */
 .sl-modal { position: fixed; inset: 0; z-index: 120; display: flex; align-items: center; justify-content: center; padding: var(--sl-s-6); }
@@ -925,6 +959,12 @@ button.sl-navhead:hover { color: var(--sl-muted); }
 .sl-filter-clear { padding: 0 4px; border: 0; background: none; font: inherit; font-size: .85em;
   color: var(--sl-muted); cursor: pointer; }
 .sl-filter-clear:hover { color: var(--sl-ink); text-decoration: underline; }
+@media (max-width: 560px) {
+  .sl-filter-search { flex-basis: 100%; }
+  .sl-filter-search::after { display: none; }
+  .sl-filter-chip { max-width: 100%; }
+  .sl-filter-chip__body { min-width: 0; }
+}
 
 /* ── Facet bar (always-visible faceted filtering) ─────────────────────────────────
    .sl-filter-bar's open sibling: chip rows per facet group, every option on the page
@@ -1015,6 +1055,12 @@ button.sl-navhead:hover { color: var(--sl-muted); }
 .sl-list-row:hover { background: var(--sl-hover); }
 .sl-list-row__title { flex: 1; min-width: 0; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .sl-list-row__trailing { flex-shrink: 0; display: flex; align-items: center; gap: var(--sl-gap-group); color: var(--sl-faint); font-size: .85em; }
+@media (max-width: 640px) {
+  .sl-list-head { flex-direction: column; gap: var(--sl-gap-item); }
+  .sl-list-row { align-items: flex-start; }
+  .sl-list-row__title { white-space: normal; }
+  .sl-list-row__trailing { flex-wrap: wrap; justify-content: flex-start; }
+}
 
 /* ── Page header (the detail-page hero: top slot · icon · title · sub · actions) ─── */
 .sl-page-header { display: flex; align-items: flex-start; gap: var(--sl-s-4); }
@@ -1025,6 +1071,10 @@ button.sl-navhead:hover { color: var(--sl-muted); }
 .sl-page-header__title svg { width: 1.05em; height: 1.05em; flex-shrink: 0; color: var(--sl-muted); }
 .sl-page-header__sub { margin: 0; color: var(--sl-muted); max-width: 65ch; }
 .sl-page-header__actions { flex-shrink: 0; display: flex; align-items: center; gap: var(--sl-gap-item); }
+@media (max-width: 640px) {
+  .sl-page-header { flex-direction: column; }
+  .sl-page-header__top, .sl-page-header__title, .sl-page-header__actions { flex-wrap: wrap; }
+}
 
 /* ── Detail layout (content column + sticky aside) and the scrollspy page rail ───── */
 .sl-detail { display: grid; grid-template-columns: minmax(0, 1fr) 248px; gap: var(--sl-gap-region); align-items: start; }
@@ -1165,6 +1215,12 @@ button.sl-navhead:hover { color: var(--sl-muted); }
 .sl-cm-more { font-size: .82em; color: var(--sl-muted); } .sl-cm-more:hover { color: var(--sl-accent); }
 .sl-cm-mood { position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: var(--sl-line-2); }
 .sl-cm-mood.pos { background: var(--sl-green); } .sl-cm-mood.neg { background: var(--sl-amber); } .sl-cm-mood.neu { background: var(--sl-line-2); }
+@media (max-width: 640px) {
+  .sl-cal-week, .sl-cal-month {
+    grid-template-columns: repeat(7, minmax(82px, 1fr));
+    overflow-x: auto;
+  }
+}
 /* YEAR: activity heatmap */
 .sl-cal-year { display: flex; gap: 9px; align-items: flex-start; overflow-x: auto; overflow-y: hidden; padding: 6px 2px 2px; }
 .sl-cy-wd { display: grid; grid-template-rows: repeat(7, 11px); gap: 3px; padding-top: 18px; }

@@ -37,6 +37,9 @@
           <span class="sl-logo__word">sona<span class="sl-logo__loop">loop</span></span>
           <span class="sl-logo__sub">design</span>
         </a>
+        <button class="sl-sidebar-close sl-iconbtn sl-iconbtn--ghost" type="button" data-sidebar-close aria-label="Close sidebar" title="Close sidebar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
       </div>
 
       <div class="sl-sb-search">
@@ -74,11 +77,13 @@
       </div>
     </aside>
 
+    <button class="sl-sidebar-backdrop" type="button" data-sidebar-close aria-label="Close sidebar"></button>
+
     <div class="sl-resize" id="rz" role="separator" aria-orientation="vertical" aria-label="Resize sidebar"></div>
 
     <div class="sl-main">
       <header class="sl-topbar">
-        <button class="sl-iconbtn" id="sbt" type="button" data-sidebar-toggle aria-label="Toggle sidebar" title="Toggle sidebar ([)">
+        <button class="sl-iconbtn" id="sbt" type="button" data-sidebar-toggle aria-label="Toggle sidebar" aria-expanded="true" title="Toggle sidebar ([)">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg>
         </button>
         <nav class="sl-breadcrumb" id="crumb" aria-label="Breadcrumb"></nav>
