@@ -26,6 +26,16 @@ tokens.data.mjs                 ← author colour here (single source of truth)
 Each consumer keeps its own var names; only the values live here. Change a colour once and
 the website + app both pick it up. The brand spec/rationale is in [`BRANDING.md`](BRANDING.md).
 
+## Workspace design-system instances
+
+Cloud customer workspaces consume the same vocabulary through
+[`design-system.data.mjs`](design-system.data.mjs), exported as
+`sonaloop-design/design-system`. It defines the versioned
+`workspace_design_system.v2` contract, the default Sonaloop instance, editable role
+metadata for brand/colors/typography/layout/imagery/charts/deck, and the migration map from
+the earlier slim customer theme. The long-form contract lives in
+[`DESIGN_SYSTEM_INSTANCE.md`](DESIGN_SYSTEM_INSTANCE.md).
+
 ## Components
 
 `styles/components.css` is the shared component layer (`.sl-btn`, `.sl-card`, `.sl-badge`,

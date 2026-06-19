@@ -4,6 +4,10 @@
 export const usage = {
   "navbar": [
     {
+      "name": "Api",
+      "to": "/resources/api"
+    },
+    {
       "name": "Blog",
       "to": "/blog"
     },
@@ -19,6 +23,10 @@ export const usage = {
     {
       "name": "Changelog Entry",
       "to": "/changelog/:slug"
+    },
+    {
+      "name": "Design",
+      "to": "/resources/design"
     },
     {
       "name": "Format Template",
@@ -49,12 +57,16 @@ export const usage = {
       "to": "/icons"
     },
     {
-      "name": "Install",
-      "to": "/install"
-    },
-    {
       "name": "Job Template",
       "to": ""
+    },
+    {
+      "name": "Mcp",
+      "to": "/mcp"
+    },
+    {
+      "name": "Mcp Client",
+      "to": "/mcp/:client"
     },
     {
       "name": "Persona Detail",
@@ -179,8 +191,16 @@ export const usage = {
   },
   "hero": [
     {
+      "name": "Api",
+      "to": "/resources/api"
+    },
+    {
       "name": "Changelog",
       "to": "/changelog"
+    },
+    {
+      "name": "Design",
+      "to": "/resources/design"
     },
     {
       "name": "Format Template",
@@ -203,12 +223,16 @@ export const usage = {
       "to": "/how-it-works"
     },
     {
-      "name": "Install",
-      "to": "/install"
-    },
-    {
       "name": "Job Template",
       "to": ""
+    },
+    {
+      "name": "Mcp",
+      "to": "/mcp"
+    },
+    {
+      "name": "Mcp Client",
+      "to": "/mcp/:client"
     },
     {
       "name": "Personas",
@@ -247,6 +271,10 @@ export const usage = {
   "cta-band": [],
   "footer": [
     {
+      "name": "Api",
+      "to": "/resources/api"
+    },
+    {
       "name": "Blog",
       "to": "/blog"
     },
@@ -262,6 +290,10 @@ export const usage = {
     {
       "name": "Changelog Entry",
       "to": "/changelog/:slug"
+    },
+    {
+      "name": "Design",
+      "to": "/resources/design"
     },
     {
       "name": "Format Template",
@@ -292,12 +324,16 @@ export const usage = {
       "to": "/icons"
     },
     {
-      "name": "Install",
-      "to": "/install"
-    },
-    {
       "name": "Job Template",
       "to": ""
+    },
+    {
+      "name": "Mcp",
+      "to": "/mcp"
+    },
+    {
+      "name": "Mcp Client",
+      "to": "/mcp/:client"
     },
     {
       "name": "Persona Detail",
@@ -371,6 +407,10 @@ export const usage = {
   "command-palette": [],
   "layout": [
     {
+      "name": "Api",
+      "to": "/resources/api"
+    },
+    {
       "name": "Blog",
       "to": "/blog"
     },
@@ -386,6 +426,10 @@ export const usage = {
     {
       "name": "Changelog Entry",
       "to": "/changelog/:slug"
+    },
+    {
+      "name": "Design",
+      "to": "/resources/design"
     },
     {
       "name": "Format Template",
@@ -412,12 +456,16 @@ export const usage = {
       "to": "/how-it-works"
     },
     {
-      "name": "Install",
-      "to": "/install"
-    },
-    {
       "name": "Job Template",
       "to": ""
+    },
+    {
+      "name": "Mcp",
+      "to": "/mcp"
+    },
+    {
+      "name": "Mcp Client",
+      "to": "/mcp/:client"
     },
     {
       "name": "Persona Detail",
@@ -472,8 +520,12 @@ export const usage = {
         "to": "/how-it-works"
       },
       {
-        "name": "Install",
-        "to": "/install"
+        "name": "Mcp",
+        "to": "/mcp"
+      },
+      {
+        "name": "Mcp Client",
+        "to": "/mcp/:client"
       },
       {
         "name": "Persona Detail",
@@ -495,12 +547,16 @@ export const usage = {
         "to": ""
       },
       {
-        "name": "Install",
-        "to": "/install"
-      },
-      {
         "name": "Job Template",
         "to": ""
+      },
+      {
+        "name": "Mcp",
+        "to": "/mcp"
+      },
+      {
+        "name": "Mcp Client",
+        "to": "/mcp/:client"
       }
     ],
     "fields": []
@@ -509,10 +565,6 @@ export const usage = {
     {
       "name": "Home",
       "to": "/"
-    },
-    {
-      "name": "Install",
-      "to": "/install"
     }
   ],
   "faq": [
@@ -521,8 +573,8 @@ export const usage = {
       "to": "/"
     },
     {
-      "name": "Install",
-      "to": "/install"
+      "name": "Mcp",
+      "to": "/mcp"
     },
     {
       "name": "Pricing",
@@ -541,8 +593,8 @@ export const source = {
   "mega-menu": {
     "export": "MegaMenuPanel",
     "file": "src/website.tsx",
-    "line": 728,
-    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L728"
+    "line": 748,
+    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L748"
   },
   "cards": {
     "content": {
@@ -579,38 +631,38 @@ export const source = {
   "hero": {
     "export": "Hero",
     "file": "src/website.tsx",
-    "line": 878,
-    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L878"
+    "line": 901,
+    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L901"
   },
   "cta-band": {
     "export": "CtaBand",
     "file": "src/website.tsx",
-    "line": 936,
-    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L936"
+    "line": 959,
+    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L959"
   },
   "footer": {
     "export": "Footer",
     "file": "src/website.tsx",
-    "line": 994,
-    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L994"
+    "line": 1017,
+    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L1017"
   },
   "product-showcase": {
     "export": "ProductShot",
     "file": "src/website.tsx",
-    "line": 1075,
-    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L1075"
+    "line": 1098,
+    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L1098"
   },
   "canvas-showcase": {
     "export": "CanvasShowcase",
     "file": "src/website.tsx",
-    "line": 1114,
-    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L1114"
+    "line": 1137,
+    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L1137"
   },
   "integration-showcase": {
     "export": "IntegrationShowcase",
     "file": "src/website.tsx",
-    "line": 1152,
-    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L1152"
+    "line": 1175,
+    "href": "https://github.com/jhoetter/sonaloop-design/blob/main/src/website.tsx#L1175"
   },
   "command-palette": {
     "export": "CommandPalette",
