@@ -232,6 +232,10 @@ export const regular = {
     label: 'ExpandIcon',
     body: '<path d="M14 4h6v6"/><path d="M20 4l-6.5 6.5"/><path d="M10 20H4v-6"/><path d="M4 20l6.5-6.5"/>',
   },
+  collapse: {
+    label: 'CollapseIcon',
+    body: '<path d="M4 14h6v6"/><path d="M10 14l-6.5 6.5"/><path d="M20 10h-6V4"/><path d="M14 10l6.5-6.5"/>',
+  },
 
   // ── Reaction / notation markers ──────────────────────────────────────────────
   // Replace inline Unicode UI markers (👍 ⚠ ● ◇ ◆ ▸) with real icons.
