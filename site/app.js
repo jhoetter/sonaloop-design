@@ -101,6 +101,57 @@ const table = (cols, rows) => `
 const h2 = (id, t) => `<h2 class="ds-h2" id="${id}">${esc(t)}</h2>`;
 const p = (html) => `<p class="ds-p">${html}</p>`;
 
+const brandAssetLink = (file, label) => `
+  <a class="ds-brand-dl-link" href="/brand/${esc(file)}" download>
+    ${svgReg('download')}
+    <span>${esc(label)}</span>
+  </a>`;
+
+const brandAssetCard = ({ title, meta, preview, files }) => `
+  <article class="ds-brand-dl-card">
+    <div class="ds-brand-dl-preview">${preview}</div>
+    <div class="ds-brand-dl-body">
+      <h3>${esc(title)}</h3>
+      <p>${meta}</p>
+      <div class="ds-brand-dl-actions">${files.map(([file, label]) => brandAssetLink(file, label)).join('')}</div>
+    </div>
+  </article>`;
+
+const brandDownloadables = () => `
+  <div class="ds-brand-downloads">
+    ${brandAssetCard({
+      title: 'Icon',
+      meta: 'Loop mark only. Use for app icons, favicons, square avatars and compact product surfaces.',
+      preview: `<span class="ds-brand-dl-mark">${svgReg('sonaloop')}</span>`,
+      files: [
+        ['sonaloop-icon.svg', 'SVG'],
+        ['sonaloop-icon-256.png', '256 PNG'],
+        ['sonaloop-icon-512.png', '512 PNG'],
+        ['sonaloop-icon-1024.png', '1024 PNG'],
+      ],
+    })}
+    ${brandAssetCard({
+      title: 'Wordmark',
+      meta: 'The lowercase wordmark: Sona Mono for sona, Sona Pixel for loop.',
+      preview: `<span class="sl-logo ds-brand-dl-logo"><span class="sl-logo__word">sona<span class="sl-logo__loop">loop</span></span></span>`,
+      files: [
+        ['sonaloop-wordmark.svg', 'SVG'],
+        ['sonaloop-wordmark-1024w.png', '1024 PNG'],
+        ['sonaloop-wordmark-2048w.png', '2048 PNG'],
+      ],
+    })}
+    ${brandAssetCard({
+      title: 'Lockup',
+      meta: 'The canonical composition: loop mark plus wordmark, matching the live Logo component.',
+      preview: `<span class="sl-logo ds-brand-dl-logo"><span class="sl-logo__mark">${svgReg('sonaloop')}</span><span class="sl-logo__word">sona<span class="sl-logo__loop">loop</span></span></span>`,
+      files: [
+        ['sonaloop-lockup.svg', 'SVG'],
+        ['sonaloop-lockup-1024w.png', '1024 PNG'],
+        ['sonaloop-lockup-2048w.png', '2048 PNG'],
+      ],
+    })}
+  </div>`;
+
 /* ── charts (live previews — mirror py/sonaloop_icons/charts.py + src/charts.tsx so the docs
    render from the same .sl-chart* contract) ──────────────────────────────────────────── */
 const CHART_SERIES = ['var(--c1)', 'var(--c2)', 'var(--c3)', 'var(--c4)', 'var(--c5)', 'var(--c6)', 'var(--c7)'];
@@ -1055,7 +1106,7 @@ function pageBrand() {
   return `
     <p class="ds-eyebrow">Brand</p>
     <h1 class="ds-h1">Sonaloop</h1>
-    <p class="ds-lead">The Sonaloop mark is a single continuous loop with three nodes — the feedback loop between personas, councils and synthesis. Pair it with the wordmark set in Geist Mono, uppercase. The lockup ships as the <a href="#/components/logo">Logo</a> component (<code>.sl-logo</code>) — every surface renders that one source.</p>
+    <p class="ds-lead">The Sonaloop mark is a single continuous loop with three nodes — the feedback loop between personas, councils and synthesis. Pair it with the lowercase wordmark set in Sona Mono plus Sona Pixel. The lockup ships as the <a href="#/components/logo">Logo</a> component (<code>.sl-logo</code>) — every surface renders that one source.</p>
 
     ${h2('brand-lockup', 'Primary lockup')}
     ${p('This is the live <a href="#/components/logo">Logo</a> component (<code>.sl-logo</code>) — the same lockup the website navbar/footer and the app sidebar render.')}
@@ -1067,6 +1118,10 @@ function pageBrand() {
       <div class="ds-brand-panel"><span class="sl-logo" style="font-size:20px"><span class="sl-logo__mark">${svgReg('sonaloop')}</span><span class="sl-logo__word">sona<span class="sl-logo__loop">loop</span></span></span></div>
       <div class="ds-brand-panel on-dark" data-theme="dark"><span class="sl-logo" style="font-size:20px"><span class="sl-logo__mark">${svgReg('sonaloop')}</span><span class="sl-logo__word">sona<span class="sl-logo__loop">loop</span></span></span></div>
     </div>
+
+    ${h2('brand-downloads', 'Downloadables')}
+    ${p('Download the canonical transparent, monochrome assets. SVGs are self-contained and embed the Sona font data; PNGs are ink on transparent background at export-ready sizes.')}
+    ${brandDownloadables()}
 
     ${h2('brand-family', 'Product family')}
     ${p('Two siblings extend the base mark with a quiet badge — keep the relationship legible, never restyle the core loop.')}
@@ -1080,7 +1135,7 @@ function pageBrand() {
     <ul class="ds-ul">
       <li class="ds-li">Keep clear space around the lockup equal to the height of the mark.</li>
       <li class="ds-li">Don't recolour the mark, add gradients, or set it on the indigo accent.</li>
-      <li class="ds-li">Don't stretch, rotate or outline the wordmark — Geist Mono, uppercase, tracking <code>0.14em</code>.</li>
+      <li class="ds-li">Don't stretch, rotate or outline the wordmark — keep Sona Mono plus Sona Pixel, lowercase, with the canonical spacing.</li>
     </ul>
   `;
 }

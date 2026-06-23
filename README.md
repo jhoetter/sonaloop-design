@@ -189,6 +189,7 @@ make install        # npm deps (also installs the pre-commit hook that keeps gen
 make dev            # regenerate + serve the docs site → http://127.0.0.1:6006/
 make dev-forwarded  # same, bound to 0.0.0.0 for a forwarded port
 make gen            # regenerate icons + tokens + tailwind preset + components module
+npm run gen:brand   # regenerate downloadable logo SVG/PNG assets under brand/
 make check          # drift guard: fail if any generated artifact is stale
 ```
 

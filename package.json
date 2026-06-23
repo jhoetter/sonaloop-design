@@ -20,6 +20,7 @@
     "./films/*": "./films/*",
     "./images": "./src/images.ts",
     "./images/*": "./images/*",
+    "./brand/*": "./brand/*",
     "./style.css": "./styles/hifi-anim.css"
   },
   "files": [
@@ -31,11 +32,13 @@
     "DESIGN_SYSTEM_INSTANCE.md",
     "styles",
     "fonts",
+    "brand",
     "images",
     "films"
   ],
   "scripts": {
     "gen": "node scripts/gen.mjs && node scripts/gen-tokens.mjs && node scripts/gen-deck.mjs && node scripts/gen-website-previews.mjs && node scripts/gen-website-usage.mjs && node scripts/gen-website-css.mjs",
+    "gen:brand": "node scripts/gen-brand-assets.mjs",
     "gen:deck": "node scripts/gen-deck.mjs",
     "gen:tokens": "node scripts/gen-tokens.mjs",
     "gen:website": "node scripts/gen-website-previews.mjs && node scripts/gen-website-css.mjs",
