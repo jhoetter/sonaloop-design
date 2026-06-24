@@ -1,7 +1,8 @@
 GALLERY_PORT ?= 6006
 FORWARDED_GALLERY_PORT ?= 16006
+FUGU_GALLERY_PORT ?= 56006
 
-.PHONY: install gen check dev dev-forwarded
+.PHONY: install gen check dev dev-forwarded dev-forwarded-fugu
 
 # Install npm deps. Also activates the git pre-commit hook (via the `prepare` script →
 # core.hooksPath=.githooks), so generated artifacts never go stale.
@@ -29,3 +30,8 @@ dev: gen
 # Same, bound to all interfaces for a forwarded port (remote / container dev).
 dev-forwarded: gen
 	@python3 scripts/serve.py $(FORWARDED_GALLERY_PORT) 0.0.0.0
+
+# Same, but on the Fugu (non-EU) dev host's port range so it can be tunnelled
+# alongside the EU host without local port clashes (FUGU = FORWARDED + 40000).
+dev-forwarded-fugu: gen
+	@python3 scripts/serve.py $(FUGU_GALLERY_PORT) 0.0.0.0
