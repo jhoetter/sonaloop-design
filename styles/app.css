@@ -1,0 +1,161 @@
+/**
+ * sonaloop-design app preset.
+ *
+ * Import after tokens.css and components.css, or consume this file directly from
+ * product apps that want the standard Sonaloop application chrome:
+ *
+ *   @import "sonaloop-design/tokens.css";
+ *   @import "sonaloop-design/components.css";
+ *   @import "sonaloop-design/app.css";
+ */
+
+.sl-app {
+  min-height: 100dvh;
+  color: var(--sl-ink);
+  background: var(--sl-bg);
+  font-family: var(--sl-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.sl-app-shell {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: minmax(15rem, 18rem) minmax(0, 1fr);
+  background: var(--sl-bg);
+}
+
+.sl-app-sidebar {
+  min-width: 0;
+  border-right: 1px solid var(--sl-line);
+  background: var(--sl-surface);
+}
+
+.sl-app-sidebar__inner {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sl-s-4);
+  padding: var(--sl-s-4);
+  position: sticky;
+  top: 0;
+}
+
+.sl-app-main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--sl-bg);
+}
+
+.sl-app-topbar {
+  min-height: var(--sl-row-h);
+  display: flex;
+  align-items: center;
+  gap: var(--sl-gap-item);
+  padding: 0 var(--sl-s-4);
+  border-bottom: 1px solid var(--sl-line);
+  background: color-mix(in srgb, var(--sl-surface) 92%, transparent);
+  backdrop-filter: blur(14px);
+}
+
+.sl-app-topbar__title {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--sl-gap-item);
+  font-weight: 600;
+}
+
+.sl-app-topbar__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sl-s-2);
+  flex: none;
+}
+
+.sl-app-content {
+  min-width: 0;
+  flex: 1;
+  padding: var(--sl-s-5);
+}
+
+.sl-app-workspace {
+  min-height: 0;
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(18rem, 22rem);
+  gap: var(--sl-s-4);
+  padding: var(--sl-s-4);
+}
+
+.sl-app-editor {
+  min-width: 0;
+  min-height: 0;
+  border: 1px solid var(--sl-line);
+  border-radius: var(--sl-radius);
+  background: var(--sl-surface);
+  overflow: hidden;
+}
+
+.sl-app-editor__toolbar {
+  min-height: var(--sl-row);
+  display: flex;
+  align-items: center;
+  gap: var(--sl-s-2);
+  padding: var(--sl-s-2) var(--sl-s-3);
+  border-bottom: 1px solid var(--sl-line);
+  background: var(--sl-surface-2);
+}
+
+.sl-app-editor__canvas {
+  min-height: 28rem;
+  padding: var(--sl-s-5);
+  background: var(--sl-bg);
+}
+
+.sl-app-inspector {
+  min-width: 0;
+  border: 1px solid var(--sl-line);
+  border-radius: var(--sl-radius);
+  background: var(--sl-surface);
+  overflow: hidden;
+}
+
+.sl-app-inspector__header {
+  min-height: var(--sl-row);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sl-gap-item);
+  padding: 0 var(--sl-s-3);
+  border-bottom: 1px solid var(--sl-line);
+  font-weight: 600;
+}
+
+.sl-app-inspector__body {
+  padding: var(--sl-s-4);
+}
+
+.sl-app-command-surface {
+  border: 1px solid var(--sl-line);
+  border-radius: var(--sl-radius);
+  background: var(--sl-surface);
+  box-shadow: 0 20px 70px color-mix(in srgb, var(--sl-ink) 18%, transparent);
+}
+
+@media (max-width: 860px) {
+  .sl-app-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .sl-app-sidebar__inner {
+    height: auto;
+    position: static;
+  }
+
+  .sl-app-workspace {
+    grid-template-columns: 1fr;
+  }
+}

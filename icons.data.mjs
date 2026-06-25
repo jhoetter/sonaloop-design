@@ -31,7 +31,172 @@
 // ── Regular 24×24 chrome icons ───────────────────────────────────────────────
 // The first 15 are ported verbatim from the sonaloop chrome icon set so
 // the app renders pixel-identical after the cutover.
+const officeIconBodies = {
+  text: '<path d="M5 6h14M5 10h10M5 14h14M5 18h8"/>',
+  table: '<rect x="4" y="5" width="16" height="14" rx="1.8"/><path d="M4 10h16M4 14h16M9 5v14M15 5v14"/>',
+  file: '<path d="M7 3.5h7l3 3V20a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 6 20V5a1.5 1.5 0 0 1 1-1.5z"/><path d="M14 3.5V7h3"/><path d="M9 11h6M9 15h5"/>',
+  review: '<path d="M5 6.5A2.5 2.5 0 0 1 7.5 4h9A2.5 2.5 0 0 1 19 6.5v6A2.5 2.5 0 0 1 16.5 15H11l-4.5 4v-4A2.5 2.5 0 0 1 4 12.5z"/><path d="M8 8h8M8 11h5"/>',
+  slide: '<rect x="4" y="5" width="16" height="12" rx="2"/><path d="M8 21h8M12 17v4"/><path d="M8 9h4M8 12h8"/>',
+  movement: '<path d="M12 4v16M8 8l4-4 4 4M8 16l4 4 4-4"/><path d="M4 12h16M8 8l-4 4 4 4M16 8l4 4-4 4"/>',
+  utility: '<circle cx="12" cy="12" r="8.5"/><path d="M8.5 12h7M12 8.5v7"/>',
+};
+
+const officeRegularNames = [
+  'alignCenter',
+  'alignCenterHorizontal',
+  'alignCenterVertical',
+  'alignEndHorizontal',
+  'alignEndVertical',
+  'alignHorizontalDistributeCenter',
+  'alignJustify',
+  'alignLeft',
+  'alignRight',
+  'alignStartHorizontal',
+  'alignStartVertical',
+  'alignVerticalDistributeCenter',
+  'alignVerticalJustifyCenter',
+  'alignVerticalJustifyEnd',
+  'alignVerticalJustifyStart',
+  'arrowDownToLine',
+  'arrowDownZA',
+  'arrowLeftRight',
+  'arrowLeftToLine',
+  'arrowRightToLine',
+  'arrowUpAZ',
+  'arrowUpToLine',
+  'asterisk',
+  'barChart3',
+  'bold',
+  'bookOpen',
+  'brush',
+  'calculator',
+  'chevronRight',
+  'chevronsDown',
+  'chevronsUp',
+  'chevronUp',
+  'clipboardCopy',
+  'clipboardPaste',
+  'combine',
+  'copyMinus',
+  'cornerDownLeft',
+  'cornerDownRight',
+  'cornerUpLeft',
+  'dollarSign',
+  'eyeOff',
+  'archive',
+  'codeFile',
+  'imageFile',
+  'spreadsheetFile',
+  'documentFile',
+  'pdfFile',
+  'frame',
+  'grid3x3',
+  'group',
+  'hand',
+  'hash',
+  'heading',
+  'highlighter',
+  'history',
+  'image',
+  'indent',
+  'italic',
+  'keyboard',
+  'layers',
+  'layoutTemplate',
+  'lightbulb',
+  'link2',
+  'listOrdered',
+  'listTree',
+  'loader',
+  'maximize',
+  'merge',
+  'messageCircle',
+  'messageSquare',
+  'messageSquarePlus',
+  'minus',
+  'monitorPlay',
+  'moreHorizontal',
+  'mousePointer2',
+  'mousePointerClick',
+  'moveDown',
+  'moveRight',
+  'moveUp',
+  'outdent',
+  'paintbrush',
+  'paintBucket',
+  'palette',
+  'penLine',
+  'percent',
+  'pilcrow',
+  'presentationFile',
+  'printer',
+  'printerCheck',
+  'redo2',
+  'refreshCw',
+  'repeat',
+  'replace',
+  'rotateCcw',
+  'rotateCw',
+  'ruler',
+  'save',
+  'scissors',
+  'scrollText',
+  'separatorHorizontal',
+  'shapes',
+  'sigma',
+  'sliders',
+  'snowflake',
+  'spline',
+  'split',
+  'squareDashed',
+  'stickyNote',
+  'strikethrough',
+  'table',
+  'table2',
+  'tableProperties',
+  'trendingUp',
+  'triangle',
+  'type',
+  'underline',
+  'undo2',
+  'ungroup',
+  'unlink',
+  'video',
+  'wand2',
+  'workflow',
+  'zoomIn',
+];
+
+function officeIconBody(name) {
+  if (/file|archive|image|presentation|spreadsheet|pdf/i.test(name)) return officeIconBodies.file;
+  if (/table|grid|merge|split|chart/i.test(name)) return officeIconBodies.table;
+  if (/message|book|link|note|unlink|review/i.test(name)) return officeIconBodies.review;
+  if (/slide|shape|layout|spline|video|monitor|maximize|frame|layer|group|triangle|square|slider/i.test(name)) {
+    return officeIconBodies.slide;
+  }
+  if (/align|bold|italic|underline|strike|heading|indent|outdent|list|type|highlighter|palette|pilcrow/i.test(name)) {
+    return officeIconBodies.text;
+  }
+  if (/arrow|chevron|move|undo|redo|refresh|rotate|corner|repeat/i.test(name)) return officeIconBodies.movement;
+  return officeIconBodies.utility;
+}
+
+function officeIconLabel(name) {
+  return `${name.charAt(0).toUpperCase()}${name.slice(1)}Icon`;
+}
+
+const officeRegular = Object.fromEntries(
+  officeRegularNames.map((name) => [
+    name,
+    {
+      label: officeIconLabel(name),
+      body: officeIconBody(name),
+    },
+  ])
+);
+
 export const regular = {
+  ...officeRegular,
   overview: {
     label: 'OverviewIcon',
     body: '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/>',
