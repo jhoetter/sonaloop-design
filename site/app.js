@@ -100,6 +100,18 @@ const table = (cols, rows) => `
 
 const h2 = (id, t) => `<h2 class="ds-h2" id="${id}">${esc(t)}</h2>`;
 const p = (html) => `<p class="ds-p">${html}</p>`;
+const brandProductNames = ['sonafile', 'sonatile', 'sonamesh', 'sonapage', 'sonaseed', 'sonatask'];
+
+const brandWordmark = (name) => {
+  const prefix = name.slice(0, -4);
+  const suffix = name.slice(-4);
+  return `<span class="sl-logo__word">${esc(prefix)}<span class="sl-logo__loop">${esc(suffix)}</span></span>`;
+};
+
+const brandLockup = (name, className = '') => `
+  <span class="sl-logo ${className}">
+    <span class="sl-logo__mark">${svgReg(name)}</span>${brandWordmark(name)}
+  </span>`;
 
 const brandAssetLink = (file, label) => `
   <a class="ds-brand-dl-link" href="/brand/${esc(file)}" download>
@@ -117,10 +129,28 @@ const brandAssetCard = ({ title, meta, preview, files }) => `
     </div>
   </article>`;
 
+const brandProductAssetCard = (name) => brandAssetCard({
+  title: name,
+  meta: `Product lockup: ${esc(name.slice(0, -4))} in Sona Mono, ${esc(name.slice(-4))} in Sona Pixel.`,
+  preview: brandLockup(name, 'ds-brand-dl-logo'),
+  files: [
+    [`${name}-icon.svg`, 'Icon SVG'],
+    [`${name}-icon-256.png`, 'Icon 256'],
+    [`${name}-icon-512.png`, 'Icon 512'],
+    [`${name}-icon-1024.png`, 'Icon 1024'],
+    [`${name}-wordmark.svg`, 'Wordmark SVG'],
+    [`${name}-wordmark-1024w.png`, 'Wordmark 1024'],
+    [`${name}-wordmark-2048w.png`, 'Wordmark 2048'],
+    [`${name}-lockup.svg`, 'Lockup SVG'],
+    [`${name}-lockup-1024w.png`, 'Lockup 1024'],
+    [`${name}-lockup-2048w.png`, 'Lockup 2048'],
+  ],
+});
+
 const brandDownloadables = () => `
   <div class="ds-brand-downloads">
     ${brandAssetCard({
-      title: 'Icon',
+      title: 'sonaloop icon',
       meta: 'Loop mark only. Use for app icons, favicons, square avatars and compact product surfaces.',
       preview: `<span class="ds-brand-dl-mark">${svgReg('sonaloop')}</span>`,
       files: [
@@ -131,9 +161,9 @@ const brandDownloadables = () => `
       ],
     })}
     ${brandAssetCard({
-      title: 'Wordmark',
+      title: 'sonaloop wordmark',
       meta: 'The lowercase wordmark: Sona Mono for sona, Sona Pixel for loop.',
-      preview: `<span class="sl-logo ds-brand-dl-logo"><span class="sl-logo__word">sona<span class="sl-logo__loop">loop</span></span></span>`,
+      preview: `<span class="sl-logo ds-brand-dl-logo">${brandWordmark('sonaloop')}</span>`,
       files: [
         ['sonaloop-wordmark.svg', 'SVG'],
         ['sonaloop-wordmark-1024w.png', '1024 PNG'],
@@ -141,15 +171,16 @@ const brandDownloadables = () => `
       ],
     })}
     ${brandAssetCard({
-      title: 'Lockup',
+      title: 'sonaloop lockup',
       meta: 'The canonical composition: loop mark plus wordmark, matching the live Logo component.',
-      preview: `<span class="sl-logo ds-brand-dl-logo"><span class="sl-logo__mark">${svgReg('sonaloop')}</span><span class="sl-logo__word">sona<span class="sl-logo__loop">loop</span></span></span>`,
+      preview: brandLockup('sonaloop', 'ds-brand-dl-logo'),
       files: [
         ['sonaloop-lockup.svg', 'SVG'],
         ['sonaloop-lockup-1024w.png', '1024 PNG'],
         ['sonaloop-lockup-2048w.png', '2048 PNG'],
       ],
     })}
+    ${brandProductNames.map(brandProductAssetCard).join('')}
   </div>`;
 
 /* ── charts (live previews — mirror py/sonaloop_icons/charts.py + src/charts.tsx so the docs
@@ -1124,12 +1155,15 @@ function pageBrand() {
     ${brandDownloadables()}
 
     ${h2('brand-family', 'Product family')}
-    ${p('Two siblings extend the base mark with a quiet badge — keep the relationship legible, never restyle the core loop.')}
-    <div class="ds-brand-clear" style="grid-template-columns:1fr 1fr">
-      <div class="ds-brand-panel" style="flex-direction:column;gap:14px">${svgHifi('sonaloop-cloud')}<span class="mono" style="font-family:var(--sl-mono);font-size:12px;color:var(--sl-faint)">Sonaloop Cloud</span></div>
-      <div class="ds-brand-panel" style="flex-direction:column;gap:14px">${svgHifi('sonaloop-research')}<span class="mono" style="font-family:var(--sl-mono);font-size:12px;color:var(--sl-faint)">Sonaloop Research</span></div>
+    ${p('Product names follow the same construction as <code>sonaloop</code>: the mark comes from the product icon, the wordmark is lowercase, and the final four letters use Sona Pixel.')}
+    <div class="ds-brand-clear ds-brand-family-grid">
+      ${brandProductNames.map((name) => `
+        <div class="ds-brand-panel" style="flex-direction:column;gap:14px">
+          ${brandLockup(name)}
+          <span class="mono" style="font-family:var(--sl-mono);font-size:12px;color:var(--sl-faint)">${esc(name)}</span>
+        </div>`).join('')}
     </div>
-    ${code('tsx', `import { SonaloopCloudIcon, SonaloopResearchIcon } from 'sonaloop-design';`)}
+    ${code('tsx', `import { SonafileIcon, SonatileIcon, SonameshIcon, SonapageIcon, SonaseedIcon, SonataskIcon } from 'sonaloop-design';`)}
 
     ${h2('brand-dont', 'Clear space & misuse')}
     <ul class="ds-ul">

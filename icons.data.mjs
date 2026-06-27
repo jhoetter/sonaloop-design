@@ -205,6 +205,55 @@ const officeRegular = Object.fromEntries(
   ])
 );
 
+const sonaProductRegular = {
+  sonafile: {
+    label: 'SonafileIcon',
+    body: svg(
+      '<path data-part="file" d="M7.8 3.6h5.8L18 8v11.2a1.8 1.8 0 0 1-1.8 1.8H7.8A1.8 1.8 0 0 1 6 19.2V5.4a1.8 1.8 0 0 1 1.8-1.8z"/>',
+      '<path d="M13.4 3.8v3.8a1.3 1.3 0 0 0 1.3 1.3h3.1"/>',
+      '<circle data-part="dot" cx="12.1" cy="16.2" r="1.85" fill="currentColor" stroke="none"/>',
+    ),
+  },
+  sonatile: {
+    label: 'SonatileIcon',
+    body: svg(
+      '<path data-part="tile" d="M17.1 12.7V7.2A2.2 2.2 0 0 0 14.9 5H7.2A2.2 2.2 0 0 0 5 7.2v8.1a2.2 2.2 0 0 0 2.2 2.2h5.3"/>',
+      '<circle data-part="dot" cx="16.8" cy="17.3" r="1.85" fill="currentColor" stroke="none"/>',
+    ),
+  },
+  sonamesh: {
+    label: 'SonameshIcon',
+    body: svg(
+      '<circle cx="7" cy="6" r="1.35" fill="currentColor" stroke="none"/><circle cx="12" cy="6" r="0.75" fill="currentColor" stroke="none"/><circle cx="17" cy="6" r="1.35" fill="currentColor" stroke="none"/>',
+      '<circle cx="7" cy="12" r="0.8" fill="currentColor" stroke="none"/><circle data-part="center" cx="12" cy="12" r="2.05" fill="currentColor" stroke="none"/><circle cx="17" cy="12" r="0.8" fill="currentColor" stroke="none"/>',
+      '<circle cx="7" cy="18" r="1.35" fill="currentColor" stroke="none"/><circle cx="12" cy="18" r="0.75" fill="currentColor" stroke="none"/><circle cx="17" cy="18" r="1.35" fill="currentColor" stroke="none"/>',
+    ),
+  },
+  sonapage: {
+    label: 'SonapageIcon',
+    body: svg(
+      '<rect x="5" y="4" width="5.8" height="14.4" rx="0.7"/>',
+      '<rect x="13.3" y="4.2" width="5.6" height="5.6" rx="0.7"/>',
+      '<path data-part="corner" d="M18.9 13.5h-4.8v4.8"/>',
+      '<circle data-part="dot" cx="18.2" cy="17.6" r="1.75" fill="currentColor" stroke="none"/>',
+    ),
+  },
+  sonaseed: {
+    label: 'SonaseedIcon',
+    body: svg(
+      '<path data-part="seed" d="M17.9 8.3A6.8 6.8 0 1 0 16.2 16.9"/>',
+      '<circle data-part="dot" cx="16.7" cy="17.1" r="1.85" fill="currentColor" stroke="none"/>',
+    ),
+  },
+  sonatask: {
+    label: 'SonataskIcon',
+    body: svg(
+      '<path data-part="lines" d="M6.2 6.4h10.1M6.2 11.7h10.1M6.2 16.9h8.2"/>',
+      '<circle data-part="dot" cx="18.1" cy="16.9" r="1.75" fill="currentColor" stroke="none"/>',
+    ),
+  },
+};
+
 export const regular = {
   ...officeRegular,
   overview: {
@@ -745,6 +794,7 @@ export const regular = {
     label: 'SonaloopIcon',
     body: '<path data-part="loop" d="M17 12L17.31 12.62L17.49 13.3L17.51 14.01L17.35 14.69L17 15.29L16.49 15.77L15.87 16.1L15.19 16.28L14.5 16.33L13.84 16.28L13.25 16.17L12.72 16.07L12.23 16.01L11.77 16.01L11.28 16.07L10.75 16.17L10.16 16.28L9.5 16.33L8.81 16.28L8.13 16.1L7.51 15.77L7 15.29L6.65 14.69L6.49 14.01L6.51 13.3L6.69 12.62L7 12L7.37 11.46L7.76 11L8.12 10.59L8.41 10.2L8.65 9.79L8.83 9.34L9.01 8.83L9.22 8.26L9.5 7.67L9.88 7.09L10.38 6.59L10.98 6.22L11.65 6.03L12.35 6.03L13.02 6.22L13.62 6.59L14.12 7.09L14.5 7.67L14.78 8.26L14.99 8.83L15.17 9.34L15.35 9.79L15.59 10.2L15.88 10.59L16.24 11L16.63 11.46L17 12Z"/><circle cx="12" cy="3.7" r="1.85"/><circle cx="19.19" cy="16.15" r="1.85"/><circle cx="4.81" cy="16.15" r="1.85"/>',
   },
+  ...sonaProductRegular,
   // ── Sonaloop product family — full sonaloop mark + corner badge chip ───────────
   // full sonaloop mark + small cloud badge chip (bottom-right)
   'sonaloop-cloud': {
@@ -772,6 +822,49 @@ export const regular = {
     body: '<defs><mask id="slDesignBadgeR"><rect width="24" height="24" fill="white"/><path d="M16.8 13.8H20A3 3 0 0 1 23 16.8V20A3 3 0 0 1 20 23H16.8A3 3 0 0 1 13.8 20V16.8A3 3 0 0 1 16.8 13.8Z" fill="black"/></mask></defs><g mask="url(#slDesignBadgeR)"><path data-part="loop" d="M17 12L17.31 12.62L17.49 13.3L17.51 14.01L17.35 14.69L17 15.29L16.49 15.77L15.87 16.1L15.19 16.28L14.5 16.33L13.84 16.28L13.25 16.17L12.72 16.07L12.23 16.01L11.77 16.01L11.28 16.07L10.75 16.17L10.16 16.28L9.5 16.33L8.81 16.28L8.13 16.1L7.51 15.77L7 15.29L6.65 14.69L6.49 14.01L6.51 13.3L6.69 12.62L7 12L7.37 11.46L7.76 11L8.12 10.59L8.41 10.2L8.65 9.79L8.83 9.34L9.01 8.83L9.22 8.26L9.5 7.67L9.88 7.09L10.38 6.59L10.98 6.22L11.65 6.03L12.35 6.03L13.02 6.22L13.62 6.59L14.12 7.09L14.5 7.67L14.78 8.26L14.99 8.83L15.17 9.34L15.35 9.79L15.59 10.2L15.88 10.59L16.24 11L16.63 11.46L17 12Z"/><circle cx="12" cy="3.7" r="1.85"/><circle cx="19.19" cy="16.15" r="1.85"/><circle cx="4.81" cy="16.15" r="1.85"/></g><path data-part="badge" d="M17.1 14.7H19.7A2.4 2.4 0 0 1 22.1 17.1V19.7A2.4 2.4 0 0 1 19.7 22.1H17.1A2.4 2.4 0 0 1 14.7 19.7V17.1A2.4 2.4 0 0 1 17.1 14.7Z M18.4 16.0L19.04 17.76L20.8 18.4L19.04 19.04L18.4 20.8L17.76 19.04L16.0 18.4L17.76 17.76Z" fill-rule="evenodd" fill="currentColor" stroke="none"/>',
   },
 
+};
+
+const sonaProductHifi = {
+  sonafile: {
+    label: 'SonafileHifi',
+    body:
+      '<path data-part="file" d="M15 7h12l8 8v24a4 4 0 0 1-4 4H15a4 4 0 0 1-4-4V11a4 4 0 0 1 4-4z" fill="currentColor" fill-opacity="0.06" stroke-width="2.25"/>' +
+      '<path d="M27 7.5v7a2.5 2.5 0 0 0 2.5 2.5H35" stroke-width="2.25"/>' +
+      '<circle data-part="dot" cx="24.2" cy="33" r="4.1" fill="currentColor" stroke="none"/>',
+  },
+  sonatile: {
+    label: 'SonatileHifi',
+    body:
+      '<path data-part="tile" d="M34 25.4V14.6A4.6 4.6 0 0 0 29.4 10H14.6A4.6 4.6 0 0 0 10 14.6v15.6a4.6 4.6 0 0 0 4.6 4.6h10.6" fill="currentColor" fill-opacity="0.06" stroke-width="2.5"/>' +
+      '<circle data-part="dot" cx="33.2" cy="34.4" r="4.1" fill="currentColor" stroke="none"/>',
+  },
+  sonamesh: {
+    label: 'SonameshHifi',
+    body:
+      '<circle cx="14" cy="12" r="3" fill="currentColor" stroke="none"/><circle cx="24" cy="12" r="1.65" fill="currentColor" stroke="none"/><circle cx="34" cy="12" r="3" fill="currentColor" stroke="none"/>' +
+      '<circle cx="14" cy="24" r="1.8" fill="currentColor" stroke="none"/><circle data-part="center" cx="24" cy="24" r="4.6" fill="currentColor" stroke="none"/><circle cx="34" cy="24" r="1.8" fill="currentColor" stroke="none"/>' +
+      '<circle cx="14" cy="36" r="3" fill="currentColor" stroke="none"/><circle cx="24" cy="36" r="1.65" fill="currentColor" stroke="none"/><circle cx="34" cy="36" r="3" fill="currentColor" stroke="none"/>',
+  },
+  sonapage: {
+    label: 'SonapageHifi',
+    body:
+      '<rect x="10" y="7" width="11.6" height="29.5" rx="1.5" fill="currentColor" fill-opacity="0.06" stroke-width="2.25"/>' +
+      '<rect x="27" y="8" width="11" height="11" rx="1.5" fill="currentColor" fill-opacity="0.06" stroke-width="2.25"/>' +
+      '<path data-part="corner" d="M38 27H28v10" stroke-width="2.5"/>' +
+      '<circle data-part="dot" cx="36.7" cy="36.1" r="4" fill="currentColor" stroke="none"/>',
+  },
+  sonaseed: {
+    label: 'SonaseedHifi',
+    body:
+      '<path data-part="seed" d="M35.8 17A13.6 13.6 0 1 0 32.4 34" stroke-width="2.75"/>' +
+      '<circle data-part="dot" cx="33.2" cy="34.4" r="4.1" fill="currentColor" stroke="none"/>',
+  },
+  sonatask: {
+    label: 'SonataskHifi',
+    body:
+      '<g data-part="lines" stroke-width="2.75"><path d="M12 12.5h20"/><path d="M12 23.5h20"/><path d="M12 34.5h16"/></g>' +
+      '<circle data-part="dot" cx="36.2" cy="34.5" r="4" fill="currentColor" stroke="none"/>',
+  },
 };
 
 // ── High-fidelity 48×48 display icons ────────────────────────────────────────
@@ -1376,6 +1469,7 @@ export const hifi = {
       '<circle cx="39.59" cy="33" r="3.6" fill="currentColor" fill-opacity="0.1" stroke-width="2"/>' +
       '<circle cx="8.41" cy="33" r="3.6" fill="currentColor" fill-opacity="0.1" stroke-width="2"/>',
   },
+  ...sonaProductHifi,
   // ── Sonaloop product family — full sonaloop mark + corner badge chip ───────────
   // full sonaloop mark + small cloud badge chip (bottom-right)
   'sonaloop-cloud': {

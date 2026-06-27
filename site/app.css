@@ -432,9 +432,12 @@ a.ds-usechip:hover code { color: var(--sl-accent); border-color: color-mix(in sr
 .ds-brand-hero > svg { width: 56px; height: 56px; color: var(--sl-ink); }
 .ds-brand-hero .wm { font-family: var(--sl-mono); font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: var(--sl-ink); }
 .ds-brand-clear { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px; }
+.ds-brand-family-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .ds-brand-panel { border: 1px solid var(--sl-line); border-radius: 12px; padding: 30px; display: flex; align-items: center; justify-content: center; min-height: 150px; }
 .ds-brand-panel.on-dark { background: #101113; color: #e6e7ea; }
 .ds-brand-panel > svg { width: 40px; height: 40px; }
+.ds-brand-panel .sl-logo { max-width: 100%; }
+.ds-brand-family-grid .sl-logo { font-size: 26px; }
 .ds-brand-downloads { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 20px; }
 .ds-brand-dl-card { border: 1px solid var(--sl-line); border-radius: 12px; background: var(--sl-surface); overflow: hidden; min-width: 0; }
 .ds-brand-dl-preview { min-height: 150px; display: flex; align-items: center; justify-content: center; padding: 28px; background: var(--sl-surface-2); color: var(--sl-ink); }

@@ -14,6 +14,12 @@ import {
   SonaloopDataHifi,
   SonaloopWebsiteHifi,
   SonaloopDesignHifi,
+  SonafileHifi,
+  SonatileHifi,
+  SonameshHifi,
+  SonapageHifi,
+  SonaseedHifi,
+  SonataskHifi,
   CouncilsHifi,
   PersonasHifi,
   MemoryHifi,
@@ -72,6 +78,12 @@ export type IconKey =
   | 'data'
   | 'website'
   | 'design'
+  | 'sonafile'
+  | 'sonatile'
+  | 'sonamesh'
+  | 'sonapage'
+  | 'sonaseed'
+  | 'sonatask'
   | 'councils'
   | 'personas'
   | 'memory'
@@ -130,6 +142,12 @@ const MAP: Record<IconKey, HifiComponent> = {
   data: SonaloopDataHifi,
   website: SonaloopWebsiteHifi,
   design: SonaloopDesignHifi,
+  sonafile: SonafileHifi,
+  sonatile: SonatileHifi,
+  sonamesh: SonameshHifi,
+  sonapage: SonapageHifi,
+  sonaseed: SonaseedHifi,
+  sonatask: SonataskHifi,
   councils: CouncilsHifi,
   personas: PersonasHifi,
   memory: MemoryHifi,
