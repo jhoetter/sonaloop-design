@@ -26,13 +26,13 @@ import type { ThemePreference } from './theme';
 
 const cx = (...c: Array<string | false | null | undefined>) => c.filter(Boolean).join(' ');
 
-const CopyGlyph = () => (
+const CopyIcon = () => (
   <svg className="sl-copy__ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <rect x="9" y="9" width="11" height="11" rx="2" />
     <path d="M5 15V5a2 2 0 0 1 2-2h10" />
   </svg>
 );
-const CheckGlyph = () => (
+const CheckIcon = () => (
   <svg className="sl-copy__check" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <path d="M5 13l4 4L19 7" />
   </svg>
@@ -207,8 +207,8 @@ export function Segmented({ options, value, onChange, fill, stacked, className, 
 }
 
 /* ── Theme toggle (controlled) ───────────────────────────────────────────────── */
-// The ONE canonical color-scheme switch, shared by every product so the glyphs never
-// diverge: ☀ light · ▢ system (follow the OS) · ☾ dark. It's presentational only —
+// The one canonical color-scheme switch, shared by every product so the icons never
+// diverge. It's presentational only —
 // the host owns the theme state (the shared useTheme() hook below, or vanilla JS /
 // Python-SSR) and passes the current `value` + an `onChange`. Built on Segmented, so it
 // inherits its styling. State lives in ./theme: useTheme()'s `preference`/`setPreference`
@@ -270,8 +270,8 @@ export function CopyButton({ text, label = 'Copy', className, ...rest }: CopyBut
       aria-label={copied ? 'Copied' : label || 'Copy'}
       {...rest}
     >
-      <CopyGlyph />
-      <CheckGlyph />
+      <CopyIcon />
+      <CheckIcon />
       {label ? <span className="sl-copy__label">{copied ? 'Copied' : label}</span> : null}
     </button>
   );
@@ -608,9 +608,9 @@ export function Logo({ label = 'Sonaloop', wordmark = true, sub, size = 'md', cl
   );
 }
 
-/* ── Command palette (⌘K) ──────────────────────────────────────────────────────────
+/* ── Command palette ───────────────────────────────────────────────────────────────
    One implementation, shared with the marketing site — it lives in ./command (image-free)
-   and is re-exported here so app-shell consumers get ⌘K without pulling website assets. */
+   and is re-exported here so app-shell consumers get the palette without pulling website assets. */
 export {
   CommandPalette,
   CommandPalettePanel,
@@ -620,7 +620,7 @@ export {
   type CommandPaletteProps,
 } from './command';
 
-const CloseGlyph = () => (
+const CloseIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" aria-hidden="true">
     <path d="M6 6l12 12M18 6L6 18" />
   </svg>
@@ -630,7 +630,7 @@ const CloseGlyph = () => (
    The product chrome shared with the Python-SSR app (same .sl-* classes): a collapsible
    + drag-resizable sidebar (brand · nav sections · bottom user menu), a resize handle, and
    a topbar (sidebar toggle · slot for breadcrumb + actions). Collapse + width persist to
-   localStorage. Pair with <CommandPalette> for ⌘K. */
+   localStorage. Pair with <CommandPalette> for Cmd-K. */
 export interface AppShellNavItem {
   label: ReactNode;
   /** Optional leading icon — pass `animate` on it for the hover micro-interaction. */
@@ -659,7 +659,7 @@ export interface AppShellUserMenu {
 }
 export interface AppShellProps {
   brand: ReactNode;
-  /** Pinned below the brand (under the border), above the nav — typically a <CommandTrigger> for ⌘K. */
+  /** Pinned below the brand (under the border), above the nav — typically a <CommandTrigger> for Cmd-K. */
   search?: ReactNode;
   nav: AppShellNavSection[];
   userMenu?: AppShellUserMenu;
@@ -832,7 +832,7 @@ export function AppShell({
         <div className="sl-brand">
           {brand}
           <button type="button" className="sl-sidebar-close sl-iconbtn sl-iconbtn--ghost" aria-label="Close sidebar" title="Close sidebar" onClick={closeSidebar}>
-            <CloseGlyph />
+            <CloseIcon />
           </button>
         </div>
         {search && <div className="sl-sb-search">{search}</div>}
@@ -983,7 +983,7 @@ function useEnterExit(open: boolean, durationMs: number) {
 }
 
 // ── Drawer expand (a wider "Notion-style" reading layout, opt-in per Drawer) ───────
-const ExpandGlyph = () => (
+const ExpandIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <path d="M9 4H5a1 1 0 0 0-1 1v4M15 4h4a1 1 0 0 1 1 1v4M9 20H5a1 1 0 0 1-1-1v-4M15 20h4a1 1 0 0 0 1-1v-4" />
   </svg>
@@ -1016,7 +1016,7 @@ export function DrawerExpandToggle({ className }: { className?: string }) {
       aria-pressed={expanded}
       title={expanded ? 'Collapse' : 'Expand'}
     >
-      <ExpandGlyph />
+      <ExpandIcon />
     </button>
   );
 }
@@ -1098,7 +1098,7 @@ export function Drawer({
               <header className="sl-drawer__head">
                 <span className="sl-drawer__title">{title}</span>
                 <DrawerExpandToggle />
-                <button type="button" className="sl-overlay-close" onClick={onClose} aria-label="Close"><CloseGlyph /></button>
+                <button type="button" className="sl-overlay-close" onClick={onClose} aria-label="Close"><CloseIcon /></button>
               </header>
               <div className="sl-drawer__body">{children}</div>
               {footer ? <footer className="sl-drawer__foot">{footer}</footer> : null}
@@ -1135,7 +1135,7 @@ export function Modal({ open, onClose, title, size = 'md', footer, hideClose, cl
         {(title || !hideClose) ? (
           <header className="sl-modal__head">
             <h2 className="sl-modal__title">{title}</h2>
-            {!hideClose ? <button type="button" className="sl-overlay-close" onClick={onClose} aria-label="Close"><CloseGlyph /></button> : null}
+            {!hideClose ? <button type="button" className="sl-overlay-close" onClick={onClose} aria-label="Close"><CloseIcon /></button> : null}
           </header>
         ) : null}
         <div className="sl-modal__body">{children}</div>
@@ -1356,12 +1356,12 @@ export function IconButton({ ghost, danger, className, ...rest }: IconButtonProp
    search always travel together — the contract ships the COMPLETE bar row, so consumers
    drop it into the scaffold bar (inside the content measure) and never compose the pieces
    themselves. Built from Popover · ToolbarButton · MenuItem. */
-const FilterGlyph = () => (
+const FilterIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <path d="M4 5h16l-6 7.5V19l-4 2v-8.5z" />
   </svg>
 );
-const SearchGlyph = () => (
+const SearchIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <circle cx="11" cy="11" r="7" />
     <path d="M21 21l-4.3-4.3" />
@@ -1369,7 +1369,7 @@ const SearchGlyph = () => (
 );
 export interface FilterOption {
   value: string;
-  /** Row content — may include a glyph/dot beside the text. */
+  /** Row content — may include an icon or status dot beside the text. */
   label: ReactNode;
   count?: number;
 }
@@ -1445,7 +1445,7 @@ export function FilterBar({ facets, onToggle, onClearFacet, onClearAll, addLabel
     <div className={cx('sl-filter-bar', className)} {...rest}>
       {search ? (
         <span className="sl-filter-search">
-          <SearchGlyph />
+          <SearchIcon />
           <input
             type="search"
             className="sl-filter-search__input"
@@ -1456,7 +1456,7 @@ export function FilterBar({ facets, onToggle, onClearFacet, onClearAll, addLabel
           />
         </span>
       ) : null}
-      <Popover trigger={({ toggle }) => <ToolbarButton icon={<FilterGlyph />} onClick={toggle}>{addLabel}</ToolbarButton>}>
+      <Popover trigger={({ toggle }) => <ToolbarButton icon={<FilterIcon />} onClick={toggle}>{addLabel}</ToolbarButton>}>
         {() => <AddFilterMenu facets={facets} onToggle={onToggle} />}
       </Popover>
       {active.map((facet) => (
@@ -1470,7 +1470,7 @@ export function FilterBar({ facets, onToggle, onClearFacet, onClearAll, addLabel
                 <span className="sl-filter-chip__val">{facet.summary ?? `${facet.selected.length} selected`}</span>
               </button>
               <button type="button" className="sl-filter-chip__x" aria-label={`Clear ${facet.label} filter`} onClick={() => onClearFacet(facet.key)}>
-                <CloseGlyph />
+                <CloseIcon />
               </button>
             </span>
           )}
@@ -1607,7 +1607,7 @@ export function ListPage({ title, count, lead, actions, className, children, ...
   );
 }
 export interface ListRowProps extends HTMLAttributes<HTMLElement> {
-  /** A leading slot — an avatar, a status glyph. */
+  /** A leading slot — an avatar or status icon. */
   leading?: ReactNode;
   /** Right-aligned metadata (badges, counts, a chevron). */
   trailing?: ReactNode;

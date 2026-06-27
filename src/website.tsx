@@ -32,12 +32,12 @@ const cx = (...c: Array<string | false | null | undefined>) => c.filter(Boolean)
 const TITLE_WEIGHT = { normal: 'font-normal', medium: 'font-medium', semibold: 'font-semibold' } as const;
 export type TitleWeight = keyof typeof TITLE_WEIGHT;
 
-/* The Link adapter (SonaloopLinkProvider / useLink / L) lives in ./command alongside the ⌘K
+/* The Link adapter (SonaloopLinkProvider / useLink / L) lives in ./command alongside the command
    palette — one image-free source. `L` and `useLink` are imported above for internal use; the
    public Link + palette API is re-exported at the foot of this file. */
 
 /* ── Small shared helpers (from ContentPrimitives / Kicker) ──────────────────────────────── */
-export function ArrowGlyph({ className = 'h-3 w-3' }: { className?: string }) {
+export function ArrowIcon({ className = 'h-3 w-3' }: { className?: string }) {
   return (
     <svg viewBox="0 0 16 16" className={className} fill="none" stroke="currentColor" strokeWidth={1.5}>
       <line x1="3" y1="8" x2="13" y2="8" />
@@ -50,7 +50,7 @@ export function ArrowLink({ to, children }: { to: string; children: ReactNode })
   return (
     <L to={to} className="sl-arrow-link">
       {children}
-      <ArrowGlyph />
+      <ArrowIcon />
     </L>
   );
 }
@@ -150,7 +150,7 @@ export function ContentCard({ icon, eyebrow, title, children, highlight = false,
           <p className="font-sans text-sm font-medium text-ink">{title}</p>
           {children && <p className="mt-1 font-sans text-sm text-ink/55 leading-snug">{children}</p>}
         </div>
-        <span className="mt-auto sl-arrow-link">{linkLabel}<ArrowGlyph /></span>
+        <span className="mt-auto sl-arrow-link">{linkLabel}<ArrowIcon /></span>
       </L>
     );
   }
@@ -168,7 +168,7 @@ export function ContentCard({ icon, eyebrow, title, children, highlight = false,
       {action && (
         <L to={action.to} className="mt-6 sl-arrow-link">
           {action.label}
-          <ArrowGlyph />
+          <ArrowIcon />
         </L>
       )}
     </>
@@ -516,9 +516,9 @@ export function OfferCard({ name, to, priceLine, icon, accent = 'blueprint', ind
       <ul className={cx('flex-1', lg ? 'space-y-3' : 'space-y-2.5')}>{bullets.map((b) => <CheckRow key={b}>{b}</CheckRow>)}</ul>
       <div className={cx('flex flex-col gap-3', lg ? 'mt-6' : 'mt-7')}>
         {cta.href
-          ? <a href={cta.href} className={cx(CARD_CTA, ctaClass)}>{cta.label}<ArrowGlyph /></a>
-          : <L to={cta.to ?? '#'} className={cx(CARD_CTA, ctaClass)}>{cta.label}<ArrowGlyph /></L>}
-        {learnMoreTo && <L to={learnMoreTo} className="sl-arrow-link justify-center">Learn more<ArrowGlyph /></L>}
+          ? <a href={cta.href} className={cx(CARD_CTA, ctaClass)}>{cta.label}<ArrowIcon /></a>
+          : <L to={cta.to ?? '#'} className={cx(CARD_CTA, ctaClass)}>{cta.label}<ArrowIcon /></L>}
+        {learnMoreTo && <L to={learnMoreTo} className="sl-arrow-link justify-center">Learn more<ArrowIcon /></L>}
       </div>
     </DrawingFrame>
   );
@@ -684,7 +684,7 @@ export function Navbar({
             </L>
             <L to={primaryCta.to} className="ml-1 sl-btn sl-btn--primary text-[13px]">
               {primaryCta.label}
-              <ArrowGlyph className="h-3 w-3" />
+              <ArrowIcon className="h-3 w-3" />
             </L>
           </div>
 
@@ -800,12 +800,12 @@ function PromoCta({ cta }: { cta: { label: string; to?: string; href?: string } 
   return cta.to ? (
     <L to={cta.to} className={cls}>
       {cta.label}
-      <ArrowGlyph />
+      <ArrowIcon />
     </L>
   ) : (
     <a href={cta.href} className={cls}>
       {cta.label}
-      <ArrowGlyph />
+      <ArrowIcon />
     </a>
   );
 }
@@ -995,7 +995,7 @@ export interface FooterProps {
   copyright?: ReactNode;
   note?: ReactNode;
   brand?: NavLinkSpec;
-  /** When set, renders a ⌘K search trigger (CommandTrigger) in the brand column that calls this
+  /** When set, renders a Cmd-K search trigger (CommandTrigger) in the brand column that calls this
       to open the command palette. Omit to hide it. */
   onSearch?: () => void;
   searchLabel?: string;
@@ -1237,7 +1237,7 @@ function IntegrationRow({ dot, label, value }: { dot: string; label: string; val
   );
 }
 
-/* ── Link adapter + ⌘K command palette ──────────────────────────────────────────────────────
+/* ── Link adapter + command palette ─────────────────────────────────────────────────────────
    Both live in ./command now (one source, image-free), re-exported here so the public
    `sonaloop-design/website` surface is unchanged for the marketing site + the docs gallery. */
 export {

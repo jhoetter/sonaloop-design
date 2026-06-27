@@ -535,6 +535,33 @@ export const regular = {
     label: 'PencilIcon',
     body: '<path d="M4 20l1-4L16 5l3 3L8 19z"/><path d="M14 7l3 3"/>',
   },
+  // ── Canvas authoring tools ─────────────────────────────────────────────────
+  // These keep editor rails semantically clear instead of reusing research or
+  // generic file glyphs for high-frequency creation tools.
+  canvasSelect: {
+    label: 'CanvasSelectIcon',
+    body: '<path d="M5 3.8 18.8 12 13 13.4l3.4 6-2.8 1.6-3.5-6.2L5 18z"/><path d="M16.5 4.5h3v3M19.5 4.5l-4 4"/>',
+  },
+  canvasFrame: {
+    label: 'CanvasFrameIcon',
+    body: '<rect x="4" y="5" width="16" height="14" rx="1.4"/><path d="M7 5v14M17 5v14M4 8h16M4 16h16"/>',
+  },
+  textCursor: {
+    label: 'TextCursorIcon',
+    body: '<path d="M8 5h8M8 19h8M12 5v14"/><path d="M6.5 8V6.5A1.5 1.5 0 0 1 8 5h8a1.5 1.5 0 0 1 1.5 1.5V8M6.5 16v1.5A1.5 1.5 0 0 0 8 19h8a1.5 1.5 0 0 0 1.5-1.5V16"/>',
+  },
+  vectorPen: {
+    label: 'VectorPenIcon',
+    body: '<path d="M5 19l4.2-1 8.3-8.3-3.2-3.2L6 14.8z"/><path d="M12.8 8l3.2 3.2"/><circle cx="5" cy="19" r="1.3"/><circle cx="18.5" cy="5.5" r="1.3"/><path d="M15.8 8.2 18.5 5.5"/>',
+  },
+  autoLayout: {
+    label: 'AutoLayoutIcon',
+    body: '<rect x="4" y="6" width="16" height="12" rx="2"/><path d="M8 10h8M8 14h8"/><path d="M17 8l3-2.5M17 16l3 2.5M7 8 4 5.5M7 16 4 18.5"/>',
+  },
+  minimap: {
+    label: 'MinimapIcon',
+    body: '<rect x="3.5" y="5" width="17" height="14" rx="2"/><rect data-part="viewport" x="8" y="8.25" width="8" height="5.5" rx="1" fill="currentColor" fill-opacity="0.1"/><path d="M6.5 16h3.2M14.3 16h3.2"/><circle cx="7" cy="8.6" r="0.8" fill="currentColor" stroke="none"/><circle cx="17" cy="15.4" r="0.8" fill="currentColor" stroke="none"/>',
+  },
 
   // ── Persona & simulation (product core) ──────────────────────────────────────
   // The lived-memory vocabulary: a persona's SOUL, their calendar/activity,

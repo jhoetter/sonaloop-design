@@ -18,7 +18,7 @@
  * --sl-row-dense (32) / --sl-row (40) / --sl-row-h (48, chrome) and --sl-ctl-sm (28).
  * Allowed literals: 1–3px optical hairlines/micro-nudges, chart + calendar-grid geometry
  * (data fidelity, not rhythm), and layout column widths. Em/rem sizing is for TYPOGRAPHY
- * (font-size/line-height) and small inline controls (buttons, inputs, chips, ⌘K); page
+ * (font-size/line-height) and small inline controls (buttons, inputs, chips, command triggers); page
  * STRUCTURE — cards, entity rows, tabs, list paddings — sits on the px token grid, so the
  * rendered rhythm is measurable (sonaloop scripts/ux_spacing.py holds it to ±0.5px).
  */
@@ -124,7 +124,7 @@
    Sona Mono and the trailing "loop" in Sona Pixel (the bitmap accent whose cells echo the loop
    mark). The single source of truth for the logo across stacks — React (website nav/footer) and
    the Python-SSR app (sidebar) apply these classes to their OWN link, so it never drifts. The
-   mark is monochrome (--sl-ink) and sits on the baseline like a glyph; the whole lockup is
+   mark is monochrome (--sl-ink) and sits on the baseline like an icon; the whole lockup is
    static (no hover/animation). Em-based — mark + wordmark track the host font-size.
    Markup: a 24×24 SonaloopIcon SVG in `.sl-logo__mark`, and the wordmark with its final "loop"
    wrapped in `.sl-logo__loop`. The host must load the Sona Mono + Sona Pixel faces
@@ -209,10 +209,10 @@
   padding: .3em .6em; font: inherit; font-size: .8em; cursor: pointer; transition: color .12s, border-color .12s; }
 .sl-copy:hover { color: var(--sl-ink); border-color: color-mix(in srgb, var(--sl-ink) 22%, var(--sl-line)); }
 .sl-copy svg { width: 1.05em; height: 1.05em; }
-/* Copy confirmation — the clipboard glyph swaps to a green check while `is-copied` is set.
+/* Copy confirmation — the clipboard icon swaps to a green check while `is-copied` is set.
    The visual lives here so the website, inspector and docs all confirm identically; each
    consumer's own JS just adds `.is-copied` for ~1.6s after writing to the clipboard (and a
-   single-icon legacy button still turns green as a fallback). */
+   compact icon-only button still turns green as a fallback). */
 .sl-copy__check { display: none; }
 .sl-copy.is-copied { color: var(--sl-green); border-color: color-mix(in srgb, var(--sl-green) 42%, var(--sl-line)); }
 .sl-copy.is-copied .sl-copy__ico { display: none; }
@@ -239,11 +239,11 @@
 .sl-note--warning { border-left-color: var(--sl-amber); } .sl-note--warning .sl-note__icon { color: var(--sl-amber); }
 .sl-note--negative { border-left-color: var(--sl-red); } .sl-note--negative .sl-note__icon { color: var(--sl-red); }
 
-/* ── Empty state (centred card with a hi-fi glyph) ─────────────────────────────────
+/* ── Empty state (centred card with a hi-fi icon) ──────────────────────────────────
    The base card is the FIRST-USE state ("nothing here yet" — inviting, with a primary
    CTA in __actions). Two sibling variants cover the other empty moments: --no-results
    (a search/filter matched nothing — a quieter dashed frame on the page background;
-   pair with a "Clear search" action) and --error (something failed — the glyph and
+   pair with a "Clear search" action) and --error (something failed — the icon and
    frame tint negative; pair with a Retry action). --sm is the compact density for
    panels, drawers and table bodies. All additive — existing .sl-empty markup keeps
    rendering exactly as before. */
@@ -258,10 +258,10 @@
 /* no-results — the search context: calmer, recedes onto the page background */
 .sl-empty--no-results { border-style: dashed; background: transparent; }
 .sl-empty--no-results .sl-empty__icon { color: var(--sl-faint); }
-/* error — the retry moment: glyph + frame tinted negative */
+/* error — the retry moment: icon + frame tinted negative */
 .sl-empty--error { border-color: color-mix(in srgb, var(--sl-red) 32%, var(--sl-line)); }
 .sl-empty--error .sl-empty__icon { color: var(--sl-red); }
-/* sm — compact (panels, drawers, table bodies); the glyph scales down with it */
+/* sm — compact (panels, drawers, table bodies); the icon scales down with it */
 .sl-empty--sm { padding: 1.4em 1.3em; gap: .45em; max-width: 22em; }
 .sl-empty--sm .sl-empty__title { font-size: 1em; }
 .sl-empty--sm .sl-empty__body { font-size: .9em; }
@@ -635,7 +635,7 @@
     color-mix(in srgb, var(--c, var(--sl-accent)) 16%, transparent) 0);
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c, var(--sl-accent)) 40%, transparent); }
 
-/* ── Command palette (⌘K) ─────────────────────────────────────────────────────────
+/* ── Command palette ──────────────────────────────────────────────────────────────
    A Linear/Raycast-style global command palette: results grouped under muted section
    headers, a type-coloured leading icon, an optional right-aligned subtitle, and a
    footer hint bar. Shared markup — the React <CommandPalette> (website) and the docs
@@ -668,7 +668,7 @@
   background: var(--sl-surface-2); color: var(--sl-muted); font-size: .8rem; }
 .sl-cmdk-foot .sl-kbd { margin-right: .4rem; }
 
-/* Search trigger — a reusable button that opens the palette (search glyph · label · ⌘K hint). */
+/* Search trigger — a reusable button that opens the palette (search icon, label, shortcut hint). */
 .sl-cmdk-trigger { display: inline-flex; align-items: center; gap: .55rem; padding: .4rem .7rem;
   border: 1px solid var(--sl-line); border-radius: var(--sl-radius); background: var(--sl-surface);
   color: var(--sl-muted); font: inherit; font-size: .85rem; cursor: pointer; transition: border-color .12s, background .12s; }

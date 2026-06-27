@@ -1,16 +1,16 @@
 /**
- * sonaloop-design — Command palette (⌘K) + the link adapter it rides on.
+ * sonaloop-design — Command palette + the link adapter it rides on.
  *
- * The ONE ⌘K implementation, shared by every surface: the marketing site (via
+ * The one command-palette implementation, shared by every surface: the marketing site (via
  * sonaloop-design/website, which re-exports it), the app shell consumers (via
  * sonaloop-design/components), and the docs gallery. It lives in its own module —
  * NOT in website.tsx — so importing it never drags the marketing image canvases
  * that website.tsx pulls in at module load. Styling is the shared `.sl-cmdk` layer
- * (styles/components.css); the Python-SSR app ships its own ⌘K over the same classes.
+ * (styles/components.css); the Python-SSR app ships its own palette over the same classes.
  *
  * Data is prop-driven: pass static `groups` (nav commands), and optionally an async
  * `onSearch` for server-backed results. The host owns open state so it can wire its own
- * trigger; `hotkey` (default true) binds ⌘K / Ctrl-K to toggle it. Navigation is injected
+ * trigger; `hotkey` (default true) binds Cmd-K / Ctrl-K to toggle it. Navigation is injected
  * via the Link adapter: items default to a plain <a>, a router app wraps once with
  * <SonaloopLinkProvider> for client-side `to` navigation.
  */
@@ -36,7 +36,7 @@ export function L(props: LinkProps) {
   return <Link {...props} />;
 }
 
-function SearchGlyph({ className }: { className?: string }) {
+function SearchIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" className={className}>
       <circle cx="11" cy="11" r="7" />
@@ -74,19 +74,19 @@ export interface CommandPaletteProps {
   onSearch?: (query: string) => CommandGroup[] | Promise<CommandGroup[]>;
   placeholder?: string;
   emptyMessage?: string;
-  /** Bind ⌘K / Ctrl-K globally to toggle the palette. Default true. */
+  /** Bind Cmd-K / Ctrl-K globally to toggle the palette. Default true. */
   hotkey?: boolean;
   /** Show the footer hint bar. Default true. */
   footer?: boolean;
 }
 
-/** A reusable button that opens the palette: search glyph · label · ⌘K hint. Drop it in a navbar. */
+/** A reusable button that opens the palette: search icon, label, shortcut hint. Drop it in a navbar. */
 export function CommandTrigger({ onClick, label = 'Search', className }: { onClick: () => void; label?: string; className?: string }) {
   return (
     <button type="button" className={cx('sl-cmdk-trigger', className)} onClick={onClick} aria-label={label}>
-      <SearchGlyph className="sl-cmdk-trigger-ico" />
+      <SearchIcon className="sl-cmdk-trigger-ico" />
       <span>{label}</span>
-      <kbd className="sl-kbd">⌘K</kbd>
+      <kbd className="sl-kbd">Cmd K</kbd>
     </button>
   );
 }
@@ -94,9 +94,9 @@ export function CommandTrigger({ onClick, label = 'Search', className }: { onCli
 function CommandFooter() {
   return (
     <div className="sl-cmdk-foot">
-      <span><kbd className="sl-kbd">↑↓</kbd>Navigate</span>
-      <span><kbd className="sl-kbd">↵</kbd>Open</span>
-      <span><kbd className="sl-kbd">esc</kbd>Close</span>
+      <span><kbd className="sl-kbd">Up/Down</kbd>Navigate</span>
+      <span><kbd className="sl-kbd">Enter</kbd>Open</span>
+      <span><kbd className="sl-kbd">Esc</kbd>Close</span>
     </div>
   );
 }
@@ -189,7 +189,7 @@ export function CommandPalettePanel({
   return (
     <div className={cx('sl-cmdk-panel', inline && 'sl-cmdk-panel--inline')} role="dialog" aria-modal="true" aria-label="Command palette">
       <div className="sl-cmdk-head">
-        <SearchGlyph className="sl-cmdk-head-ico" />
+        <SearchIcon className="sl-cmdk-head-ico" />
         <input
           // eslint-disable-next-line @typescript-eslint/no-explicit-any -- refs cross a dual @types/react boundary (DS source consumed by apps with their own react types)
           ref={inputRef as any}
@@ -233,7 +233,7 @@ export function CommandPalette({
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
-  // ⌘K / Ctrl-K toggles the palette.
+  // Cmd-K / Ctrl-K toggles the palette.
   useEffect(() => {
     if (!hotkey) return;
     const onKey = (e: KeyboardEvent) => {
