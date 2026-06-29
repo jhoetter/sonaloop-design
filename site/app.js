@@ -100,7 +100,7 @@ const table = (cols, rows) => `
 
 const h2 = (id, t) => `<h2 class="ds-h2" id="${id}">${esc(t)}</h2>`;
 const p = (html) => `<p class="ds-p">${html}</p>`;
-const brandProductNames = ['sonafile', 'sonatile', 'sonamesh', 'sonapage', 'sonaseed', 'sonatask'];
+const brandProductNames = ['sonafile', 'sonatile', 'sonamesh', 'sonamill', 'sonapage', 'sonaseed', 'sonatask'];
 
 const brandWordmark = (name) => {
   const prefix = name.slice(0, -4);

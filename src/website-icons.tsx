@@ -17,6 +17,7 @@ import {
   SonafileHifi,
   SonatileHifi,
   SonameshHifi,
+  SonamillHifi,
   SonapageHifi,
   SonaseedHifi,
   SonataskHifi,
@@ -81,6 +82,7 @@ export type IconKey =
   | 'sonafile'
   | 'sonatile'
   | 'sonamesh'
+  | 'sonamill'
   | 'sonapage'
   | 'sonaseed'
   | 'sonatask'
@@ -145,6 +147,7 @@ const MAP: Record<IconKey, HifiComponent> = {
   sonafile: SonafileHifi,
   sonatile: SonatileHifi,
   sonamesh: SonameshHifi,
+  sonamill: SonamillHifi,
   sonapage: SonapageHifi,
   sonaseed: SonaseedHifi,
   sonatask: SonataskHifi,

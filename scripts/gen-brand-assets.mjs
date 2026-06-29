@@ -23,6 +23,7 @@ const BRANDS = [
   'sonafile',
   'sonatile',
   'sonamesh',
+  'sonamill',
   'sonapage',
   'sonaseed',
   'sonatask',

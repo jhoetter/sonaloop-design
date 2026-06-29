@@ -25,10 +25,6 @@ export const usage = {
       "to": "/changelog/:slug"
     },
     {
-      "name": "Cms Marketing",
-      "to": ""
-    },
-    {
       "name": "Design",
       "to": "/resources/design"
     },
@@ -296,10 +292,6 @@ export const usage = {
       "to": "/changelog/:slug"
     },
     {
-      "name": "Cms Marketing",
-      "to": ""
-    },
-    {
       "name": "Design",
       "to": "/resources/design"
     },
@@ -434,10 +426,6 @@ export const usage = {
     {
       "name": "Changelog Entry",
       "to": "/changelog/:slug"
-    },
-    {
-      "name": "Cms Marketing",
-      "to": ""
     },
     {
       "name": "Design",
