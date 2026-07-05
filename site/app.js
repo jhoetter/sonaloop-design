@@ -2539,7 +2539,7 @@ function pageDeckOverview() {
     ${p('Deck order as a customer reads it: cover → agenda → executive summary → chapters (divider · insights · evidence) → recommendations and risks → voices → next steps → closing. Click any slide for its layout spec and slide model.')}
     <div class="deck-grid">${gallery}</div>
     ${h2('render', 'Rendering the demo deck')}
-    ${code('bash', `# in ~/repos/sonaloop — renders every layout below with this placeholder content
+    ${code('bash', `# in ~/repos/sonaloop-research — renders every layout below with this placeholder content
 sonaloop template-deck                # → data/export/master-template.pptx
 make template-deck                    # same, via the Makefile`)}
   `;
