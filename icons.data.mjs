@@ -348,6 +348,10 @@ export const regular = {
     label: 'MonitorIcon',
     body: '<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M9 20h6M12 16v4"/>',
   },
+  phone: {
+    label: 'PhoneIcon',
+    body: '<rect x="7" y="2.8" width="10" height="18.4" rx="2.2"/><path d="M10.2 5.5h3.6"/><circle cx="12" cy="18" r="0.75" fill="currentColor" stroke="none"/>',
+  },
   chevron: {
     label: 'ChevronIcon',
     body: '<path d="M6 9l6 6 6-6"/>',
@@ -1002,6 +1006,13 @@ export const hifi = {
       '<rect data-part="screen" x="5" y="8" width="38" height="26" rx="4" fill="currentColor" fill-opacity="0.08" stroke-width="2"/>' +
       '<path d="M18 40h12" stroke-width="2"/>' +
       '<path d="M24 34v6" stroke-width="1.75"/>',
+  },
+  phone: {
+    label: 'PhoneHifi',
+    body:
+      '<rect data-part="device" x="15" y="4" width="18" height="40" rx="4.5" fill="currentColor" fill-opacity="0.08" stroke-width="2"/>' +
+      '<path d="M20 10h8" stroke-width="1.75" stroke-opacity="0.65"/>' +
+      '<circle cx="24" cy="37" r="1.7" fill="currentColor" fill-opacity="0.2" stroke-width="1.5"/>',
   },
   chevron: {
     label: 'ChevronHifi',
